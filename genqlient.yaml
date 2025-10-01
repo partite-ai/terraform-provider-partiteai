@@ -1,0 +1,69 @@
+# Default genqlient config; for full documentation see:
+# https://github.com/Khan/genqlient/blob/main/docs/genqlient.yaml
+schema: ../mesh/pkg/graph/schema.graphqls
+operations:
+- internal/graphql/genqlient.graphql
+generated: internal/graphql/generated.go
+optional: pointer_omitempty
+bindings:
+  AgentID:
+    type: string
+  AgentVersionID:
+    type: string
+  ApiKeyID:
+    type: string
+  LinkID:
+    type: string
+  LinkStableID:
+    type: string
+  McpConnectionID:
+    type: string
+  MemorySlotID:
+    type: string
+  MeshID:
+    type: string
+  MeshVersionID:
+    type: string
+  ModelProviderID:
+    type: string
+  ModelProfileID:
+    type: string
+  ModelSetID:
+    type: string
+  SerializableType:
+    type: "map[string]any"
+  SerializableTMap:
+    type: "map[string]any"
+  Tag:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.Tag"
+  Time:
+    type: string
+  NewAgent:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewAgent"
+  UpdateAgent:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateAgent"
+  NewModelProvider:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewModelProvider"
+  UpdateModelProvider:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateModelProvider"
+  NewModelProfile:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewModelProfile"
+  UpdateModelProfile:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateModelProfile"
+  NewModelSet:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewModelSet"
+  UpdateModelSet:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateModelSet"
+  NewMesh:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewMesh"
+  UpdateMesh:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateMesh"
+  NewLink:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewLink"
+  UpdateLink:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateLink"
+  NewInput:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewInput"
+  UpdateInput:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateInput"
+  
