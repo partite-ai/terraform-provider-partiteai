@@ -5,23 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -31,12 +25,14 @@ var _ resource.Resource = &AgentResource{}
 var _ resource.ResourceWithImportState = &AgentResource{}
 
 func NewAgentResource() resource.Resource {
-	return &AgentResource{}
+	return &AgentResource{
+		BaseResource: NewBaseResource("agent"),
+	}
 }
 
 // AgentResource defines the resource implementation.
 type AgentResource struct {
-	client graphql.Client
+	BaseResource
 }
 
 // AgentResourceModel describes the resource data model.
@@ -64,13 +60,6 @@ type AgentResourceModel struct {
 
 var memorySlotType = schema.NestedAttributeObject{
 	Attributes: map[string]schema.Attribute{
-		"id": schema.StringAttribute{
-			MarkdownDescription: "Memory slot identifier",
-			Computed:            true,
-			PlanModifiers: []planmodifier.String{
-				stringplanmodifier.UseStateForUnknown(),
-			},
-		},
 		"name": schema.StringAttribute{
 			MarkdownDescription: "Memory slot name",
 			Required:            true,
@@ -88,12 +77,8 @@ var memorySlotType = schema.NestedAttributeObject{
 			MarkdownDescription: "Scope of the memory slot (e.g., 'conversation', 'user')",
 			Required:            true,
 			Validators: []validator.String{
-				stringvalidator.OneOf("GLOBAL", "LOCAL", "REQUEST"),
+				commonValidators.memoryScope,
 			},
-		},
-		"created_at": schema.StringAttribute{
-			Computed:            true,
-			MarkdownDescription: "Timestamp when the memory slot was created",
 		},
 	},
 }
@@ -112,78 +97,48 @@ var mcpConnectionType = schema.NestedAttributeObject{
 }
 
 type mcpConnectionInfo struct {
-	Id   string       `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
+	Id   string `tfsdk:"id"`
+	Name string `tfsdk:"name"`
+}
+
+func (t *mcpConnectionInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection) diag.Diagnostics {
+	t.Id = src.Id
+	t.Name = src.Name
+	return nil
 }
 
 type memorySlotInfo struct {
-	Id          string               `json:"id" tfsdk:"id"`
 	Name        string               `json:"name" tfsdk:"name"`
 	Description string               `json:"description" tfsdk:"description"`
 	MemoryType  jsontypes.Normalized `json:"memoryType" tfsdk:"memory_type"`
 	MemoryScope string               `json:"memoryScope" tfsdk:"memory_scope"`
 	CanRead     types.String         `json:"canRead" tfsdk:"can_read"`
 	CanWrite    types.String         `json:"canWrite" tfsdk:"can_write"`
-	CreatedAt   timetypes.RFC3339    `json:"createdAt" tfsdk:"created_at"`
 }
 
-func (r *AgentResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_agent"
+func (t *memorySlotInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) diag.Diagnostics {
+	var diags diag.Diagnostics
+	t.Name = src.Name
+	t.Description = src.Description
+
+	smt, err := json.Marshal(src.MemoryType)
+	if err != nil {
+		diags.AddError("Internal Error", fmt.Sprintf("Failed to marshal MemoryType: %s", err))
+		return diags
+	}
+	t.MemoryType = jsontypes.NewNormalizedValue(string(smt))
+
+	t.MemoryScope = string(src.MemoryScope)
+	t.CanRead = types.StringPointerValue(src.CanRead)
+	t.CanWrite = types.StringPointerValue(src.CanWrite)
+
+	return diags
 }
 
 func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
-	tagType := schema.NestedAttributeObject{
-		Attributes: map[string]schema.Attribute{
-			"name": schema.StringAttribute{
-				MarkdownDescription: "Tag name",
-				Required:            true,
-			},
-			"value": schema.StringAttribute{
-				MarkdownDescription: "Tag value",
-				Required:            true,
-			},
-		},
-	}
 	resp.Schema = schema.Schema{
-		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "Agent resource",
-
-		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Agent identifier",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"name": schema.StringAttribute{
-				MarkdownDescription: "Agent name",
-				Required:            true,
-			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Agent description",
-				Optional:            true,
-			},
-			"tags": schema.ListNestedAttribute{
-				Optional:            true,
-				Computed:            true,
-				Default:             listdefault.StaticValue(types.ListValueMust(tagType.Type(), nil)),
-				NestedObject:        tagType,
-				MarkdownDescription: "Tags for the Agent",
-			},
-			"created_at": schema.StringAttribute{
-				CustomType:          timetypes.RFC3339Type{},
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the agent was created",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"updated_at": schema.StringAttribute{
-				CustomType:          timetypes.RFC3339Type{},
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the agent was last updated",
-			},
+		Attributes: standardSchemaAttributes(map[string]schema.Attribute{
 			"version_id": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "Current version identifier of the agent",
@@ -223,10 +178,9 @@ func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				MarkdownDescription: "Defines the complexity of the model the agent uses.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf("LOW", "MEDIUM", "HIGH"),
+					commonValidators.modelComplexity,
 				},
 			},
-
 			"input_message_type": schema.StringAttribute{
 				CustomType:          jsontypes.NormalizedType{},
 				MarkdownDescription: "Schema defining the structure of input messages the agent can process",
@@ -256,39 +210,18 @@ func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
 			},
-		},
+		}),
 	}
-}
-
-func (r *AgentResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if req.ProviderData == nil {
-		return
-	}
-
-	client, ok := req.ProviderData.(graphql.Client)
-
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected graphql.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-
-		return
-	}
-
-	r.client = client
 }
 
 func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data AgentResourceModel
-
-	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "creating", "agent", "")
 
 	var tags []*pgql.Tag
 	if diag := data.Tags.ElementsAs(ctx, &tags, false); diag.HasError() {
@@ -297,10 +230,7 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 	}
 
 	var inputMessageType map[string]any
-	if err := json.Unmarshal([]byte(data.InputMessageType.ValueString()), &inputMessageType); err != nil {
-		resp.Diagnostics.AddError("Invalid JSON", fmt.Sprintf("Input message type contains invalid JSON: %s", err))
-		return
-	}
+	resp.Diagnostics.Append(data.InputMessageType.Unmarshal(&inputMessageType)...)
 
 	var memorySlots []pgql.NewMemorySlot
 	if !data.MemorySlots.IsNull() {
@@ -340,7 +270,7 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		}
 	}
 
-	createResp, err := pgql.CreateAgent(ctx, r.client, &pgql.NewAgent{
+	createResp, err := pgql.CreateAgent(ctx, r.GetClient(), &pgql.NewAgent{
 		Name:                        data.Name.ValueString(),
 		Description:                 pgql.OptPtr(data.Description.ValueStringPointer()),
 		Tags:                        tags,
@@ -357,58 +287,44 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 	})
 
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to create agent, got error: %s", err))
+		handleAPIError(&resp.Diagnostics, err, "create agent")
 		return
 	}
 
-	if diag := r.mapFields(ctx, &data, createResp.CreateAgent.Agent); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, createResp.CreateAgent.Agent)...)
 
-	// Write logs using the tflog package
-	// Documentation: https://terraform.io/plugin/log
-	tflog.Trace(ctx, "created a resource")
-
-	// Save data into Terraform state
+	logResourceOperation(ctx, "created", "agent", data.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *AgentResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data AgentResourceModel
-
-	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	agentResp, err := pgql.GetAgent(ctx, r.client, data.Id.ValueString())
+	logResourceOperation(ctx, "reading", "agent", data.Id.ValueString())
+
+	agentResp, err := pgql.GetAgent(ctx, r.GetClient(), data.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to read agent, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "agent", data.Id.ValueString())
 		return
 	}
 
-	if diag := r.mapFields(ctx, &data, *agentResp.Agent); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
-
-	// Save updated data into Terraform state
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, *agentResp.Agent)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var planData, stateData AgentResourceModel
-
-	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
 	resp.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "updating", "agent", planData.Id.ValueString())
 
 	var update pgql.UpdateAgent
 	if !planData.Name.Equal(stateData.Name) {
@@ -510,119 +426,66 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		update.McpConnections = pgql.Opt(mcpConnections)
 	}
 
-	updateResp, err := pgql.ModifyAgent(ctx, r.client, planData.Id.ValueString(), &update)
+	updateResp, err := pgql.ModifyAgent(ctx, r.GetClient(), planData.Id.ValueString(), &update)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to update agent, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "agent", planData.Id.ValueString())
 		return
 	}
 
-	if diag := r.mapFields(ctx, &planData, updateResp.UpdateAgent.Agent); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
+	resp.Diagnostics.Append(r.mapResponse(ctx, &planData, updateResp.UpdateAgent.Agent)...)
 
-	// Save updated data into Terraform state
+	logResourceOperation(ctx, "updated", "agent", planData.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
 }
 
 func (r *AgentResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data AgentResourceModel
-
-	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	_, err := pgql.DeleteAgent(ctx, r.client, data.Id.ValueString())
+	logResourceOperation(ctx, "deleting", "agent", data.Id.ValueString())
+
+	_, err := pgql.DeleteAgent(ctx, r.GetClient(), data.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to delete agent, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "agent", data.Id.ValueString())
 		return
 	}
+
+	logResourceOperation(ctx, "deleted", "agent", data.Id.ValueString())
 }
 
 func (r *AgentResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func (r *AgentResource) mapFields(ctx context.Context, data *AgentResourceModel, agentDetails pgql.AgentDetails) diag.Diagnostics {
-	var diag diag.Diagnostics
-	data.Id = types.StringValue(agentDetails.Id)
-	data.CreatedAt, diag = timetypes.NewRFC3339Value(agentDetails.CreatedAt)
-	if diag.HasError() {
-		return diag
-	}
-	data.UpdatedAt, diag = timetypes.NewRFC3339Value(agentDetails.UpdatedAt)
-	if diag.HasError() {
-		return diag
-	}
-	data.VersionId = types.StringValue(agentDetails.LatestVersion.Id)
-	data.VersionOrdinal = types.Int64Value(int64(agentDetails.LatestVersion.Ordinal))
-	data.VersionCreatedAt, diag = timetypes.NewRFC3339Value(agentDetails.LatestVersion.CreatedAt)
-	if diag.HasError() {
-		return diag
-	}
+func (r *AgentResource) mapResponse(ctx context.Context, data *AgentResourceModel, agentDetails pgql.AgentDetails) diag.Diagnostics {
+	var diags diag.Diagnostics
 
-	mcpConnInfos := make([]mcpConnectionInfo, 0, len(agentDetails.LatestVersion.McpConnections))
-	for _, v := range agentDetails.LatestVersion.McpConnections {
-		mcpConnInfos = append(mcpConnInfos, mcpConnectionInfo{
-			Id:   v.Id,
-			Name: types.StringValue(v.Name),
-		})
-	}
-	if lv, diag := types.SetValueFrom(ctx, data.McpConnections.ElementType(ctx), mcpConnInfos); diag != nil {
-		return diag
-	} else {
-		data.McpConnections = lv
-	}
+	// Use setFields for standard fields
+	diags.Append(setFields(
+		ctx,
+		&data.Id, agentDetails.Id,
+		&data.Name, agentDetails.Name,
+		&data.Description, agentDetails.Description,
+		&data.CreatedAt, agentDetails.CreatedAt,
+		&data.UpdatedAt, agentDetails.UpdatedAt,
+		&data.VersionId, agentDetails.LatestVersion.Id,
+		&data.VersionOrdinal, int64(agentDetails.LatestVersion.Ordinal),
+		&data.VersionCreatedAt, agentDetails.LatestVersion.CreatedAt,
+		&data.Identity, agentDetails.LatestVersion.Identity,
+		&data.TaskInstructions, agentDetails.LatestVersion.TaskInstructions,
+		&data.ModelComplexity, string(agentDetails.LatestVersion.ModelComplexity),
+		&data.InputMessageType, agentDetails.LatestVersion.InputMessageType,
+		&data.PreserveConversationHistory, agentDetails.LatestVersion.PreserveConversationHistory,
+		&data.SendThinkingToUser, agentDetails.LatestVersion.SendThinkingToUser,
+		&data.SendMessagesToUser, agentDetails.LatestVersion.SendMessagesToUser,
+		&data.AskQuestionsToUser, agentDetails.LatestVersion.AskQuestionsToUser,
+		&data.Tags, agentDetails.Tags,
+		&data.MemorySlots, newStructSliceMappable(agentDetails.LatestVersion.MemorySlots, memorySlotInfo{}),
+		&data.McpConnections, newStructSliceMappable(agentDetails.LatestVersion.McpConnections, mcpConnectionInfo{}),
+	)...)
 
-	memorySlotInfos := make([]memorySlotInfo, 0, len(agentDetails.LatestVersion.MemorySlots))
-	for _, v := range agentDetails.LatestVersion.MemorySlots {
-		createdAt, diag := timetypes.NewRFC3339Value(v.CreatedAt)
-		if diag.HasError() {
-			return diag
-		}
-		memorySlotSerialized, err := json.Marshal(v.MemoryType)
-		if err != nil {
-			diag.AddError("JSON Marshalling Error", fmt.Sprintf("Unable to marshal memory slot type to JSON: %s", err))
-			return diag
-		}
-		memorySlotInfos = append(memorySlotInfos, memorySlotInfo{
-			Id:          v.Id,
-			Name:        v.Name,
-			Description: v.Description,
-			MemoryType:  jsontypes.NewNormalizedValue(string(memorySlotSerialized)),
-			MemoryScope: string(v.MemoryScope),
-			CanRead:     types.StringPointerValue(v.CanRead),
-			CanWrite:    types.StringPointerValue(v.CanWrite),
-			CreatedAt:   createdAt,
-		})
-	}
-	if lv, diag := types.SetValueFrom(ctx, data.MemorySlots.ElementType(ctx), memorySlotInfos); diag != nil {
-		return diag
-	} else {
-		data.MemorySlots = lv
-	}
-
-	data.Name = types.StringValue(agentDetails.Name)
-	data.Description = types.StringPointerValue(agentDetails.Description)
-	data.Tags, diag = types.ListValueFrom(ctx, data.Tags.ElementType(ctx), agentDetails.Tags)
-	if diag.HasError() {
-		return diag
-	}
-	data.Identity = types.StringPointerValue(agentDetails.LatestVersion.Identity)
-	data.TaskInstructions = types.StringValue(agentDetails.LatestVersion.TaskInstructions)
-	data.ModelComplexity = types.StringValue(string(agentDetails.LatestVersion.ModelComplexity))
-	inputMessageTypeSerialized, err := json.Marshal(agentDetails.LatestVersion.InputMessageType)
-	if err != nil {
-		diag.AddError("JSON Marshalling Error", fmt.Sprintf("Unable to marshal input message type to JSON: %s", err))
-		return diag
-	}
-	data.InputMessageType = jsontypes.NewNormalizedValue(string(inputMessageTypeSerialized))
-	data.PreserveConversationHistory = types.BoolValue(agentDetails.LatestVersion.PreserveConversationHistory)
-	data.SendThinkingToUser = types.BoolValue(agentDetails.LatestVersion.SendThinkingToUser)
-	data.SendMessagesToUser = types.BoolValue(agentDetails.LatestVersion.SendMessagesToUser)
-	data.AskQuestionsToUser = types.BoolValue(agentDetails.LatestVersion.AskQuestionsToUser)
-	return diag
+	return diags
 }

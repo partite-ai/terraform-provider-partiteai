@@ -5,19 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -27,32 +21,45 @@ var _ resource.Resource = &MeshLinkResource{}
 var _ resource.ResourceWithImportState = &MeshLinkResource{}
 
 func NewMeshLinkResource() resource.Resource {
-	return &MeshLinkResource{}
+	return &MeshLinkResource{
+		BaseResource: NewBaseResource("mesh_link"),
+	}
 }
 
 // MeshLinkResource implements the mesh link resource.
 type MeshLinkResource struct {
-	client graphql.Client
+	BaseResource
 }
 
 // MeshLinkResourceModel describes the resource data model.
 type MeshLinkResourceModel struct {
-	Id                 types.String `tfsdk:"id"`
-	MeshId             types.String `tfsdk:"mesh_id"`
-	FromAgentId        types.String `tfsdk:"from_agent_id"`
-	FromAgentVersionId types.String `tfsdk:"from_agent_version_id"`
-	ToAgentId          types.String `tfsdk:"to_agent_id"`
-	ToAgentVersionId   types.String `tfsdk:"to_agent_version_id"`
-	Name               types.String `tfsdk:"name"`
-	Description        types.String `tfsdk:"description"`
-	TransfersControl   types.Bool   `tfsdk:"transfers_control"`
-	Responses          types.Set    `tfsdk:"responses"`
-	CreatedAt          types.String `tfsdk:"created_at"`
-	UpdatedAt          types.String `tfsdk:"updated_at"`
+	Id                 types.String      `tfsdk:"id"`
+	MeshId             types.String      `tfsdk:"mesh_id"`
+	FromAgentId        types.String      `tfsdk:"from_agent_id"`
+	FromAgentVersionId types.String      `tfsdk:"from_agent_version_id"`
+	ToAgentId          types.String      `tfsdk:"to_agent_id"`
+	ToAgentVersionId   types.String      `tfsdk:"to_agent_version_id"`
+	Name               types.String      `tfsdk:"name"`
+	Description        types.String      `tfsdk:"description"`
+	TransfersControl   types.Bool        `tfsdk:"transfers_control"`
+	Responses          types.Set         `tfsdk:"responses"`
+	CreatedAt          timetypes.RFC3339 `tfsdk:"created_at"`
+	UpdatedAt          timetypes.RFC3339 `tfsdk:"updated_at"`
 }
 
-func (r *MeshLinkResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_mesh_link"
+type linkResponseStruct struct {
+	Name        string               `tfsdk:"name"`
+	Description string               `tfsdk:"description"`
+	MessageType jsontypes.Normalized `tfsdk:"message_type"`
+}
+
+func (r *linkResponseStruct) FromGQL(src pgql.LinkDetailsLinkResponsesLinkResponse) diag.Diagnostics {
+	r.Name = src.Name
+	r.Description = src.Description
+	return setFields(
+		context.Background(),
+		&r.MessageType, src.MessageType,
+	)
 }
 
 func (r *MeshLinkResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -62,9 +69,6 @@ func (r *MeshLinkResource) Schema(ctx context.Context, req resource.SchemaReques
 			"id": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "The ID of the link",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
 			},
 			"mesh_id": schema.StringAttribute{
 				Required:            true,
@@ -105,10 +109,12 @@ func (r *MeshLinkResource) Schema(ctx context.Context, req resource.SchemaReques
 				MarkdownDescription: "Whether the link transfers control",
 			},
 			"created_at": schema.StringAttribute{
+				CustomType:          timetypes.RFC3339Type{},
 				Computed:            true,
 				MarkdownDescription: "Timestamp when the link was created",
 			},
 			"updated_at": schema.StringAttribute{
+				CustomType:          timetypes.RFC3339Type{},
 				Computed:            true,
 				MarkdownDescription: "Timestamp when the link was last updated",
 			},
@@ -136,27 +142,14 @@ func (r *MeshLinkResource) Schema(ctx context.Context, req resource.SchemaReques
 	}
 }
 
-func (r *MeshLinkResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if req.ProviderData == nil {
-		return
-	}
-	client, ok := req.ProviderData.(graphql.Client)
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected graphql.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-		return
-	}
-	r.client = client
-}
-
 func (r *MeshLinkResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data MeshLinkResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "creating", "mesh_link", "")
 
 	fromAgentID, err := r.resolveAgentID(ctx, data.FromAgentId, data.FromAgentVersionId)
 	if err != nil {
@@ -202,7 +195,7 @@ func (r *MeshLinkResource) Create(ctx context.Context, req resource.CreateReques
 		fromAgentVersionID = pgql.Opt(data.FromAgentVersionId.ValueString())
 	}
 
-	createResp, err := pgql.CreateLink(ctx, r.client, data.MeshId.ValueString(), &pgql.NewLink{
+	createResp, err := pgql.CreateLink(ctx, r.GetClient(), data.MeshId.ValueString(), &pgql.NewLink{
 		Name:               data.Name.ValueString(),
 		Description:        data.Description.ValueString(),
 		TransfersControl:   data.TransfersControl.ValueBool(),
@@ -213,12 +206,13 @@ func (r *MeshLinkResource) Create(ctx context.Context, req resource.CreateReques
 		Responses:          responses,
 	})
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to create mesh link, got error: %s", err))
+		handleAPIError(&resp.Diagnostics, err, "create mesh link")
 		return
 	}
 
-	resp.Diagnostics.Append(r.mapFields(ctx, &data, data.MeshId.ValueString(), createResp.AddMeshLink)...)
-	tflog.Trace(ctx, "created a mesh link resource")
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, data.MeshId.ValueString(), createResp.AddMeshLink)...)
+
+	logResourceOperation(ctx, "created", "mesh_link", data.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -228,9 +222,12 @@ func (r *MeshLinkResource) Read(ctx context.Context, req resource.ReadRequest, r
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	meshResp, err := pgql.GetMeshLinks(ctx, r.client, data.MeshId.ValueString())
+
+	logResourceOperation(ctx, "reading", "mesh_link", data.Id.ValueString())
+
+	meshResp, err := pgql.GetMeshLinks(ctx, r.GetClient(), data.MeshId.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to read mesh links, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "mesh_link", data.Id.ValueString())
 		return
 	}
 	var link *pgql.LinkDetails
@@ -241,10 +238,10 @@ func (r *MeshLinkResource) Read(ctx context.Context, req resource.ReadRequest, r
 		}
 	}
 	if link == nil {
-		resp.Diagnostics.AddError("Not Found", "Mesh link not found")
+		handleAPIErrorWithDetails(&resp.Diagnostics, fmt.Errorf("mesh link not found"), "read", "mesh_link", data.Id.ValueString())
 		return
 	}
-	resp.Diagnostics.Append(r.mapFields(ctx, &data, data.MeshId.ValueString(), *link)...)
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, data.MeshId.ValueString(), *link)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -255,6 +252,9 @@ func (r *MeshLinkResource) Update(ctx context.Context, req resource.UpdateReques
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "updating", "mesh_link", planData.Id.ValueString())
+
 	var update pgql.UpdateLink
 	if !planData.Name.Equal(stateData.Name) {
 		update.Name = pgql.Opt(planData.Name.ValueString())
@@ -300,15 +300,17 @@ func (r *MeshLinkResource) Update(ctx context.Context, req resource.UpdateReques
 		update.Responses = pgql.Opt(responses)
 	}
 
-	updateResp, err := pgql.ModifyLink(ctx, r.client,
+	updateResp, err := pgql.ModifyLink(ctx, r.GetClient(),
 		planData.Id.ValueString(),
 		&update,
 	)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to update mesh link, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "mesh_link", planData.Id.ValueString())
 		return
 	}
-	resp.Diagnostics.Append(r.mapFields(ctx, &planData, planData.MeshId.ValueString(), updateResp.UpdateLinkByStableID)...)
+	resp.Diagnostics.Append(r.mapResponse(ctx, &planData, planData.MeshId.ValueString(), updateResp.UpdateLinkByStableID)...)
+
+	logResourceOperation(ctx, "updated", "mesh_link", planData.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
 }
 
@@ -318,57 +320,41 @@ func (r *MeshLinkResource) Delete(ctx context.Context, req resource.DeleteReques
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	_, err := pgql.DeleteLink(ctx, r.client,
+
+	logResourceOperation(ctx, "deleting", "mesh_link", data.Id.ValueString())
+
+	_, err := pgql.DeleteLink(ctx, r.GetClient(),
 		data.Id.ValueString(),
 	)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to delete mesh link, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "mesh_link", data.Id.ValueString())
 		return
 	}
+
+	logResourceOperation(ctx, "deleted", "mesh_link", data.Id.ValueString())
 }
 
-func (r *MeshLinkResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-}
+func (r *MeshLinkResource) mapResponse(ctx context.Context, data *MeshLinkResourceModel, meshID string, link pgql.LinkDetails) diag.Diagnostics {
+	var diags diag.Diagnostics
 
-func (r *MeshLinkResource) mapFields(ctx context.Context, data *MeshLinkResourceModel, meshID string, link pgql.LinkDetails) diag.Diagnostics {
-	data.Id = types.StringValue(link.StableID)
-	data.MeshId = types.StringValue(meshID)
-	data.FromAgentId = types.StringValue(link.FromAgentVersion.Agent.Id)
-	data.FromAgentVersionId = types.StringValue(link.FromAgentVersion.Id)
-	data.ToAgentId = types.StringValue(link.ToAgentVersion.Agent.Id)
-	data.ToAgentVersionId = types.StringValue(link.ToAgentVersion.Id)
-	data.Name = types.StringValue(link.Name)
-	data.Description = types.StringPointerValue(link.Description)
-	data.TransfersControl = types.BoolValue(link.TransfersControl)
-	data.CreatedAt = types.StringValue(link.CreatedAt)
-	data.UpdatedAt = types.StringValue(link.UpdatedAt)
-	type responseStruct struct {
-		Name        string `tfsdk:"name"`
-		Description string `tfsdk:"description"`
-		MessageType string `tfsdk:"message_type"`
-	}
+	// Use setFields for standard fields
+	diags.Append(setFields(
+		ctx,
+		&data.Id, link.StableID,
+		&data.MeshId, meshID,
+		&data.FromAgentId, link.FromAgentVersion.Agent.Id,
+		&data.FromAgentVersionId, link.FromAgentVersion.Id,
+		&data.ToAgentId, link.ToAgentVersion.Agent.Id,
+		&data.ToAgentVersionId, link.ToAgentVersion.Id,
+		&data.Name, link.Name,
+		&data.Description, link.Description,
+		&data.TransfersControl, link.TransfersControl,
+		&data.CreatedAt, link.CreatedAt,
+		&data.UpdatedAt, link.UpdatedAt,
+		&data.Responses, newStructSliceMappable(link.LinkResponses, linkResponseStruct{}),
+	)...)
 
-	var responseStructs []responseStruct
-	for _, r := range link.LinkResponses {
-		messageTypeBytes, _ := json.Marshal(r.MessageType)
-		responseStructs = append(responseStructs, responseStruct{
-			Name:        r.Name,
-			Description: r.Description,
-			MessageType: string(messageTypeBytes),
-		})
-	}
-
-	var responses types.Set
-	diag := tfsdk.ValueFrom(ctx, responseStructs, types.SetType{
-		ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{
-			"name":         types.StringType,
-			"description":  types.StringType,
-			"message_type": jsontypes.NormalizedType{},
-		}},
-	}, &responses)
-	data.Responses = responses
-	return diag
+	return diags
 }
 
 func (r *MeshLinkResource) resolveAgentID(ctx context.Context, agentID types.String, agentVersionID types.String) (string, error) {
@@ -376,7 +362,7 @@ func (r *MeshLinkResource) resolveAgentID(ctx context.Context, agentID types.Str
 		return agentID.ValueString(), nil
 	}
 	if !agentVersionID.IsNull() && !agentVersionID.IsUnknown() {
-		resp, err := pgql.GetAgentIDForVersion(ctx, r.client, agentVersionID.ValueString())
+		resp, err := pgql.GetAgentIDForVersion(ctx, r.GetClient(), agentVersionID.ValueString())
 		if err != nil {
 			return "", err
 		}

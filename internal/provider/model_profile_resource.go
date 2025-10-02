@@ -2,21 +2,15 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -26,11 +20,13 @@ var _ resource.Resource = &ModelProfileResource{}
 var _ resource.ResourceWithImportState = &ModelProfileResource{}
 
 func NewModelProfileResource() resource.Resource {
-	return &ModelProfileResource{}
+	return &ModelProfileResource{
+		BaseResource: NewBaseResource("model_profile"),
+	}
 }
 
 type ModelProfileResource struct {
-	client graphql.Client
+	BaseResource
 }
 
 type ModelProfileResourceModel struct {
@@ -46,52 +42,13 @@ type ModelProfileResourceModel struct {
 	Google          types.Object      `tfsdk:"google"`
 }
 
-func (r *ModelProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_model_profile"
-}
-
 func (r *ModelProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Model Profile resource",
-		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Model Profile identifier",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
+		Attributes: standardSchemaAttributes(map[string]schema.Attribute{
 			"model_provider_id": schema.StringAttribute{
 				MarkdownDescription: "ID of the Model Provider",
 				Required:            true,
-			},
-			"name": schema.StringAttribute{
-				MarkdownDescription: "Model Profile name",
-				Required:            true,
-			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Description of the Model Profile",
-				Optional:            true,
-			},
-			"tags": schema.ListNestedAttribute{
-				MarkdownDescription: "Tags for the Model Profile",
-				NestedObject:        tagType,
-				Optional:            true,
-				Computed:            true,
-				Default:             listdefault.StaticValue(types.ListValueMust(tagType.Type(), nil)),
-			},
-			"created_at": schema.StringAttribute{
-				CustomType:          timetypes.RFC3339Type{},
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the Model Profile was created",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"updated_at": schema.StringAttribute{
-				CustomType:          timetypes.RFC3339Type{},
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the Model Profile was last updated",
 			},
 			"anthropic": schema.SingleNestedAttribute{
 				MarkdownDescription: "Anthropic profile config",
@@ -179,23 +136,8 @@ func (r *ModelProfileResource) Schema(ctx context.Context, req resource.SchemaRe
 					},
 				},
 			},
-		},
+		}),
 	}
-}
-
-func (r *ModelProfileResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if req.ProviderData == nil {
-		return
-	}
-	client, ok := req.ProviderData.(graphql.Client)
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected graphql.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-		return
-	}
-	r.client = client
 }
 
 func (r *ModelProfileResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -204,6 +146,9 @@ func (r *ModelProfileResource) Create(ctx context.Context, req resource.CreateRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "creating", "model_profile", "")
+
 	var createReq pgql.NewModelProfile
 	createReq.Name = data.Name.ValueString()
 	createReq.Description = pgql.OptPtr(data.Description.ValueStringPointer())
@@ -295,16 +240,15 @@ func (r *ModelProfileResource) Create(ctx context.Context, req resource.CreateRe
 		}
 	}
 
-	createResp, err := pgql.CreateModelProfile(ctx, r.client, data.ModelProviderId.ValueString(), &createReq)
+	createResp, err := pgql.CreateModelProfile(ctx, r.GetClient(), data.ModelProviderId.ValueString(), &createReq)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to create model profile, got error: %s", err))
+		handleAPIError(&resp.Diagnostics, err, "create model profile")
 		return
 	}
-	if diag := r.mapFields(ctx, &data, createResp.CreateModelProfile); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
-	tflog.Trace(ctx, "created a model profile resource")
+
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, createResp.CreateModelProfile)...)
+
+	logResourceOperation(ctx, "created", "model_profile", data.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -314,15 +258,16 @@ func (r *ModelProfileResource) Read(ctx context.Context, req resource.ReadReques
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	modelProfileResp, err := pgql.GetModelProfile(ctx, r.client, data.Id.ValueString())
+
+	logResourceOperation(ctx, "reading", "model_profile", data.Id.ValueString())
+
+	modelProfileResp, err := pgql.GetModelProfile(ctx, r.GetClient(), data.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to read model profile, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "model_profile", data.Id.ValueString())
 		return
 	}
-	if diag := r.mapFields(ctx, &data, modelProfileResp.ModelProfile); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
+
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, modelProfileResp.ModelProfile)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -333,6 +278,9 @@ func (r *ModelProfileResource) Update(ctx context.Context, req resource.UpdateRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "updating", "model_profile", planData.Id.ValueString())
+
 	var update pgql.UpdateModelProfile
 	if !planData.Name.Equal(stateData.Name) {
 		update.Name = pgql.Opt(planData.Name.ValueString())
@@ -340,6 +288,7 @@ func (r *ModelProfileResource) Update(ctx context.Context, req resource.UpdateRe
 	if !planData.Description.Equal(stateData.Description) {
 		update.Description = pgql.OptNil(planData.Description.ValueStringPointer())
 	}
+
 	// Only one config block should be set
 	numSet := 0
 	if !planData.Anthropic.IsNull() && !planData.Anthropic.IsUnknown() {
@@ -355,6 +304,7 @@ func (r *ModelProfileResource) Update(ctx context.Context, req resource.UpdateRe
 		resp.Diagnostics.AddError("Invalid config", "Exactly one of anthropic, openai, or google must be set.")
 		return
 	}
+
 	update.ConfigurationAnthropic = nil
 	update.ConfigurationOpenAI = nil
 	update.ConfigurationGoogle = nil
@@ -426,15 +376,16 @@ func (r *ModelProfileResource) Update(ctx context.Context, req resource.UpdateRe
 		}
 		update.Tags = pgql.Opt(gqlTags)
 	}
-	updateResp, err := pgql.ModifyModelProfile(ctx, r.client, planData.Id.ValueString(), &update)
+
+	updateResp, err := pgql.ModifyModelProfile(ctx, r.GetClient(), planData.Id.ValueString(), &update)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to update model profile, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "model_profile", planData.Id.ValueString())
 		return
 	}
-	if diag := r.mapFields(ctx, &planData, updateResp.UpdateModelProfile); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
+
+	resp.Diagnostics.Append(r.mapResponse(ctx, &planData, updateResp.UpdateModelProfile)...)
+
+	logResourceOperation(ctx, "updated", "model_profile", planData.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
 }
 
@@ -444,49 +395,39 @@ func (r *ModelProfileResource) Delete(ctx context.Context, req resource.DeleteRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	_, err := pgql.DeleteModelProfile(ctx, r.client, data.Id.ValueString())
+
+	logResourceOperation(ctx, "deleting", "model_profile", data.Id.ValueString())
+
+	_, err := pgql.DeleteModelProfile(ctx, r.GetClient(), data.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to delete model profile, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "model_profile", data.Id.ValueString())
 		return
 	}
+
+	logResourceOperation(ctx, "deleted", "model_profile", data.Id.ValueString())
 }
 
 func (r *ModelProfileResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func (r *ModelProfileResource) mapFields(ctx context.Context, data *ModelProfileResourceModel, details pgql.ModelProfileDetails) diag.Diagnostics {
-	var diag diag.Diagnostics
-	data.Id = types.StringValue(details.Id)
-	data.Name = types.StringValue(details.Name)
-	if details.Description != nil {
-		data.Description = types.StringValue(*details.Description)
-	} else {
-		data.Description = types.StringNull()
-	}
-	var tags []attr.Value
-	for _, tag := range details.Tags {
-		tags = append(tags, types.ObjectValueMust(map[string]attr.Type{
-			"name":  types.StringType,
-			"value": types.StringType,
-		}, map[string]attr.Value{
-			"name":  types.StringValue(tag.Name),
-			"value": types.StringValue(tag.Value),
-		}))
-	}
-	data.Tags = types.ListValueMust(tagType.Type(), tags)
-	data.CreatedAt, diag = timetypes.NewRFC3339Value(details.CreatedAt)
-	if diag.HasError() {
-		return diag
-	}
-	data.UpdatedAt, diag = timetypes.NewRFC3339Value(details.UpdatedAt)
-	if diag.HasError() {
-		return diag
-	}
+func (r *ModelProfileResource) mapResponse(ctx context.Context, data *ModelProfileResourceModel, details pgql.ModelProfileDetails) diag.Diagnostics {
+	// Use setFields for standard fields
+	diags := setFields(
+		ctx,
+		&data.Id, details.Id,
+		&data.Name, details.Name,
+		&data.Description, details.Description,
+		&data.CreatedAt, details.CreatedAt,
+		&data.UpdatedAt, details.UpdatedAt,
+		&data.Tags, details.Tags,
+	)
+
 	// Clear all blocks
 	data.Anthropic = types.ObjectNull(data.Anthropic.AttributeTypes(ctx))
 	data.OpenAI = types.ObjectNull(data.OpenAI.AttributeTypes(ctx))
 	data.Google = types.ObjectNull(data.Google.AttributeTypes(ctx))
+
 	// Set the correct block based on config type
 	switch c := details.Configuration.(type) {
 	case *pgql.ModelProfileDetailsConfigurationModelProfileConfigAnthropic:
@@ -524,5 +465,6 @@ func (r *ModelProfileResource) mapFields(ctx context.Context, data *ModelProfile
 		}
 		data.Google = types.ObjectValueMust(data.Google.AttributeTypes(ctx), block)
 	}
-	return diag
+
+	return diags
 }

@@ -2,21 +2,15 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -26,15 +20,15 @@ var _ resource.Resource = &ModelProviderResource{}
 var _ resource.ResourceWithImportState = &ModelProviderResource{}
 
 func NewModelProviderResource() resource.Resource {
-	return &ModelProviderResource{}
+	return &ModelProviderResource{
+		BaseResource: NewBaseResource("model_provider"),
+	}
 }
 
-// ModelProviderResource defines the resource implementation.
 type ModelProviderResource struct {
-	client graphql.Client
+	BaseResource
 }
 
-// ModelProviderResourceModel describes the resource data model.
 type ModelProviderResourceModel struct {
 	Id           types.String      `tfsdk:"id"`
 	Name         types.String      `tfsdk:"name"`
@@ -48,62 +42,10 @@ type ModelProviderResourceModel struct {
 	OpenAICompat types.Object      `tfsdk:"openai_compatible"`
 }
 
-var tagType = schema.NestedAttributeObject{
-	Attributes: map[string]schema.Attribute{
-		"name": schema.StringAttribute{
-			MarkdownDescription: "Name of the tag",
-			Required:            true,
-		},
-		"value": schema.StringAttribute{
-			MarkdownDescription: "Value of the tag",
-			Required:            true,
-		},
-	},
-}
-
-func (r *ModelProviderResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_model_provider"
-}
-
 func (r *ModelProviderResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Model Provider resource",
-		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Model Provider identifier",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"name": schema.StringAttribute{
-				MarkdownDescription: "Model Provider name",
-				Required:            true,
-			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Description of the Model Provider",
-				Optional:            true,
-			},
-			"tags": schema.ListNestedAttribute{
-				MarkdownDescription: "Tags for the Model Provider",
-				NestedObject:        tagType,
-				Optional:            true,
-				Computed:            true,
-				Default:             listdefault.StaticValue(types.ListValueMust(tagType.Type(), nil)),
-			},
-			"created_at": schema.StringAttribute{
-				CustomType:          timetypes.RFC3339Type{},
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the Model Provider was created",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"updated_at": schema.StringAttribute{
-				CustomType:          timetypes.RFC3339Type{},
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the Model Provider was last updated",
-			},
+		Attributes: standardSchemaAttributes(map[string]schema.Attribute{
 			"anthropic": schema.SingleNestedAttribute{
 				MarkdownDescription: "Anthropic provider config",
 				Optional:            true,
@@ -177,23 +119,8 @@ func (r *ModelProviderResource) Schema(ctx context.Context, req resource.SchemaR
 					},
 				},
 			},
-		},
+		}),
 	}
-}
-
-func (r *ModelProviderResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if req.ProviderData == nil {
-		return
-	}
-	client, ok := req.ProviderData.(graphql.Client)
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected graphql.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-		return
-	}
-	r.client = client
 }
 
 func (r *ModelProviderResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -202,6 +129,9 @@ func (r *ModelProviderResource) Create(ctx context.Context, req resource.CreateR
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "creating", "model_provider", "")
+
 	var createReq pgql.NewModelProvider
 	createReq.Name = data.Name.ValueString()
 	createReq.Description = pgql.Optional[string]{}
@@ -305,16 +235,15 @@ func (r *ModelProviderResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	createResp, err := pgql.CreateModelProvider(ctx, r.client, &createReq)
+	createResp, err := pgql.CreateModelProvider(ctx, r.GetClient(), &createReq)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to create model provider, got error: %s", err))
+		handleAPIError(&resp.Diagnostics, err, "create model provider")
 		return
 	}
-	if diag := r.mapFields(ctx, &data, createResp.CreateModelProvider); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
-	tflog.Trace(ctx, "created a model provider resource")
+
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, createResp.CreateModelProvider)...)
+
+	logResourceOperation(ctx, "created", "model_provider", data.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -324,15 +253,16 @@ func (r *ModelProviderResource) Read(ctx context.Context, req resource.ReadReque
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	modelProviderResp, err := pgql.GetModelProvider(ctx, r.client, data.Id.ValueString())
+
+	logResourceOperation(ctx, "reading", "model_provider", data.Id.ValueString())
+
+	modelProviderResp, err := pgql.GetModelProvider(ctx, r.GetClient(), data.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to read model provider, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "model_provider", data.Id.ValueString())
 		return
 	}
-	if diag := r.mapFields(ctx, &data, modelProviderResp.ModelProvider); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
+
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, modelProviderResp.ModelProvider)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -343,6 +273,9 @@ func (r *ModelProviderResource) Update(ctx context.Context, req resource.UpdateR
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "updating", "model_provider", planData.Id.ValueString())
+
 	var update pgql.UpdateModelProvider
 	if !planData.Name.Equal(stateData.Name) {
 		update.Name = pgql.Opt(planData.Name.ValueString())
@@ -350,6 +283,7 @@ func (r *ModelProviderResource) Update(ctx context.Context, req resource.UpdateR
 	if !planData.Description.Equal(stateData.Description) {
 		update.Description = pgql.OptNil(planData.Description.ValueStringPointer())
 	}
+
 	// Determine which provider block is set
 	switch {
 	case !planData.Anthropic.IsNull() && !planData.Anthropic.IsUnknown():
@@ -426,6 +360,7 @@ func (r *ModelProviderResource) Update(ctx context.Context, req resource.UpdateR
 		resp.Diagnostics.AddError("Missing provider config", "One provider config block must be set")
 		return
 	}
+
 	if !planData.Tags.Equal(stateData.Tags) {
 		var tags []struct {
 			Name  string `tfsdk:"name"`
@@ -438,15 +373,16 @@ func (r *ModelProviderResource) Update(ctx context.Context, req resource.UpdateR
 		}
 		update.Tags = pgql.Opt(gqlTags)
 	}
-	updateResp, err := pgql.ModifyModelProvider(ctx, r.client, planData.Id.ValueString(), &update)
+
+	updateResp, err := pgql.ModifyModelProvider(ctx, r.GetClient(), planData.Id.ValueString(), &update)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to update model provider, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "model_provider", planData.Id.ValueString())
 		return
 	}
-	if diag := r.mapFields(ctx, &planData, updateResp.UpdateModelProvider); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
+
+	resp.Diagnostics.Append(r.mapResponse(ctx, &planData, updateResp.UpdateModelProvider)...)
+
+	logResourceOperation(ctx, "updated", "model_provider", planData.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
 }
 
@@ -456,50 +392,40 @@ func (r *ModelProviderResource) Delete(ctx context.Context, req resource.DeleteR
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	_, err := pgql.DeleteModelProvider(ctx, r.client, data.Id.ValueString())
+
+	logResourceOperation(ctx, "deleting", "model_provider", data.Id.ValueString())
+
+	_, err := pgql.DeleteModelProvider(ctx, r.GetClient(), data.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to delete model provider, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "model_provider", data.Id.ValueString())
 		return
 	}
+
+	logResourceOperation(ctx, "deleted", "model_provider", data.Id.ValueString())
 }
 
 func (r *ModelProviderResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func (r *ModelProviderResource) mapFields(ctx context.Context, data *ModelProviderResourceModel, details pgql.ModelProviderDetails) diag.Diagnostics {
-	var diag diag.Diagnostics
-	data.Id = types.StringValue(details.Id)
-	data.Name = types.StringValue(details.Name)
-	if details.Description != nil {
-		data.Description = types.StringValue(*details.Description)
-	} else {
-		data.Description = types.StringNull()
-	}
-	var tags []attr.Value
-	for _, tag := range details.Tags {
-		tags = append(tags, types.ObjectValueMust(map[string]attr.Type{
-			"name":  types.StringType,
-			"value": types.StringType,
-		}, map[string]attr.Value{
-			"name":  types.StringValue(tag.Name),
-			"value": types.StringValue(tag.Value),
-		}))
-	}
-	data.Tags = types.ListValueMust(tagType.Type(), tags)
-	data.CreatedAt, diag = timetypes.NewRFC3339Value(details.CreatedAt)
-	if diag.HasError() {
-		return diag
-	}
-	data.UpdatedAt, diag = timetypes.NewRFC3339Value(details.UpdatedAt)
-	if diag.HasError() {
-		return diag
-	}
+func (r *ModelProviderResource) mapResponse(ctx context.Context, data *ModelProviderResourceModel, details pgql.ModelProviderDetails) diag.Diagnostics {
+	// Use setFields for standard fields
+	diags := setFields(
+		ctx,
+		&data.Id, details.Id,
+		&data.Name, details.Name,
+		&data.Description, details.Description,
+		&data.CreatedAt, details.CreatedAt,
+		&data.UpdatedAt, details.UpdatedAt,
+		&data.Tags, details.Tags,
+	)
+
 	// Clear all blocks
 	data.Anthropic = types.ObjectNull(data.Anthropic.AttributeTypes(ctx))
 	data.OpenAI = types.ObjectNull(data.OpenAI.AttributeTypes(ctx))
 	data.GoogleGenAI = types.ObjectNull(data.GoogleGenAI.AttributeTypes(ctx))
 	data.OpenAICompat = types.ObjectNull(data.OpenAICompat.AttributeTypes(ctx))
+
 	// Set the correct block based on provider type
 	switch details.ProviderType {
 	case pgql.ModelProviderTypeAnthropic:
@@ -549,5 +475,6 @@ func (r *ModelProviderResource) mapFields(ctx context.Context, data *ModelProvid
 		}
 		data.OpenAICompat = types.ObjectValueMust(data.OpenAICompat.AttributeTypes(ctx), block)
 	}
-	return diag
+
+	return diags
 }

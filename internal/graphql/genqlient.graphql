@@ -425,6 +425,7 @@ fragment LinkDetails on Link {
       id
     }
   }
+
   linkResponses {
     name
     description
@@ -474,6 +475,7 @@ fragment InputDetails on Input {
       id
     }
   }
+
   inputResponses {
     name
     description

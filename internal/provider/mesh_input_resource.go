@@ -5,16 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -24,33 +20,49 @@ var _ resource.Resource = &MeshInputResource{}
 var _ resource.ResourceWithImportState = &MeshInputResource{}
 
 func NewMeshInputResource() resource.Resource {
-	return &MeshInputResource{}
+	return &MeshInputResource{
+		BaseResource: NewBaseResource("mesh_input"),
+	}
 }
 
 // MeshInputResource implements the mesh input resource.
 type MeshInputResource struct {
-	client graphql.Client
+	BaseResource
 }
 
 // MeshInputResourceModel describes the resource data model.
 type MeshInputResourceModel struct {
-	MeshId         types.String `tfsdk:"mesh_id"`
-	AgentId        types.String `tfsdk:"agent_id"`
-	AgentVersionId types.String `tfsdk:"agent_version_id"`
-	Name           types.String `tfsdk:"name"`
-	Responses      types.Set    `tfsdk:"responses"`
-	CreatedAt      types.String `tfsdk:"created_at"`
-	UpdatedAt      types.String `tfsdk:"updated_at"`
+	MeshId         types.String      `tfsdk:"mesh_id"`
+	AgentId        types.String      `tfsdk:"agent_id"`
+	AgentVersionId types.String      `tfsdk:"agent_version_id"`
+	Name           types.String      `tfsdk:"name"`
+	Responses      types.Set         `tfsdk:"responses"`
+	CreatedAt      timetypes.RFC3339 `tfsdk:"created_at"`
+	UpdatedAt      timetypes.RFC3339 `tfsdk:"updated_at"`
 }
 
-func (r *MeshInputResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_mesh_input"
+type inputResponseStruct struct {
+	Name        string               `tfsdk:"name"`
+	Description string               `tfsdk:"description"`
+	MessageType jsontypes.Normalized `tfsdk:"message_type"`
+}
+
+func (r *inputResponseStruct) FromGQL(src pgql.InputDetailsInputResponsesInputResponse) diag.Diagnostics {
+	r.Name = src.Name
+	r.Description = src.Description
+	return setFields(
+		context.Background(),
+		&r.MessageType, src.MessageType,
+	)
 }
 
 func (r *MeshInputResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Mesh Input resource",
 		Attributes: map[string]schema.Attribute{
+			"name":       commonSchemas.name,
+			"created_at": commonSchemas.createdAt,
+			"updated_at": commonSchemas.updatedAt,
 			"mesh_id": schema.StringAttribute{
 				Required:            true,
 				MarkdownDescription: "Mesh ID",
@@ -64,18 +76,6 @@ func (r *MeshInputResource) Schema(ctx context.Context, req resource.SchemaReque
 				Optional:            true,
 				Computed:            true,
 				MarkdownDescription: "Agent Version ID. Either agent_id or agent_version_id must be set.",
-			},
-			"name": schema.StringAttribute{
-				Required:            true,
-				MarkdownDescription: "Input name (unique within mesh)",
-			},
-			"created_at": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the input was created",
-			},
-			"updated_at": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the input was last updated",
 			},
 			"responses": schema.SetNestedAttribute{
 				Required: true,
@@ -101,21 +101,6 @@ func (r *MeshInputResource) Schema(ctx context.Context, req resource.SchemaReque
 	}
 }
 
-func (r *MeshInputResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if req.ProviderData == nil {
-		return
-	}
-	client, ok := req.ProviderData.(graphql.Client)
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected graphql.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-		return
-	}
-	r.client = client
-}
-
 func (r *MeshInputResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data MeshInputResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
@@ -123,25 +108,24 @@ func (r *MeshInputResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
+	logResourceOperation(ctx, "creating", "mesh_input", "")
+
 	agentID, err := r.resolveAgentID(ctx, data.AgentId, data.AgentVersionId)
 	if err != nil {
 		resp.Diagnostics.AddError("Configuration Error", fmt.Sprintf("Unable to resolve agent_id: %s", err))
 		return
 	}
 
-	var responseStructs []struct {
-		Name        string `tfsdk:"name"`
-		Description string `tfsdk:"description"`
-		MessageType string `tfsdk:"message_type"`
-	}
+	var responseStructs []inputResponseStruct
 	resp.Diagnostics.Append(data.Responses.ElementsAs(ctx, &responseStructs, false)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
 	var responses []pgql.NewInputResponse
 	for _, r := range responseStructs {
 		var messageType map[string]interface{}
-		if err := json.Unmarshal([]byte(r.MessageType), &messageType); err != nil {
+		if err := json.Unmarshal([]byte(r.MessageType.ValueString()), &messageType); err != nil {
 			resp.Diagnostics.AddError("Configuration Error", fmt.Sprintf("Invalid JSON for response message_type: %s", err))
 			return
 		}
@@ -152,18 +136,19 @@ func (r *MeshInputResource) Create(ctx context.Context, req resource.CreateReque
 		})
 	}
 
-	createResp, err := pgql.CreateInput(ctx, r.client, data.MeshId.ValueString(), &pgql.NewInput{
+	createResp, err := pgql.CreateInput(ctx, r.GetClient(), data.MeshId.ValueString(), &pgql.NewInput{
 		Name:      data.Name.ValueString(),
 		AgentID:   agentID,
 		Responses: responses,
 	})
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to create mesh input, got error: %s", err))
+		handleAPIError(&resp.Diagnostics, err, "create mesh input")
 		return
 	}
 
-	resp.Diagnostics.Append(r.mapFields(ctx, &data, data.MeshId.ValueString(), createResp.AddMeshInput)...)
-	tflog.Trace(ctx, "created a mesh input resource")
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, data.MeshId.ValueString(), createResp.AddMeshInput)...)
+
+	logResourceOperation(ctx, "created", "mesh_input", data.Name.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -173,11 +158,15 @@ func (r *MeshInputResource) Read(ctx context.Context, req resource.ReadRequest, 
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	meshResp, err := pgql.GetMeshInputs(ctx, r.client, data.MeshId.ValueString())
+
+	logResourceOperation(ctx, "reading", "mesh_input", data.Name.ValueString())
+
+	meshResp, err := pgql.GetMeshInputs(ctx, r.GetClient(), data.MeshId.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to read mesh inputs, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "mesh_input", data.Name.ValueString())
 		return
 	}
+
 	var input *pgql.InputDetails
 	for _, i := range meshResp.Mesh.DraftVersion.Inputs {
 		if i.Name == data.Name.ValueString() {
@@ -189,7 +178,8 @@ func (r *MeshInputResource) Read(ctx context.Context, req resource.ReadRequest, 
 		resp.Diagnostics.AddError("Not Found", "Mesh input not found")
 		return
 	}
-	resp.Diagnostics.Append(r.mapFields(ctx, &data, data.MeshId.ValueString(), *input)...)
+
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, data.MeshId.ValueString(), *input)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -200,6 +190,9 @@ func (r *MeshInputResource) Update(ctx context.Context, req resource.UpdateReque
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "updating", "mesh_input", planData.Name.ValueString())
+
 	var update pgql.UpdateInput
 	if !planData.Name.Equal(stateData.Name) {
 		update.Name = pgql.Opt(planData.Name.ValueString())
@@ -208,11 +201,7 @@ func (r *MeshInputResource) Update(ctx context.Context, req resource.UpdateReque
 		update.AgentVersionID = pgql.Opt(planData.AgentVersionId.ValueString())
 	}
 	if !planData.Responses.Equal(stateData.Responses) {
-		var responseStructs []struct {
-			Name        string `tfsdk:"name"`
-			Description string `tfsdk:"description"`
-			MessageType string `tfsdk:"message_type"`
-		}
+		var responseStructs []inputResponseStruct
 		resp.Diagnostics.Append(planData.Responses.ElementsAs(ctx, &responseStructs, false)...)
 		if resp.Diagnostics.HasError() {
 			return
@@ -220,7 +209,7 @@ func (r *MeshInputResource) Update(ctx context.Context, req resource.UpdateReque
 		var responses []pgql.NewInputResponse
 		for _, r := range responseStructs {
 			var messageType map[string]interface{}
-			if err := json.Unmarshal([]byte(r.MessageType), &messageType); err != nil {
+			if err := json.Unmarshal([]byte(r.MessageType.ValueString()), &messageType); err != nil {
 				resp.Diagnostics.AddError("Configuration Error", fmt.Sprintf("Invalid JSON for response message_type: %s", err))
 				return
 			}
@@ -233,16 +222,19 @@ func (r *MeshInputResource) Update(ctx context.Context, req resource.UpdateReque
 		update.Responses = pgql.Opt(responses)
 	}
 
-	updateResp, err := pgql.ModifyInput(ctx, r.client,
+	updateResp, err := pgql.ModifyInput(ctx, r.GetClient(),
 		planData.MeshId.ValueString(),
 		planData.Name.ValueString(),
 		&update,
 	)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to update mesh input, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "mesh_input", planData.Name.ValueString())
 		return
 	}
-	resp.Diagnostics.Append(r.mapFields(ctx, &planData, planData.MeshId.ValueString(), updateResp.UpdateInput)...)
+
+	resp.Diagnostics.Append(r.mapResponse(ctx, &planData, planData.MeshId.ValueString(), updateResp.UpdateInput)...)
+
+	logResourceOperation(ctx, "updated", "mesh_input", planData.Name.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
 }
 
@@ -252,53 +244,32 @@ func (r *MeshInputResource) Delete(ctx context.Context, req resource.DeleteReque
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	_, err := pgql.DeleteInput(ctx, r.client,
+
+	logResourceOperation(ctx, "deleting", "mesh_input", data.Name.ValueString())
+
+	_, err := pgql.DeleteInput(ctx, r.GetClient(),
 		data.MeshId.ValueString(),
 		data.Name.ValueString(),
 	)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to delete mesh input, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "mesh_input", data.Name.ValueString())
 		return
 	}
+
+	logResourceOperation(ctx, "deleted", "mesh_input", data.Name.ValueString())
 }
 
-func (r *MeshInputResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-}
-
-func (r *MeshInputResource) mapFields(ctx context.Context, data *MeshInputResourceModel, meshID string, input pgql.InputDetails) diag.Diagnostics {
-	data.MeshId = types.StringValue(meshID)
-	data.AgentId = types.StringValue(input.AgentVersion.Agent.Id)
-	data.AgentVersionId = types.StringValue(input.AgentVersion.Id)
-	data.Name = types.StringValue(input.Name)
-	data.CreatedAt = types.StringValue(input.CreatedAt)
-	data.UpdatedAt = types.StringValue(input.UpdatedAt)
-	type responseStruct struct {
-		Name        string `tfsdk:"name"`
-		Description string `tfsdk:"description"`
-		MessageType string `tfsdk:"message_type"`
-	}
-
-	var responseStructs []responseStruct
-	for _, r := range input.InputResponses {
-		messageTypeBytes, _ := json.Marshal(r.MessageType)
-		responseStructs = append(responseStructs, responseStruct{
-			Name:        r.Name,
-			Description: r.Description,
-			MessageType: string(messageTypeBytes),
-		})
-	}
-
-	var responses types.Set
-	diag := tfsdk.ValueFrom(ctx, responseStructs, types.SetType{
-		ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{
-			"name":         types.StringType,
-			"description":  types.StringType,
-			"message_type": jsontypes.NormalizedType{},
-		}},
-	}, &responses)
-	data.Responses = responses
-	return diag
+func (r *MeshInputResource) mapResponse(ctx context.Context, data *MeshInputResourceModel, meshID string, input pgql.InputDetails) diag.Diagnostics {
+	return setFields(
+		ctx,
+		&data.MeshId, meshID,
+		&data.AgentId, input.AgentVersion.Agent.Id,
+		&data.AgentVersionId, input.AgentVersion.Id,
+		&data.Name, input.Name,
+		&data.CreatedAt, input.CreatedAt,
+		&data.UpdatedAt, input.UpdatedAt,
+		&data.Responses, newStructSliceMappable(input.InputResponses, inputResponseStruct{}),
+	)
 }
 
 // resolveAgentID returns agentID and agentVersionID, ensuring only one is set in config, and computes the other if needed.
@@ -312,7 +283,7 @@ func (r *MeshInputResource) resolveAgentID(ctx context.Context, agentID types.St
 		return agentID.ValueString(), nil
 	}
 	if agentVersionIDSet {
-		resp, err := pgql.GetAgentIDForVersion(ctx, r.client, agentVersionID.ValueString())
+		resp, err := pgql.GetAgentIDForVersion(ctx, r.GetClient(), agentVersionID.ValueString())
 		if err != nil {
 			return "", err
 		}

@@ -5,19 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -27,12 +21,14 @@ var _ resource.Resource = &McpConnectionResource{}
 var _ resource.ResourceWithImportState = &McpConnectionResource{}
 
 func NewMcpConnectionResource() resource.Resource {
-	return &McpConnectionResource{}
+	return &McpConnectionResource{
+		BaseResource: NewBaseResource("mcp_connection"),
+	}
 }
 
 // McpConnectionResource defines the resource implementation.
 type McpConnectionResource struct {
-	client graphql.Client
+	BaseResource
 }
 
 // McpConnectionResourceModel describes the resource data model.
@@ -120,36 +116,13 @@ func (r *McpConnectionResource) Metadata(ctx context.Context, req resource.Metad
 }
 
 func (r *McpConnectionResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
-
 	resp.Schema = schema.Schema{
-		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "MCP connection resource",
-
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "MCP connection identifier",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"name": schema.StringAttribute{
-				MarkdownDescription: "MCP connection name",
-				Required:            true,
-			},
-			"created_at": schema.StringAttribute{
-				CustomType:          timetypes.RFC3339Type{},
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the MCP connection was created",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"updated_at": schema.StringAttribute{
-				CustomType:          timetypes.RFC3339Type{},
-				Computed:            true,
-				MarkdownDescription: "Timestamp when the MCP connection was last updated",
-			},
+			"id":         commonSchemas.id,
+			"name":       commonSchemas.name,
+			"created_at": commonSchemas.createdAt,
+			"updated_at": commonSchemas.updatedAt,
 			"http_transport": schema.SingleNestedAttribute{
 				MarkdownDescription: "HTTP transport configuration for the MCP connection.",
 				Optional:            true,
@@ -196,35 +169,14 @@ func (r *McpConnectionResource) Schema(ctx context.Context, req resource.SchemaR
 	}
 }
 
-func (r *McpConnectionResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if req.ProviderData == nil {
-		return
-	}
-
-	client, ok := req.ProviderData.(graphql.Client)
-
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected graphql.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-
-		return
-	}
-
-	r.client = client
-}
-
 func (r *McpConnectionResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data McpConnectionResourceModel
-
-	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "creating", "mcp_connection", "")
 
 	var createReq pgql.NewMcpConnection
 	createReq.Name = data.Name.ValueString()
@@ -238,61 +190,46 @@ func (r *McpConnectionResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	createResp, err := pgql.CreateMcpConnection(ctx, r.client, createReq)
-
+	createResp, err := pgql.CreateMcpConnection(ctx, r.GetClient(), createReq)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to create agent, got error: %s", err))
+		handleAPIError(&resp.Diagnostics, err, "create MCP connection")
 		return
 	}
 
-	if diag := r.mapFields(ctx, &data, createResp.CreateMcpConnection); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, createResp.CreateMcpConnection)...)
 
-	// Write logs using the tflog package
-	// Documentation: https://terraform.io/plugin/log
-	tflog.Trace(ctx, "created a resource")
-
-	// Save data into Terraform state
+	logResourceOperation(ctx, "created", "mcp_connection", data.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *McpConnectionResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data McpConnectionResourceModel
-
-	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	mcpConnectionResp, err := pgql.GetMcpConnection(ctx, r.client, data.Id.ValueString())
+	logResourceOperation(ctx, "reading", "mcp_connection", data.Id.ValueString())
+
+	mcpConnectionResp, err := pgql.GetMcpConnection(ctx, r.GetClient(), data.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to read agent, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "mcp_connection", data.Id.ValueString())
 		return
 	}
 
-	if diag := r.mapFields(ctx, &data, *mcpConnectionResp.McpConnection); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
-
-	// Save updated data into Terraform state
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, *mcpConnectionResp.McpConnection)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *McpConnectionResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var planData, stateData McpConnectionResourceModel
-
-	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
 	resp.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	logResourceOperation(ctx, "updating", "mcp_connection", planData.Id.ValueString())
 
 	var update pgql.UpdateMcpConnection
 	if !planData.Name.Equal(stateData.Name) {
@@ -311,137 +248,92 @@ func (r *McpConnectionResource) Update(ctx context.Context, req resource.UpdateR
 		update.Transport = &t
 	}
 
-	updateResp, err := pgql.ModifyMcpConnection(ctx, r.client, planData.Id.ValueString(), update)
+	updateResp, err := pgql.ModifyMcpConnection(ctx, r.GetClient(), planData.Id.ValueString(), update)
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to update mcp connection, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "mcp_connection", planData.Id.ValueString())
 		return
 	}
 
-	if diag := r.mapFields(ctx, &planData, updateResp.UpdateMcpConnection); diag.HasError() {
-		resp.Diagnostics.Append(diag...)
-		return
-	}
+	resp.Diagnostics.Append(r.mapResponse(ctx, &planData, updateResp.UpdateMcpConnection)...)
 
-	// Save updated data into Terraform state
+	logResourceOperation(ctx, "updated", "mcp_connection", planData.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
 }
 
 func (r *McpConnectionResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data McpConnectionResourceModel
-
-	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	_, err := pgql.DeleteMcpConnection(ctx, r.client, data.Id.ValueString())
+	logResourceOperation(ctx, "deleting", "mcp_connection", data.Id.ValueString())
+
+	_, err := pgql.DeleteMcpConnection(ctx, r.GetClient(), data.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unable to delete mcp connection, got error: %s", err))
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "mcp_connection", data.Id.ValueString())
 		return
 	}
+
+	logResourceOperation(ctx, "deleted", "mcp_connection", data.Id.ValueString())
 }
 
-func (r *McpConnectionResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-}
+func (r *McpConnectionResource) mapResponse(ctx context.Context, data *McpConnectionResourceModel, mcpConnectionDetails pgql.McpConnectionDetails) diag.Diagnostics {
+	diags := setFields(
+		ctx,
+		&data.Id, mcpConnectionDetails.Id,
+		&data.Name, mcpConnectionDetails.Name,
+		&data.CreatedAt, mcpConnectionDetails.CreatedAt,
+		&data.UpdatedAt, mcpConnectionDetails.UpdatedAt,
+	)
 
-func (r *McpConnectionResource) mapFields(ctx context.Context, data *McpConnectionResourceModel, mcpConnectionDetails pgql.McpConnectionDetails) diag.Diagnostics {
-	var diag diag.Diagnostics
-	data.Id = types.StringValue(mcpConnectionDetails.Id)
-	data.CreatedAt, diag = timetypes.NewRFC3339Value(mcpConnectionDetails.CreatedAt)
-	if diag.HasError() {
-		return diag
+	if diags.HasError() {
+		return diags
 	}
-	data.UpdatedAt, diag = timetypes.NewRFC3339Value(mcpConnectionDetails.UpdatedAt)
-	if diag.HasError() {
-		return diag
-	}
+
 	switch mcpConnectionDetails.Transport {
 	case pgql.McpTransportHttp:
-		var httpTransport struct {
-			Url                    types.String `tfsdk:"url"`
-			OauthClientCredentials types.Object `tfsdk:"oauth_client_credentials"`
-			BasicAuthCredentials   types.Object `tfsdk:"basic_credentials"`
-			HeaderCredentials      types.Object `tfsdk:"header_credentials"`
-		}
-
-		if !data.HttpTransport.IsNull() && !data.HttpTransport.IsUnknown() {
-			if diag := tfsdk.ValueAs(ctx, data.HttpTransport, &httpTransport); diag.HasError() {
-				return diag
-			}
-		}
-		httpTransport.Url = types.StringValue(mcpConnectionDetails.HttpTransport.Url)
+		var t httpTransportStruct
+		diags.Append(tfsdk.ValueAs(ctx, data.HttpTransport, &t)...)
+		t.Url = mcpConnectionDetails.HttpTransport.Url
 		switch mcpConnectionDetails.HttpTransport.AuthFlow {
 		case pgql.McpAuthFlowOauth2AuthorizationCode, pgql.McpAuthFlowNone:
-			httpTransport.OauthClientCredentials = types.ObjectNull(attrsToTypes(oauthClientCredentialsType.Attributes))
-			httpTransport.BasicAuthCredentials = types.ObjectNull(attrsToTypes(basicAuthCredentialsType.Attributes))
-			httpTransport.HeaderCredentials = types.ObjectNull(attrsToTypes(headerAuthCredentialsType.Attributes))
+			t.OauthClientCredentials = nil
+			t.BasicAuthCredentials = nil
+			t.HeaderCredentials = nil
 		case pgql.McpAuthFlowOauth2ClientCredentials:
-			if httpTransport.OauthClientCredentials.IsNull() || httpTransport.OauthClientCredentials.IsUnknown() {
-				httpTransport.OauthClientCredentials = types.ObjectValueMust(
-					attrsToTypes(oauthClientCredentialsType.Attributes),
-					map[string]attr.Value{
-						"client_id":     types.StringValue("<unknown>"),
-						"client_secret": types.StringValue("<unknown>"),
-						"scopes":        types.ListValueMust(types.StringType, nil),
-					},
-				)
+			if t.OauthClientCredentials == nil {
+				t.OauthClientCredentials = &oauthClientCredentialsStruct{
+					ClientId:     "<unknown>",
+					ClientSecret: "<unknown>",
+				}
 			}
-			httpTransport.BasicAuthCredentials = types.ObjectNull(attrsToTypes(basicAuthCredentialsType.Attributes))
-			httpTransport.HeaderCredentials = types.ObjectNull(attrsToTypes(headerAuthCredentialsType.Attributes))
+			t.BasicAuthCredentials = nil
+			t.HeaderCredentials = nil
 		case pgql.McpAuthFlowBasic:
-			if httpTransport.BasicAuthCredentials.IsNull() || httpTransport.BasicAuthCredentials.IsUnknown() {
-				httpTransport.BasicAuthCredentials = types.ObjectValueMust(
-					attrsToTypes(basicAuthCredentialsType.Attributes),
-					map[string]attr.Value{
-						"username": types.StringValue("<unknown>"),
-						"password": types.StringValue("<unknown>"),
-					},
-				)
+			if t.BasicAuthCredentials == nil {
+				t.BasicAuthCredentials = &basicAuthCredentialsStruct{
+					Username: "<unknown>",
+					Password: "<unknown>",
+				}
 			}
-			httpTransport.OauthClientCredentials = types.ObjectNull(attrsToTypes(oauthClientCredentialsType.Attributes))
-			httpTransport.HeaderCredentials = types.ObjectNull(attrsToTypes(headerAuthCredentialsType.Attributes))
+			t.OauthClientCredentials = nil
+			t.HeaderCredentials = nil
 		case pgql.McpAuthFlowHeader:
-			if httpTransport.HeaderCredentials.IsNull() || httpTransport.HeaderCredentials.IsUnknown() {
-				httpTransport.HeaderCredentials = types.ObjectValueMust(
-					attrsToTypes(headerAuthCredentialsType.Attributes),
-					map[string]attr.Value{
-						"header_name":  types.StringValue("<unknown>"),
-						"header_value": types.StringValue("<unknown>"),
-					},
-				)
+			if t.HeaderCredentials == nil {
+				t.HeaderCredentials = &headerAuthCredentialsStruct{
+					HeaderName:  "<unknown>",
+					HeaderValue: "<unknown>",
+				}
 			}
-			httpTransport.OauthClientCredentials = types.ObjectNull(attrsToTypes(oauthClientCredentialsType.Attributes))
-			httpTransport.BasicAuthCredentials = types.ObjectNull(attrsToTypes(basicAuthCredentialsType.Attributes))
+			t.OauthClientCredentials = nil
+			t.BasicAuthCredentials = nil
 		}
-		if diag := tfsdk.ValueFrom(ctx, httpTransport, data.HttpTransport.Type(ctx), &data.HttpTransport); diag.HasError() {
-			return diag
-		}
+		diags.Append(setFields(ctx, &data.HttpTransport, t)...)
 		data.StdioTransport = types.ObjectNull(data.StdioTransport.AttributeTypes(ctx))
 		data.ServerInitiatedHttpTransport = types.ObjectNull(data.ServerInitiatedHttpTransport.AttributeTypes(ctx))
 	case pgql.McpTransportStdio:
-		type envVar struct {
-			Name  string `tfsdk:"name"`
-			Value string `tfsdk:"value"`
-		}
-		var stdioTransport struct {
-			Command     string   `tfsdk:"command"`
-			Arguments   []string `tfsdk:"arguments"`
-			Environment []envVar `tfsdk:"environment"`
-		}
-
-		stdioTransport.Command = mcpConnectionDetails.StdioTransport.Command
-		stdioTransport.Arguments = mcpConnectionDetails.StdioTransport.Arguments
-		for _, ev := range mcpConnectionDetails.StdioTransport.Environment {
-			name, value, _ := strings.Cut(ev, "=")
-			stdioTransport.Environment = append(stdioTransport.Environment, envVar{Name: name, Value: value})
-		}
-
-		if diag := tfsdk.ValueFrom(ctx, stdioTransport, data.StdioTransport.Type(ctx), &data.StdioTransport); diag.HasError() {
-			return diag
-		}
+		diags.Append(setFields(ctx, &data.StdioTransport, newStructMappable(mcpConnectionDetails.StdioTransport, stdioTransportStruct{}))...)
 		data.HttpTransport = types.ObjectNull(data.HttpTransport.AttributeTypes(ctx))
 		data.ServerInitiatedHttpTransport = types.ObjectNull(data.ServerInitiatedHttpTransport.AttributeTypes(ctx))
 	case pgql.McpTransportServerInitiatedHttp:
@@ -452,7 +344,7 @@ func (r *McpConnectionResource) mapFields(ctx context.Context, data *McpConnecti
 		data.StdioTransport = types.ObjectNull(data.StdioTransport.AttributeTypes(ctx))
 	}
 
-	return diag
+	return diags
 }
 
 func fillMcpConnectionUpdateMessage(
@@ -549,10 +441,48 @@ func fillMcpConnectionUpdateMessage(
 	return nil
 }
 
-func attrsToTypes(attrs map[string]schema.Attribute) map[string]attr.Type {
-	types := make(map[string]attr.Type, len(attrs))
-	for k, v := range attrs {
-		types[k] = v.GetType()
+type httpTransportStruct struct {
+	Url                    string                        `tfsdk:"url"`
+	OauthClientCredentials *oauthClientCredentialsStruct `tfsdk:"oauth_client_credentials"`
+	BasicAuthCredentials   *basicAuthCredentialsStruct   `tfsdk:"basic_credentials"`
+	HeaderCredentials      *headerAuthCredentialsStruct  `tfsdk:"header_credentials"`
+}
+
+type oauthClientCredentialsStruct struct {
+	ClientId     string   `tfsdk:"client_id"`
+	ClientSecret string   `tfsdk:"client_secret"`
+	Scopes       []string `tfsdk:"scopes"`
+}
+
+type basicAuthCredentialsStruct struct {
+	Username string `tfsdk:"username"`
+	Password string `tfsdk:"password"`
+}
+
+type headerAuthCredentialsStruct struct {
+	HeaderName  string `tfsdk:"header_name"`
+	HeaderValue string `tfsdk:"header_value"`
+}
+
+type stdioTransportStruct struct {
+	Command     string         `tfsdk:"command"`
+	Arguments   []string       `tfsdk:"arguments"`
+	Environment []envVarStruct `tfsdk:"environment"`
+}
+
+func (t *stdioTransportStruct) FromGQL(src *pgql.McpConnectionDetailsStdioTransportStdioMcpTransport) diag.Diagnostics {
+	var diags diag.Diagnostics
+	t.Command = src.Command
+	t.Arguments = src.Arguments
+
+	for _, ev := range src.Environment {
+		name, value, _ := strings.Cut(ev, "=")
+		t.Environment = append(t.Environment, envVarStruct{Name: name, Value: value})
 	}
-	return types
+	return diags
+}
+
+type envVarStruct struct {
+	Name  string `tfsdk:"name"`
+	Value string `tfsdk:"value"`
 }
