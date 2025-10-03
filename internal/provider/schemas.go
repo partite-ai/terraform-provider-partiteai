@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"maps"
+
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -24,7 +26,7 @@ var tagObjectType = schema.NestedAttributeObject{
 	},
 }
 
-// commonSchemas provides reusable schema components
+// commonSchemas provides reusable schema components.
 var commonSchemas = struct {
 	id          schema.StringAttribute
 	name        schema.StringAttribute
@@ -70,7 +72,7 @@ var commonSchemas = struct {
 	},
 }
 
-// standardSchemaAttributes returns a schema with the common attributes merged with the provided ones
+// standardSchemaAttributes returns a schema with the common attributes merged with the provided ones.
 func standardSchemaAttributes(attrs map[string]schema.Attribute) map[string]schema.Attribute {
 	mergedAttrs := map[string]schema.Attribute{
 		"id":          commonSchemas.id,
@@ -88,7 +90,7 @@ func standardSchemaAttributes(attrs map[string]schema.Attribute) map[string]sche
 	return mergedAttrs
 }
 
-// Data source nested attribute objects
+// Data source nested attribute objects.
 var memorySlotDataSourceType = dsschema.NestedAttributeObject{
 	Attributes: map[string]dsschema.Attribute{
 		"name": dsschema.StringAttribute{
@@ -132,7 +134,7 @@ var mcpConnectionDataSourceType = dsschema.NestedAttributeObject{
 	},
 }
 
-// More data source nested attribute objects for MCP connections
+// More data source nested attribute objects for MCP connections.
 var envVarDataSourceType = dsschema.NestedAttributeObject{
 	Attributes: map[string]dsschema.Attribute{
 		"name": dsschema.StringAttribute{
@@ -147,60 +149,7 @@ var envVarDataSourceType = dsschema.NestedAttributeObject{
 	},
 }
 
-var oauthClientCredentialsDataSourceType = dsschema.SingleNestedAttribute{
-	MarkdownDescription: "OAuth client credentials for authentication.",
-	Computed:            true,
-	Attributes: map[string]dsschema.Attribute{
-		"client_id": dsschema.StringAttribute{
-			MarkdownDescription: "The client ID for OAuth authentication.",
-			Computed:            true,
-		},
-		"client_secret": dsschema.StringAttribute{
-			MarkdownDescription: "The client secret for OAuth authentication.",
-			Computed:            true,
-			Sensitive:           true,
-		},
-		"scopes": dsschema.ListAttribute{
-			MarkdownDescription: "The scopes for OAuth authentication.",
-			ElementType:         types.StringType,
-			Computed:            true,
-		},
-	},
-}
-
-var basicAuthCredentialsDataSourceType = dsschema.SingleNestedAttribute{
-	MarkdownDescription: "Basic authentication credentials.",
-	Computed:            true,
-	Attributes: map[string]dsschema.Attribute{
-		"username": dsschema.StringAttribute{
-			MarkdownDescription: "The username for basic authentication.",
-			Computed:            true,
-		},
-		"password": dsschema.StringAttribute{
-			MarkdownDescription: "The password for basic authentication.",
-			Computed:            true,
-			Sensitive:           true,
-		},
-	},
-}
-
-var headerAuthCredentialsDataSourceType = dsschema.SingleNestedAttribute{
-	MarkdownDescription: "Header authentication credentials.",
-	Computed:            true,
-	Attributes: map[string]dsschema.Attribute{
-		"name": dsschema.StringAttribute{
-			MarkdownDescription: "The name of the header.",
-			Computed:            true,
-		},
-		"value": dsschema.StringAttribute{
-			MarkdownDescription: "The value of the header.",
-			Computed:            true,
-			Sensitive:           true,
-		},
-	},
-}
-
-// Data source schemas - similar to resource schemas but with required ID and all computed
+// Data source schemas - similar to resource schemas but with required ID and all computed.
 var commonDataSourceSchemas = struct {
 	id          dsschema.StringAttribute
 	name        dsschema.StringAttribute
@@ -249,7 +198,7 @@ var commonDataSourceSchemas = struct {
 	},
 }
 
-// standardDataSourceSchemaAttributes returns a data source schema with the common attributes merged with the provided ones
+// standardDataSourceSchemaAttributes returns a data source schema with the common attributes merged with the provided ones.
 func standardDataSourceSchemaAttributes(attrs map[string]dsschema.Attribute) map[string]dsschema.Attribute {
 	mergedAttrs := map[string]dsschema.Attribute{
 		"id":          commonDataSourceSchemas.id,
@@ -260,9 +209,7 @@ func standardDataSourceSchemaAttributes(attrs map[string]dsschema.Attribute) map
 		"updated_at":  commonDataSourceSchemas.updatedAt,
 	}
 
-	for k, v := range attrs {
-		mergedAttrs[k] = v
-	}
+	maps.Copy(mergedAttrs, attrs)
 
 	return mergedAttrs
 }

@@ -10,7 +10,7 @@ import (
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-// MeshBaseModel contains the common fields for mesh resources and data sources
+// MeshBaseModel contains the common fields for mesh resources and data sources.
 type MeshBaseModel struct {
 	Id             types.String      `tfsdk:"id"`
 	Name           types.String      `tfsdk:"name"`
@@ -22,7 +22,7 @@ type MeshBaseModel struct {
 	DraftVersionId types.String      `tfsdk:"draft_version_id"`
 }
 
-// MapFromGraphQL maps a GraphQL MeshDetails response to the MeshBaseModel
+// MapFromGraphQL maps a GraphQL MeshDetails response to the MeshBaseModel.
 func (m *MeshBaseModel) MapFromGraphQL(ctx context.Context, meshDetails pgql.MeshDetails) diag.Diagnostics {
 	return setFields(
 		ctx,

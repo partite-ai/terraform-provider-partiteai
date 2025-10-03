@@ -11,7 +11,7 @@ import (
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-// ModelProfileBaseModel contains the common fields for model profile resources and data sources
+// ModelProfileBaseModel contains the common fields for model profile resources and data sources.
 type ModelProfileBaseModel struct {
 	Id              types.String      `tfsdk:"id"`
 	ModelProviderId types.String      `tfsdk:"model_provider_id"`
@@ -25,7 +25,7 @@ type ModelProfileBaseModel struct {
 	Google          types.Object      `tfsdk:"google"`
 }
 
-// MapFromGraphQL maps a GraphQL ModelProfileDetails response to the ModelProfileBaseModel
+// MapFromGraphQL maps a GraphQL ModelProfileDetails response to the ModelProfileBaseModel.
 func (m *ModelProfileBaseModel) MapFromGraphQL(ctx context.Context, details pgql.ModelProfileDetails) diag.Diagnostics {
 	// Use setFields for standard fields
 	diags := setFields(

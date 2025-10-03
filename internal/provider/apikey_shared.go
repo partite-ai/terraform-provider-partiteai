@@ -10,7 +10,7 @@ import (
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-// ApiKeyBaseModel contains all the common fields for both resource and data source
+// ApiKeyBaseModel contains all the common fields for both resource and data source.
 type ApiKeyBaseModel struct {
 	Id          types.String      `tfsdk:"id"`
 	Name        types.String      `tfsdk:"name"`
@@ -21,7 +21,7 @@ type ApiKeyBaseModel struct {
 	UpdatedAt   timetypes.RFC3339 `tfsdk:"updated_at"`
 }
 
-// MapFromGraphQL maps GraphQL response to the base model
+// MapFromGraphQL maps GraphQL response to the base model.
 func (m *ApiKeyBaseModel) MapFromGraphQL(ctx context.Context, apiKeyDetails *pgql.ApiKeyDetails) diag.Diagnostics {
 	var diags diag.Diagnostics
 

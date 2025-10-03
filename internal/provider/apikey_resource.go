@@ -25,7 +25,7 @@ type ApiKeyResource struct {
 	BaseResource
 }
 
-// ApiKeyResourceModel extends the base model with resource-specific fields
+// ApiKeyResourceModel extends the base model with resource-specific fields.
 type ApiKeyResourceModel struct {
 	ApiKeyBaseModel
 	Secret types.String `tfsdk:"secret"` // Only available in resource after creation

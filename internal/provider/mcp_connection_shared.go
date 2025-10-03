@@ -12,7 +12,7 @@ import (
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-// McpConnectionBaseModel contains all the common fields for both resource and data source
+// McpConnectionBaseModel contains all the common fields for both resource and data source.
 type McpConnectionBaseModel struct {
 	Id                           types.String      `tfsdk:"id"`
 	Name                         types.String      `tfsdk:"name"`
@@ -23,7 +23,7 @@ type McpConnectionBaseModel struct {
 	UpdatedAt                    timetypes.RFC3339 `tfsdk:"updated_at"`
 }
 
-// MapFromGraphQL maps GraphQL response to the base model (copied from resource mapResponse)
+// MapFromGraphQL maps GraphQL response to the base model (copied from resource mapResponse).
 func (m *McpConnectionBaseModel) MapFromGraphQL(ctx context.Context, mcpConnectionDetails pgql.McpConnectionDetails) diag.Diagnostics {
 	diags := setFields(
 		ctx,

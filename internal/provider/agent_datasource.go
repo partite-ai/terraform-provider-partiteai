@@ -25,7 +25,7 @@ type AgentDataSource struct {
 	BaseDataSource
 }
 
-// AgentDataSourceModel extends the base model with data source-specific fields (none currently)
+// AgentDataSourceModel extends the base model with data source-specific fields.
 type AgentDataSourceModel struct {
 	AgentBaseModel
 }

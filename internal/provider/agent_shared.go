@@ -11,7 +11,7 @@ import (
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-// AgentBaseModel contains all the common fields for both resource and data source
+// AgentBaseModel contains all the common fields for both resource and data source.
 type AgentBaseModel struct {
 	Id                          types.String         `tfsdk:"id"`
 	Name                        types.String         `tfsdk:"name"`
@@ -34,7 +34,7 @@ type AgentBaseModel struct {
 	AskQuestionsToUser          types.Bool           `tfsdk:"ask_questions_to_user"`
 }
 
-// MapFromGraphQL maps GraphQL response to the base model
+// MapFromGraphQL maps GraphQL response to the base model.
 func (m *AgentBaseModel) MapFromGraphQL(ctx context.Context, agentDetails pgql.AgentDetails) diag.Diagnostics {
 	var diags diag.Diagnostics
 

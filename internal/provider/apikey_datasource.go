@@ -24,7 +24,7 @@ type ApiKeyDataSource struct {
 	BaseDataSource
 }
 
-// ApiKeyDataSourceModel extends the base model with data source-specific fields
+// ApiKeyDataSourceModel extends the base model with data source-specific fields.
 type ApiKeyDataSourceModel struct {
 	ApiKeyBaseModel
 	Secret types.String `tfsdk:"secret"` // Read-only, may be empty for existing keys

@@ -34,7 +34,7 @@ type McpConnectionResource struct {
 	BaseResource
 }
 
-// McpConnectionResourceModel extends the base model with resource-specific fields (none currently)
+// McpConnectionResourceModel extends the base model with resource-specific fields (none currently).
 type McpConnectionResourceModel struct {
 	McpConnectionBaseModel
 }

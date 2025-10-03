@@ -11,7 +11,7 @@ import (
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-// ModelProviderBaseModel contains the common fields for model provider resources and data sources
+// ModelProviderBaseModel contains the common fields for model provider resources and data sources.
 type ModelProviderBaseModel struct {
 	Id           types.String      `tfsdk:"id"`
 	Name         types.String      `tfsdk:"name"`
@@ -25,7 +25,7 @@ type ModelProviderBaseModel struct {
 	OpenAICompat types.Object      `tfsdk:"openai_compatible"`
 }
 
-// MapFromGraphQL maps a GraphQL ModelProviderDetails response to the ModelProviderBaseModel
+// MapFromGraphQL maps a GraphQL ModelProviderDetails response to the ModelProviderBaseModel.
 func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgql.ModelProviderDetails) diag.Diagnostics {
 	// Use setFields for standard fields
 	diags := setFields(
@@ -47,42 +47,73 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 	// Set the correct block based on provider type
 	switch details.ProviderType {
 	case pgql.ModelProviderTypeAnthropic:
-		c := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigAnthropic)
+		c, ok := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigAnthropic)
+		if !ok {
+			diags.AddError("Internal Error", "Expected Anthropic provider config type")
+			return diags
+		}
+		anthropicAttrs := m.Anthropic.AttributeTypes(ctx)
 		var block = map[string]attr.Value{
 			"api_key": types.StringValue(c.ApiKey),
 		}
-		m.Anthropic = types.ObjectValueMust(m.Anthropic.AttributeTypes(ctx), block)
+		m.Anthropic = types.ObjectValueMust(anthropicAttrs, block)
 	case pgql.ModelProviderTypeOpenAi:
-		c := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigOpenAI)
+		c, ok := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigOpenAI)
+		if !ok {
+			diags.AddError("Internal Error", "Expected OpenAI provider config type")
+			return diags
+		}
+		openaiAttrs := m.OpenAI.AttributeTypes(ctx)
 		var block = map[string]attr.Value{
 			"api_key": types.StringValue(c.ApiKey),
 		}
-		m.OpenAI = types.ObjectValueMust(m.OpenAI.AttributeTypes(ctx), block)
+		m.OpenAI = types.ObjectValueMust(openaiAttrs, block)
 	case pgql.ModelProviderTypeGoogleGenAi:
-		c := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI)
+		c, ok := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI)
+		if !ok {
+			diags.AddError("Internal Error", "Expected GoogleGenAI provider config type")
+			return diags
+		}
+		googleGenAIAttrs := m.GoogleGenAI.AttributeTypes(ctx)
+		geminiType, ok := googleGenAIAttrs["gemini"].(types.ObjectType)
+		if !ok {
+			diags.AddError("Internal Error", "Expected gemini to be ObjectType")
+			return diags
+		}
+		vertexType, ok := googleGenAIAttrs["vertex"].(types.ObjectType)
+		if !ok {
+			diags.AddError("Internal Error", "Expected vertex to be ObjectType")
+			return diags
+		}
+
 		block := map[string]attr.Value{}
 		// Set only one of gemini or vertex
 		if c.Gemini != nil {
 			geminiBlock := map[string]attr.Value{
 				"api_key": types.StringValue(c.Gemini.ApiKey),
 			}
-			block["gemini"] = types.ObjectValueMust(m.GoogleGenAI.AttributeTypes(ctx)["gemini"].(types.ObjectType).AttributeTypes(), geminiBlock)
-			block["vertex"] = types.ObjectNull(m.GoogleGenAI.AttributeTypes(ctx)["vertex"].(types.ObjectType).AttributeTypes())
+			block["gemini"] = types.ObjectValueMust(geminiType.AttributeTypes(), geminiBlock)
+			block["vertex"] = types.ObjectNull(vertexType.AttributeTypes())
 		} else if c.Vertex != nil {
 			vertexBlock := map[string]attr.Value{
 				"service_account_key": types.StringValue(c.Vertex.ServiceAccountKey),
 				"project_id":          types.StringValue(c.Vertex.ProjectID),
 				"location":            types.StringValue(c.Vertex.Location),
 			}
-			block["vertex"] = types.ObjectValueMust(m.GoogleGenAI.AttributeTypes(ctx)["vertex"].(types.ObjectType).AttributeTypes(), vertexBlock)
-			block["gemini"] = types.ObjectNull(m.GoogleGenAI.AttributeTypes(ctx)["gemini"].(types.ObjectType).AttributeTypes())
+			block["vertex"] = types.ObjectValueMust(vertexType.AttributeTypes(), vertexBlock)
+			block["gemini"] = types.ObjectNull(geminiType.AttributeTypes())
 		} else {
-			block["gemini"] = types.ObjectNull(m.GoogleGenAI.AttributeTypes(ctx)["gemini"].(types.ObjectType).AttributeTypes())
-			block["vertex"] = types.ObjectNull(m.GoogleGenAI.AttributeTypes(ctx)["vertex"].(types.ObjectType).AttributeTypes())
+			block["gemini"] = types.ObjectNull(geminiType.AttributeTypes())
+			block["vertex"] = types.ObjectNull(vertexType.AttributeTypes())
 		}
-		m.GoogleGenAI = types.ObjectValueMust(m.GoogleGenAI.AttributeTypes(ctx), block)
+		m.GoogleGenAI = types.ObjectValueMust(googleGenAIAttrs, block)
 	case pgql.ModelProviderTypeOpenAiCompatible:
-		c := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible)
+		c, ok := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible)
+		if !ok {
+			diags.AddError("Internal Error", "Expected OpenAICompatible provider config type")
+			return diags
+		}
+		openAICompatAttrs := m.OpenAICompat.AttributeTypes(ctx)
 		block := map[string]attr.Value{
 			"url": types.StringValue(c.Url),
 		}
@@ -91,7 +122,7 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 		} else {
 			block["api_token"] = types.StringNull()
 		}
-		m.OpenAICompat = types.ObjectValueMust(m.OpenAICompat.AttributeTypes(ctx), block)
+		m.OpenAICompat = types.ObjectValueMust(openAICompatAttrs, block)
 	}
 
 	return diags

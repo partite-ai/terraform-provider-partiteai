@@ -10,7 +10,7 @@ import (
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-// ModelSetBaseModel contains the common fields for model set resources and data sources
+// ModelSetBaseModel contains the common fields for model set resources and data sources.
 type ModelSetBaseModel struct {
 	Id                  types.String      `tfsdk:"id"`
 	Name                types.String      `tfsdk:"name"`
@@ -22,7 +22,7 @@ type ModelSetBaseModel struct {
 	UpdatedAt           timetypes.RFC3339 `tfsdk:"updated_at"`
 }
 
-// MapFromGraphQL maps a GraphQL ModelSetDetails response to the ModelSetBaseModel
+// MapFromGraphQL maps a GraphQL ModelSetDetails response to the ModelSetBaseModel.
 func (m *ModelSetBaseModel) MapFromGraphQL(ctx context.Context, details pgql.ModelSetDetails) diag.Diagnostics {
 	// Use setFields for standard fields
 	diags := setFields(

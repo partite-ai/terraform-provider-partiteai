@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-// int64Ptr converts an int pointer to an int64 pointer
+// int64Ptr converts an int pointer to an int64 pointer.
 func int64Ptr(i *int) *int64 {
 	if i == nil {
 		return nil
@@ -23,12 +23,12 @@ func int64Ptr(i *int) *int64 {
 	return &v
 }
 
-// handleAPIError provides standardized error handling for GraphQL API calls
+// handleAPIError provides standardized error handling for GraphQL API calls.
 func handleAPIError(diags *diag.Diagnostics, err error, operation string) {
 	diags.AddError("API Error", fmt.Sprintf("Unable to %s, got error: %s", operation, err))
 }
 
-// handleAPIErrorWithDetails provides detailed error handling with context
+// handleAPIErrorWithDetails provides detailed error handling with context.
 func handleAPIErrorWithDetails(diags *diag.Diagnostics, err error, operation, resourceType, resourceID string) {
 	diags.AddError(
 		"API Error",
@@ -36,7 +36,7 @@ func handleAPIErrorWithDetails(diags *diag.Diagnostics, err error, operation, re
 	)
 }
 
-// SetCommonFields sets common fields (id, name, description, timestamps) on a resource model
+// SetCommonFields sets common fields (id, name, description, timestamps) on a resource model.
 func setFields(
 	ctx context.Context,
 	fields ...any,
@@ -47,7 +47,12 @@ func setFields(
 	var diags diag.Diagnostics
 	for i := 0; i < len(fields); i += 2 {
 		if srcMap, ok := fields[i+1].(tfMappable); ok {
-			diags.Append(srcMap.mapToTF(ctx, fields[i].(tfTypeable))...)
+			tft, ok := fields[i].(tfTypeable)
+			if !ok {
+				diags.AddError("Internal Error", fmt.Sprintf("Expected tfTypeable, got %T", fields[i]))
+				continue
+			}
+			diags.Append(srcMap.mapToTF(ctx, tft)...)
 			continue
 		}
 		switch v := fields[i].(type) {
@@ -74,7 +79,7 @@ func setFields(
 	return diags
 }
 
-func setStringField(ctx context.Context, field *types.String, value any) diag.Diagnostics {
+func setStringField(_ context.Context, field *types.String, value any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	switch v := value.(type) {
 	case string:
@@ -87,7 +92,7 @@ func setStringField(ctx context.Context, field *types.String, value any) diag.Di
 	return diags
 }
 
-func setTimestampField(ctx context.Context, field *timetypes.RFC3339, value any) diag.Diagnostics {
+func setTimestampField(_ context.Context, field *timetypes.RFC3339, value any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	switch v := value.(type) {
 	case string:
@@ -100,7 +105,7 @@ func setTimestampField(ctx context.Context, field *timetypes.RFC3339, value any)
 	return diags
 }
 
-func setInt64Field(ctx context.Context, field *types.Int64, value any) diag.Diagnostics {
+func setInt64Field(_ context.Context, field *types.Int64, value any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	switch v := value.(type) {
 	case int64:
@@ -139,7 +144,7 @@ func setSetField(ctx context.Context, field *types.Set, value any) diag.Diagnost
 	return diags
 }
 
-func setJsonField(ctx context.Context, field *jsontypes.Normalized, value any) diag.Diagnostics {
+func setJsonField(_ context.Context, field *jsontypes.Normalized, value any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	switch v := value.(type) {
 	case string:
@@ -171,7 +176,7 @@ func setObjectField(ctx context.Context, field *types.Object, value any) diag.Di
 	return diags
 }
 
-func setBoolField(ctx context.Context, field *types.Bool, value any) diag.Diagnostics {
+func setBoolField(_ context.Context, field *types.Bool, value any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	switch v := value.(type) {
 	case bool:
@@ -184,7 +189,7 @@ func setBoolField(ctx context.Context, field *types.Bool, value any) diag.Diagno
 	return diags
 }
 
-// logResourceOperation logs a resource operation for debugging
+// logResourceOperation logs a resource operation for debugging.
 func logResourceOperation(ctx context.Context, operation, resourceType, resourceID string) {
 	tflog.Debug(ctx, fmt.Sprintf("%s %s", operation, resourceType),
 		map[string]interface{}{
@@ -194,10 +199,10 @@ func logResourceOperation(ctx context.Context, operation, resourceType, resource
 		})
 }
 
-// logDataSourceOperation logs a data source operation for debugging
-func logDataSourceOperation(ctx context.Context, operation, dataSourceType, dataSourceID string) {
+// logDataSourceOperation logs a data source operation for debugging.
+func logDataSourceOperation(ctx context.Context, operation, dataSourceType, dataSourceID string) { //nolint:unparam
 	tflog.Debug(ctx, fmt.Sprintf("%s %s data source", operation, dataSourceType),
-		map[string]interface{}{
+		map[string]any{
 			"data_source_type": dataSourceType,
 			"data_source_id":   dataSourceID,
 			"operation":        operation,
@@ -242,7 +247,7 @@ func (l structSliceMappable[S, T, PT]) mapToTF(ctx context.Context, target tfTyp
 func newStructSliceMappable[S any, T any, PT interface {
 	*T
 	fromGQL[S]
-}](src []S, targetExample T) tfMappable {
+}](src []S, targetExample T) tfMappable { //nolint:unparam
 	return structSliceMappable[S, T, PT]{src: src}
 }
 
@@ -263,6 +268,6 @@ func (l structMappable[S, T, PT]) mapToTF(ctx context.Context, target tfTypeable
 func newStructMappable[S any, T any, PT interface {
 	*T
 	fromGQL[S]
-}](src S, targetExample T) tfMappable {
+}](src S, targetExample T) tfMappable { //nolint:unparam
 	return structMappable[S, T, PT]{src: src}
 }
