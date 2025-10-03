@@ -6,7 +6,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 # Releases need permissions to read and write the repository contents.
 # GitHub considers creating releases and uploading assets as writing contents.
@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
@@ -38,4 +38,17 @@ jobs:
         env:
           # GitHub sets the GITHUB_TOKEN secret automatically.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-2
+          role-to-assume: arn:aws:iam::202533501736:role/terraform-provider-upload-github
+      - name: Export public key
+        run: gpg --armor --export $GPG_FINGERPRINT > dist/gpg.pub
+        env:
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+      - name: Upload release
+        run: go run ./publishtools/publish -directory=dist -domain=tf.partite.ai -bucket=partite-tf-partite-ai-content -namespace=partite-ai -provider-name=partiteai -gpg-fingerprint=$GPG_FINGERPRINT
+        env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
