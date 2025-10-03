@@ -3,8 +3,6 @@ package provider
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -30,16 +28,7 @@ type ModelProviderResource struct {
 }
 
 type ModelProviderResourceModel struct {
-	Id           types.String      `tfsdk:"id"`
-	Name         types.String      `tfsdk:"name"`
-	Description  types.String      `tfsdk:"description"`
-	Tags         types.List        `tfsdk:"tags"`
-	CreatedAt    timetypes.RFC3339 `tfsdk:"created_at"`
-	UpdatedAt    timetypes.RFC3339 `tfsdk:"updated_at"`
-	Anthropic    types.Object      `tfsdk:"anthropic"`
-	OpenAI       types.Object      `tfsdk:"openai"`
-	GoogleGenAI  types.Object      `tfsdk:"google_genai"`
-	OpenAICompat types.Object      `tfsdk:"openai_compatible"`
+	ModelProviderBaseModel
 }
 
 func (r *ModelProviderResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -409,72 +398,5 @@ func (r *ModelProviderResource) ImportState(ctx context.Context, req resource.Im
 }
 
 func (r *ModelProviderResource) mapResponse(ctx context.Context, data *ModelProviderResourceModel, details pgql.ModelProviderDetails) diag.Diagnostics {
-	// Use setFields for standard fields
-	diags := setFields(
-		ctx,
-		&data.Id, details.Id,
-		&data.Name, details.Name,
-		&data.Description, details.Description,
-		&data.CreatedAt, details.CreatedAt,
-		&data.UpdatedAt, details.UpdatedAt,
-		&data.Tags, details.Tags,
-	)
-
-	// Clear all blocks
-	data.Anthropic = types.ObjectNull(data.Anthropic.AttributeTypes(ctx))
-	data.OpenAI = types.ObjectNull(data.OpenAI.AttributeTypes(ctx))
-	data.GoogleGenAI = types.ObjectNull(data.GoogleGenAI.AttributeTypes(ctx))
-	data.OpenAICompat = types.ObjectNull(data.OpenAICompat.AttributeTypes(ctx))
-
-	// Set the correct block based on provider type
-	switch details.ProviderType {
-	case pgql.ModelProviderTypeAnthropic:
-		c := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigAnthropic)
-		var block = map[string]attr.Value{
-			"api_key": types.StringValue(c.ApiKey),
-		}
-		data.Anthropic = types.ObjectValueMust(data.Anthropic.AttributeTypes(ctx), block)
-	case pgql.ModelProviderTypeOpenAi:
-		c := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigOpenAI)
-		var block = map[string]attr.Value{
-			"api_key": types.StringValue(c.ApiKey),
-		}
-		data.OpenAI = types.ObjectValueMust(data.OpenAI.AttributeTypes(ctx), block)
-	case pgql.ModelProviderTypeGoogleGenAi:
-		c := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI)
-		block := map[string]attr.Value{}
-		// Set only one of gemini or vertex
-		if c.Gemini != nil {
-			geminiBlock := map[string]attr.Value{
-				"api_key": types.StringValue(c.Gemini.ApiKey),
-			}
-			block["gemini"] = types.ObjectValueMust(data.GoogleGenAI.AttributeTypes(ctx)["gemini"].(types.ObjectType).AttributeTypes(), geminiBlock)
-			block["vertex"] = types.ObjectNull(data.GoogleGenAI.AttributeTypes(ctx)["vertex"].(types.ObjectType).AttributeTypes())
-		} else if c.Vertex != nil {
-			vertexBlock := map[string]attr.Value{
-				"service_account_key": types.StringValue(c.Vertex.ServiceAccountKey),
-				"project_id":          types.StringValue(c.Vertex.ProjectID),
-				"location":            types.StringValue(c.Vertex.Location),
-			}
-			block["vertex"] = types.ObjectValueMust(data.GoogleGenAI.AttributeTypes(ctx)["vertex"].(types.ObjectType).AttributeTypes(), vertexBlock)
-			block["gemini"] = types.ObjectNull(data.GoogleGenAI.AttributeTypes(ctx)["gemini"].(types.ObjectType).AttributeTypes())
-		} else {
-			block["gemini"] = types.ObjectNull(data.GoogleGenAI.AttributeTypes(ctx)["gemini"].(types.ObjectType).AttributeTypes())
-			block["vertex"] = types.ObjectNull(data.GoogleGenAI.AttributeTypes(ctx)["vertex"].(types.ObjectType).AttributeTypes())
-		}
-		data.GoogleGenAI = types.ObjectValueMust(data.GoogleGenAI.AttributeTypes(ctx), block)
-	case pgql.ModelProviderTypeOpenAiCompatible:
-		c := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible)
-		block := map[string]attr.Value{
-			"url": types.StringValue(c.Url),
-		}
-		if c.ApiToken != nil {
-			block["api_token"] = types.StringValue(*c.ApiToken)
-		} else {
-			block["api_token"] = types.StringNull()
-		}
-		data.OpenAICompat = types.ObjectValueMust(data.OpenAICompat.AttributeTypes(ctx), block)
-	}
-
-	return diags
+	return data.MapFromGraphQL(ctx, details)
 }

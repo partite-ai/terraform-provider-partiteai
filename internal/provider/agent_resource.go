@@ -35,27 +35,8 @@ type AgentResource struct {
 	BaseResource
 }
 
-// AgentResourceModel describes the resource data model.
 type AgentResourceModel struct {
-	Id                          types.String         `tfsdk:"id"`
-	Name                        types.String         `tfsdk:"name"`
-	Description                 types.String         `tfsdk:"description"`
-	Tags                        types.List           `tfsdk:"tags"`
-	CreatedAt                   timetypes.RFC3339    `tfsdk:"created_at"`
-	UpdatedAt                   timetypes.RFC3339    `tfsdk:"updated_at"`
-	VersionId                   types.String         `tfsdk:"version_id"`
-	VersionOrdinal              types.Int64          `tfsdk:"version_ordinal"`
-	VersionCreatedAt            timetypes.RFC3339    `tfsdk:"version_created_at"`
-	McpConnections              types.Set            `tfsdk:"mcp_connections"`
-	MemorySlots                 types.Set            `tfsdk:"memory_slots"`
-	Identity                    types.String         `tfsdk:"identity"`
-	TaskInstructions            types.String         `tfsdk:"task_instructions"`
-	ModelComplexity             types.String         `tfsdk:"model_complexity"`
-	InputMessageType            jsontypes.Normalized `tfsdk:"input_message_type"`
-	PreserveConversationHistory types.Bool           `tfsdk:"preserve_conversation_history"`
-	SendThinkingToUser          types.Bool           `tfsdk:"send_thinking_to_user"`
-	SendMessagesToUser          types.Bool           `tfsdk:"send_messages_to_user"`
-	AskQuestionsToUser          types.Bool           `tfsdk:"ask_questions_to_user"`
+	AgentBaseModel
 }
 
 var memorySlotType = schema.NestedAttributeObject{
@@ -461,31 +442,5 @@ func (r *AgentResource) ImportState(ctx context.Context, req resource.ImportStat
 }
 
 func (r *AgentResource) mapResponse(ctx context.Context, data *AgentResourceModel, agentDetails pgql.AgentDetails) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	// Use setFields for standard fields
-	diags.Append(setFields(
-		ctx,
-		&data.Id, agentDetails.Id,
-		&data.Name, agentDetails.Name,
-		&data.Description, agentDetails.Description,
-		&data.CreatedAt, agentDetails.CreatedAt,
-		&data.UpdatedAt, agentDetails.UpdatedAt,
-		&data.VersionId, agentDetails.LatestVersion.Id,
-		&data.VersionOrdinal, int64(agentDetails.LatestVersion.Ordinal),
-		&data.VersionCreatedAt, agentDetails.LatestVersion.CreatedAt,
-		&data.Identity, agentDetails.LatestVersion.Identity,
-		&data.TaskInstructions, agentDetails.LatestVersion.TaskInstructions,
-		&data.ModelComplexity, string(agentDetails.LatestVersion.ModelComplexity),
-		&data.InputMessageType, agentDetails.LatestVersion.InputMessageType,
-		&data.PreserveConversationHistory, agentDetails.LatestVersion.PreserveConversationHistory,
-		&data.SendThinkingToUser, agentDetails.LatestVersion.SendThinkingToUser,
-		&data.SendMessagesToUser, agentDetails.LatestVersion.SendMessagesToUser,
-		&data.AskQuestionsToUser, agentDetails.LatestVersion.AskQuestionsToUser,
-		&data.Tags, agentDetails.Tags,
-		&data.MemorySlots, newStructSliceMappable(agentDetails.LatestVersion.MemorySlots, memorySlotInfo{}),
-		&data.McpConnections, newStructSliceMappable(agentDetails.LatestVersion.McpConnections, mcpConnectionInfo{}),
-	)...)
-
-	return diags
+	return data.MapFromGraphQL(ctx, agentDetails)
 }

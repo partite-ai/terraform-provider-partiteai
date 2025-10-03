@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -26,15 +25,10 @@ type ApiKeyResource struct {
 	BaseResource
 }
 
+// ApiKeyResourceModel extends the base model with resource-specific fields
 type ApiKeyResourceModel struct {
-	Id          types.String      `tfsdk:"id"`
-	Name        types.String      `tfsdk:"name"`
-	Description types.String      `tfsdk:"description"`
-	Scopes      types.Set         `tfsdk:"scopes"`
-	Kid         types.String      `tfsdk:"kid"`
-	Secret      types.String      `tfsdk:"secret"`
-	CreatedAt   timetypes.RFC3339 `tfsdk:"created_at"`
-	UpdatedAt   timetypes.RFC3339 `tfsdk:"updated_at"`
+	ApiKeyBaseModel
+	Secret types.String `tfsdk:"secret"` // Only available in resource after creation
 }
 
 func (r *ApiKeyResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -163,14 +157,5 @@ func (r *ApiKeyResource) Delete(ctx context.Context, req resource.DeleteRequest,
 }
 
 func (r *ApiKeyResource) mapResponse(ctx context.Context, data *ApiKeyResourceModel, apiKey *pgql.ApiKeyDetails) diag.Diagnostics {
-	return setFields(
-		ctx,
-		&data.Id, apiKey.Id,
-		&data.Name, apiKey.Name,
-		&data.Description, apiKey.Description,
-		&data.CreatedAt, apiKey.CreatedAt,
-		&data.UpdatedAt, apiKey.UpdatedAt,
-		&data.Kid, apiKey.Kid,
-		&data.Scopes, apiKey.Scopes,
-	)
+	return data.MapFromGraphQL(ctx, apiKey)
 }

@@ -195,7 +195,17 @@ func (p *PartiteAIProvider) EphemeralResources(ctx context.Context) []func() eph
 }
 
 func (p *PartiteAIProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+		NewAgentDataSource,
+		NewApiKeyDataSource,
+		NewMcpConnectionDataSource,
+		NewMeshDataSource,
+		NewMeshInputDataSource,
+		NewMeshLinkDataSource,
+		NewModelProviderDataSource,
+		NewModelProfileDataSource,
+		NewModelSetDataSource,
+	}
 }
 
 func (p *PartiteAIProvider) Functions(ctx context.Context) []func() function.Function {

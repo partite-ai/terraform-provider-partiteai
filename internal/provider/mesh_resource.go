@@ -3,12 +3,10 @@ package provider
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -30,14 +28,7 @@ type MeshResource struct {
 
 // MeshResourceModel describes the resource data model.
 type MeshResourceModel struct {
-	Id             types.String      `tfsdk:"id"`
-	Name           types.String      `tfsdk:"name"`
-	Description    types.String      `tfsdk:"description"`
-	Tags           types.List        `tfsdk:"tags"`
-	CreatedAt      timetypes.RFC3339 `tfsdk:"created_at"`
-	UpdatedAt      timetypes.RFC3339 `tfsdk:"updated_at"`
-	ModelSetId     types.String      `tfsdk:"model_set_id"`
-	DraftVersionId types.String      `tfsdk:"draft_version_id"`
+	MeshBaseModel
 }
 
 func (r *MeshResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -177,15 +168,5 @@ func (r *MeshResource) ImportState(ctx context.Context, req resource.ImportState
 }
 
 func (r *MeshResource) mapFields(ctx context.Context, data *MeshResourceModel, meshDetails pgql.MeshDetails) diag.Diagnostics {
-	return setFields(
-		ctx,
-		&data.Id, meshDetails.Id,
-		&data.Name, meshDetails.Name,
-		&data.Description, meshDetails.Description,
-		&data.Tags, meshDetails.Tags,
-		&data.CreatedAt, meshDetails.CreatedAt,
-		&data.UpdatedAt, meshDetails.UpdatedAt,
-		&data.DraftVersionId, meshDetails.DraftVersion.Id,
-		&data.ModelSetId, meshDetails.DraftVersion.ModelSet.Id,
-	)
+	return data.MapFromGraphQL(ctx, meshDetails)
 }

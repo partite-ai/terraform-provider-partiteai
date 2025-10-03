@@ -3,8 +3,6 @@ package provider
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -30,16 +28,7 @@ type ModelProfileResource struct {
 }
 
 type ModelProfileResourceModel struct {
-	Id              types.String      `tfsdk:"id"`
-	ModelProviderId types.String      `tfsdk:"model_provider_id"`
-	Name            types.String      `tfsdk:"name"`
-	Description     types.String      `tfsdk:"description"`
-	Tags            types.List        `tfsdk:"tags"`
-	CreatedAt       timetypes.RFC3339 `tfsdk:"created_at"`
-	UpdatedAt       timetypes.RFC3339 `tfsdk:"updated_at"`
-	Anthropic       types.Object      `tfsdk:"anthropic"`
-	OpenAI          types.Object      `tfsdk:"openai"`
-	Google          types.Object      `tfsdk:"google"`
+	ModelProfileBaseModel
 }
 
 func (r *ModelProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -412,59 +401,5 @@ func (r *ModelProfileResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (r *ModelProfileResource) mapResponse(ctx context.Context, data *ModelProfileResourceModel, details pgql.ModelProfileDetails) diag.Diagnostics {
-	// Use setFields for standard fields
-	diags := setFields(
-		ctx,
-		&data.Id, details.Id,
-		&data.Name, details.Name,
-		&data.Description, details.Description,
-		&data.CreatedAt, details.CreatedAt,
-		&data.UpdatedAt, details.UpdatedAt,
-		&data.Tags, details.Tags,
-	)
-
-	// Clear all blocks
-	data.Anthropic = types.ObjectNull(data.Anthropic.AttributeTypes(ctx))
-	data.OpenAI = types.ObjectNull(data.OpenAI.AttributeTypes(ctx))
-	data.Google = types.ObjectNull(data.Google.AttributeTypes(ctx))
-
-	// Set the correct block based on config type
-	switch c := details.Configuration.(type) {
-	case *pgql.ModelProfileDetailsConfigurationModelProfileConfigAnthropic:
-		block := map[string]attr.Value{
-			"model":                  types.StringValue(c.Model),
-			"max_tokens":             types.Int64PointerValue(int64Ptr(c.MaxTokens)),
-			"temperature":            types.Float64PointerValue(c.Temperature),
-			"top_p":                  types.Float64PointerValue(c.TopP),
-			"top_k":                  types.Int64PointerValue(int64Ptr(c.TopK)),
-			"thinking_budget_tokens": types.Int64PointerValue(int64Ptr(c.ThinkingBudgetTokens)),
-		}
-		data.Anthropic = types.ObjectValueMust(data.Anthropic.AttributeTypes(ctx), block)
-	case *pgql.ModelProfileDetailsConfigurationModelProfileConfigOpenAI:
-		block := map[string]attr.Value{
-			"model":       types.StringValue(c.Model),
-			"max_tokens":  types.Int64PointerValue(int64Ptr(c.MaxTokens)),
-			"temperature": types.Float64PointerValue(c.Temperature),
-			"top_p":       types.Float64PointerValue(c.TopP),
-			"reasoning_effort": func() types.String {
-				if c.ReasoningEffort != nil {
-					return types.StringValue(string(*c.ReasoningEffort))
-				}
-				return types.StringNull()
-			}(),
-		}
-		data.OpenAI = types.ObjectValueMust(data.OpenAI.AttributeTypes(ctx), block)
-	case *pgql.ModelProfileDetailsConfigurationModelProfileConfigGoogle:
-		block := map[string]attr.Value{
-			"model":                  types.StringValue(c.Model),
-			"max_tokens":             types.Int64PointerValue(int64Ptr(c.MaxTokens)),
-			"temperature":            types.Float64PointerValue(c.Temperature),
-			"top_p":                  types.Float64PointerValue(c.TopP),
-			"top_k":                  types.Int64PointerValue(int64Ptr(c.TopK)),
-			"thinking_budget_tokens": types.Int64PointerValue(int64Ptr(c.ThinkingBudgetTokens)),
-		}
-		data.Google = types.ObjectValueMust(data.Google.AttributeTypes(ctx), block)
-	}
-
-	return diags
+	return data.MapFromGraphQL(ctx, details)
 }

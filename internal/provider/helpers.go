@@ -194,6 +194,16 @@ func logResourceOperation(ctx context.Context, operation, resourceType, resource
 		})
 }
 
+// logDataSourceOperation logs a data source operation for debugging
+func logDataSourceOperation(ctx context.Context, operation, dataSourceType, dataSourceID string) {
+	tflog.Debug(ctx, fmt.Sprintf("%s %s data source", operation, dataSourceType),
+		map[string]interface{}{
+			"data_source_type": dataSourceType,
+			"data_source_id":   dataSourceID,
+			"operation":        operation,
+		})
+}
+
 type tfTypeable interface {
 	Type(ctx context.Context) attr.Type
 }

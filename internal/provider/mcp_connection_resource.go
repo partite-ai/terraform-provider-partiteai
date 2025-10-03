@@ -3,13 +3,16 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
 
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
@@ -31,15 +34,9 @@ type McpConnectionResource struct {
 	BaseResource
 }
 
-// McpConnectionResourceModel describes the resource data model.
+// McpConnectionResourceModel extends the base model with resource-specific fields (none currently)
 type McpConnectionResourceModel struct {
-	Id                           types.String      `tfsdk:"id"`
-	Name                         types.String      `tfsdk:"name"`
-	HttpTransport                types.Object      `tfsdk:"http_transport"`
-	StdioTransport               types.Object      `tfsdk:"stdio_transport"`
-	ServerInitiatedHttpTransport types.Object      `tfsdk:"server_initiated_http_transport"`
-	CreatedAt                    timetypes.RFC3339 `tfsdk:"created_at"`
-	UpdatedAt                    timetypes.RFC3339 `tfsdk:"updated_at"`
+	McpConnectionBaseModel
 }
 
 var envVarType = schema.NestedAttributeObject{
@@ -59,22 +56,24 @@ var envVarType = schema.NestedAttributeObject{
 var oauthClientCredentialsType = schema.SingleNestedAttribute{
 	MarkdownDescription: "OAuth client credentials for authentication.",
 	Optional:            true,
+	WriteOnly:           true,
 	Attributes: map[string]schema.Attribute{
 		"client_id": schema.StringAttribute{
 			MarkdownDescription: "The client ID for OAuth authentication.",
 			Required:            true,
+			WriteOnly:           true,
 		},
 		"client_secret": schema.StringAttribute{
 			MarkdownDescription: "The client secret for OAuth authentication.",
 			Required:            true,
 			Sensitive:           true,
+			WriteOnly:           true,
 		},
 		"scopes": schema.ListAttribute{
 			MarkdownDescription: "The scopes for OAuth authentication.",
 			ElementType:         types.StringType,
 			Optional:            true,
-			Computed:            true,
-			Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, nil)),
+			WriteOnly:           true,
 		},
 	},
 }
@@ -82,15 +81,18 @@ var oauthClientCredentialsType = schema.SingleNestedAttribute{
 var basicAuthCredentialsType = schema.SingleNestedAttribute{
 	MarkdownDescription: "Basic authentication credentials.",
 	Optional:            true,
+	WriteOnly:           true,
 	Attributes: map[string]schema.Attribute{
 		"username": schema.StringAttribute{
 			MarkdownDescription: "The username for basic authentication.",
 			Required:            true,
+			WriteOnly:           true,
 		},
 		"password": schema.StringAttribute{
 			MarkdownDescription: "The password for basic authentication.",
 			Required:            true,
 			Sensitive:           true,
+			WriteOnly:           true,
 		},
 	},
 }
@@ -98,15 +100,18 @@ var basicAuthCredentialsType = schema.SingleNestedAttribute{
 var headerAuthCredentialsType = schema.SingleNestedAttribute{
 	MarkdownDescription: "Header authentication credentials.",
 	Optional:            true,
+	WriteOnly:           true,
 	Attributes: map[string]schema.Attribute{
 		"header_name": schema.StringAttribute{
 			MarkdownDescription: "The name of the header for authentication.",
 			Required:            true,
+			WriteOnly:           true,
 		},
 		"header_value": schema.StringAttribute{
 			MarkdownDescription: "The value of the header for authentication.",
 			Required:            true,
 			Sensitive:           true,
+			WriteOnly:           true,
 		},
 	},
 }
@@ -131,9 +136,24 @@ func (r *McpConnectionResource) Schema(ctx context.Context, req resource.SchemaR
 						MarkdownDescription: "The URL of the HTTP endpoint.",
 						Required:            true,
 					},
-					"oauth_client_credentials": oauthClientCredentialsType,
-					"basic_credentials":        basicAuthCredentialsType,
-					"header_credentials":       headerAuthCredentialsType,
+					"authentication_method": schema.StringAttribute{
+						MarkdownDescription: "The authentication method to use. Valid values are 'NONE', 'BASIC', 'HEADER', 'OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_CLIENT_CREDENTIALS'.",
+						Optional:            true,
+						Computed:            true,
+						Default:             stringdefault.StaticString("NONE"),
+						Validators: []validator.String{
+							stringvalidator.OneOf("NONE", "BASIC", "HEADER", "OAUTH2_AUTHORIZATION_CODE", "OAUTH2_CLIENT_CREDENTIALS"),
+						},
+					},
+					"oauth_client_credentials_wo": oauthClientCredentialsType,
+					"basic_credentials_wo":        basicAuthCredentialsType,
+					"header_credentials_wo":       headerAuthCredentialsType,
+					"credentials_version": schema.Int64Attribute{
+						MarkdownDescription: "The version of the credentials. Increment this value to rotate credentials.",
+						Optional:            true,
+						Computed:            true,
+						Default:             int64default.StaticInt64(1),
+					},
 				},
 			},
 			"stdio_transport": schema.SingleNestedAttribute{
@@ -178,6 +198,24 @@ func (r *McpConnectionResource) Create(ctx context.Context, req resource.CreateR
 
 	logResourceOperation(ctx, "creating", "mcp_connection", "")
 
+	var attrs = data.HttpTransport.Attributes()
+	oauthCredsAttr := attrs["oauth_client_credentials_wo"]
+	basicCredsAttr := attrs["basic_credentials_wo"]
+	headerCredsAttr := attrs["header_credentials_wo"]
+	resp.Diagnostics.Append(req.Config.GetAttribute(
+		ctx, path.Root("http_transport").AtName("oauth_client_credentials_wo"), &oauthCredsAttr,
+	)...)
+	resp.Diagnostics.Append(req.Config.GetAttribute(
+		ctx, path.Root("http_transport").AtName("basic_credentials_wo"), &basicCredsAttr,
+	)...)
+	resp.Diagnostics.Append(req.Config.GetAttribute(
+		ctx, path.Root("http_transport").AtName("header_credentials_wo"), &headerCredsAttr,
+	)...)
+	attrs["oauth_client_credentials_wo"] = oauthCredsAttr
+	attrs["basic_credentials_wo"] = basicCredsAttr
+	attrs["header_credentials_wo"] = headerCredsAttr
+	data.HttpTransport = types.ObjectValueMust(data.HttpTransport.AttributeTypes(ctx), attrs)
+
 	var createReq pgql.NewMcpConnection
 	createReq.Name = data.Name.ValueString()
 	if diag := fillMcpConnectionUpdateMessage(
@@ -185,6 +223,7 @@ func (r *McpConnectionResource) Create(ctx context.Context, req resource.CreateR
 		&createReq.Transport,
 		&createReq.HttpTransport, &createReq.OauthClientCredentials, &createReq.BasicCredentials, &createReq.HeaderCredentials,
 		&createReq.StdioTransport,
+		true,
 	); diag.HasError() {
 		resp.Diagnostics.Append(diag...)
 		return
@@ -239,13 +278,53 @@ func (r *McpConnectionResource) Update(ctx context.Context, req resource.UpdateR
 	if !planData.HttpTransport.Equal(stateData.HttpTransport) ||
 		!planData.StdioTransport.Equal(stateData.StdioTransport) ||
 		!planData.ServerInitiatedHttpTransport.Equal(stateData.ServerInitiatedHttpTransport) {
+		updateCreds := false
+		if !planData.HttpTransport.Equal(stateData.HttpTransport) {
+			authModeChanged := false
+			credentialsVersionChanged := false
+			if !planData.HttpTransport.IsNull() && !planData.HttpTransport.IsUnknown() {
+				if !planData.HttpTransport.Attributes()["authentication_method"].Equal(stateData.HttpTransport.Attributes()["authentication_method"]) {
+					authModeChanged = true
+				}
+				if !planData.HttpTransport.Attributes()["credentials_version"].Equal(stateData.HttpTransport.Attributes()["credentials_version"]) {
+					credentialsVersionChanged = true
+				}
+			}
+			updateCreds = authModeChanged || credentialsVersionChanged
+
+			if updateCreds {
+				var attrs = planData.HttpTransport.Attributes()
+				oauthCredsAttr := attrs["oauth_client_credentials_wo"]
+				basicCredsAttr := attrs["basic_credentials_wo"]
+				headerCredsAttr := attrs["header_credentials_wo"]
+				resp.Diagnostics.Append(req.Config.GetAttribute(
+					ctx, path.Root("http_transport").AtName("oauth_client_credentials_wo"), &oauthCredsAttr,
+				)...)
+				resp.Diagnostics.Append(req.Config.GetAttribute(
+					ctx, path.Root("http_transport").AtName("basic_credentials_wo"), &basicCredsAttr,
+				)...)
+				resp.Diagnostics.Append(req.Config.GetAttribute(
+					ctx, path.Root("http_transport").AtName("header_credentials_wo"), &headerCredsAttr,
+				)...)
+				attrs["oauth_client_credentials_wo"] = oauthCredsAttr
+				attrs["basic_credentials_wo"] = basicCredsAttr
+				attrs["header_credentials_wo"] = headerCredsAttr
+				planData.HttpTransport = types.ObjectValueMust(planData.HttpTransport.AttributeTypes(ctx), attrs)
+			}
+		}
+
 		var t pgql.McpTransport
-		fillMcpConnectionUpdateMessage(
+		resp.Diagnostics.Append(fillMcpConnectionUpdateMessage(
 			ctx, planData, &t,
 			&update.HttpTransport, &update.OauthClientCredentials, &update.BasicCredentials, &update.HeaderCredentials,
 			&update.StdioTransport,
-		)
+			updateCreds,
+		)...)
 		update.Transport = &t
+
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	updateResp, err := pgql.ModifyMcpConnection(ctx, r.GetClient(), planData.Id.ValueString(), update)
@@ -279,72 +358,7 @@ func (r *McpConnectionResource) Delete(ctx context.Context, req resource.DeleteR
 }
 
 func (r *McpConnectionResource) mapResponse(ctx context.Context, data *McpConnectionResourceModel, mcpConnectionDetails pgql.McpConnectionDetails) diag.Diagnostics {
-	diags := setFields(
-		ctx,
-		&data.Id, mcpConnectionDetails.Id,
-		&data.Name, mcpConnectionDetails.Name,
-		&data.CreatedAt, mcpConnectionDetails.CreatedAt,
-		&data.UpdatedAt, mcpConnectionDetails.UpdatedAt,
-	)
-
-	if diags.HasError() {
-		return diags
-	}
-
-	switch mcpConnectionDetails.Transport {
-	case pgql.McpTransportHttp:
-		var t httpTransportStruct
-		diags.Append(tfsdk.ValueAs(ctx, data.HttpTransport, &t)...)
-		t.Url = mcpConnectionDetails.HttpTransport.Url
-		switch mcpConnectionDetails.HttpTransport.AuthFlow {
-		case pgql.McpAuthFlowOauth2AuthorizationCode, pgql.McpAuthFlowNone:
-			t.OauthClientCredentials = nil
-			t.BasicAuthCredentials = nil
-			t.HeaderCredentials = nil
-		case pgql.McpAuthFlowOauth2ClientCredentials:
-			if t.OauthClientCredentials == nil {
-				t.OauthClientCredentials = &oauthClientCredentialsStruct{
-					ClientId:     "<unknown>",
-					ClientSecret: "<unknown>",
-				}
-			}
-			t.BasicAuthCredentials = nil
-			t.HeaderCredentials = nil
-		case pgql.McpAuthFlowBasic:
-			if t.BasicAuthCredentials == nil {
-				t.BasicAuthCredentials = &basicAuthCredentialsStruct{
-					Username: "<unknown>",
-					Password: "<unknown>",
-				}
-			}
-			t.OauthClientCredentials = nil
-			t.HeaderCredentials = nil
-		case pgql.McpAuthFlowHeader:
-			if t.HeaderCredentials == nil {
-				t.HeaderCredentials = &headerAuthCredentialsStruct{
-					HeaderName:  "<unknown>",
-					HeaderValue: "<unknown>",
-				}
-			}
-			t.OauthClientCredentials = nil
-			t.BasicAuthCredentials = nil
-		}
-		diags.Append(setFields(ctx, &data.HttpTransport, t)...)
-		data.StdioTransport = types.ObjectNull(data.StdioTransport.AttributeTypes(ctx))
-		data.ServerInitiatedHttpTransport = types.ObjectNull(data.ServerInitiatedHttpTransport.AttributeTypes(ctx))
-	case pgql.McpTransportStdio:
-		diags.Append(setFields(ctx, &data.StdioTransport, newStructMappable(mcpConnectionDetails.StdioTransport, stdioTransportStruct{}))...)
-		data.HttpTransport = types.ObjectNull(data.HttpTransport.AttributeTypes(ctx))
-		data.ServerInitiatedHttpTransport = types.ObjectNull(data.ServerInitiatedHttpTransport.AttributeTypes(ctx))
-	case pgql.McpTransportServerInitiatedHttp:
-		if diag := tfsdk.ValueFrom(ctx, struct{}{}, data.ServerInitiatedHttpTransport.Type(ctx), &data.ServerInitiatedHttpTransport); diag.HasError() {
-			return diag
-		}
-		data.HttpTransport = types.ObjectNull(data.HttpTransport.AttributeTypes(ctx))
-		data.StdioTransport = types.ObjectNull(data.StdioTransport.AttributeTypes(ctx))
-	}
-
-	return diags
+	return data.MapFromGraphQL(ctx, mcpConnectionDetails)
 }
 
 func fillMcpConnectionUpdateMessage(
@@ -356,6 +370,7 @@ func fillMcpConnectionUpdateMessage(
 	basicCreds **pgql.McpConnectionBasicCredentials,
 	headerCreds **pgql.McpConnectionHeaderCredentials,
 	stdioTransport **pgql.McpConnectionStdioTransportSettings,
+	updateCredentials bool,
 ) diag.Diagnostics {
 	switch {
 	case !data.HttpTransport.IsNull() && !data.HttpTransport.IsUnknown():
@@ -364,50 +379,51 @@ func fillMcpConnectionUpdateMessage(
 		if diag := tfsdk.ValueAs(ctx, data.HttpTransport.Attributes()["url"], &ht.Url); diag.HasError() {
 			return diag
 		}
+		if diag := tfsdk.ValueAs(ctx, data.HttpTransport.Attributes()["authentication_method"], &ht.AuthFlow); diag.HasError() {
+			return diag
+		}
 
-		if v, ok := data.HttpTransport.Attributes()["oauth_client_credentials"]; ok && !v.IsNull() && !v.IsUnknown() {
-			ht.AuthFlow = pgql.McpAuthFlowOauth2ClientCredentials
-			var creds struct {
-				ClientId     string   `tfsdk:"client_id"`
-				ClientSecret string   `tfsdk:"client_secret"`
-				Scopes       []string `tfsdk:"scopes"`
+		if updateCredentials {
+			switch ht.AuthFlow {
+			case pgql.McpAuthFlowOauth2ClientCredentials:
+				var creds struct {
+					ClientId     string   `tfsdk:"client_id"`
+					ClientSecret string   `tfsdk:"client_secret"`
+					Scopes       []string `tfsdk:"scopes"`
+				}
+				if diag := tfsdk.ValueAs(ctx, data.HttpTransport.Attributes()["oauth_client_credentials_wo"], &creds); diag.HasError() {
+					return diag
+				}
+				*oauthClientCreds = &pgql.McpConnectionOauthClientCredentials{
+					ClientID:     creds.ClientId,
+					ClientSecret: creds.ClientSecret,
+					Scopes:       creds.Scopes,
+				}
+			case pgql.McpAuthFlowBasic:
+				var creds struct {
+					Username string `tfsdk:"username"`
+					Password string `tfsdk:"password"`
+				}
+				if diag := tfsdk.ValueAs(ctx, data.HttpTransport.Attributes()["basic_credentials_wo"], &creds); diag.HasError() {
+					return diag
+				}
+				*basicCreds = &pgql.McpConnectionBasicCredentials{
+					Username: creds.Username,
+					Password: creds.Password,
+				}
+			case pgql.McpAuthFlowHeader:
+				var creds struct {
+					HeaderName  string `tfsdk:"header_name"`
+					HeaderValue string `tfsdk:"header_value"`
+				}
+				if diag := tfsdk.ValueAs(ctx, data.HttpTransport.Attributes()["header_credentials_wo"], &creds); diag.HasError() {
+					return diag
+				}
+				*headerCreds = &pgql.McpConnectionHeaderCredentials{
+					Name:  creds.HeaderName,
+					Value: creds.HeaderValue,
+				}
 			}
-			if diag := tfsdk.ValueAs(ctx, v, &creds); diag.HasError() {
-				return diag
-			}
-			*oauthClientCreds = &pgql.McpConnectionOauthClientCredentials{
-				ClientID:     creds.ClientId,
-				ClientSecret: creds.ClientSecret,
-				Scopes:       creds.Scopes,
-			}
-		} else if v, ok := data.HttpTransport.Attributes()["basic_credentials"]; ok && !v.IsNull() && !v.IsUnknown() {
-			ht.AuthFlow = pgql.McpAuthFlowBasic
-			var creds struct {
-				Username string `tfsdk:"username"`
-				Password string `tfsdk:"password"`
-			}
-			if diag := tfsdk.ValueAs(ctx, v, &creds); diag.HasError() {
-				return diag
-			}
-			*basicCreds = &pgql.McpConnectionBasicCredentials{
-				Username: creds.Username,
-				Password: creds.Password,
-			}
-		} else if v, ok := data.HttpTransport.Attributes()["header_credentials"]; ok && !v.IsNull() && !v.IsUnknown() {
-			ht.AuthFlow = pgql.McpAuthFlowHeader
-			var creds struct {
-				HeaderName  string `tfsdk:"header_name"`
-				HeaderValue string `tfsdk:"header_value"`
-			}
-			if diag := tfsdk.ValueAs(ctx, v, &creds); diag.HasError() {
-				return diag
-			}
-			*headerCreds = &pgql.McpConnectionHeaderCredentials{
-				Name:  creds.HeaderName,
-				Value: creds.HeaderValue,
-			}
-		} else {
-			ht.AuthFlow = pgql.McpAuthFlowNone
 		}
 		*httpTransport = ht
 	case !data.StdioTransport.IsNull() && !data.StdioTransport.IsUnknown():
@@ -439,50 +455,4 @@ func fillMcpConnectionUpdateMessage(
 		*pTransport = pgql.McpTransportServerInitiatedHttp
 	}
 	return nil
-}
-
-type httpTransportStruct struct {
-	Url                    string                        `tfsdk:"url"`
-	OauthClientCredentials *oauthClientCredentialsStruct `tfsdk:"oauth_client_credentials"`
-	BasicAuthCredentials   *basicAuthCredentialsStruct   `tfsdk:"basic_credentials"`
-	HeaderCredentials      *headerAuthCredentialsStruct  `tfsdk:"header_credentials"`
-}
-
-type oauthClientCredentialsStruct struct {
-	ClientId     string   `tfsdk:"client_id"`
-	ClientSecret string   `tfsdk:"client_secret"`
-	Scopes       []string `tfsdk:"scopes"`
-}
-
-type basicAuthCredentialsStruct struct {
-	Username string `tfsdk:"username"`
-	Password string `tfsdk:"password"`
-}
-
-type headerAuthCredentialsStruct struct {
-	HeaderName  string `tfsdk:"header_name"`
-	HeaderValue string `tfsdk:"header_value"`
-}
-
-type stdioTransportStruct struct {
-	Command     string         `tfsdk:"command"`
-	Arguments   []string       `tfsdk:"arguments"`
-	Environment []envVarStruct `tfsdk:"environment"`
-}
-
-func (t *stdioTransportStruct) FromGQL(src *pgql.McpConnectionDetailsStdioTransportStdioMcpTransport) diag.Diagnostics {
-	var diags diag.Diagnostics
-	t.Command = src.Command
-	t.Arguments = src.Arguments
-
-	for _, ev := range src.Environment {
-		name, value, _ := strings.Cut(ev, "=")
-		t.Environment = append(t.Environment, envVarStruct{Name: name, Value: value})
-	}
-	return diags
-}
-
-type envVarStruct struct {
-	Name  string `tfsdk:"name"`
-	Value string `tfsdk:"value"`
 }

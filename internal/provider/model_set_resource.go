@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/Khan/genqlient/graphql"
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -32,14 +31,7 @@ type ModelSetResource struct {
 }
 
 type ModelSetResourceModel struct {
-	Id                  types.String      `tfsdk:"id"`
-	Name                types.String      `tfsdk:"name"`
-	Description         types.String      `tfsdk:"description"`
-	Tags                types.List        `tfsdk:"tags"`
-	DefaultModelProfile types.Object      `tfsdk:"default_model_profile"`
-	Rules               types.List        `tfsdk:"rules"`
-	CreatedAt           timetypes.RFC3339 `tfsdk:"created_at"`
-	UpdatedAt           timetypes.RFC3339 `tfsdk:"updated_at"`
+	ModelSetBaseModel
 }
 
 func modelProfileRefType(name string) schema.SingleNestedAttribute {
@@ -298,31 +290,7 @@ func (r *ModelSetResource) ImportState(ctx context.Context, req resource.ImportS
 }
 
 func (r *ModelSetResource) mapResponse(ctx context.Context, data *ModelSetResourceModel, details pgql.ModelSetDetails) diag.Diagnostics {
-	// Use setFields for standard fields
-	diags := setFields(
-		ctx,
-		&data.Id, details.Id,
-		&data.Name, details.Name,
-		&data.Description, details.Description,
-		&data.CreatedAt, details.CreatedAt,
-		&data.UpdatedAt, details.UpdatedAt,
-		&data.Tags, details.Tags,
-		&data.Rules, newStructSliceMappable(details.Rules, modelSetRuleStruct{}),
-	)
-
-	var defaultModelProfile modelProfileRefStruct
-	diags = append(diags, setFields(
-		ctx,
-		&defaultModelProfile.ModelProfileId, details.DefaultModelProfile.Id,
-		&defaultModelProfile.ModelProviderId, details.DefaultModelProfile.Provider.Id,
-		&defaultModelProfile.ModelProfileName, details.DefaultModelProfile.Name,
-	)...)
-
-	diags = append(diags, setFields(
-		ctx,
-		&data.DefaultModelProfile, defaultModelProfile,
-	)...)
-	return diags
+	return data.MapFromGraphQL(ctx, details)
 }
 
 func resolveModelProfileID(ctx context.Context, client graphql.Client, ref types.Object) (string, diag.Diagnostics) {
