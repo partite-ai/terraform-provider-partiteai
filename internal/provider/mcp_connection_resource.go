@@ -198,24 +198,25 @@ func (r *McpConnectionResource) Create(ctx context.Context, req resource.CreateR
 
 	logResourceOperation(ctx, "creating", "mcp_connection", "")
 
-	var attrs = data.HttpTransport.Attributes()
-	oauthCredsAttr := attrs["oauth_client_credentials_wo"]
-	basicCredsAttr := attrs["basic_credentials_wo"]
-	headerCredsAttr := attrs["header_credentials_wo"]
-	resp.Diagnostics.Append(req.Config.GetAttribute(
-		ctx, path.Root("http_transport").AtName("oauth_client_credentials_wo"), &oauthCredsAttr,
-	)...)
-	resp.Diagnostics.Append(req.Config.GetAttribute(
-		ctx, path.Root("http_transport").AtName("basic_credentials_wo"), &basicCredsAttr,
-	)...)
-	resp.Diagnostics.Append(req.Config.GetAttribute(
-		ctx, path.Root("http_transport").AtName("header_credentials_wo"), &headerCredsAttr,
-	)...)
-	attrs["oauth_client_credentials_wo"] = oauthCredsAttr
-	attrs["basic_credentials_wo"] = basicCredsAttr
-	attrs["header_credentials_wo"] = headerCredsAttr
-	data.HttpTransport = types.ObjectValueMust(data.HttpTransport.AttributeTypes(ctx), attrs)
-
+	if !data.HttpTransport.IsNull() {
+		var attrs = data.HttpTransport.Attributes()
+		oauthCredsAttr := attrs["oauth_client_credentials_wo"]
+		basicCredsAttr := attrs["basic_credentials_wo"]
+		headerCredsAttr := attrs["header_credentials_wo"]
+		resp.Diagnostics.Append(req.Config.GetAttribute(
+			ctx, path.Root("http_transport").AtName("oauth_client_credentials_wo"), &oauthCredsAttr,
+		)...)
+		resp.Diagnostics.Append(req.Config.GetAttribute(
+			ctx, path.Root("http_transport").AtName("basic_credentials_wo"), &basicCredsAttr,
+		)...)
+		resp.Diagnostics.Append(req.Config.GetAttribute(
+			ctx, path.Root("http_transport").AtName("header_credentials_wo"), &headerCredsAttr,
+		)...)
+		attrs["oauth_client_credentials_wo"] = oauthCredsAttr
+		attrs["basic_credentials_wo"] = basicCredsAttr
+		attrs["header_credentials_wo"] = headerCredsAttr
+		data.HttpTransport = types.ObjectValueMust(data.HttpTransport.AttributeTypes(ctx), attrs)
+	}
 	var createReq pgql.NewMcpConnection
 	createReq.Name = data.Name.ValueString()
 	if diag := fillMcpConnectionUpdateMessage(
