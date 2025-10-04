@@ -52,7 +52,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
       - name: Upload release
-        run: go run ./publishtools/publish -dir dist -domain tf.partite.ai -bucket partite-tf-partite-ai-content -namespace partite-ai -provider-name partiteai -gpg-fingerprint=$GPG_FINGERPRINT
+        run: go run ./publishtools/publish -dir dist -domain tf.partite.ai -bucket partite-tf-partite-ai-content -namespace partite-ai -provider partiteai
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           AWS_REGION: us-east-2
