@@ -39,6 +39,10 @@ jobs:
         id: import_gpg
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+      - name: Export public key
+        run: mkdir -p dist && gpg --armor --export $GPG_FINGERPRINT > dist/gpg.pub
+        env:
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
         with:
@@ -47,12 +51,8 @@ jobs:
           # GitHub sets the GITHUB_TOKEN secret automatically.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
-      - name: Export public key
-        run: gpg --armor --export $GPG_FINGERPRINT > dist/gpg.pub
-        env:
-          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
       - name: Upload release
-        run: go run ./publishtools/publish -directory=dist -domain=tf.partite.ai -bucket=partite-tf-partite-ai-content -namespace=partite-ai -provider-name=partiteai -gpg-fingerprint=$GPG_FINGERPRINT
+        run: go run ./publishtools/publish -dir dist -domain tf.partite.ai -bucket partite-tf-partite-ai-content -namespace partite-ai -provider-name partiteai -gpg-fingerprint=$GPG_FINGERPRINT
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           AWS_REGION: us-east-2
