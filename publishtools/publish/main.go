@@ -143,9 +143,11 @@ func processVersionMeta(ctx context.Context, s3Client *s3.Client, bucket, namesp
 		}
 
 		putInput := &s3.PutObjectInput{
-			Bucket: aws.String(bucket),
-			Key:    aws.String(versionsKey),
-			Body:   strings.NewReader(string(updatedData)),
+			Bucket:       aws.String(bucket),
+			Key:          aws.String(versionsKey),
+			Body:         strings.NewReader(string(updatedData)),
+			ContentType:  aws.String("application/json"),
+			CacheControl: aws.String("public,max-age=60"),
 		}
 
 		// Add conditional request headers
@@ -242,9 +244,10 @@ func processPackages(ctx context.Context, s3Client *s3.Client, bucket, namespace
 
 		metaKey := fmt.Sprintf("v1/providers/%s/%s/%s/download/%s/%s", namespace, providerName, version, packageMeta.PackageMeta.OS, packageMeta.PackageMeta.Arch)
 		_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-			Bucket: aws.String(bucket),
-			Key:    aws.String(metaKey),
-			Body:   strings.NewReader(string(metaJSON)),
+			Bucket:      aws.String(bucket),
+			Key:         aws.String(metaKey),
+			Body:        strings.NewReader(string(metaJSON)),
+			ContentType: aws.String("application/json"),
 		})
 		if err != nil {
 			return fmt.Errorf("failed to upload package metadata for %s/%s to S3: %v", packageMeta.PackageMeta.OS, packageMeta.PackageMeta.Arch, err)
