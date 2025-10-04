@@ -78,13 +78,13 @@ var mcpConnectionType = schema.NestedAttributeObject{
 }
 
 type mcpConnectionInfo struct {
-	Id   string `tfsdk:"id"`
-	Name string `tfsdk:"name"`
+	Id   string       `tfsdk:"id"`
+	Name types.String `tfsdk:"name"`
 }
 
 func (t *mcpConnectionInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection) diag.Diagnostics {
 	t.Id = src.Id
-	t.Name = src.Name
+	t.Name = types.StringValue(src.Name)
 	return nil
 }
 
