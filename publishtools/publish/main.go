@@ -72,10 +72,7 @@ func main() {
 		log.Fatalf("Failed to load artifacts: %v", err)
 	}
 
-	versionMeta, err := createVersionMeta(metadata.Version, artifacts)
-	if err != nil {
-		log.Fatalf("Failed to create version meta: %v", err)
-	}
+	versionMeta := createVersionMeta(metadata.Version, artifacts)
 
 	if err := processVersionMeta(ctx, s3Client, bucket, namespace, providerName, versionMeta); err != nil {
 		log.Fatalf("Failed to process version meta: %v", err)
@@ -180,10 +177,11 @@ func processSignatures(ctx context.Context, s3Client *s3.Client, bucket, namespa
 		var isSignature, isChecksum bool
 
 		// Identify signature and checksum files by type
-		if artifact.Type == "Signature" {
+		switch artifact.Type {
+		case "Signature":
 			isSignature = true
 			signatureFile = artifact.Name
-		} else if artifact.Type == "Checksum" {
+		case "Checksum":
 			isChecksum = true
 			checksumFile = artifact.Name
 		}

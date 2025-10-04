@@ -16,7 +16,7 @@ type Platform struct {
 	Arch string `json:"arch"`
 }
 
-func createVersionMeta(version string, artifacts []Artifact) (*VersionMeta, error) {
+func createVersionMeta(version string, artifacts []Artifact) *VersionMeta {
 	platformsSet := make(map[Platform]struct{})
 
 	for _, artifact := range artifacts {
@@ -35,5 +35,5 @@ func createVersionMeta(version string, artifacts []Artifact) (*VersionMeta, erro
 		Version:   version,
 		Protocols: []string{"6.0"},
 		Platforms: platforms,
-	}, nil
+	}
 }
