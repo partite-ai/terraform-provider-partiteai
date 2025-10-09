@@ -50,6 +50,12 @@ Required:
 
 - `id` (String) MCP connection identifier
 
+Optional:
+
+- `filter_type` (String) Type of filter applied to the MCP connection
+- `tool_name_pattern` (String) Pattern to match tool names associated with the MCP connection
+- `tool_names` (List of String) List of tool names associated with the MCP connection
+
 Read-Only:
 
 - `name` (String) MCP connection name
