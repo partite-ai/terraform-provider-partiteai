@@ -2,10 +2,13 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
@@ -61,6 +64,63 @@ func (m *AgentBaseModel) MapFromGraphQL(ctx context.Context, agentDetails pgql.A
 		&m.MemorySlots, newStructSliceMappable(agentDetails.LatestVersion.MemorySlots, memorySlotInfo{}),
 		&m.McpConnections, newStructSliceMappable(agentDetails.LatestVersion.McpConnections, mcpConnectionInfo{}),
 	)...)
+
+	return diags
+}
+
+type mcpConnectionInfo struct {
+	Id              string       `tfsdk:"id"`
+	Name            types.String `tfsdk:"name"`
+	FilterType      types.String `tfsdk:"filter_type"`
+	ToolNames       types.List   `tfsdk:"tool_names"`
+	ToolNamePattern types.String `tfsdk:"tool_name_pattern"`
+}
+
+func (t *mcpConnectionInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation) diag.Diagnostics {
+	var diags diag.Diagnostics
+	t.Id = src.McpConnection.Id
+	t.Name = types.StringValue(src.McpConnection.Name)
+	t.FilterType = types.StringValue(string(src.FilterType))
+	switch src.FilterType {
+	case pgql.McpConnectionFilterTypeNone:
+		t.ToolNames = types.ListNull(types.StringType)
+		t.ToolNamePattern = types.StringNull()
+	case pgql.McpConnectionFilterTypeList:
+		diags.Append(
+			tfsdk.ValueFrom(context.Background(), src.ToolNames, types.ListType{ElemType: types.StringType}, &t.ToolNames)...,
+		)
+		t.ToolNamePattern = types.StringNull()
+	default:
+		t.ToolNames = types.ListNull(types.StringType)
+		t.ToolNamePattern = types.StringPointerValue(src.ToolNamePattern)
+	}
+	return nil
+}
+
+type memorySlotInfo struct {
+	Name        string               `json:"name" tfsdk:"name"`
+	Description string               `json:"description" tfsdk:"description"`
+	MemoryType  jsontypes.Normalized `json:"memoryType" tfsdk:"memory_type"`
+	MemoryScope string               `json:"memoryScope" tfsdk:"memory_scope"`
+	CanRead     types.String         `json:"canRead" tfsdk:"can_read"`
+	CanWrite    types.String         `json:"canWrite" tfsdk:"can_write"`
+}
+
+func (t *memorySlotInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) diag.Diagnostics {
+	var diags diag.Diagnostics
+	t.Name = src.Name
+	t.Description = src.Description
+
+	smt, err := json.Marshal(src.MemoryType)
+	if err != nil {
+		diags.AddError("Internal Error", fmt.Sprintf("Failed to marshal MemoryType: %s", err))
+		return diags
+	}
+	t.MemoryType = jsontypes.NewNormalizedValue(string(smt))
+
+	t.MemoryScope = string(src.MemoryScope)
+	t.CanRead = types.StringPointerValue(src.CanRead)
+	t.CanWrite = types.StringPointerValue(src.CanWrite)
 
 	return diags
 }

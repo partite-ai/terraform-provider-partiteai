@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -74,46 +75,22 @@ var mcpConnectionType = schema.NestedAttributeObject{
 			MarkdownDescription: "MCP connection name",
 			Computed:            true,
 		},
+		"filter_type": schema.StringAttribute{
+			MarkdownDescription: "Type of filter applied to the MCP connection",
+			Optional:            true,
+			Computed:            true,
+			Default:             stringdefault.StaticString("NONE"),
+		},
+		"tool_names": schema.ListAttribute{
+			ElementType:         types.StringType,
+			MarkdownDescription: "List of tool names associated with the MCP connection",
+			Optional:            true,
+		},
+		"tool_name_pattern": schema.StringAttribute{
+			MarkdownDescription: "Pattern to match tool names associated with the MCP connection",
+			Optional:            true,
+		},
 	},
-}
-
-type mcpConnectionInfo struct {
-	Id   string       `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-}
-
-func (t *mcpConnectionInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection) diag.Diagnostics {
-	t.Id = src.Id
-	t.Name = types.StringValue(src.Name)
-	return nil
-}
-
-type memorySlotInfo struct {
-	Name        string               `json:"name" tfsdk:"name"`
-	Description string               `json:"description" tfsdk:"description"`
-	MemoryType  jsontypes.Normalized `json:"memoryType" tfsdk:"memory_type"`
-	MemoryScope string               `json:"memoryScope" tfsdk:"memory_scope"`
-	CanRead     types.String         `json:"canRead" tfsdk:"can_read"`
-	CanWrite    types.String         `json:"canWrite" tfsdk:"can_write"`
-}
-
-func (t *memorySlotInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) diag.Diagnostics {
-	var diags diag.Diagnostics
-	t.Name = src.Name
-	t.Description = src.Description
-
-	smt, err := json.Marshal(src.MemoryType)
-	if err != nil {
-		diags.AddError("Internal Error", fmt.Sprintf("Failed to marshal MemoryType: %s", err))
-		return diags
-	}
-	t.MemoryType = jsontypes.NewNormalizedValue(string(smt))
-
-	t.MemoryScope = string(src.MemoryScope)
-	t.CanRead = types.StringPointerValue(src.CanRead)
-	t.CanWrite = types.StringPointerValue(src.CanWrite)
-
-	return diags
 }
 
 func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -239,7 +216,7 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		}
 	}
 
-	var mcpConnections []string
+	var mcpConnections []pgql.NewMcpConnectionAgentAssociation
 	if !data.McpConnections.IsNull() {
 		var mcpConnectionStructs []mcpConnectionInfo
 		if diag := data.McpConnections.ElementsAs(ctx, &mcpConnectionStructs, false); diag.HasError() {
@@ -247,7 +224,24 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 			return
 		}
 		for _, v := range mcpConnectionStructs {
-			mcpConnections = append(mcpConnections, v.Id)
+			caa := pgql.NewMcpConnectionAgentAssociation{
+				McpConnectionID: v.Id,
+				FilterType:      pgql.McpConnectionFilterType(v.FilterType.ValueString()),
+			}
+			switch caa.FilterType {
+			case pgql.McpConnectionFilterTypeList:
+				var toolNames []string
+				if !v.ToolNames.IsNull() {
+					if diag := v.ToolNames.ElementsAs(ctx, &toolNames, false); diag.HasError() {
+						resp.Diagnostics.Append(diag...)
+						return
+					}
+				}
+				caa.ToolNames = toolNames
+			case pgql.McpConnectionFilterTypePattern:
+				caa.ToolNamePattern = v.ToolNamePattern.ValueStringPointer()
+			}
+			mcpConnections = append(mcpConnections, caa)
 		}
 	}
 
@@ -393,7 +387,7 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	}
 
 	if !planData.McpConnections.Equal(stateData.McpConnections) {
-		var mcpConnections []string
+		var mcpConnections []pgql.NewMcpConnectionAgentAssociation
 		if !planData.McpConnections.IsNull() {
 			var mcpConnectionStructs []mcpConnectionInfo
 			if diag := planData.McpConnections.ElementsAs(ctx, &mcpConnectionStructs, false); diag.HasError() {
@@ -401,7 +395,24 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 				return
 			}
 			for _, v := range mcpConnectionStructs {
-				mcpConnections = append(mcpConnections, v.Id)
+				caa := pgql.NewMcpConnectionAgentAssociation{
+					McpConnectionID: v.Id,
+					FilterType:      pgql.McpConnectionFilterType(v.FilterType.ValueString()),
+				}
+				switch caa.FilterType {
+				case pgql.McpConnectionFilterTypeList:
+					var toolNames []string
+					if !v.ToolNames.IsNull() {
+						if diag := v.ToolNames.ElementsAs(ctx, &toolNames, false); diag.HasError() {
+							resp.Diagnostics.Append(diag...)
+							return
+						}
+					}
+					caa.ToolNames = toolNames
+				case pgql.McpConnectionFilterTypePattern:
+					caa.ToolNamePattern = v.ToolNamePattern.ValueStringPointer()
+				}
+				mcpConnections = append(mcpConnections, caa)
 			}
 		}
 		update.McpConnections = pgql.Opt(mcpConnections)

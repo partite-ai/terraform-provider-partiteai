@@ -21,8 +21,13 @@ fragment AgentDetails on Agent {
     sendMessagesToUser
     askQuestionsToUser
     mcpConnections {
-      id
-      name
+      mcpConnection {
+        id
+        name
+      }
+      filterType
+      toolNames
+      toolNamePattern
     }
     memorySlots {
       id

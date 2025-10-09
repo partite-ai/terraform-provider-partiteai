@@ -46,21 +46,21 @@ func (v *AgentDetails) GetLatestVersion() AgentDetailsLatestVersionAgentVersion 
 
 // AgentDetailsLatestVersionAgentVersion includes the requested fields of the GraphQL type AgentVersion.
 type AgentDetailsLatestVersionAgentVersion struct {
-	Id                          string                                                             `json:"id"`
-	Ordinal                     int                                                                `json:"ordinal"`
-	CreatedAt                   string                                                             `json:"createdAt"`
-	Label                       *string                                                            `json:"label"`
-	Tags                        []*Tag                                                             `json:"tags"`
-	Identity                    *string                                                            `json:"identity"`
-	TaskInstructions            string                                                             `json:"taskInstructions"`
-	ModelComplexity             ModelComplexity                                                    `json:"modelComplexity"`
-	InputMessageType            map[string]any                                                     `json:"inputMessageType"`
-	PreserveConversationHistory bool                                                               `json:"preserveConversationHistory"`
-	SendThinkingToUser          bool                                                               `json:"sendThinkingToUser"`
-	SendMessagesToUser          bool                                                               `json:"sendMessagesToUser"`
-	AskQuestionsToUser          bool                                                               `json:"askQuestionsToUser"`
-	McpConnections              []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection `json:"mcpConnections"`
-	MemorySlots                 []AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot       `json:"memorySlots"`
+	Id                          string                                                                             `json:"id"`
+	Ordinal                     int                                                                                `json:"ordinal"`
+	CreatedAt                   string                                                                             `json:"createdAt"`
+	Label                       *string                                                                            `json:"label"`
+	Tags                        []*Tag                                                                             `json:"tags"`
+	Identity                    *string                                                                            `json:"identity"`
+	TaskInstructions            string                                                                             `json:"taskInstructions"`
+	ModelComplexity             ModelComplexity                                                                    `json:"modelComplexity"`
+	InputMessageType            map[string]any                                                                     `json:"inputMessageType"`
+	PreserveConversationHistory bool                                                                               `json:"preserveConversationHistory"`
+	SendThinkingToUser          bool                                                                               `json:"sendThinkingToUser"`
+	SendMessagesToUser          bool                                                                               `json:"sendMessagesToUser"`
+	AskQuestionsToUser          bool                                                                               `json:"askQuestionsToUser"`
+	McpConnections              []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation `json:"mcpConnections"`
+	MemorySlots                 []AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot                       `json:"memorySlots"`
 }
 
 // GetId returns AgentDetailsLatestVersionAgentVersion.Id, and is useful for accessing the field via an interface.
@@ -117,7 +117,7 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetAskQuestionsToUser() bool {
 }
 
 // GetMcpConnections returns AgentDetailsLatestVersionAgentVersion.McpConnections, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersion) GetMcpConnections() []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection {
+func (v *AgentDetailsLatestVersionAgentVersion) GetMcpConnections() []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation {
 	return v.McpConnections
 }
 
@@ -126,19 +126,47 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetMemorySlots() []AgentDetailsL
 	return v.MemorySlots
 }
 
-// AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection includes the requested fields of the GraphQL type McpConnection.
-type AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection struct {
+// AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation includes the requested fields of the GraphQL type McpConnectionAgentAssociation.
+type AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation struct {
+	McpConnection   AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociationMcpConnection `json:"mcpConnection"`
+	FilterType      McpConnectionFilterType                                                                       `json:"filterType"`
+	ToolNames       []string                                                                                      `json:"toolNames"`
+	ToolNamePattern *string                                                                                       `json:"toolNamePattern"`
+}
+
+// GetMcpConnection returns AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation.McpConnection, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation) GetMcpConnection() AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociationMcpConnection {
+	return v.McpConnection
+}
+
+// GetFilterType returns AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation.FilterType, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation) GetFilterType() McpConnectionFilterType {
+	return v.FilterType
+}
+
+// GetToolNames returns AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation.ToolNames, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation) GetToolNames() []string {
+	return v.ToolNames
+}
+
+// GetToolNamePattern returns AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation.ToolNamePattern, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation) GetToolNamePattern() *string {
+	return v.ToolNamePattern
+}
+
+// AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociationMcpConnection includes the requested fields of the GraphQL type McpConnection.
+type AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociationMcpConnection struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
 }
 
-// GetId returns AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection.Id, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection) GetId() string {
+// GetId returns AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociationMcpConnection.Id, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociationMcpConnection) GetId() string {
 	return v.Id
 }
 
-// GetName returns AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection.Name, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnection) GetName() string {
+// GetName returns AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociationMcpConnection.Name, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociationMcpConnection) GetName() string {
 	return v.Name
 }
 
@@ -899,6 +927,20 @@ func (v *McpConnectionDetailsStdioTransportStdioMcpTransport) GetArguments() []s
 // GetEnvironment returns McpConnectionDetailsStdioTransportStdioMcpTransport.Environment, and is useful for accessing the field via an interface.
 func (v *McpConnectionDetailsStdioTransportStdioMcpTransport) GetEnvironment() []string {
 	return v.Environment
+}
+
+type McpConnectionFilterType string
+
+const (
+	McpConnectionFilterTypeNone    McpConnectionFilterType = "NONE"
+	McpConnectionFilterTypeList    McpConnectionFilterType = "LIST"
+	McpConnectionFilterTypePattern McpConnectionFilterType = "PATTERN"
+)
+
+var AllMcpConnectionFilterType = []McpConnectionFilterType{
+	McpConnectionFilterTypeNone,
+	McpConnectionFilterTypeList,
+	McpConnectionFilterTypePattern,
 }
 
 type McpConnectionHeaderCredentials struct {
@@ -2435,8 +2477,13 @@ fragment AgentDetails on Agent {
 		sendMessagesToUser
 		askQuestionsToUser
 		mcpConnections {
-			id
-			name
+			mcpConnection {
+				id
+				name
+			}
+			filterType
+			toolNames
+			toolNamePattern
 		}
 		memorySlots {
 			id
@@ -3270,8 +3317,13 @@ fragment AgentDetails on Agent {
 		sendMessagesToUser
 		askQuestionsToUser
 		mcpConnections {
-			id
-			name
+			mcpConnection {
+				id
+				name
+			}
+			filterType
+			toolNames
+			toolNamePattern
 		}
 		memorySlots {
 			id
@@ -3898,8 +3950,13 @@ fragment AgentDetails on Agent {
 		sendMessagesToUser
 		askQuestionsToUser
 		mcpConnections {
-			id
-			name
+			mcpConnection {
+				id
+				name
+			}
+			filterType
+			toolNames
+			toolNamePattern
 		}
 		memorySlots {
 			id

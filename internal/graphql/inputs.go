@@ -1,35 +1,50 @@
 package graphql
 
 type NewAgent struct {
-	Name                        string           `json:"name"`
-	Description                 Optional[string] `json:"description,omitzero"`
-	Tags                        []*Tag           `json:"tags"`
-	Identity                    Optional[string] `json:"identity,omitzero"`
-	TaskInstructions            string           `json:"taskInstructions"`
-	ModelComplexity             ModelComplexity  `json:"modelComplexity"`
-	InputMessageType            map[string]any   `json:"inputMessageType"`
-	SendThinkingToUser          Optional[bool]   `json:"sendThinkingToUser,omitzero"`
-	SendMessagesToUser          Optional[bool]   `json:"sendMessagesToUser,omitzero"`
-	AskQuestionsToUser          Optional[bool]   `json:"askQuestionsToUser,omitzero"`
-	PreserveConversationHistory Optional[bool]   `json:"preserveConversationHistory,omitzero"`
-	MemorySlots                 []NewMemorySlot  `json:"memorySlots"`
-	McpConnections              []string         `json:"mcpConnections"`
+	Name                        string                             `json:"name"`
+	Description                 Optional[string]                   `json:"description,omitzero"`
+	Tags                        []*Tag                             `json:"tags"`
+	Identity                    Optional[string]                   `json:"identity,omitzero"`
+	TaskInstructions            string                             `json:"taskInstructions"`
+	ModelComplexity             ModelComplexity                    `json:"modelComplexity"`
+	InputMessageType            map[string]any                     `json:"inputMessageType"`
+	SendThinkingToUser          Optional[bool]                     `json:"sendThinkingToUser,omitzero"`
+	SendMessagesToUser          Optional[bool]                     `json:"sendMessagesToUser,omitzero"`
+	AskQuestionsToUser          Optional[bool]                     `json:"askQuestionsToUser,omitzero"`
+	PreserveConversationHistory Optional[bool]                     `json:"preserveConversationHistory,omitzero"`
+	MemorySlots                 []NewMemorySlot                    `json:"memorySlots"`
+	McpConnections              []NewMcpConnectionAgentAssociation `json:"mcpConnections"`
 }
 
 type UpdateAgent struct {
-	Name                        Optional[string]          `json:"name,omitzero"`
-	Description                 Optional[string]          `json:"description,omitzero"`
-	Tags                        Optional[[]*Tag]          `json:"tags,omitzero"`
-	Identity                    Optional[string]          `json:"identity,omitzero"`
-	TaskInstructions            Optional[string]          `json:"taskInstructions,omitzero"`
-	ModelComplexity             Optional[ModelComplexity] `json:"modelComplexity,omitzero"`
-	InputMessageType            Optional[map[string]any]  `json:"inputMessageType,omitzero"`
-	SendThinkingToUser          Optional[bool]            `json:"sendThinkingToUser,omitzero"`
-	SendMessagesToUser          Optional[bool]            `json:"sendMessagesToUser,omitzero"`
-	AskQuestionsToUser          Optional[bool]            `json:"askQuestionsToUser,omitzero"`
-	PreserveConversationHistory Optional[bool]            `json:"preserveConversationHistory,omitzero"`
-	MemorySlots                 Optional[[]NewMemorySlot] `json:"memorySlots,omitzero"`
-	McpConnections              Optional[[]string]        `json:"mcpConnections,omitzero"`
+	Name                        Optional[string]                             `json:"name,omitzero"`
+	Description                 Optional[string]                             `json:"description,omitzero"`
+	Tags                        Optional[[]*Tag]                             `json:"tags,omitzero"`
+	Identity                    Optional[string]                             `json:"identity,omitzero"`
+	TaskInstructions            Optional[string]                             `json:"taskInstructions,omitzero"`
+	ModelComplexity             Optional[ModelComplexity]                    `json:"modelComplexity,omitzero"`
+	InputMessageType            Optional[map[string]any]                     `json:"inputMessageType,omitzero"`
+	SendThinkingToUser          Optional[bool]                               `json:"sendThinkingToUser,omitzero"`
+	SendMessagesToUser          Optional[bool]                               `json:"sendMessagesToUser,omitzero"`
+	AskQuestionsToUser          Optional[bool]                               `json:"askQuestionsToUser,omitzero"`
+	PreserveConversationHistory Optional[bool]                               `json:"preserveConversationHistory,omitzero"`
+	MemorySlots                 Optional[[]NewMemorySlot]                    `json:"memorySlots,omitzero"`
+	McpConnections              Optional[[]NewMcpConnectionAgentAssociation] `json:"mcpConnections,omitzero"`
+}
+
+type NewMcpConnectionAgentAssociation struct {
+	// The ID of the MCP connection to associate with the agent.
+	McpConnectionID string `json:"mcpConnectionID"`
+	// The filter type to apply to the MCP connection.
+	//
+	// NONE: All tools from the MCP connection are available to the agent.
+	// LIST: Only the tools specified in toolNames are available to the agent.
+	// PATTERN: Only tools matching the toolNamePattern regex are available to the agent.
+	FilterType McpConnectionFilterType `json:"filterType"`
+	// The list of tool names to allow the agent to use. Only applicable if filterType is LIST. Required to have at least one entry if filterType is LIST.
+	ToolNames []string `json:"toolNames"`
+	// A regex pattern to match tool names against. Only applicable if filterType is PATTERN. Required to be a valid regex if filterType is PATTERN.
+	ToolNamePattern *string `json:"toolNamePattern,omitempty"`
 }
 
 type NewMemorySlot struct {
