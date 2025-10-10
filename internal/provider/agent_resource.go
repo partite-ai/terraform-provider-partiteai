@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -86,6 +87,11 @@ var mcpConnectionType = schema.NestedAttributeObject{
 			ElementType:         types.StringType,
 			MarkdownDescription: "List of tool names associated with the MCP connection",
 			Optional:            true,
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+				listvalidator.UniqueValues(),
+				listvalidator.NoNullValues(),
+			},
 		},
 		"tool_name_pattern": schema.StringAttribute{
 			MarkdownDescription: "Pattern to match tool names associated with the MCP connection",
