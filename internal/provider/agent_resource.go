@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -77,9 +76,7 @@ var mcpConnectionType = schema.NestedAttributeObject{
 		},
 		"filter_type": schema.StringAttribute{
 			MarkdownDescription: "Type of filter applied to the MCP connection",
-			Optional:            true,
-			Computed:            true,
-			Default:             stringdefault.StaticString("NONE"),
+			Required:            true,
 		},
 		"tool_names": schema.ListAttribute{
 			ElementType:         types.StringType,
