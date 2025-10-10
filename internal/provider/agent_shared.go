@@ -70,7 +70,6 @@ func (m *AgentBaseModel) MapFromGraphQL(ctx context.Context, agentDetails pgql.A
 
 type mcpConnectionInfo struct {
 	Id              string       `tfsdk:"id"`
-	Name            types.String `tfsdk:"name"`
 	FilterType      types.String `tfsdk:"filter_type"`
 	ToolNames       types.List   `tfsdk:"tool_names"`
 	ToolNamePattern types.String `tfsdk:"tool_name_pattern"`
@@ -79,7 +78,6 @@ type mcpConnectionInfo struct {
 func (t *mcpConnectionInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation) diag.Diagnostics {
 	var diags diag.Diagnostics
 	t.Id = src.McpConnection.Id
-	t.Name = types.StringValue(src.McpConnection.Name)
 	t.FilterType = types.StringValue(string(src.FilterType))
 	switch src.FilterType {
 	case pgql.McpConnectionFilterTypeNone:

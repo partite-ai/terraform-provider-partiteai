@@ -72,10 +72,6 @@ var mcpConnectionType = schema.NestedAttributeObject{
 			MarkdownDescription: "MCP connection identifier",
 			Required:            true,
 		},
-		"name": schema.StringAttribute{
-			MarkdownDescription: "MCP connection name",
-			Computed:            true,
-		},
 		"filter_type": schema.StringAttribute{
 			MarkdownDescription: "Type of filter applied to the MCP connection. One of 'NONE', 'LIST', or 'PATTERN'.",
 			Required:            true,

@@ -127,8 +127,17 @@ var mcpConnectionDataSourceType = dsschema.NestedAttributeObject{
 			MarkdownDescription: "MCP connection identifier",
 			Computed:            true,
 		},
-		"name": dsschema.StringAttribute{
-			MarkdownDescription: "MCP connection name",
+		"filter_type": schema.StringAttribute{
+			MarkdownDescription: "Type of filter applied to the MCP connection. One of 'NONE', 'LIST', or 'PATTERN'.",
+			Computed:            true,
+		},
+		"tool_names": schema.ListAttribute{
+			ElementType:         types.StringType,
+			MarkdownDescription: "List of tool names associated with the MCP connection",
+			Computed:            true,
+		},
+		"tool_name_pattern": schema.StringAttribute{
+			MarkdownDescription: "Pattern to match tool names associated with the MCP connection",
 			Computed:            true,
 		},
 	},
