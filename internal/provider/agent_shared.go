@@ -90,9 +90,12 @@ func (t *mcpConnectionInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersi
 			tfsdk.ValueFrom(context.Background(), src.ToolNames, types.ListType{ElemType: types.StringType}, &t.ToolNames)...,
 		)
 		t.ToolNamePattern = types.StringNull()
-	default:
+	case pgql.McpConnectionFilterTypePattern:
 		t.ToolNames = types.ListNull(types.StringType)
 		t.ToolNamePattern = types.StringPointerValue(src.ToolNamePattern)
+	default:
+		t.ToolNames = types.ListNull(types.StringType)
+		t.ToolNamePattern = types.StringNull()
 	}
 	return nil
 }
