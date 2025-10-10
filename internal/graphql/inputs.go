@@ -204,12 +204,12 @@ type NewLink struct {
 }
 
 type UpdateLink struct {
-	Name                  Optional[string]            `json:"name,omitzero"`
-	Description           Optional[string]            `json:"description,omitzero"`
-	TransfersControl      Optional[bool]              `json:"transfersControl,omitzero"`
-	NewFromAgentVersionID Optional[string]            `json:"newFromAgentVersionID,omitzero"`
-	NewToAgentVersionID   Optional[string]            `json:"newToAgentVersionID,omitzero"`
-	Responses             Optional[[]NewLinkResponse] `json:"responses,omitzero"`
+	Name               Optional[string]            `json:"name,omitzero"`
+	Description        Optional[string]            `json:"description,omitzero"`
+	TransfersControl   Optional[bool]              `json:"transfersControl,omitzero"`
+	FromAgentVersionID Optional[string]            `json:"fromAgentVersionID,omitzero"`
+	ToAgentVersionID   Optional[string]            `json:"toAgentVersionID,omitzero"`
+	Responses          Optional[[]NewLinkResponse] `json:"responses,omitzero"`
 }
 
 type NewLinkResponse struct {

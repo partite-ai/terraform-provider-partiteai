@@ -267,11 +267,11 @@ func (r *MeshLinkResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	if !planData.FromAgentVersionId.Equal(stateData.FromAgentVersionId) && !planData.FromAgentVersionId.IsUnknown() {
-		update.NewFromAgentVersionID = pgql.Opt(planData.FromAgentVersionId.ValueString())
+		update.FromAgentVersionID = pgql.Opt(planData.FromAgentVersionId.ValueString())
 	}
 
 	if !planData.ToAgentVersionId.Equal(stateData.ToAgentVersionId) && !planData.ToAgentVersionId.IsUnknown() {
-		update.NewToAgentVersionID = pgql.Opt(planData.ToAgentVersionId.ValueString())
+		update.ToAgentVersionID = pgql.Opt(planData.ToAgentVersionId.ValueString())
 	}
 
 	if !planData.Responses.Equal(stateData.Responses) {
