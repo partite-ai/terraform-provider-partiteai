@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -75,8 +76,11 @@ var mcpConnectionType = schema.NestedAttributeObject{
 			Computed:            true,
 		},
 		"filter_type": schema.StringAttribute{
-			MarkdownDescription: "Type of filter applied to the MCP connection",
+			MarkdownDescription: "Type of filter applied to the MCP connection. One of 'NONE', 'LIST', or 'PATTERN'.",
 			Required:            true,
+			Validators: []validator.String{
+				stringvalidator.OneOf("NONE", "LIST", "PATTERN"),
+			},
 		},
 		"tool_names": schema.ListAttribute{
 			ElementType:         types.StringType,
