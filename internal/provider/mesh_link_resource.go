@@ -167,9 +167,9 @@ func (r *MeshLinkResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	var responseStructs []struct {
-		Name        string `tfsdk:"name"`
-		Description string `tfsdk:"description"`
-		MessageType string `tfsdk:"message_type"`
+		Name        string               `tfsdk:"name"`
+		Description string               `tfsdk:"description"`
+		MessageType jsontypes.Normalized `tfsdk:"message_type"`
 	}
 	resp.Diagnostics.Append(data.Responses.ElementsAs(ctx, &responseStructs, false)...)
 	if resp.Diagnostics.HasError() {
@@ -180,7 +180,7 @@ func (r *MeshLinkResource) Create(ctx context.Context, req resource.CreateReques
 		responses = append(responses, pgql.NewLinkResponse{
 			Name:        r.Name,
 			Description: r.Description,
-			MessageType: r.MessageType,
+			MessageType: r.MessageType.ValueString(),
 		})
 	}
 
@@ -275,9 +275,9 @@ func (r *MeshLinkResource) Update(ctx context.Context, req resource.UpdateReques
 
 	if !planData.Responses.Equal(stateData.Responses) {
 		var responseStructs []struct {
-			Name        string `tfsdk:"name"`
-			Description string `tfsdk:"description"`
-			MessageType string `tfsdk:"message_type"`
+			Name        string               `tfsdk:"name"`
+			Description string               `tfsdk:"description"`
+			MessageType jsontypes.Normalized `tfsdk:"message_type"`
 		}
 		resp.Diagnostics.Append(planData.Responses.ElementsAs(ctx, &responseStructs, false)...)
 		if resp.Diagnostics.HasError() {
@@ -288,7 +288,7 @@ func (r *MeshLinkResource) Update(ctx context.Context, req resource.UpdateReques
 			responses = append(responses, pgql.NewLinkResponse{
 				Name:        r.Name,
 				Description: r.Description,
-				MessageType: r.MessageType,
+				MessageType: r.MessageType.ValueString(),
 			})
 		}
 		update.Responses = pgql.Opt(responses)

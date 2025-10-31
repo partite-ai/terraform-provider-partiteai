@@ -153,6 +153,9 @@ func setJsonField(_ context.Context, field *jsontypes.Normalized, value any) dia
 	case *string:
 		jsonVal := jsontypes.NewNormalizedPointerValue(v)
 		*field = jsonVal
+	case json.RawMessage:
+		jsonVal := jsontypes.NewNormalizedValue(string(v))
+		*field = jsonVal
 	case map[string]any:
 		seriVal, err := json.Marshal(v)
 		if err != nil {

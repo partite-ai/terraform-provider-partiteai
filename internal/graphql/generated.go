@@ -54,7 +54,7 @@ type AgentDetailsLatestVersionAgentVersion struct {
 	Identity                    *string                                                                            `json:"identity"`
 	TaskInstructions            string                                                                             `json:"taskInstructions"`
 	ModelComplexity             ModelComplexity                                                                    `json:"modelComplexity"`
-	InputMessageType            map[string]any                                                                     `json:"inputMessageType"`
+	InputMessageType            json.RawMessage                                                                    `json:"inputMessageType"`
 	PreserveConversationHistory bool                                                                               `json:"preserveConversationHistory"`
 	SendThinkingToUser          bool                                                                               `json:"sendThinkingToUser"`
 	SendMessagesToUser          bool                                                                               `json:"sendMessagesToUser"`
@@ -92,7 +92,7 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetModelComplexity() ModelComple
 }
 
 // GetInputMessageType returns AgentDetailsLatestVersionAgentVersion.InputMessageType, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersion) GetInputMessageType() map[string]any {
+func (v *AgentDetailsLatestVersionAgentVersion) GetInputMessageType() json.RawMessage {
 	return v.InputMessageType
 }
 
@@ -172,14 +172,14 @@ func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAs
 
 // AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot includes the requested fields of the GraphQL type MemorySlot.
 type AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot struct {
-	Id          string         `json:"id"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	MemoryType  map[string]any `json:"memoryType"`
-	MemoryScope MemoryScope    `json:"memoryScope"`
-	CanRead     *string        `json:"canRead"`
-	CanWrite    *string        `json:"canWrite"`
-	CreatedAt   string         `json:"createdAt"`
+	Id          string          `json:"id"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	MemoryType  json.RawMessage `json:"memoryType"`
+	MemoryScope MemoryScope     `json:"memoryScope"`
+	CanRead     *string         `json:"canRead"`
+	CanWrite    *string         `json:"canWrite"`
+	CreatedAt   string          `json:"createdAt"`
 }
 
 // GetId returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.Id, and is useful for accessing the field via an interface.
@@ -194,7 +194,7 @@ func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetDescript
 }
 
 // GetMemoryType returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.MemoryType, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetMemoryType() map[string]any {
+func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetMemoryType() json.RawMessage {
 	return v.MemoryType
 }
 
@@ -716,9 +716,9 @@ func (v *InputDetailsAgentVersionAgent) GetId() string { return v.Id }
 
 // InputDetailsInputResponsesInputResponse includes the requested fields of the GraphQL type InputResponse.
 type InputDetailsInputResponsesInputResponse struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	MessageType map[string]any `json:"messageType"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	MessageType json.RawMessage `json:"messageType"`
 }
 
 // GetName returns InputDetailsInputResponsesInputResponse.Name, and is useful for accessing the field via an interface.
@@ -728,7 +728,7 @@ func (v *InputDetailsInputResponsesInputResponse) GetName() string { return v.Na
 func (v *InputDetailsInputResponsesInputResponse) GetDescription() string { return v.Description }
 
 // GetMessageType returns InputDetailsInputResponsesInputResponse.MessageType, and is useful for accessing the field via an interface.
-func (v *InputDetailsInputResponsesInputResponse) GetMessageType() map[string]any {
+func (v *InputDetailsInputResponsesInputResponse) GetMessageType() json.RawMessage {
 	return v.MessageType
 }
 
@@ -796,9 +796,9 @@ func (v *LinkDetailsFromAgentVersionAgent) GetId() string { return v.Id }
 
 // LinkDetailsLinkResponsesLinkResponse includes the requested fields of the GraphQL type LinkResponse.
 type LinkDetailsLinkResponsesLinkResponse struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	MessageType map[string]any `json:"messageType"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	MessageType json.RawMessage `json:"messageType"`
 }
 
 // GetName returns LinkDetailsLinkResponsesLinkResponse.Name, and is useful for accessing the field via an interface.
@@ -808,7 +808,7 @@ func (v *LinkDetailsLinkResponsesLinkResponse) GetName() string { return v.Name 
 func (v *LinkDetailsLinkResponsesLinkResponse) GetDescription() string { return v.Description }
 
 // GetMessageType returns LinkDetailsLinkResponsesLinkResponse.MessageType, and is useful for accessing the field via an interface.
-func (v *LinkDetailsLinkResponsesLinkResponse) GetMessageType() map[string]any { return v.MessageType }
+func (v *LinkDetailsLinkResponsesLinkResponse) GetMessageType() json.RawMessage { return v.MessageType }
 
 // LinkDetailsToAgentVersion includes the requested fields of the GraphQL type AgentVersion.
 type LinkDetailsToAgentVersion struct {

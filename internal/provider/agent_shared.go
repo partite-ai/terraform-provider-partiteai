@@ -2,8 +2,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
@@ -111,13 +109,7 @@ func (t *memorySlotInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionM
 	var diags diag.Diagnostics
 	t.Name = src.Name
 	t.Description = src.Description
-
-	smt, err := json.Marshal(src.MemoryType)
-	if err != nil {
-		diags.AddError("Internal Error", fmt.Sprintf("Failed to marshal MemoryType: %s", err))
-		return diags
-	}
-	t.MemoryType = jsontypes.NewNormalizedValue(string(smt))
+	t.MemoryType = jsontypes.NewNormalizedValue(string(src.MemoryType))
 
 	t.MemoryScope = string(src.MemoryScope)
 	t.CanRead = types.StringPointerValue(src.CanRead)

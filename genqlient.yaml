@@ -2,7 +2,7 @@
 # https://github.com/Khan/genqlient/blob/main/docs/genqlient.yaml
 schema: ../mesh/pkg/graph/schema.graphqls
 operations:
-- internal/graphql/genqlient.graphql
+  - internal/graphql/genqlient.graphql
 generated: internal/graphql/generated.go
 optional: pointer_omitempty
 bindings:
@@ -31,9 +31,9 @@ bindings:
   ModelSetID:
     type: string
   SerializableType:
-    type: "map[string]any"
+    type: "encoding/json.RawMessage"
   SerializableTMap:
-    type: "map[string]any"
+    type: "encoding/json.RawMessage"
   Tag:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.Tag"
   Time:
@@ -66,4 +66,3 @@ bindings:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewInput"
   UpdateInput:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateInput"
-  
