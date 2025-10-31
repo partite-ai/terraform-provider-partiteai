@@ -7,7 +7,7 @@ type NewAgent struct {
 	Identity                    Optional[string]                   `json:"identity,omitzero"`
 	TaskInstructions            string                             `json:"taskInstructions"`
 	ModelComplexity             ModelComplexity                    `json:"modelComplexity"`
-	InputMessageType            map[string]any                     `json:"inputMessageType"`
+	InputMessageType            string                             `json:"inputMessageType"`
 	SendThinkingToUser          Optional[bool]                     `json:"sendThinkingToUser,omitzero"`
 	SendMessagesToUser          Optional[bool]                     `json:"sendMessagesToUser,omitzero"`
 	AskQuestionsToUser          Optional[bool]                     `json:"askQuestionsToUser,omitzero"`
@@ -23,7 +23,7 @@ type UpdateAgent struct {
 	Identity                    Optional[string]                             `json:"identity,omitzero"`
 	TaskInstructions            Optional[string]                             `json:"taskInstructions,omitzero"`
 	ModelComplexity             Optional[ModelComplexity]                    `json:"modelComplexity,omitzero"`
-	InputMessageType            Optional[map[string]any]                     `json:"inputMessageType,omitzero"`
+	InputMessageType            Optional[string]                             `json:"inputMessageType,omitzero"`
 	SendThinkingToUser          Optional[bool]                               `json:"sendThinkingToUser,omitzero"`
 	SendMessagesToUser          Optional[bool]                               `json:"sendMessagesToUser,omitzero"`
 	AskQuestionsToUser          Optional[bool]                               `json:"askQuestionsToUser,omitzero"`
@@ -55,7 +55,7 @@ type NewMemorySlot struct {
 	// A description of the data the memory slot is intended to hold, and when it should be used.
 	Description string `json:"description"`
 	// A JSON schema describing the structure of the data to be stored in the memory slot.
-	MemoryType map[string]any `json:"memoryType"`
+	MemoryType string `json:"memoryType"`
 	// An optional expression defining whether this memory slot is currently readable.
 	CanRead Optional[string] `json:"canRead,omitzero"`
 	// An optional expression defining whether this memory slot is currently writable.
@@ -213,9 +213,9 @@ type UpdateLink struct {
 }
 
 type NewLinkResponse struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	MessageType map[string]any `json:"messageType"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	MessageType string `json:"messageType"`
 }
 
 type NewInput struct {
@@ -231,7 +231,7 @@ type UpdateInput struct {
 }
 
 type NewInputResponse struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	MessageType map[string]any `json:"messageType"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	MessageType string `json:"messageType"`
 }

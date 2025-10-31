@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
@@ -124,15 +123,10 @@ func (r *MeshInputResource) Create(ctx context.Context, req resource.CreateReque
 
 	var responses []pgql.NewInputResponse
 	for _, r := range responseStructs {
-		var messageType map[string]interface{}
-		if err := json.Unmarshal([]byte(r.MessageType.ValueString()), &messageType); err != nil {
-			resp.Diagnostics.AddError("Configuration Error", fmt.Sprintf("Invalid JSON for response message_type: %s", err))
-			return
-		}
 		responses = append(responses, pgql.NewInputResponse{
 			Name:        r.Name,
 			Description: r.Description,
-			MessageType: messageType,
+			MessageType: r.MessageType.ValueString(),
 		})
 	}
 
@@ -208,15 +202,10 @@ func (r *MeshInputResource) Update(ctx context.Context, req resource.UpdateReque
 		}
 		var responses []pgql.NewInputResponse
 		for _, r := range responseStructs {
-			var messageType map[string]interface{}
-			if err := json.Unmarshal([]byte(r.MessageType.ValueString()), &messageType); err != nil {
-				resp.Diagnostics.AddError("Configuration Error", fmt.Sprintf("Invalid JSON for response message_type: %s", err))
-				return
-			}
 			responses = append(responses, pgql.NewInputResponse{
 				Name:        r.Name,
 				Description: r.Description,
-				MessageType: messageType,
+				MessageType: r.MessageType.ValueString(),
 			})
 		}
 		update.Responses = pgql.Opt(responses)

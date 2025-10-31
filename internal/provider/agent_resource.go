@@ -2,8 +2,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
@@ -190,9 +188,6 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	var inputMessageType map[string]any
-	resp.Diagnostics.Append(data.InputMessageType.Unmarshal(&inputMessageType)...)
-
 	var memorySlots []pgql.NewMemorySlot
 	if !data.MemorySlots.IsNull() {
 		for _, v := range data.MemorySlots.Elements() {
@@ -202,16 +197,10 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 				return
 			}
 
-			var memoryType map[string]any
-			if err := json.Unmarshal([]byte(memorySlot.MemoryType.ValueString()), &memoryType); err != nil {
-				resp.Diagnostics.AddError("Invalid JSON", fmt.Sprintf("Memory type contains invalid JSON: %s", err))
-				return
-			}
-
 			memorySlots = append(memorySlots, pgql.NewMemorySlot{
 				Name:        memorySlot.Name,
 				Description: memorySlot.Description,
-				MemoryType:  memoryType,
+				MemoryType:  memorySlot.MemoryType.ValueString(),
 				Scope:       pgql.MemoryScope(memorySlot.MemoryScope),
 				CanRead:     pgql.OptPtr(memorySlot.CanRead.ValueStringPointer()),
 				CanWrite:    pgql.OptPtr(memorySlot.CanWrite.ValueStringPointer()),
@@ -255,7 +244,7 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		Identity:                    pgql.OptPtr(data.Identity.ValueStringPointer()),
 		TaskInstructions:            data.TaskInstructions.ValueString(),
 		ModelComplexity:             pgql.ModelComplexity(data.ModelComplexity.ValueString()),
-		InputMessageType:            inputMessageType,
+		InputMessageType:            data.InputMessageType.ValueString(),
 		SendThinkingToUser:          pgql.OptPtr(data.SendThinkingToUser.ValueBoolPointer()),
 		SendMessagesToUser:          pgql.OptPtr(data.SendMessagesToUser.ValueBoolPointer()),
 		AskQuestionsToUser:          pgql.OptPtr(data.AskQuestionsToUser.ValueBoolPointer()),
@@ -335,12 +324,7 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	}
 
 	if !planData.InputMessageType.Equal(stateData.InputMessageType) {
-		var inputMessageType map[string]any
-		if err := json.Unmarshal([]byte(planData.InputMessageType.ValueString()), &inputMessageType); err != nil {
-			resp.Diagnostics.AddError("Invalid JSON", fmt.Sprintf("Input message type contains invalid JSON: %s", err))
-			return
-		}
-		update.InputMessageType = pgql.Opt(inputMessageType)
+		update.InputMessageType = pgql.Opt(planData.InputMessageType.ValueString())
 	}
 
 	if !planData.SendThinkingToUser.Equal(stateData.SendThinkingToUser) {
@@ -369,16 +353,10 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 					return
 				}
 
-				var memoryType map[string]any
-				if err := json.Unmarshal([]byte(memorySlot.MemoryType.ValueString()), &memoryType); err != nil {
-					resp.Diagnostics.AddError("Invalid JSON", fmt.Sprintf("Memory type contains invalid JSON: %s", err))
-					return
-				}
-
 				memorySlots = append(memorySlots, pgql.NewMemorySlot{
 					Name:        memorySlot.Name,
 					Description: memorySlot.Description,
-					MemoryType:  memoryType,
+					MemoryType:  memorySlot.MemoryType.ValueString(),
 					Scope:       pgql.MemoryScope(memorySlot.MemoryScope),
 					CanRead:     pgql.OptPtr(memorySlot.CanRead.ValueStringPointer()),
 					CanWrite:    pgql.OptPtr(memorySlot.CanWrite.ValueStringPointer()),
