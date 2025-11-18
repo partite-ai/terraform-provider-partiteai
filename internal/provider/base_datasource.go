@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -11,6 +12,7 @@ import (
 // BaseDataSource provides common functionality for all data sources.
 type BaseDataSource struct {
 	client   graphql.Client
+	baseURL  *url.URL
 	typeName string
 }
 
@@ -28,16 +30,17 @@ func (d *BaseDataSource) Configure(ctx context.Context, req datasource.Configure
 		return
 	}
 
-	client, ok := req.ProviderData.(graphql.Client)
+	providerData, ok := req.ProviderData.(*providerData)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
-			fmt.Sprintf("Expected graphql.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *providerData, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 		return
 	}
 
-	d.client = client
+	d.client = providerData.client
+	d.baseURL = providerData.baseURL
 }
 
 // Metadata implements the common Metadata method for all data sources.

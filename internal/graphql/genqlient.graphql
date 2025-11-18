@@ -526,3 +526,47 @@ query GetAgentIDForVersion($id: AgentVersionID!) {
     }
   }
 }
+
+fragment WebhookDestinationDetails on WebhookDestination {
+  id
+  name
+  description
+  externalID
+  mesh {
+    id
+  }
+  meshVersionLabel
+  inputName
+  createdAt
+  updatedAt
+}
+
+query GetWebhookDestination($id: WebhookDestinationID!) {
+  # @genqlient(flatten: true)
+  webhookDestination(id: $id) {
+    ...WebhookDestinationDetails
+  }
+}
+
+mutation CreateWebhookDestination($input: NewWebhookDestination!) {
+  # @genqlient(flatten: true)
+  createWebhookDestination(input: $input) {
+    ...WebhookDestinationDetails
+  }
+}
+
+mutation ModifyWebhookDestination(
+  $id: WebhookDestinationID!
+  $input: UpdateWebhookDestination!
+) {
+  # @genqlient(flatten: true)
+  updateWebhookDestination(id: $id, input: $input) {
+    ...WebhookDestinationDetails
+  }
+}
+
+mutation DeleteWebhookDestination($id: WebhookDestinationID!) {
+  deleteWebhookDestinations(webhookDestinationIDs: [$id]) {
+    ids
+  }
+}

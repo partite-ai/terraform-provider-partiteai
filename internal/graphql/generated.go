@@ -360,6 +360,16 @@ type CreateModelSetResponse struct {
 // GetCreateModelSet returns CreateModelSetResponse.CreateModelSet, and is useful for accessing the field via an interface.
 func (v *CreateModelSetResponse) GetCreateModelSet() ModelSetDetails { return v.CreateModelSet }
 
+// CreateWebhookDestinationResponse is returned by CreateWebhookDestination on success.
+type CreateWebhookDestinationResponse struct {
+	CreateWebhookDestination WebhookDestinationDetails `json:"createWebhookDestination"`
+}
+
+// GetCreateWebhookDestination returns CreateWebhookDestinationResponse.CreateWebhookDestination, and is useful for accessing the field via an interface.
+func (v *CreateWebhookDestinationResponse) GetCreateWebhookDestination() WebhookDestinationDetails {
+	return v.CreateWebhookDestination
+}
+
 // DeleteAgentDeleteAgentsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
 type DeleteAgentDeleteAgentsDeleteResults struct {
 	Ids []string `json:"ids"`
@@ -522,6 +532,26 @@ func (v *DeleteModelSetResponse) GetDeleteModelSets() DeleteModelSetDeleteModelS
 	return v.DeleteModelSets
 }
 
+// DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults) GetIds() []string {
+	return v.Ids
+}
+
+// DeleteWebhookDestinationResponse is returned by DeleteWebhookDestination on success.
+type DeleteWebhookDestinationResponse struct {
+	DeleteWebhookDestinations DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults `json:"deleteWebhookDestinations"`
+}
+
+// GetDeleteWebhookDestinations returns DeleteWebhookDestinationResponse.DeleteWebhookDestinations, and is useful for accessing the field via an interface.
+func (v *DeleteWebhookDestinationResponse) GetDeleteWebhookDestinations() DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults {
+	return v.DeleteWebhookDestinations
+}
+
 // GetAgentIDForVersionAgentVersion includes the requested fields of the GraphQL type AgentVersion.
 type GetAgentIDForVersionAgentVersion struct {
 	Agent GetAgentIDForVersionAgentVersionAgent `json:"agent"`
@@ -667,6 +697,16 @@ type GetModelSetResponse struct {
 
 // GetModelSet returns GetModelSetResponse.ModelSet, and is useful for accessing the field via an interface.
 func (v *GetModelSetResponse) GetModelSet() ModelSetDetails { return v.ModelSet }
+
+// GetWebhookDestinationResponse is returned by GetWebhookDestination on success.
+type GetWebhookDestinationResponse struct {
+	WebhookDestination WebhookDestinationDetails `json:"webhookDestination"`
+}
+
+// GetWebhookDestination returns GetWebhookDestinationResponse.WebhookDestination, and is useful for accessing the field via an interface.
+func (v *GetWebhookDestinationResponse) GetWebhookDestination() WebhookDestinationDetails {
+	return v.WebhookDestination
+}
 
 // InputDetails includes the GraphQL fields of Input requested by the fragment InputDetails.
 type InputDetails struct {
@@ -1958,6 +1998,16 @@ type ModifyModelSetResponse struct {
 // GetUpdateModelSet returns ModifyModelSetResponse.UpdateModelSet, and is useful for accessing the field via an interface.
 func (v *ModifyModelSetResponse) GetUpdateModelSet() ModelSetDetails { return v.UpdateModelSet }
 
+// ModifyWebhookDestinationResponse is returned by ModifyWebhookDestination on success.
+type ModifyWebhookDestinationResponse struct {
+	UpdateWebhookDestination WebhookDestinationDetails `json:"updateWebhookDestination"`
+}
+
+// GetUpdateWebhookDestination returns ModifyWebhookDestinationResponse.UpdateWebhookDestination, and is useful for accessing the field via an interface.
+func (v *ModifyWebhookDestinationResponse) GetUpdateWebhookDestination() WebhookDestinationDetails {
+	return v.UpdateWebhookDestination
+}
+
 type NewMcpConnection struct {
 	Name                              string                                          `json:"name"`
 	Transport                         McpTransport                                    `json:"transport"`
@@ -2066,6 +2116,54 @@ func (v *UpdateMcpConnection) GetHeaderCredentials() *McpConnectionHeaderCredent
 	return v.HeaderCredentials
 }
 
+// WebhookDestinationDetails includes the GraphQL fields of WebhookDestination requested by the fragment WebhookDestinationDetails.
+type WebhookDestinationDetails struct {
+	Id               string                        `json:"id"`
+	Name             string                        `json:"name"`
+	Description      *string                       `json:"description"`
+	ExternalID       string                        `json:"externalID"`
+	Mesh             WebhookDestinationDetailsMesh `json:"mesh"`
+	MeshVersionLabel *string                       `json:"meshVersionLabel"`
+	InputName        string                        `json:"inputName"`
+	CreatedAt        string                        `json:"createdAt"`
+	UpdatedAt        string                        `json:"updatedAt"`
+}
+
+// GetId returns WebhookDestinationDetails.Id, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetId() string { return v.Id }
+
+// GetName returns WebhookDestinationDetails.Name, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetName() string { return v.Name }
+
+// GetDescription returns WebhookDestinationDetails.Description, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetDescription() *string { return v.Description }
+
+// GetExternalID returns WebhookDestinationDetails.ExternalID, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetExternalID() string { return v.ExternalID }
+
+// GetMesh returns WebhookDestinationDetails.Mesh, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetMesh() WebhookDestinationDetailsMesh { return v.Mesh }
+
+// GetMeshVersionLabel returns WebhookDestinationDetails.MeshVersionLabel, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetMeshVersionLabel() *string { return v.MeshVersionLabel }
+
+// GetInputName returns WebhookDestinationDetails.InputName, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetInputName() string { return v.InputName }
+
+// GetCreatedAt returns WebhookDestinationDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns WebhookDestinationDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// WebhookDestinationDetailsMesh includes the requested fields of the GraphQL type Mesh.
+type WebhookDestinationDetailsMesh struct {
+	Id string `json:"id"`
+}
+
+// GetId returns WebhookDestinationDetailsMesh.Id, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetailsMesh) GetId() string { return v.Id }
+
 // __CreateAgentInput is used internally by genqlient
 type __CreateAgentInput struct {
 	Input *NewAgent `json:"input"`
@@ -2158,6 +2256,14 @@ type __CreateModelSetInput struct {
 // GetInput returns __CreateModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateModelSetInput) GetInput() *NewModelSet { return v.Input }
 
+// __CreateWebhookDestinationInput is used internally by genqlient
+type __CreateWebhookDestinationInput struct {
+	Input *NewWebhookDestination `json:"input"`
+}
+
+// GetInput returns __CreateWebhookDestinationInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateWebhookDestinationInput) GetInput() *NewWebhookDestination { return v.Input }
+
 // __DeleteAgentInput is used internally by genqlient
 type __DeleteAgentInput struct {
 	Id string `json:"id"`
@@ -2233,6 +2339,14 @@ type __DeleteModelSetInput struct {
 
 // GetId returns __DeleteModelSetInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteModelSetInput) GetId() string { return v.Id }
+
+// __DeleteWebhookDestinationInput is used internally by genqlient
+type __DeleteWebhookDestinationInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteWebhookDestinationInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteWebhookDestinationInput) GetId() string { return v.Id }
 
 // __GetAgentIDForVersionInput is used internally by genqlient
 type __GetAgentIDForVersionInput struct {
@@ -2325,6 +2439,14 @@ type __GetModelSetInput struct {
 
 // GetId returns __GetModelSetInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetModelSetInput) GetId() string { return v.Id }
+
+// __GetWebhookDestinationInput is used internally by genqlient
+type __GetWebhookDestinationInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetWebhookDestinationInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetWebhookDestinationInput) GetId() string { return v.Id }
 
 // __ModifyAgentInput is used internally by genqlient
 type __ModifyAgentInput struct {
@@ -2445,6 +2567,18 @@ func (v *__ModifyModelSetInput) GetId() string { return v.Id }
 
 // GetInput returns __ModifyModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyModelSetInput) GetInput() *UpdateModelSet { return v.Input }
+
+// __ModifyWebhookDestinationInput is used internally by genqlient
+type __ModifyWebhookDestinationInput struct {
+	Id    string                    `json:"id"`
+	Input *UpdateWebhookDestination `json:"input"`
+}
+
+// GetId returns __ModifyWebhookDestinationInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyWebhookDestinationInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyWebhookDestinationInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyWebhookDestinationInput) GetInput() *UpdateWebhookDestination { return v.Input }
 
 // The mutation executed by CreateAgent.
 const CreateAgent_Operation = `
@@ -2980,6 +3114,53 @@ func CreateModelSet(
 	return data_, err_
 }
 
+// The mutation executed by CreateWebhookDestination.
+const CreateWebhookDestination_Operation = `
+mutation CreateWebhookDestination ($input: NewWebhookDestination!) {
+	createWebhookDestination(input: $input) {
+		... WebhookDestinationDetails
+	}
+}
+fragment WebhookDestinationDetails on WebhookDestination {
+	id
+	name
+	description
+	externalID
+	mesh {
+		id
+	}
+	meshVersionLabel
+	inputName
+	createdAt
+	updatedAt
+}
+`
+
+func CreateWebhookDestination(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewWebhookDestination,
+) (data_ *CreateWebhookDestinationResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateWebhookDestination",
+		Query:  CreateWebhookDestination_Operation,
+		Variables: &__CreateWebhookDestinationInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateWebhookDestinationResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by DeleteAgent.
 const DeleteAgent_Operation = `
 mutation DeleteAgent ($id: AgentID!) {
@@ -3277,6 +3458,40 @@ func DeleteModelSet(
 	}
 
 	data_ = &DeleteModelSetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteWebhookDestination.
+const DeleteWebhookDestination_Operation = `
+mutation DeleteWebhookDestination ($id: WebhookDestinationID!) {
+	deleteWebhookDestinations(webhookDestinationIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteWebhookDestination(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteWebhookDestinationResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteWebhookDestination",
+		Query:  DeleteWebhookDestination_Operation,
+		Variables: &__DeleteWebhookDestinationInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteWebhookDestinationResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -3919,6 +4134,53 @@ func GetModelSet(
 	return data_, err_
 }
 
+// The query executed by GetWebhookDestination.
+const GetWebhookDestination_Operation = `
+query GetWebhookDestination ($id: WebhookDestinationID!) {
+	webhookDestination(id: $id) {
+		... WebhookDestinationDetails
+	}
+}
+fragment WebhookDestinationDetails on WebhookDestination {
+	id
+	name
+	description
+	externalID
+	mesh {
+		id
+	}
+	meshVersionLabel
+	inputName
+	createdAt
+	updatedAt
+}
+`
+
+func GetWebhookDestination(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetWebhookDestinationResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetWebhookDestination",
+		Query:  GetWebhookDestination_Operation,
+		Variables: &__GetWebhookDestinationInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetWebhookDestinationResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by ModifyAgent.
 const ModifyAgent_Operation = `
 mutation ModifyAgent ($id: AgentID!, $input: UpdateAgent!) {
@@ -4453,6 +4715,55 @@ func ModifyModelSet(
 	}
 
 	data_ = &ModifyModelSetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyWebhookDestination.
+const ModifyWebhookDestination_Operation = `
+mutation ModifyWebhookDestination ($id: WebhookDestinationID!, $input: UpdateWebhookDestination!) {
+	updateWebhookDestination(id: $id, input: $input) {
+		... WebhookDestinationDetails
+	}
+}
+fragment WebhookDestinationDetails on WebhookDestination {
+	id
+	name
+	description
+	externalID
+	mesh {
+		id
+	}
+	meshVersionLabel
+	inputName
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyWebhookDestination(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateWebhookDestination,
+) (data_ *ModifyWebhookDestinationResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyWebhookDestination",
+		Query:  ModifyWebhookDestination_Operation,
+		Variables: &__ModifyWebhookDestinationInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyWebhookDestinationResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

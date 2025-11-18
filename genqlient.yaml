@@ -24,6 +24,8 @@ bindings:
     type: string
   MeshVersionID:
     type: string
+  WebhookDestinationID:
+    type: string
   ModelProviderID:
     type: string
   ModelProfileID:
@@ -66,3 +68,7 @@ bindings:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewInput"
   UpdateInput:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateInput"
+  NewWebhookDestination:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewWebhookDestination"
+  UpdateWebhookDestination:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateWebhookDestination"

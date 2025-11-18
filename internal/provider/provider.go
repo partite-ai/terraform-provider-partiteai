@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/Khan/genqlient/graphql"
@@ -172,8 +173,25 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 	}
 
 	client := graphql.NewClient(endpoint, httpClient)
-	resp.DataSourceData = client
-	resp.ResourceData = client
+
+	baseURL, err := url.Parse(endpoint)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Invalid endpoint URL",
+			"The provider cannot create the Partite.ai API client because the endpoint URL is invalid: "+err.Error(),
+		)
+		return
+	}
+	baseURL.Path = ""
+
+	resp.DataSourceData = &providerData{
+		client:  client,
+		baseURL: baseURL,
+	}
+	resp.ResourceData = &providerData{
+		client:  client,
+		baseURL: baseURL,
+	}
 }
 
 func (p *PartiteAIProvider) Resources(ctx context.Context) []func() resource.Resource {
@@ -181,6 +199,7 @@ func (p *PartiteAIProvider) Resources(ctx context.Context) []func() resource.Res
 		NewAgentResource,
 		NewMcpConnectionResource,
 		NewApiKeyResource,
+		NewWebhookDestinationResource,
 		NewModelProviderResource,
 		NewModelProfileResource,
 		NewModelSetResource,
@@ -198,6 +217,7 @@ func (p *PartiteAIProvider) DataSources(ctx context.Context) []func() datasource
 	return []func() datasource.DataSource{
 		NewAgentDataSource,
 		NewApiKeyDataSource,
+		NewWebhookDestinationDataSource,
 		NewMcpConnectionDataSource,
 		NewMeshDataSource,
 		NewMeshInputDataSource,
@@ -237,4 +257,9 @@ type authTransport struct {
 func (t *authTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.SetBasicAuth(t.apiKey, t.apiSecret)
 	return http.DefaultTransport.RoundTrip(req)
+}
+
+type providerData struct {
+	client  graphql.Client
+	baseURL *url.URL
 }

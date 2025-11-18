@@ -235,3 +235,19 @@ type NewInputResponse struct {
 	Description string `json:"description"`
 	MessageType string `json:"messageType"`
 }
+
+type NewWebhookDestination struct {
+	Name             string           `json:"name"`
+	Description      Optional[string] `json:"description,omitzero"`
+	MeshID           string           `json:"meshID"`
+	MeshVersionLabel Optional[string] `json:"meshVersionLabel,omitzero"`
+	InputName        string           `json:"inputName"`
+}
+
+type UpdateWebhookDestination struct {
+	Name             Optional[string] `json:"name,omitzero"`
+	Description      Optional[string] `json:"description,omitzero"`
+	MeshID           Optional[string] `json:"meshID,omitzero"`
+	MeshVersionLabel Optional[string] `json:"meshVersionLabel,omitzero"`
+	InputName        Optional[string] `json:"inputName,omitzero"`
+}
