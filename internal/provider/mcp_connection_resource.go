@@ -189,6 +189,19 @@ func (r *McpConnectionResource) Schema(ctx context.Context, req resource.SchemaR
 	}
 }
 
+func (r *McpConnectionResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	mcpConnectionResp, err := pgql.GetMcpConnection(ctx, r.GetClient(), req.ID)
+	if err != nil {
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "mcp_connection", req.ID)
+		return
+	}
+
+	if mcpConnectionResp.McpConnection.Transport == pgql.McpTransportHttp {
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("http_transport").AtName("credentials_version"), 1)...)
+	}
+}
+
 func (r *McpConnectionResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data McpConnectionResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)

@@ -3,10 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -98,6 +100,21 @@ func (r *MeshInputResource) Schema(ctx context.Context, req resource.SchemaReque
 			},
 		},
 	}
+}
+
+func (r *MeshInputResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	meshID, inputName, ok := strings.Cut(req.ID, ":")
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Invalid Import Identifier",
+			"The import identifier must be in the format '<mesh_id>:<input_name>'.\n\n"+
+				"Example: 'cmsh_1234567890abcdef:my_input'",
+		)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("mesh_id"), meshID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), inputName)...)
 }
 
 func (r *MeshInputResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {

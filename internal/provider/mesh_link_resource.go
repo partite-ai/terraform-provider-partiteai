@@ -3,10 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -146,6 +148,19 @@ func (r *MeshLinkResource) Schema(ctx context.Context, req resource.SchemaReques
 	}
 }
 
+func (r *MeshLinkResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	meshID, linkID, ok := strings.Cut(req.ID, ":")
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			"Expected import identifier with format: <mesh_id>:<link_id>. Got: "+req.ID,
+		)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), linkID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("mesh_id"), meshID)...)
+}
+
 func (r *MeshLinkResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data MeshLinkResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
@@ -222,7 +237,7 @@ func (r *MeshLinkResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	logResourceOperation(ctx, "reading", "mesh_link", data.Id.ValueString())
+	logResourceOperation(ctx, "reading", "mesh_link", data.Id.ValueString()+":"+data.MeshId.ValueString())
 
 	meshResp, err := pgql.GetMeshLinks(ctx, r.GetClient(), data.MeshId.ValueString())
 	if err != nil {
