@@ -19,7 +19,6 @@ fragment AgentDetails on Agent {
     preserveConversationHistory
     sendThinkingToUser
     sendMessagesToUser
-    askQuestionsToUser
     mcpConnections {
       mcpConnection {
         id
@@ -28,6 +27,12 @@ fragment AgentDetails on Agent {
       filterType
       toolNames
       toolNamePattern
+    }
+    tasks {
+      taskDefinition {
+        id
+        name
+      }
     }
     memorySlots {
       id
@@ -567,6 +572,51 @@ mutation ModifyWebhookDestination(
 
 mutation DeleteWebhookDestination($id: WebhookDestinationID!) {
   deleteWebhookDestinations(webhookDestinationIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "TaskDefinitionDetails")
+fragment TaskDefinitionDetails on TaskDefinition {
+  id
+  name
+  description
+  inputMessageType
+  outputMessageType
+  createdAt
+  updatedAt
+}
+
+query GetTaskDefinition($id: TaskDefinitionID!) {
+  # @genqlient(flatten: true)
+  taskDefinition(id: $id) {
+    ...TaskDefinitionDetails
+  }
+}
+
+query GetTaskDefinitionByName($name: String!) {
+  # @genqlient(flatten: true)
+  taskDefinitionByName(name: $name) {
+    ...TaskDefinitionDetails
+  }
+}
+
+mutation CreateTaskDefinition($input: NewTaskDefinition!) {
+  # @genqlient(flatten: true)
+  createTaskDefinition(input: $input) {
+    ...TaskDefinitionDetails
+  }
+}
+
+mutation ModifyTaskDefinition($id: TaskDefinitionID!, $input: UpdateTaskDefinition!) {
+  # @genqlient(flatten: true)
+  updateTaskDefinition(taskDefinitionID: $id, input: $input) {
+    ...TaskDefinitionDetails
+  }
+}
+
+mutation DeleteTaskDefinition($id: TaskDefinitionID!) {
+  deleteTaskDefinitions(taskDefinitionIDs: [$id]) {
     ids
   }
 }

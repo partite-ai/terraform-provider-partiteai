@@ -24,7 +24,6 @@ Agent resource
 
 ### Optional
 
-- `ask_questions_to_user` (Boolean) Whether the agent is allowed to ask questions to the user for clarification
 - `description` (String) Resource description
 - `identity` (String) A brief description of the agent's identity, such as its role or persona.
 - `mcp_connections` (Attributes Set) List of MCP connections associated with the agent (see [below for nested schema](#nestedatt--mcp_connections))
@@ -33,6 +32,7 @@ Agent resource
 - `send_messages_to_user` (Boolean) Whether the agent should send messages to the user
 - `send_thinking_to_user` (Boolean) Whether the agent should send 'thinking' messages to the user
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
+- `tasks` (Attributes Set) Set of task definitions associated with the agent, referenced by task definition ID (see [below for nested schema](#nestedatt--tasks))
 
 ### Read-Only
 
@@ -78,3 +78,11 @@ Required:
 
 - `name` (String) Tag name
 - `value` (String) Tag value
+
+
+<a id="nestedatt--tasks"></a>
+### Nested Schema for `tasks`
+
+Required:
+
+- `id` (String) Task definition identifier

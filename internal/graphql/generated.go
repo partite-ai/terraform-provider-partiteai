@@ -58,8 +58,8 @@ type AgentDetailsLatestVersionAgentVersion struct {
 	PreserveConversationHistory bool                                                                               `json:"preserveConversationHistory"`
 	SendThinkingToUser          bool                                                                               `json:"sendThinkingToUser"`
 	SendMessagesToUser          bool                                                                               `json:"sendMessagesToUser"`
-	AskQuestionsToUser          bool                                                                               `json:"askQuestionsToUser"`
 	McpConnections              []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation `json:"mcpConnections"`
+	Tasks                       []AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation                   `json:"tasks"`
 	MemorySlots                 []AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot                       `json:"memorySlots"`
 }
 
@@ -111,14 +111,14 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetSendMessagesToUser() bool {
 	return v.SendMessagesToUser
 }
 
-// GetAskQuestionsToUser returns AgentDetailsLatestVersionAgentVersion.AskQuestionsToUser, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersion) GetAskQuestionsToUser() bool {
-	return v.AskQuestionsToUser
-}
-
 // GetMcpConnections returns AgentDetailsLatestVersionAgentVersion.McpConnections, and is useful for accessing the field via an interface.
 func (v *AgentDetailsLatestVersionAgentVersion) GetMcpConnections() []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation {
 	return v.McpConnections
+}
+
+// GetTasks returns AgentDetailsLatestVersionAgentVersion.Tasks, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersion) GetTasks() []AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation {
+	return v.Tasks
 }
 
 // GetMemorySlots returns AgentDetailsLatestVersionAgentVersion.MemorySlots, and is useful for accessing the field via an interface.
@@ -129,7 +129,7 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetMemorySlots() []AgentDetailsL
 // AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation includes the requested fields of the GraphQL type McpConnectionAgentAssociation.
 type AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation struct {
 	McpConnection   AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociationMcpConnection `json:"mcpConnection"`
-	FilterType      McpConnectionFilterType                                                                       `json:"filterType"`
+	FilterType      ToolFilterType                                                                                `json:"filterType"`
 	ToolNames       []string                                                                                      `json:"toolNames"`
 	ToolNamePattern *string                                                                                       `json:"toolNamePattern"`
 }
@@ -140,7 +140,7 @@ func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAs
 }
 
 // GetFilterType returns AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation.FilterType, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation) GetFilterType() McpConnectionFilterType {
+func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation) GetFilterType() ToolFilterType {
 	return v.FilterType
 }
 
@@ -216,6 +216,39 @@ func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetCanWrite
 // GetCreatedAt returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.CreatedAt, and is useful for accessing the field via an interface.
 func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetCreatedAt() string {
 	return v.CreatedAt
+}
+
+// AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation includes the requested fields of the GraphQL type TaskAgentAssociation.
+type AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation struct {
+	TaskDefinition AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition `json:"taskDefinition"`
+}
+
+// GetTaskDefinition returns AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation.TaskDefinition, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation) GetTaskDefinition() AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition {
+	return v.TaskDefinition
+}
+
+// AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition includes the requested fields of the GraphQL type TaskDefinition.
+// The GraphQL type's documentation follows.
+//
+// An author-defined TaskDefinition describing a task an agent can send to the
+// user as a tool call. Carries an input schema (what the agent supplies) and an
+// output schema (what the user submits when completing it). One TaskDefinition
+// is reusable across agents and meshes via TaskAgentAssociation.
+type AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition struct {
+	Id string `json:"id"`
+	// Tool name exposed to the LLM. Unique across all task definitions.
+	Name string `json:"name"`
+}
+
+// GetId returns AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition.Id, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition) GetId() string {
+	return v.Id
+}
+
+// GetName returns AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition.Name, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition) GetName() string {
+	return v.Name
 }
 
 // ApiKeyDetails includes the GraphQL fields of ApiKey requested by the fragment ApiKeyDetails.
@@ -359,6 +392,17 @@ type CreateModelSetResponse struct {
 
 // GetCreateModelSet returns CreateModelSetResponse.CreateModelSet, and is useful for accessing the field via an interface.
 func (v *CreateModelSetResponse) GetCreateModelSet() ModelSetDetails { return v.CreateModelSet }
+
+// CreateTaskDefinitionResponse is returned by CreateTaskDefinition on success.
+type CreateTaskDefinitionResponse struct {
+	// Create a new author-defined TaskDefinition. Name must be unique.
+	CreateTaskDefinition TaskDefinitionDetails `json:"createTaskDefinition"`
+}
+
+// GetCreateTaskDefinition returns CreateTaskDefinitionResponse.CreateTaskDefinition, and is useful for accessing the field via an interface.
+func (v *CreateTaskDefinitionResponse) GetCreateTaskDefinition() TaskDefinitionDetails {
+	return v.CreateTaskDefinition
+}
 
 // CreateWebhookDestinationResponse is returned by CreateWebhookDestination on success.
 type CreateWebhookDestinationResponse struct {
@@ -532,6 +576,26 @@ func (v *DeleteModelSetResponse) GetDeleteModelSets() DeleteModelSetDeleteModelS
 	return v.DeleteModelSets
 }
 
+// DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteTaskDefinitionResponse is returned by DeleteTaskDefinition on success.
+type DeleteTaskDefinitionResponse struct {
+	// Delete TaskDefinitions. Fails if any definition is still associated with an
+	// agent — remove the associations first.
+	DeleteTaskDefinitions DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults `json:"deleteTaskDefinitions"`
+}
+
+// GetDeleteTaskDefinitions returns DeleteTaskDefinitionResponse.DeleteTaskDefinitions, and is useful for accessing the field via an interface.
+func (v *DeleteTaskDefinitionResponse) GetDeleteTaskDefinitions() DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults {
+	return v.DeleteTaskDefinitions
+}
+
 // DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
 type DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults struct {
 	Ids []string `json:"ids"`
@@ -697,6 +761,26 @@ type GetModelSetResponse struct {
 
 // GetModelSet returns GetModelSetResponse.ModelSet, and is useful for accessing the field via an interface.
 func (v *GetModelSetResponse) GetModelSet() ModelSetDetails { return v.ModelSet }
+
+// GetTaskDefinitionByNameResponse is returned by GetTaskDefinitionByName on success.
+type GetTaskDefinitionByNameResponse struct {
+	TaskDefinitionByName *TaskDefinitionDetails `json:"taskDefinitionByName"`
+}
+
+// GetTaskDefinitionByName returns GetTaskDefinitionByNameResponse.TaskDefinitionByName, and is useful for accessing the field via an interface.
+func (v *GetTaskDefinitionByNameResponse) GetTaskDefinitionByName() *TaskDefinitionDetails {
+	return v.TaskDefinitionByName
+}
+
+// GetTaskDefinitionResponse is returned by GetTaskDefinition on success.
+type GetTaskDefinitionResponse struct {
+	TaskDefinition *TaskDefinitionDetails `json:"taskDefinition"`
+}
+
+// GetTaskDefinition returns GetTaskDefinitionResponse.TaskDefinition, and is useful for accessing the field via an interface.
+func (v *GetTaskDefinitionResponse) GetTaskDefinition() *TaskDefinitionDetails {
+	return v.TaskDefinition
+}
 
 // GetWebhookDestinationResponse is returned by GetWebhookDestination on success.
 type GetWebhookDestinationResponse struct {
@@ -967,20 +1051,6 @@ func (v *McpConnectionDetailsStdioTransportStdioMcpTransport) GetArguments() []s
 // GetEnvironment returns McpConnectionDetailsStdioTransportStdioMcpTransport.Environment, and is useful for accessing the field via an interface.
 func (v *McpConnectionDetailsStdioTransportStdioMcpTransport) GetEnvironment() []string {
 	return v.Environment
-}
-
-type McpConnectionFilterType string
-
-const (
-	McpConnectionFilterTypeNone    McpConnectionFilterType = "NONE"
-	McpConnectionFilterTypeList    McpConnectionFilterType = "LIST"
-	McpConnectionFilterTypePattern McpConnectionFilterType = "PATTERN"
-)
-
-var AllMcpConnectionFilterType = []McpConnectionFilterType{
-	McpConnectionFilterTypeNone,
-	McpConnectionFilterTypeList,
-	McpConnectionFilterTypePattern,
 }
 
 type McpConnectionHeaderCredentials struct {
@@ -1998,6 +2068,18 @@ type ModifyModelSetResponse struct {
 // GetUpdateModelSet returns ModifyModelSetResponse.UpdateModelSet, and is useful for accessing the field via an interface.
 func (v *ModifyModelSetResponse) GetUpdateModelSet() ModelSetDetails { return v.UpdateModelSet }
 
+// ModifyTaskDefinitionResponse is returned by ModifyTaskDefinition on success.
+type ModifyTaskDefinitionResponse struct {
+	// Update an author-defined TaskDefinition. Any subset of input fields may be
+	// supplied; an empty input is a no-op.
+	UpdateTaskDefinition TaskDefinitionDetails `json:"updateTaskDefinition"`
+}
+
+// GetUpdateTaskDefinition returns ModifyTaskDefinitionResponse.UpdateTaskDefinition, and is useful for accessing the field via an interface.
+func (v *ModifyTaskDefinitionResponse) GetUpdateTaskDefinition() TaskDefinitionDetails {
+	return v.UpdateTaskDefinition
+}
+
 // ModifyWebhookDestinationResponse is returned by ModifyWebhookDestination on success.
 type ModifyWebhookDestinationResponse struct {
 	UpdateWebhookDestination WebhookDestinationDetails `json:"updateWebhookDestination"`
@@ -2067,6 +2149,65 @@ var AllOpenAIReasoningEffort = []OpenAIReasoningEffort{
 	OpenAIReasoningEffortLow,
 	OpenAIReasoningEffortMedium,
 	OpenAIReasoningEffortHigh,
+}
+
+// TaskDefinitionDetails includes the GraphQL fields of TaskDefinition requested by the fragment TaskDefinitionDetails.
+// The GraphQL type's documentation follows.
+//
+// An author-defined TaskDefinition describing a task an agent can send to the
+// user as a tool call. Carries an input schema (what the agent supplies) and an
+// output schema (what the user submits when completing it). One TaskDefinition
+// is reusable across agents and meshes via TaskAgentAssociation.
+type TaskDefinitionDetails struct {
+	Id string `json:"id"`
+	// Tool name exposed to the LLM. Unique across all task definitions.
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	// JSON Schema the agent must satisfy when invoking the task.
+	InputMessageType json.RawMessage `json:"inputMessageType"`
+	// JSON Schema the user must satisfy when completing the task.
+	OutputMessageType json.RawMessage `json:"outputMessageType"`
+	CreatedAt         string          `json:"createdAt"`
+	UpdatedAt         string          `json:"updatedAt"`
+}
+
+// GetId returns TaskDefinitionDetails.Id, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetails) GetId() string { return v.Id }
+
+// GetName returns TaskDefinitionDetails.Name, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetails) GetName() string { return v.Name }
+
+// GetDescription returns TaskDefinitionDetails.Description, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetails) GetDescription() string { return v.Description }
+
+// GetInputMessageType returns TaskDefinitionDetails.InputMessageType, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetails) GetInputMessageType() json.RawMessage { return v.InputMessageType }
+
+// GetOutputMessageType returns TaskDefinitionDetails.OutputMessageType, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetails) GetOutputMessageType() json.RawMessage { return v.OutputMessageType }
+
+// GetCreatedAt returns TaskDefinitionDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns TaskDefinitionDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// Tool filter shape shared by all per-agent tool-provider associations
+// (MCP connections, installed particles). NONE = all tools exposed; LIST =
+// only tools whose name appears in toolNames; PATTERN = only tools whose
+// name matches toolNamePattern (a regex).
+type ToolFilterType string
+
+const (
+	ToolFilterTypeNone    ToolFilterType = "NONE"
+	ToolFilterTypeList    ToolFilterType = "LIST"
+	ToolFilterTypePattern ToolFilterType = "PATTERN"
+)
+
+var AllToolFilterType = []ToolFilterType{
+	ToolFilterTypeNone,
+	ToolFilterTypeList,
+	ToolFilterTypePattern,
 }
 
 type UpdateMcpConnection struct {
@@ -2256,6 +2397,14 @@ type __CreateModelSetInput struct {
 // GetInput returns __CreateModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateModelSetInput) GetInput() *NewModelSet { return v.Input }
 
+// __CreateTaskDefinitionInput is used internally by genqlient
+type __CreateTaskDefinitionInput struct {
+	Input *NewTaskDefinition `json:"input"`
+}
+
+// GetInput returns __CreateTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateTaskDefinitionInput) GetInput() *NewTaskDefinition { return v.Input }
+
 // __CreateWebhookDestinationInput is used internally by genqlient
 type __CreateWebhookDestinationInput struct {
 	Input *NewWebhookDestination `json:"input"`
@@ -2339,6 +2488,14 @@ type __DeleteModelSetInput struct {
 
 // GetId returns __DeleteModelSetInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteModelSetInput) GetId() string { return v.Id }
+
+// __DeleteTaskDefinitionInput is used internally by genqlient
+type __DeleteTaskDefinitionInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteTaskDefinitionInput) GetId() string { return v.Id }
 
 // __DeleteWebhookDestinationInput is used internally by genqlient
 type __DeleteWebhookDestinationInput struct {
@@ -2439,6 +2596,22 @@ type __GetModelSetInput struct {
 
 // GetId returns __GetModelSetInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetModelSetInput) GetId() string { return v.Id }
+
+// __GetTaskDefinitionByNameInput is used internally by genqlient
+type __GetTaskDefinitionByNameInput struct {
+	Name string `json:"name"`
+}
+
+// GetName returns __GetTaskDefinitionByNameInput.Name, and is useful for accessing the field via an interface.
+func (v *__GetTaskDefinitionByNameInput) GetName() string { return v.Name }
+
+// __GetTaskDefinitionInput is used internally by genqlient
+type __GetTaskDefinitionInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetTaskDefinitionInput) GetId() string { return v.Id }
 
 // __GetWebhookDestinationInput is used internally by genqlient
 type __GetWebhookDestinationInput struct {
@@ -2568,6 +2741,18 @@ func (v *__ModifyModelSetInput) GetId() string { return v.Id }
 // GetInput returns __ModifyModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyModelSetInput) GetInput() *UpdateModelSet { return v.Input }
 
+// __ModifyTaskDefinitionInput is used internally by genqlient
+type __ModifyTaskDefinitionInput struct {
+	Id    string                `json:"id"`
+	Input *UpdateTaskDefinition `json:"input"`
+}
+
+// GetId returns __ModifyTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyTaskDefinitionInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyTaskDefinitionInput) GetInput() *UpdateTaskDefinition { return v.Input }
+
 // __ModifyWebhookDestinationInput is used internally by genqlient
 type __ModifyWebhookDestinationInput struct {
 	Id    string                    `json:"id"`
@@ -2609,7 +2794,6 @@ fragment AgentDetails on Agent {
 		preserveConversationHistory
 		sendThinkingToUser
 		sendMessagesToUser
-		askQuestionsToUser
 		mcpConnections {
 			mcpConnection {
 				id
@@ -2618,6 +2802,12 @@ fragment AgentDetails on Agent {
 			filterType
 			toolNames
 			toolNamePattern
+		}
+		tasks {
+			taskDefinition {
+				id
+				name
+			}
 		}
 		memorySlots {
 			id
@@ -3114,6 +3304,49 @@ func CreateModelSet(
 	return data_, err_
 }
 
+// The mutation executed by CreateTaskDefinition.
+const CreateTaskDefinition_Operation = `
+mutation CreateTaskDefinition ($input: NewTaskDefinition!) {
+	createTaskDefinition(input: $input) {
+		... TaskDefinitionDetails
+	}
+}
+fragment TaskDefinitionDetails on TaskDefinition {
+	id
+	name
+	description
+	inputMessageType
+	outputMessageType
+	createdAt
+	updatedAt
+}
+`
+
+func CreateTaskDefinition(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewTaskDefinition,
+) (data_ *CreateTaskDefinitionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateTaskDefinition",
+		Query:  CreateTaskDefinition_Operation,
+		Variables: &__CreateTaskDefinitionInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateTaskDefinitionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by CreateWebhookDestination.
 const CreateWebhookDestination_Operation = `
 mutation CreateWebhookDestination ($input: NewWebhookDestination!) {
@@ -3469,6 +3702,40 @@ func DeleteModelSet(
 	return data_, err_
 }
 
+// The mutation executed by DeleteTaskDefinition.
+const DeleteTaskDefinition_Operation = `
+mutation DeleteTaskDefinition ($id: TaskDefinitionID!) {
+	deleteTaskDefinitions(taskDefinitionIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteTaskDefinition(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteTaskDefinitionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteTaskDefinition",
+		Query:  DeleteTaskDefinition_Operation,
+		Variables: &__DeleteTaskDefinitionInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteTaskDefinitionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by DeleteWebhookDestination.
 const DeleteWebhookDestination_Operation = `
 mutation DeleteWebhookDestination ($id: WebhookDestinationID!) {
@@ -3530,7 +3797,6 @@ fragment AgentDetails on Agent {
 		preserveConversationHistory
 		sendThinkingToUser
 		sendMessagesToUser
-		askQuestionsToUser
 		mcpConnections {
 			mcpConnection {
 				id
@@ -3539,6 +3805,12 @@ fragment AgentDetails on Agent {
 			filterType
 			toolNames
 			toolNamePattern
+		}
+		tasks {
+			taskDefinition {
+				id
+				name
+			}
 		}
 		memorySlots {
 			id
@@ -4134,6 +4406,92 @@ func GetModelSet(
 	return data_, err_
 }
 
+// The query executed by GetTaskDefinition.
+const GetTaskDefinition_Operation = `
+query GetTaskDefinition ($id: TaskDefinitionID!) {
+	taskDefinition(id: $id) {
+		... TaskDefinitionDetails
+	}
+}
+fragment TaskDefinitionDetails on TaskDefinition {
+	id
+	name
+	description
+	inputMessageType
+	outputMessageType
+	createdAt
+	updatedAt
+}
+`
+
+func GetTaskDefinition(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetTaskDefinitionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetTaskDefinition",
+		Query:  GetTaskDefinition_Operation,
+		Variables: &__GetTaskDefinitionInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetTaskDefinitionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetTaskDefinitionByName.
+const GetTaskDefinitionByName_Operation = `
+query GetTaskDefinitionByName ($name: String!) {
+	taskDefinitionByName(name: $name) {
+		... TaskDefinitionDetails
+	}
+}
+fragment TaskDefinitionDetails on TaskDefinition {
+	id
+	name
+	description
+	inputMessageType
+	outputMessageType
+	createdAt
+	updatedAt
+}
+`
+
+func GetTaskDefinitionByName(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	name string,
+) (data_ *GetTaskDefinitionByNameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetTaskDefinitionByName",
+		Query:  GetTaskDefinitionByName_Operation,
+		Variables: &__GetTaskDefinitionByNameInput{
+			Name: name,
+		},
+	}
+
+	data_ = &GetTaskDefinitionByNameResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetWebhookDestination.
 const GetWebhookDestination_Operation = `
 query GetWebhookDestination ($id: WebhookDestinationID!) {
@@ -4210,7 +4568,6 @@ fragment AgentDetails on Agent {
 		preserveConversationHistory
 		sendThinkingToUser
 		sendMessagesToUser
-		askQuestionsToUser
 		mcpConnections {
 			mcpConnection {
 				id
@@ -4219,6 +4576,12 @@ fragment AgentDetails on Agent {
 			filterType
 			toolNames
 			toolNamePattern
+		}
+		tasks {
+			taskDefinition {
+				id
+				name
+			}
 		}
 		memorySlots {
 			id
@@ -4715,6 +5078,51 @@ func ModifyModelSet(
 	}
 
 	data_ = &ModifyModelSetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyTaskDefinition.
+const ModifyTaskDefinition_Operation = `
+mutation ModifyTaskDefinition ($id: TaskDefinitionID!, $input: UpdateTaskDefinition!) {
+	updateTaskDefinition(taskDefinitionID: $id, input: $input) {
+		... TaskDefinitionDetails
+	}
+}
+fragment TaskDefinitionDetails on TaskDefinition {
+	id
+	name
+	description
+	inputMessageType
+	outputMessageType
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyTaskDefinition(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateTaskDefinition,
+) (data_ *ModifyTaskDefinitionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyTaskDefinition",
+		Query:  ModifyTaskDefinition_Operation,
+		Variables: &__ModifyTaskDefinitionInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyTaskDefinitionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

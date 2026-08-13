@@ -94,6 +94,15 @@ var mcpConnectionType = schema.NestedAttributeObject{
 	},
 }
 
+var taskAssociationType = schema.NestedAttributeObject{
+	Attributes: map[string]schema.Attribute{
+		"id": schema.StringAttribute{
+			MarkdownDescription: "Task definition identifier",
+			Required:            true,
+		},
+	},
+}
+
 func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Agent resource",
@@ -117,6 +126,13 @@ func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Computed:            true,
 				NestedObject:        mcpConnectionType,
 				Default:             setdefault.StaticValue(types.SetValueMust(mcpConnectionType.Type(), nil)),
+			},
+			"tasks": schema.SetNestedAttribute{
+				MarkdownDescription: "Set of task definitions associated with the agent, referenced by task definition ID",
+				Optional:            true,
+				Computed:            true,
+				NestedObject:        taskAssociationType,
+				Default:             setdefault.StaticValue(types.SetValueMust(taskAssociationType.Type(), nil)),
 			},
 			"memory_slots": schema.SetNestedAttribute{
 				MarkdownDescription: "List of memory slots for the agent",
@@ -159,12 +175,6 @@ func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			},
 			"send_messages_to_user": schema.BoolAttribute{
 				MarkdownDescription: "Whether the agent should send messages to the user",
-				Optional:            true,
-				Computed:            true,
-				Default:             booldefault.StaticBool(false),
-			},
-			"ask_questions_to_user": schema.BoolAttribute{
-				MarkdownDescription: "Whether the agent is allowed to ask questions to the user for clarification",
 				Optional:            true,
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
@@ -218,10 +228,10 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		for _, v := range mcpConnectionStructs {
 			caa := pgql.NewMcpConnectionAgentAssociation{
 				McpConnectionID: v.Id,
-				FilterType:      pgql.McpConnectionFilterType(v.FilterType.ValueString()),
+				FilterType:      pgql.ToolFilterType(v.FilterType.ValueString()),
 			}
 			switch caa.FilterType {
-			case pgql.McpConnectionFilterTypeList:
+			case pgql.ToolFilterTypeList:
 				var toolNames []string
 				if !v.ToolNames.IsNull() {
 					if diag := v.ToolNames.ElementsAs(ctx, &toolNames, false); diag.HasError() {
@@ -230,10 +240,22 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 					}
 				}
 				caa.ToolNames = toolNames
-			case pgql.McpConnectionFilterTypePattern:
+			case pgql.ToolFilterTypePattern:
 				caa.ToolNamePattern = v.ToolNamePattern.ValueStringPointer()
 			}
 			mcpConnections = append(mcpConnections, caa)
+		}
+	}
+
+	var tasks []pgql.NewTaskAgentAssociation
+	if !data.Tasks.IsNull() {
+		var taskStructs []taskInfo
+		if diag := data.Tasks.ElementsAs(ctx, &taskStructs, false); diag.HasError() {
+			resp.Diagnostics.Append(diag...)
+			return
+		}
+		for _, v := range taskStructs {
+			tasks = append(tasks, pgql.NewTaskAgentAssociation{TaskDefinitionID: v.Id})
 		}
 	}
 
@@ -247,10 +269,10 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		InputMessageType:            data.InputMessageType.ValueString(),
 		SendThinkingToUser:          pgql.OptPtr(data.SendThinkingToUser.ValueBoolPointer()),
 		SendMessagesToUser:          pgql.OptPtr(data.SendMessagesToUser.ValueBoolPointer()),
-		AskQuestionsToUser:          pgql.OptPtr(data.AskQuestionsToUser.ValueBoolPointer()),
 		PreserveConversationHistory: pgql.OptPtr(data.PreserveConversationHistory.ValueBoolPointer()),
 		MemorySlots:                 memorySlots,
 		McpConnections:              mcpConnections,
+		Tasks:                       tasks,
 	})
 
 	if err != nil {
@@ -335,10 +357,6 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		update.SendMessagesToUser = pgql.OptPtr(planData.SendMessagesToUser.ValueBoolPointer())
 	}
 
-	if !planData.AskQuestionsToUser.Equal(stateData.AskQuestionsToUser) {
-		update.AskQuestionsToUser = pgql.OptPtr(planData.AskQuestionsToUser.ValueBoolPointer())
-	}
-
 	if !planData.PreserveConversationHistory.Equal(stateData.PreserveConversationHistory) {
 		update.PreserveConversationHistory = pgql.OptPtr(planData.PreserveConversationHistory.ValueBoolPointer())
 	}
@@ -378,10 +396,10 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 			for _, v := range mcpConnectionStructs {
 				caa := pgql.NewMcpConnectionAgentAssociation{
 					McpConnectionID: v.Id,
-					FilterType:      pgql.McpConnectionFilterType(v.FilterType.ValueString()),
+					FilterType:      pgql.ToolFilterType(v.FilterType.ValueString()),
 				}
 				switch caa.FilterType {
-				case pgql.McpConnectionFilterTypeList:
+				case pgql.ToolFilterTypeList:
 					var toolNames []string
 					if !v.ToolNames.IsNull() {
 						if diag := v.ToolNames.ElementsAs(ctx, &toolNames, false); diag.HasError() {
@@ -390,13 +408,28 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 						}
 					}
 					caa.ToolNames = toolNames
-				case pgql.McpConnectionFilterTypePattern:
+				case pgql.ToolFilterTypePattern:
 					caa.ToolNamePattern = v.ToolNamePattern.ValueStringPointer()
 				}
 				mcpConnections = append(mcpConnections, caa)
 			}
 		}
 		update.McpConnections = pgql.Opt(mcpConnections)
+	}
+
+	if !planData.Tasks.Equal(stateData.Tasks) {
+		var tasks []pgql.NewTaskAgentAssociation
+		if !planData.Tasks.IsNull() {
+			var taskStructs []taskInfo
+			if diag := planData.Tasks.ElementsAs(ctx, &taskStructs, false); diag.HasError() {
+				resp.Diagnostics.Append(diag...)
+				return
+			}
+			for _, v := range taskStructs {
+				tasks = append(tasks, pgql.NewTaskAgentAssociation{TaskDefinitionID: v.Id})
+			}
+		}
+		update.Tasks = pgql.Opt(tasks)
 	}
 
 	updateResp, err := pgql.ModifyAgent(ctx, r.GetClient(), planData.Id.ValueString(), &update)

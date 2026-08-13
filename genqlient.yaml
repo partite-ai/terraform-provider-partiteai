@@ -32,6 +32,10 @@ bindings:
     type: string
   ModelSetID:
     type: string
+  TaskDefinitionID:
+    type: string
+  TaskAgentAssociationID:
+    type: string
   SerializableType:
     type: "encoding/json.RawMessage"
   SerializableTMap:
@@ -72,3 +76,7 @@ bindings:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewWebhookDestination"
   UpdateWebhookDestination:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateWebhookDestination"
+  NewTaskDefinition:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewTaskDefinition"
+  UpdateTaskDefinition:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateTaskDefinition"

@@ -24,6 +24,7 @@ type AgentBaseModel struct {
 	VersionOrdinal              types.Int64          `tfsdk:"version_ordinal"`
 	VersionCreatedAt            timetypes.RFC3339    `tfsdk:"version_created_at"`
 	McpConnections              types.Set            `tfsdk:"mcp_connections"`
+	Tasks                       types.Set            `tfsdk:"tasks"`
 	MemorySlots                 types.Set            `tfsdk:"memory_slots"`
 	Identity                    types.String         `tfsdk:"identity"`
 	TaskInstructions            types.String         `tfsdk:"task_instructions"`
@@ -32,7 +33,6 @@ type AgentBaseModel struct {
 	PreserveConversationHistory types.Bool           `tfsdk:"preserve_conversation_history"`
 	SendThinkingToUser          types.Bool           `tfsdk:"send_thinking_to_user"`
 	SendMessagesToUser          types.Bool           `tfsdk:"send_messages_to_user"`
-	AskQuestionsToUser          types.Bool           `tfsdk:"ask_questions_to_user"`
 }
 
 // MapFromGraphQL maps GraphQL response to the base model.
@@ -57,10 +57,10 @@ func (m *AgentBaseModel) MapFromGraphQL(ctx context.Context, agentDetails pgql.A
 		&m.PreserveConversationHistory, agentDetails.LatestVersion.PreserveConversationHistory,
 		&m.SendThinkingToUser, agentDetails.LatestVersion.SendThinkingToUser,
 		&m.SendMessagesToUser, agentDetails.LatestVersion.SendMessagesToUser,
-		&m.AskQuestionsToUser, agentDetails.LatestVersion.AskQuestionsToUser,
 		&m.Tags, agentDetails.Tags,
 		&m.MemorySlots, newStructSliceMappable(agentDetails.LatestVersion.MemorySlots, memorySlotInfo{}),
 		&m.McpConnections, newStructSliceMappable(agentDetails.LatestVersion.McpConnections, mcpConnectionInfo{}),
+		&m.Tasks, newStructSliceMappable(agentDetails.LatestVersion.Tasks, taskInfo{}),
 	)...)
 
 	return diags
@@ -78,21 +78,30 @@ func (t *mcpConnectionInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersi
 	t.Id = src.McpConnection.Id
 	t.FilterType = types.StringValue(string(src.FilterType))
 	switch src.FilterType {
-	case pgql.McpConnectionFilterTypeNone:
+	case pgql.ToolFilterTypeNone:
 		t.ToolNames = types.ListNull(types.StringType)
 		t.ToolNamePattern = types.StringNull()
-	case pgql.McpConnectionFilterTypeList:
+	case pgql.ToolFilterTypeList:
 		diags.Append(
 			tfsdk.ValueFrom(context.Background(), src.ToolNames, types.ListType{ElemType: types.StringType}, &t.ToolNames)...,
 		)
 		t.ToolNamePattern = types.StringNull()
-	case pgql.McpConnectionFilterTypePattern:
+	case pgql.ToolFilterTypePattern:
 		t.ToolNames = types.ListNull(types.StringType)
 		t.ToolNamePattern = types.StringPointerValue(src.ToolNamePattern)
 	default:
 		t.ToolNames = types.ListNull(types.StringType)
 		t.ToolNamePattern = types.StringNull()
 	}
+	return nil
+}
+
+type taskInfo struct {
+	Id string `tfsdk:"id"`
+}
+
+func (t *taskInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation) diag.Diagnostics {
+	t.Id = src.TaskDefinition.Id
 	return nil
 }
 
