@@ -10,10 +10,10 @@ type NewAgent struct {
 	InputMessageType            string                             `json:"inputMessageType"`
 	SendThinkingToUser          Optional[bool]                     `json:"sendThinkingToUser,omitzero"`
 	SendMessagesToUser          Optional[bool]                     `json:"sendMessagesToUser,omitzero"`
-	AskQuestionsToUser          Optional[bool]                     `json:"askQuestionsToUser,omitzero"`
 	PreserveConversationHistory Optional[bool]                     `json:"preserveConversationHistory,omitzero"`
 	MemorySlots                 []NewMemorySlot                    `json:"memorySlots"`
 	McpConnections              []NewMcpConnectionAgentAssociation `json:"mcpConnections"`
+	Tasks                       []NewTaskAgentAssociation          `json:"tasks"`
 }
 
 type UpdateAgent struct {
@@ -26,10 +26,10 @@ type UpdateAgent struct {
 	InputMessageType            Optional[string]                             `json:"inputMessageType,omitzero"`
 	SendThinkingToUser          Optional[bool]                               `json:"sendThinkingToUser,omitzero"`
 	SendMessagesToUser          Optional[bool]                               `json:"sendMessagesToUser,omitzero"`
-	AskQuestionsToUser          Optional[bool]                               `json:"askQuestionsToUser,omitzero"`
 	PreserveConversationHistory Optional[bool]                               `json:"preserveConversationHistory,omitzero"`
 	MemorySlots                 Optional[[]NewMemorySlot]                    `json:"memorySlots,omitzero"`
 	McpConnections              Optional[[]NewMcpConnectionAgentAssociation] `json:"mcpConnections,omitzero"`
+	Tasks                       Optional[[]NewTaskAgentAssociation]          `json:"tasks,omitzero"`
 }
 
 type NewMcpConnectionAgentAssociation struct {
@@ -40,11 +40,16 @@ type NewMcpConnectionAgentAssociation struct {
 	// NONE: All tools from the MCP connection are available to the agent.
 	// LIST: Only the tools specified in toolNames are available to the agent.
 	// PATTERN: Only tools matching the toolNamePattern regex are available to the agent.
-	FilterType McpConnectionFilterType `json:"filterType"`
+	FilterType ToolFilterType `json:"filterType"`
 	// The list of tool names to allow the agent to use. Only applicable if filterType is LIST. Required to have at least one entry if filterType is LIST.
 	ToolNames []string `json:"toolNames"`
 	// A regex pattern to match tool names against. Only applicable if filterType is PATTERN. Required to be a valid regex if filterType is PATTERN.
 	ToolNamePattern *string `json:"toolNamePattern,omitempty"`
+}
+
+type NewTaskAgentAssociation struct {
+	// The ID of the task definition to expose to this agent version as a tool.
+	TaskDefinitionID string `json:"taskDefinitionID"`
 }
 
 type NewMemorySlot struct {
@@ -250,4 +255,21 @@ type UpdateWebhookDestination struct {
 	MeshID           Optional[string] `json:"meshID,omitzero"`
 	MeshVersionLabel Optional[string] `json:"meshVersionLabel,omitzero"`
 	InputName        Optional[string] `json:"inputName,omitzero"`
+}
+
+type NewTaskDefinition struct {
+	// Tool name exposed to the LLM. Must be unique across task definitions.
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	// A JSON schema the agent must satisfy when invoking the task.
+	InputMessageType string `json:"inputMessageType"`
+	// A JSON schema the user must satisfy when completing the task.
+	OutputMessageType string `json:"outputMessageType"`
+}
+
+type UpdateTaskDefinition struct {
+	Name              Optional[string] `json:"name,omitzero"`
+	Description       Optional[string] `json:"description,omitzero"`
+	InputMessageType  Optional[string] `json:"inputMessageType,omitzero"`
+	OutputMessageType Optional[string] `json:"outputMessageType,omitzero"`
 }

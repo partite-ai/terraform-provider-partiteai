@@ -143,6 +143,15 @@ var mcpConnectionDataSourceType = dsschema.NestedAttributeObject{
 	},
 }
 
+var taskAssociationDataSourceType = dsschema.NestedAttributeObject{
+	Attributes: map[string]dsschema.Attribute{
+		"id": dsschema.StringAttribute{
+			MarkdownDescription: "Task definition identifier",
+			Computed:            true,
+		},
+	},
+}
+
 // More data source nested attribute objects for MCP connections.
 var envVarDataSourceType = dsschema.NestedAttributeObject{
 	Attributes: map[string]dsschema.Attribute{

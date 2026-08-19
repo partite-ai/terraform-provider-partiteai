@@ -21,7 +21,6 @@ Agent data source
 
 ### Read-Only
 
-- `ask_questions_to_user` (Boolean) Whether the agent should ask questions to the user
 - `created_at` (String) Timestamp when the resource was created
 - `description` (String) Resource description
 - `identity` (String) A brief description of the agent's identity, such as its role or persona.
@@ -35,6 +34,7 @@ Agent data source
 - `send_thinking_to_user` (Boolean) Whether the agent should send 'thinking' messages to the user
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
 - `task_instructions` (String) Detailed instructions that guide the agent's behavior and decision-making processes.
+- `tasks` (Attributes Set) Set of task definitions associated with the agent, referenced by task definition ID (see [below for nested schema](#nestedatt--tasks))
 - `updated_at` (String) Timestamp when the resource was last updated
 - `version_created_at` (String) Timestamp when the current version was created
 - `version_id` (String) Current version identifier of the agent
@@ -71,3 +71,11 @@ Read-Only:
 
 - `name` (String) Tag name
 - `value` (String) Tag value
+
+
+<a id="nestedatt--tasks"></a>
+### Nested Schema for `tasks`
+
+Read-Only:
+
+- `id` (String) Task definition identifier

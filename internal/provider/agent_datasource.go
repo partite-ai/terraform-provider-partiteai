@@ -52,6 +52,11 @@ func (d *AgentDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Computed:            true,
 				NestedObject:        mcpConnectionDataSourceType,
 			},
+			"tasks": schema.SetNestedAttribute{
+				MarkdownDescription: "Set of task definitions associated with the agent, referenced by task definition ID",
+				Computed:            true,
+				NestedObject:        taskAssociationDataSourceType,
+			},
 			"memory_slots": schema.SetNestedAttribute{
 				MarkdownDescription: "List of memory slots for the agent",
 				Computed:            true,
@@ -84,10 +89,6 @@ func (d *AgentDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 			},
 			"send_messages_to_user": schema.BoolAttribute{
 				MarkdownDescription: "Whether the agent should send messages to the user",
-				Computed:            true,
-			},
-			"ask_questions_to_user": schema.BoolAttribute{
-				MarkdownDescription: "Whether the agent should ask questions to the user",
 				Computed:            true,
 			},
 		}),
