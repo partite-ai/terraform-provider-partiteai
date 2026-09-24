@@ -25,12 +25,12 @@ type AgentBaseModel struct {
 	VersionCreatedAt            timetypes.RFC3339    `tfsdk:"version_created_at"`
 	McpConnections              types.Set            `tfsdk:"mcp_connections"`
 	Tasks                       types.Set            `tfsdk:"tasks"`
-	MemorySlots                 types.Set            `tfsdk:"memory_slots"`
+	Particles                   types.Set            `tfsdk:"particles"`
+	MemoryInteractionProfileIds types.Set            `tfsdk:"memory_interaction_profile_ids"`
 	Identity                    types.String         `tfsdk:"identity"`
 	TaskInstructions            types.String         `tfsdk:"task_instructions"`
 	ModelComplexity             types.String         `tfsdk:"model_complexity"`
 	InputMessageType            jsontypes.Normalized `tfsdk:"input_message_type"`
-	PreserveConversationHistory types.Bool           `tfsdk:"preserve_conversation_history"`
 	SendThinkingToUser          types.Bool           `tfsdk:"send_thinking_to_user"`
 	SendMessagesToUser          types.Bool           `tfsdk:"send_messages_to_user"`
 }
@@ -54,13 +54,13 @@ func (m *AgentBaseModel) MapFromGraphQL(ctx context.Context, agentDetails pgql.A
 		&m.TaskInstructions, agentDetails.LatestVersion.TaskInstructions,
 		&m.ModelComplexity, string(agentDetails.LatestVersion.ModelComplexity),
 		&m.InputMessageType, agentDetails.LatestVersion.InputMessageType,
-		&m.PreserveConversationHistory, agentDetails.LatestVersion.PreserveConversationHistory,
 		&m.SendThinkingToUser, agentDetails.LatestVersion.SendThinkingToUser,
 		&m.SendMessagesToUser, agentDetails.LatestVersion.SendMessagesToUser,
 		&m.Tags, agentDetails.Tags,
-		&m.MemorySlots, newStructSliceMappable(agentDetails.LatestVersion.MemorySlots, memorySlotInfo{}),
+		&m.MemoryInteractionProfileIds, memoryInteractionProfileIDs(agentDetails.LatestVersion.MemoryInteractionProfiles),
 		&m.McpConnections, newStructSliceMappable(agentDetails.LatestVersion.McpConnections, mcpConnectionInfo{}),
 		&m.Tasks, newStructSliceMappable(agentDetails.LatestVersion.Tasks, taskInfo{}),
+		&m.Particles, newStructSliceMappable(agentDetails.LatestVersion.Particles, particleAssociationInfo{}),
 	)...)
 
 	return diags
@@ -105,24 +105,44 @@ func (t *taskInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionTasksTa
 	return nil
 }
 
-type memorySlotInfo struct {
-	Name        string               `json:"name" tfsdk:"name"`
-	Description string               `json:"description" tfsdk:"description"`
-	MemoryType  jsontypes.Normalized `json:"memoryType" tfsdk:"memory_type"`
-	MemoryScope string               `json:"memoryScope" tfsdk:"memory_scope"`
-	CanRead     types.String         `json:"canRead" tfsdk:"can_read"`
-	CanWrite    types.String         `json:"canWrite" tfsdk:"can_write"`
+// memoryInteractionProfileIDs are the profiles one agent version holds, as the
+// ids a configuration names them by.
+func memoryInteractionProfileIDs(
+	profiles []pgql.AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile,
+) []string {
+	out := make([]string, 0, len(profiles))
+	for _, profile := range profiles {
+		out = append(out, profile.Id)
+	}
+	return out
 }
 
-func (t *memorySlotInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) diag.Diagnostics {
+type particleAssociationInfo struct {
+	Id              string       `tfsdk:"id"`
+	FilterType      types.String `tfsdk:"filter_type"`
+	ToolNames       types.List   `tfsdk:"tool_names"`
+	ToolNamePattern types.String `tfsdk:"tool_name_pattern"`
+}
+
+func (t *particleAssociationInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation) diag.Diagnostics {
 	var diags diag.Diagnostics
-	t.Name = src.Name
-	t.Description = src.Description
-	t.MemoryType = jsontypes.NewNormalizedValue(string(src.MemoryType))
-
-	t.MemoryScope = string(src.MemoryScope)
-	t.CanRead = types.StringPointerValue(src.CanRead)
-	t.CanWrite = types.StringPointerValue(src.CanWrite)
-
+	t.Id = src.InstalledParticle.Id
+	t.FilterType = types.StringValue(string(src.FilterType))
+	switch src.FilterType {
+	case pgql.ToolFilterTypeNone:
+		t.ToolNames = types.ListNull(types.StringType)
+		t.ToolNamePattern = types.StringNull()
+	case pgql.ToolFilterTypeList:
+		diags.Append(
+			tfsdk.ValueFrom(context.Background(), src.ToolNames, types.ListType{ElemType: types.StringType}, &t.ToolNames)...,
+		)
+		t.ToolNamePattern = types.StringNull()
+	case pgql.ToolFilterTypePattern:
+		t.ToolNames = types.ListNull(types.StringType)
+		t.ToolNamePattern = types.StringPointerValue(src.ToolNamePattern)
+	default:
+		t.ToolNames = types.ListNull(types.StringType)
+		t.ToolNamePattern = types.StringNull()
+	}
 	return diags
 }

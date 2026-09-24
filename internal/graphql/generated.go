@@ -46,21 +46,23 @@ func (v *AgentDetails) GetLatestVersion() AgentDetailsLatestVersionAgentVersion 
 
 // AgentDetailsLatestVersionAgentVersion includes the requested fields of the GraphQL type AgentVersion.
 type AgentDetailsLatestVersionAgentVersion struct {
-	Id                          string                                                                             `json:"id"`
-	Ordinal                     int                                                                                `json:"ordinal"`
-	CreatedAt                   string                                                                             `json:"createdAt"`
-	Label                       *string                                                                            `json:"label"`
-	Tags                        []*Tag                                                                             `json:"tags"`
-	Identity                    *string                                                                            `json:"identity"`
-	TaskInstructions            string                                                                             `json:"taskInstructions"`
-	ModelComplexity             ModelComplexity                                                                    `json:"modelComplexity"`
-	InputMessageType            json.RawMessage                                                                    `json:"inputMessageType"`
-	PreserveConversationHistory bool                                                                               `json:"preserveConversationHistory"`
-	SendThinkingToUser          bool                                                                               `json:"sendThinkingToUser"`
-	SendMessagesToUser          bool                                                                               `json:"sendMessagesToUser"`
-	McpConnections              []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation `json:"mcpConnections"`
-	Tasks                       []AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation                   `json:"tasks"`
-	MemorySlots                 []AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot                       `json:"memorySlots"`
+	Id                 string                                                                             `json:"id"`
+	Ordinal            int                                                                                `json:"ordinal"`
+	CreatedAt          string                                                                             `json:"createdAt"`
+	Label              *string                                                                            `json:"label"`
+	Tags               []*Tag                                                                             `json:"tags"`
+	Identity           *string                                                                            `json:"identity"`
+	TaskInstructions   string                                                                             `json:"taskInstructions"`
+	ModelComplexity    ModelComplexity                                                                    `json:"modelComplexity"`
+	InputMessageType   json.RawMessage                                                                    `json:"inputMessageType"`
+	SendThinkingToUser bool                                                                               `json:"sendThinkingToUser"`
+	SendMessagesToUser bool                                                                               `json:"sendMessagesToUser"`
+	McpConnections     []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation `json:"mcpConnections"`
+	Tasks              []AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation                   `json:"tasks"`
+	// How this agent reads and writes memory. A profile takes effect only where the
+	// agent runs in a mesh that has memory stores attached.
+	MemoryInteractionProfiles []AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile `json:"memoryInteractionProfiles"`
+	Particles                 []AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation                 `json:"particles"`
 }
 
 // GetId returns AgentDetailsLatestVersionAgentVersion.Id, and is useful for accessing the field via an interface.
@@ -96,11 +98,6 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetInputMessageType() json.RawMe
 	return v.InputMessageType
 }
 
-// GetPreserveConversationHistory returns AgentDetailsLatestVersionAgentVersion.PreserveConversationHistory, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersion) GetPreserveConversationHistory() bool {
-	return v.PreserveConversationHistory
-}
-
 // GetSendThinkingToUser returns AgentDetailsLatestVersionAgentVersion.SendThinkingToUser, and is useful for accessing the field via an interface.
 func (v *AgentDetailsLatestVersionAgentVersion) GetSendThinkingToUser() bool {
 	return v.SendThinkingToUser
@@ -121,9 +118,14 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetTasks() []AgentDetailsLatestV
 	return v.Tasks
 }
 
-// GetMemorySlots returns AgentDetailsLatestVersionAgentVersion.MemorySlots, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersion) GetMemorySlots() []AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot {
-	return v.MemorySlots
+// GetMemoryInteractionProfiles returns AgentDetailsLatestVersionAgentVersion.MemoryInteractionProfiles, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersion) GetMemoryInteractionProfiles() []AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile {
+	return v.MemoryInteractionProfiles
+}
+
+// GetParticles returns AgentDetailsLatestVersionAgentVersion.Particles, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersion) GetParticles() []AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation {
+	return v.Particles
 }
 
 // AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation includes the requested fields of the GraphQL type McpConnectionAgentAssociation.
@@ -170,52 +172,58 @@ func (v *AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAs
 	return v.Name
 }
 
-// AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot includes the requested fields of the GraphQL type MemorySlot.
-type AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot struct {
-	Id          string          `json:"id"`
-	Name        string          `json:"name"`
-	Description string          `json:"description"`
-	MemoryType  json.RawMessage `json:"memoryType"`
-	MemoryScope MemoryScope     `json:"memoryScope"`
-	CanRead     *string         `json:"canRead"`
-	CanWrite    *string         `json:"canWrite"`
-	CreatedAt   string          `json:"createdAt"`
+// AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile includes the requested fields of the GraphQL type MemoryInteractionProfile.
+type AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
 }
 
-// GetId returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.Id, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetId() string { return v.Id }
-
-// GetName returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.Name, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetName() string { return v.Name }
-
-// GetDescription returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.Description, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetDescription() string {
-	return v.Description
+// GetId returns AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile.Id, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile) GetId() string {
+	return v.Id
 }
 
-// GetMemoryType returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.MemoryType, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetMemoryType() json.RawMessage {
-	return v.MemoryType
+// GetName returns AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile.Name, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile) GetName() string {
+	return v.Name
 }
 
-// GetMemoryScope returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.MemoryScope, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetMemoryScope() MemoryScope {
-	return v.MemoryScope
+// AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation includes the requested fields of the GraphQL type ParticleAgentAssociation.
+type AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation struct {
+	InstalledParticle AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociationInstalledParticle `json:"installedParticle"`
+	FilterType        ToolFilterType                                                                          `json:"filterType"`
+	ToolNames         []string                                                                                `json:"toolNames"`
+	ToolNamePattern   *string                                                                                 `json:"toolNamePattern"`
 }
 
-// GetCanRead returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.CanRead, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetCanRead() *string {
-	return v.CanRead
+// GetInstalledParticle returns AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation.InstalledParticle, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation) GetInstalledParticle() AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociationInstalledParticle {
+	return v.InstalledParticle
 }
 
-// GetCanWrite returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.CanWrite, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetCanWrite() *string {
-	return v.CanWrite
+// GetFilterType returns AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation.FilterType, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation) GetFilterType() ToolFilterType {
+	return v.FilterType
 }
 
-// GetCreatedAt returns AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot.CreatedAt, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionMemorySlotsMemorySlot) GetCreatedAt() string {
-	return v.CreatedAt
+// GetToolNames returns AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation.ToolNames, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation) GetToolNames() []string {
+	return v.ToolNames
+}
+
+// GetToolNamePattern returns AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation.ToolNamePattern, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation) GetToolNamePattern() *string {
+	return v.ToolNamePattern
+}
+
+// AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociationInstalledParticle includes the requested fields of the GraphQL type InstalledParticle.
+type AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociationInstalledParticle struct {
+	Id string `json:"id"`
+}
+
+// GetId returns AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociationInstalledParticle.Id, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociationInstalledParticle) GetId() string {
+	return v.Id
 }
 
 // AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation includes the requested fields of the GraphQL type TaskAgentAssociation.
@@ -323,6 +331,26 @@ func (v *CreateApiKeyResponse) GetCreateApiKey() CreateApiKeyCreateApiKeyCreateA
 	return v.CreateApiKey
 }
 
+// CreateEmbeddingProfileResponse is returned by CreateEmbeddingProfile on success.
+type CreateEmbeddingProfileResponse struct {
+	CreateEmbeddingProfile EmbeddingProfileDetails `json:"createEmbeddingProfile"`
+}
+
+// GetCreateEmbeddingProfile returns CreateEmbeddingProfileResponse.CreateEmbeddingProfile, and is useful for accessing the field via an interface.
+func (v *CreateEmbeddingProfileResponse) GetCreateEmbeddingProfile() EmbeddingProfileDetails {
+	return v.CreateEmbeddingProfile
+}
+
+// CreateEvalMeshMonitorResponse is returned by CreateEvalMeshMonitor on success.
+type CreateEvalMeshMonitorResponse struct {
+	CreateEvalMeshMonitor EvalMeshMonitorDetails `json:"createEvalMeshMonitor"`
+}
+
+// GetCreateEvalMeshMonitor returns CreateEvalMeshMonitorResponse.CreateEvalMeshMonitor, and is useful for accessing the field via an interface.
+func (v *CreateEvalMeshMonitorResponse) GetCreateEvalMeshMonitor() EvalMeshMonitorDetails {
+	return v.CreateEvalMeshMonitor
+}
+
 // CreateInputResponse is returned by CreateInput on success.
 type CreateInputResponse struct {
 	AddMeshInput InputDetails `json:"addMeshInput"`
@@ -330,6 +358,17 @@ type CreateInputResponse struct {
 
 // GetAddMeshInput returns CreateInputResponse.AddMeshInput, and is useful for accessing the field via an interface.
 func (v *CreateInputResponse) GetAddMeshInput() InputDetails { return v.AddMeshInput }
+
+// CreateInstalledParticleResponse is returned by CreateInstalledParticle on success.
+type CreateInstalledParticleResponse struct {
+	// Create a new installed particle backed by the given artifact. Captures credentials inline if the artifact's manifest declares the credentials capability.
+	CreateInstalledParticle InstalledParticleDetails `json:"createInstalledParticle"`
+}
+
+// GetCreateInstalledParticle returns CreateInstalledParticleResponse.CreateInstalledParticle, and is useful for accessing the field via an interface.
+func (v *CreateInstalledParticleResponse) GetCreateInstalledParticle() InstalledParticleDetails {
+	return v.CreateInstalledParticle
+}
 
 // CreateLinkResponse is returned by CreateLink on success.
 type CreateLinkResponse struct {
@@ -347,6 +386,26 @@ type CreateMcpConnectionResponse struct {
 // GetCreateMcpConnection returns CreateMcpConnectionResponse.CreateMcpConnection, and is useful for accessing the field via an interface.
 func (v *CreateMcpConnectionResponse) GetCreateMcpConnection() McpConnectionDetails {
 	return v.CreateMcpConnection
+}
+
+// CreateMemoryInteractionProfileResponse is returned by CreateMemoryInteractionProfile on success.
+type CreateMemoryInteractionProfileResponse struct {
+	CreateMemoryInteractionProfile MemoryInteractionProfileDetails `json:"createMemoryInteractionProfile"`
+}
+
+// GetCreateMemoryInteractionProfile returns CreateMemoryInteractionProfileResponse.CreateMemoryInteractionProfile, and is useful for accessing the field via an interface.
+func (v *CreateMemoryInteractionProfileResponse) GetCreateMemoryInteractionProfile() MemoryInteractionProfileDetails {
+	return v.CreateMemoryInteractionProfile
+}
+
+// CreateMemoryStoreResponse is returned by CreateMemoryStore on success.
+type CreateMemoryStoreResponse struct {
+	CreateMemoryStore MemoryStoreDetails `json:"createMemoryStore"`
+}
+
+// GetCreateMemoryStore returns CreateMemoryStoreResponse.CreateMemoryStore, and is useful for accessing the field via an interface.
+func (v *CreateMemoryStoreResponse) GetCreateMemoryStore() MemoryStoreDetails {
+	return v.CreateMemoryStore
 }
 
 // CreateMeshCreateMeshMeshVersion includes the requested fields of the GraphQL type MeshVersion.
@@ -377,6 +436,7 @@ func (v *CreateModelProfileResponse) GetCreateModelProfile() ModelProfileDetails
 
 // CreateModelProviderResponse is returned by CreateModelProvider on success.
 type CreateModelProviderResponse struct {
+	// Writes a model provider, with the profiles the input names.
 	CreateModelProvider ModelProviderDetails `json:"createModelProvider"`
 }
 
@@ -393,6 +453,14 @@ type CreateModelSetResponse struct {
 // GetCreateModelSet returns CreateModelSetResponse.CreateModelSet, and is useful for accessing the field via an interface.
 func (v *CreateModelSetResponse) GetCreateModelSet() ModelSetDetails { return v.CreateModelSet }
 
+// CreateRubricResponse is returned by CreateRubric on success.
+type CreateRubricResponse struct {
+	CreateRubric RubricDetails `json:"createRubric"`
+}
+
+// GetCreateRubric returns CreateRubricResponse.CreateRubric, and is useful for accessing the field via an interface.
+func (v *CreateRubricResponse) GetCreateRubric() RubricDetails { return v.CreateRubric }
+
 // CreateTaskDefinitionResponse is returned by CreateTaskDefinition on success.
 type CreateTaskDefinitionResponse struct {
 	// Create a new author-defined TaskDefinition. Name must be unique.
@@ -404,6 +472,14 @@ func (v *CreateTaskDefinitionResponse) GetCreateTaskDefinition() TaskDefinitionD
 	return v.CreateTaskDefinition
 }
 
+// CreateUserMetricResponse is returned by CreateUserMetric on success.
+type CreateUserMetricResponse struct {
+	CreateUserMetric UserMetricDetails `json:"createUserMetric"`
+}
+
+// GetCreateUserMetric returns CreateUserMetricResponse.CreateUserMetric, and is useful for accessing the field via an interface.
+func (v *CreateUserMetricResponse) GetCreateUserMetric() UserMetricDetails { return v.CreateUserMetric }
+
 // CreateWebhookDestinationResponse is returned by CreateWebhookDestination on success.
 type CreateWebhookDestinationResponse struct {
 	CreateWebhookDestination WebhookDestinationDetails `json:"createWebhookDestination"`
@@ -413,6 +489,14 @@ type CreateWebhookDestinationResponse struct {
 func (v *CreateWebhookDestinationResponse) GetCreateWebhookDestination() WebhookDestinationDetails {
 	return v.CreateWebhookDestination
 }
+
+// CreateWorkspaceResponse is returned by CreateWorkspace on success.
+type CreateWorkspaceResponse struct {
+	CreateWorkspace WorkspaceDetails `json:"createWorkspace"`
+}
+
+// GetCreateWorkspace returns CreateWorkspaceResponse.CreateWorkspace, and is useful for accessing the field via an interface.
+func (v *CreateWorkspaceResponse) GetCreateWorkspace() WorkspaceDetails { return v.CreateWorkspace }
 
 // DeleteAgentDeleteAgentsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
 type DeleteAgentDeleteAgentsDeleteResults struct {
@@ -450,6 +534,42 @@ func (v *DeleteApiKeyResponse) GetDeleteApiKeys() DeleteApiKeyDeleteApiKeysDelet
 	return v.DeleteApiKeys
 }
 
+// DeleteEmbeddingProfileDeleteEmbeddingProfilesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteEmbeddingProfileDeleteEmbeddingProfilesDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteEmbeddingProfileDeleteEmbeddingProfilesDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteEmbeddingProfileDeleteEmbeddingProfilesDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteEmbeddingProfileResponse is returned by DeleteEmbeddingProfile on success.
+type DeleteEmbeddingProfileResponse struct {
+	DeleteEmbeddingProfiles DeleteEmbeddingProfileDeleteEmbeddingProfilesDeleteResults `json:"deleteEmbeddingProfiles"`
+}
+
+// GetDeleteEmbeddingProfiles returns DeleteEmbeddingProfileResponse.DeleteEmbeddingProfiles, and is useful for accessing the field via an interface.
+func (v *DeleteEmbeddingProfileResponse) GetDeleteEmbeddingProfiles() DeleteEmbeddingProfileDeleteEmbeddingProfilesDeleteResults {
+	return v.DeleteEmbeddingProfiles
+}
+
+// DeleteEvalMeshMonitorDeleteEvalMeshMonitorDeleteResult includes the requested fields of the GraphQL type DeleteResult.
+type DeleteEvalMeshMonitorDeleteEvalMeshMonitorDeleteResult struct {
+	Id string `json:"id"`
+}
+
+// GetId returns DeleteEvalMeshMonitorDeleteEvalMeshMonitorDeleteResult.Id, and is useful for accessing the field via an interface.
+func (v *DeleteEvalMeshMonitorDeleteEvalMeshMonitorDeleteResult) GetId() string { return v.Id }
+
+// DeleteEvalMeshMonitorResponse is returned by DeleteEvalMeshMonitor on success.
+type DeleteEvalMeshMonitorResponse struct {
+	DeleteEvalMeshMonitor DeleteEvalMeshMonitorDeleteEvalMeshMonitorDeleteResult `json:"deleteEvalMeshMonitor"`
+}
+
+// GetDeleteEvalMeshMonitor returns DeleteEvalMeshMonitorResponse.DeleteEvalMeshMonitor, and is useful for accessing the field via an interface.
+func (v *DeleteEvalMeshMonitorResponse) GetDeleteEvalMeshMonitor() DeleteEvalMeshMonitorDeleteEvalMeshMonitorDeleteResult {
+	return v.DeleteEvalMeshMonitor
+}
+
 // DeleteInputRemoveMeshInputDeleteResult includes the requested fields of the GraphQL type DeleteResult.
 type DeleteInputRemoveMeshInputDeleteResult struct {
 	Id string `json:"id"`
@@ -466,6 +586,27 @@ type DeleteInputResponse struct {
 // GetRemoveMeshInput returns DeleteInputResponse.RemoveMeshInput, and is useful for accessing the field via an interface.
 func (v *DeleteInputResponse) GetRemoveMeshInput() DeleteInputRemoveMeshInputDeleteResult {
 	return v.RemoveMeshInput
+}
+
+// DeleteInstalledParticleDeleteInstalledParticlesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteInstalledParticleDeleteInstalledParticlesDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteInstalledParticleDeleteInstalledParticlesDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteInstalledParticleDeleteInstalledParticlesDeleteResults) GetIds() []string {
+	return v.Ids
+}
+
+// DeleteInstalledParticleResponse is returned by DeleteInstalledParticle on success.
+type DeleteInstalledParticleResponse struct {
+	// Delete installed particles. Cascades credentials, secrets, and agent associations for each. Artifacts remain and are GC'd later if no other install references them.
+	DeleteInstalledParticles DeleteInstalledParticleDeleteInstalledParticlesDeleteResults `json:"deleteInstalledParticles"`
+}
+
+// GetDeleteInstalledParticles returns DeleteInstalledParticleResponse.DeleteInstalledParticles, and is useful for accessing the field via an interface.
+func (v *DeleteInstalledParticleResponse) GetDeleteInstalledParticles() DeleteInstalledParticleDeleteInstalledParticlesDeleteResults {
+	return v.DeleteInstalledParticles
 }
 
 // DeleteLinkRemoveMeshLinkByStableIDDeleteResult includes the requested fields of the GraphQL type DeleteResult.
@@ -502,6 +643,45 @@ type DeleteMcpConnectionResponse struct {
 // GetDeleteMcpConnections returns DeleteMcpConnectionResponse.DeleteMcpConnections, and is useful for accessing the field via an interface.
 func (v *DeleteMcpConnectionResponse) GetDeleteMcpConnections() DeleteMcpConnectionDeleteMcpConnectionsDeleteResults {
 	return v.DeleteMcpConnections
+}
+
+// DeleteMemoryInteractionProfileDeleteMemoryInteractionProfilesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteMemoryInteractionProfileDeleteMemoryInteractionProfilesDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteMemoryInteractionProfileDeleteMemoryInteractionProfilesDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteMemoryInteractionProfileDeleteMemoryInteractionProfilesDeleteResults) GetIds() []string {
+	return v.Ids
+}
+
+// DeleteMemoryInteractionProfileResponse is returned by DeleteMemoryInteractionProfile on success.
+type DeleteMemoryInteractionProfileResponse struct {
+	DeleteMemoryInteractionProfiles DeleteMemoryInteractionProfileDeleteMemoryInteractionProfilesDeleteResults `json:"deleteMemoryInteractionProfiles"`
+}
+
+// GetDeleteMemoryInteractionProfiles returns DeleteMemoryInteractionProfileResponse.DeleteMemoryInteractionProfiles, and is useful for accessing the field via an interface.
+func (v *DeleteMemoryInteractionProfileResponse) GetDeleteMemoryInteractionProfiles() DeleteMemoryInteractionProfileDeleteMemoryInteractionProfilesDeleteResults {
+	return v.DeleteMemoryInteractionProfiles
+}
+
+// DeleteMemoryStoreDeleteMemoryStoresDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteMemoryStoreDeleteMemoryStoresDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteMemoryStoreDeleteMemoryStoresDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteMemoryStoreDeleteMemoryStoresDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteMemoryStoreResponse is returned by DeleteMemoryStore on success.
+type DeleteMemoryStoreResponse struct {
+	// Removes memory stores, with every document, fact and observation they hold.
+	DeleteMemoryStores DeleteMemoryStoreDeleteMemoryStoresDeleteResults `json:"deleteMemoryStores"`
+}
+
+// GetDeleteMemoryStores returns DeleteMemoryStoreResponse.DeleteMemoryStores, and is useful for accessing the field via an interface.
+func (v *DeleteMemoryStoreResponse) GetDeleteMemoryStores() DeleteMemoryStoreDeleteMemoryStoresDeleteResults {
+	return v.DeleteMemoryStores
 }
 
 // DeleteMeshDeleteMeshesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
@@ -576,6 +756,24 @@ func (v *DeleteModelSetResponse) GetDeleteModelSets() DeleteModelSetDeleteModelS
 	return v.DeleteModelSets
 }
 
+// DeleteRubricDeleteRubricDeleteResult includes the requested fields of the GraphQL type DeleteResult.
+type DeleteRubricDeleteRubricDeleteResult struct {
+	Id string `json:"id"`
+}
+
+// GetId returns DeleteRubricDeleteRubricDeleteResult.Id, and is useful for accessing the field via an interface.
+func (v *DeleteRubricDeleteRubricDeleteResult) GetId() string { return v.Id }
+
+// DeleteRubricResponse is returned by DeleteRubric on success.
+type DeleteRubricResponse struct {
+	DeleteRubric DeleteRubricDeleteRubricDeleteResult `json:"deleteRubric"`
+}
+
+// GetDeleteRubric returns DeleteRubricResponse.DeleteRubric, and is useful for accessing the field via an interface.
+func (v *DeleteRubricResponse) GetDeleteRubric() DeleteRubricDeleteRubricDeleteResult {
+	return v.DeleteRubric
+}
+
 // DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
 type DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults struct {
 	Ids []string `json:"ids"`
@@ -594,6 +792,24 @@ type DeleteTaskDefinitionResponse struct {
 // GetDeleteTaskDefinitions returns DeleteTaskDefinitionResponse.DeleteTaskDefinitions, and is useful for accessing the field via an interface.
 func (v *DeleteTaskDefinitionResponse) GetDeleteTaskDefinitions() DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults {
 	return v.DeleteTaskDefinitions
+}
+
+// DeleteUserMetricDeleteUserMetricDeleteResult includes the requested fields of the GraphQL type DeleteResult.
+type DeleteUserMetricDeleteUserMetricDeleteResult struct {
+	Id string `json:"id"`
+}
+
+// GetId returns DeleteUserMetricDeleteUserMetricDeleteResult.Id, and is useful for accessing the field via an interface.
+func (v *DeleteUserMetricDeleteUserMetricDeleteResult) GetId() string { return v.Id }
+
+// DeleteUserMetricResponse is returned by DeleteUserMetric on success.
+type DeleteUserMetricResponse struct {
+	DeleteUserMetric DeleteUserMetricDeleteUserMetricDeleteResult `json:"deleteUserMetric"`
+}
+
+// GetDeleteUserMetric returns DeleteUserMetricResponse.DeleteUserMetric, and is useful for accessing the field via an interface.
+func (v *DeleteUserMetricResponse) GetDeleteUserMetric() DeleteUserMetricDeleteUserMetricDeleteResult {
+	return v.DeleteUserMetric
 }
 
 // DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
@@ -615,6 +831,328 @@ type DeleteWebhookDestinationResponse struct {
 func (v *DeleteWebhookDestinationResponse) GetDeleteWebhookDestinations() DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults {
 	return v.DeleteWebhookDestinations
 }
+
+// DeleteWorkspaceDeleteWorkspacesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteWorkspaceDeleteWorkspacesDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteWorkspaceDeleteWorkspacesDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteWorkspaceDeleteWorkspacesDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteWorkspaceResponse is returned by DeleteWorkspace on success.
+type DeleteWorkspaceResponse struct {
+	DeleteWorkspaces DeleteWorkspaceDeleteWorkspacesDeleteResults `json:"deleteWorkspaces"`
+}
+
+// GetDeleteWorkspaces returns DeleteWorkspaceResponse.DeleteWorkspaces, and is useful for accessing the field via an interface.
+func (v *DeleteWorkspaceResponse) GetDeleteWorkspaces() DeleteWorkspaceDeleteWorkspacesDeleteResults {
+	return v.DeleteWorkspaces
+}
+
+// EmbeddingProfileDetails includes the GraphQL fields of EmbeddingProfile requested by the fragment EmbeddingProfileDetails.
+type EmbeddingProfileDetails struct {
+	Id          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	// The size of the vectors this profile produces.
+	Dimensions    int                                                        `json:"dimensions"`
+	Configuration EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig `json:"-"`
+	Provider      EmbeddingProfileDetailsProviderModelProvider               `json:"provider"`
+	CreatedAt     string                                                     `json:"createdAt"`
+	UpdatedAt     string                                                     `json:"updatedAt"`
+}
+
+// GetId returns EmbeddingProfileDetails.Id, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetails) GetId() string { return v.Id }
+
+// GetName returns EmbeddingProfileDetails.Name, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetails) GetName() string { return v.Name }
+
+// GetDescription returns EmbeddingProfileDetails.Description, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetails) GetDescription() *string { return v.Description }
+
+// GetDimensions returns EmbeddingProfileDetails.Dimensions, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetails) GetDimensions() int { return v.Dimensions }
+
+// GetConfiguration returns EmbeddingProfileDetails.Configuration, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetails) GetConfiguration() EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig {
+	return v.Configuration
+}
+
+// GetProvider returns EmbeddingProfileDetails.Provider, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetails) GetProvider() EmbeddingProfileDetailsProviderModelProvider {
+	return v.Provider
+}
+
+// GetCreatedAt returns EmbeddingProfileDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns EmbeddingProfileDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+func (v *EmbeddingProfileDetails) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*EmbeddingProfileDetails
+		Configuration json.RawMessage `json:"configuration"`
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.EmbeddingProfileDetails = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	{
+		dst := &v.Configuration
+		src := firstPass.Configuration
+		if len(src) != 0 && string(src) != "null" {
+			err = __unmarshalEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig(
+				src, dst)
+			if err != nil {
+				return fmt.Errorf(
+					"unable to unmarshal EmbeddingProfileDetails.Configuration: %w", err)
+			}
+		}
+	}
+	return nil
+}
+
+type __premarshalEmbeddingProfileDetails struct {
+	Id string `json:"id"`
+
+	Name string `json:"name"`
+
+	Description *string `json:"description"`
+
+	Dimensions int `json:"dimensions"`
+
+	Configuration json.RawMessage `json:"configuration"`
+
+	Provider EmbeddingProfileDetailsProviderModelProvider `json:"provider"`
+
+	CreatedAt string `json:"createdAt"`
+
+	UpdatedAt string `json:"updatedAt"`
+}
+
+func (v *EmbeddingProfileDetails) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *EmbeddingProfileDetails) __premarshalJSON() (*__premarshalEmbeddingProfileDetails, error) {
+	var retval __premarshalEmbeddingProfileDetails
+
+	retval.Id = v.Id
+	retval.Name = v.Name
+	retval.Description = v.Description
+	retval.Dimensions = v.Dimensions
+	{
+
+		dst := &retval.Configuration
+		src := v.Configuration
+		var err error
+		*dst, err = __marshalEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig(
+			&src)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"unable to marshal EmbeddingProfileDetails.Configuration: %w", err)
+		}
+	}
+	retval.Provider = v.Provider
+	retval.CreatedAt = v.CreatedAt
+	retval.UpdatedAt = v.UpdatedAt
+	return &retval, nil
+}
+
+// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig includes the requested fields of the GraphQL interface EmbeddingProfileConfig.
+//
+// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig is implemented by the following types:
+// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle
+// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI
+type EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig interface {
+	implementsGraphQLInterfaceEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig()
+	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
+	GetTypename() *string
+}
+
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) implementsGraphQLInterfaceEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig() {
+}
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) implementsGraphQLInterfaceEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig() {
+}
+
+func __unmarshalEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig(b []byte, v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig) error {
+	if string(b) == "null" {
+		return nil
+	}
+
+	var tn struct {
+		TypeName string `json:"__typename"`
+	}
+	err := json.Unmarshal(b, &tn)
+	if err != nil {
+		return err
+	}
+
+	switch tn.TypeName {
+	case "EmbeddingProfileConfigGoogle":
+		*v = new(EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle)
+		return json.Unmarshal(b, *v)
+	case "EmbeddingProfileConfigOpenAI":
+		*v = new(EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI)
+		return json.Unmarshal(b, *v)
+	case "":
+		return fmt.Errorf(
+			"response was missing EmbeddingProfileConfig.__typename")
+	default:
+		return fmt.Errorf(
+			`unexpected concrete type for EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig: "%v"`, tn.TypeName)
+	}
+}
+
+func __marshalEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig(v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig) ([]byte, error) {
+
+	var typename string
+	switch v := (*v).(type) {
+	case *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle:
+		typename = "EmbeddingProfileConfigGoogle"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle
+		}{typename, v}
+		return json.Marshal(result)
+	case *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI:
+		typename = "EmbeddingProfileConfigOpenAI"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI
+		}{typename, v}
+		return json.Marshal(result)
+	case nil:
+		return []byte("null"), nil
+	default:
+		return nil, fmt.Errorf(
+			`unexpected concrete type for EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig: "%T"`, v)
+	}
+}
+
+// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle includes the requested fields of the GraphQL type EmbeddingProfileConfigGoogle.
+type EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle struct {
+	Typename       *string `json:"__typename"`
+	Model          string  `json:"model"`
+	Dimensions     int     `json:"dimensions"`
+	SendDimensions bool    `json:"sendDimensions"`
+	TaskType       *string `json:"taskType"`
+}
+
+// GetTypename returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.Typename, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetTypename() *string {
+	return v.Typename
+}
+
+// GetModel returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.Model, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetModel() string {
+	return v.Model
+}
+
+// GetDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.Dimensions, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetDimensions() int {
+	return v.Dimensions
+}
+
+// GetSendDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.SendDimensions, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetSendDimensions() bool {
+	return v.SendDimensions
+}
+
+// GetTaskType returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.TaskType, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetTaskType() *string {
+	return v.TaskType
+}
+
+// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI includes the requested fields of the GraphQL type EmbeddingProfileConfigOpenAI.
+type EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI struct {
+	Typename       *string `json:"__typename"`
+	Model          string  `json:"model"`
+	Dimensions     int     `json:"dimensions"`
+	SendDimensions bool    `json:"sendDimensions"`
+}
+
+// GetTypename returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI.Typename, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) GetTypename() *string {
+	return v.Typename
+}
+
+// GetModel returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI.Model, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) GetModel() string {
+	return v.Model
+}
+
+// GetDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI.Dimensions, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) GetDimensions() int {
+	return v.Dimensions
+}
+
+// GetSendDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI.SendDimensions, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) GetSendDimensions() bool {
+	return v.SendDimensions
+}
+
+// EmbeddingProfileDetailsProviderModelProvider includes the requested fields of the GraphQL type ModelProvider.
+type EmbeddingProfileDetailsProviderModelProvider struct {
+	Id string `json:"id"`
+}
+
+// GetId returns EmbeddingProfileDetailsProviderModelProvider.Id, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsProviderModelProvider) GetId() string { return v.Id }
+
+// EvalMeshMonitorDetails includes the GraphQL fields of EvalMeshMonitor requested by the fragment EvalMeshMonitorDetails.
+type EvalMeshMonitorDetails struct {
+	Id         string  `json:"id"`
+	MeshID     string  `json:"meshID"`
+	RubricID   string  `json:"rubricID"`
+	ModelSetID string  `json:"modelSetID"`
+	Enabled    bool    `json:"enabled"`
+	SampleRate float64 `json:"sampleRate"`
+	CreatedAt  string  `json:"createdAt"`
+	UpdatedAt  string  `json:"updatedAt"`
+}
+
+// GetId returns EvalMeshMonitorDetails.Id, and is useful for accessing the field via an interface.
+func (v *EvalMeshMonitorDetails) GetId() string { return v.Id }
+
+// GetMeshID returns EvalMeshMonitorDetails.MeshID, and is useful for accessing the field via an interface.
+func (v *EvalMeshMonitorDetails) GetMeshID() string { return v.MeshID }
+
+// GetRubricID returns EvalMeshMonitorDetails.RubricID, and is useful for accessing the field via an interface.
+func (v *EvalMeshMonitorDetails) GetRubricID() string { return v.RubricID }
+
+// GetModelSetID returns EvalMeshMonitorDetails.ModelSetID, and is useful for accessing the field via an interface.
+func (v *EvalMeshMonitorDetails) GetModelSetID() string { return v.ModelSetID }
+
+// GetEnabled returns EvalMeshMonitorDetails.Enabled, and is useful for accessing the field via an interface.
+func (v *EvalMeshMonitorDetails) GetEnabled() bool { return v.Enabled }
+
+// GetSampleRate returns EvalMeshMonitorDetails.SampleRate, and is useful for accessing the field via an interface.
+func (v *EvalMeshMonitorDetails) GetSampleRate() float64 { return v.SampleRate }
+
+// GetCreatedAt returns EvalMeshMonitorDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *EvalMeshMonitorDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns EvalMeshMonitorDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *EvalMeshMonitorDetails) GetUpdatedAt() string { return v.UpdatedAt }
 
 // GetAgentIDForVersionAgentVersion includes the requested fields of the GraphQL type AgentVersion.
 type GetAgentIDForVersionAgentVersion struct {
@@ -660,6 +1198,46 @@ type GetApiKeyResponse struct {
 // GetApiKey returns GetApiKeyResponse.ApiKey, and is useful for accessing the field via an interface.
 func (v *GetApiKeyResponse) GetApiKey() ApiKeyDetails { return v.ApiKey }
 
+// GetEmbeddingProfileByProviderAndNameResponse is returned by GetEmbeddingProfileByProviderAndName on success.
+type GetEmbeddingProfileByProviderAndNameResponse struct {
+	EmbeddingProfileByProviderAndName EmbeddingProfileDetails `json:"embeddingProfileByProviderAndName"`
+}
+
+// GetEmbeddingProfileByProviderAndName returns GetEmbeddingProfileByProviderAndNameResponse.EmbeddingProfileByProviderAndName, and is useful for accessing the field via an interface.
+func (v *GetEmbeddingProfileByProviderAndNameResponse) GetEmbeddingProfileByProviderAndName() EmbeddingProfileDetails {
+	return v.EmbeddingProfileByProviderAndName
+}
+
+// GetEmbeddingProfileResponse is returned by GetEmbeddingProfile on success.
+type GetEmbeddingProfileResponse struct {
+	EmbeddingProfile EmbeddingProfileDetails `json:"embeddingProfile"`
+}
+
+// GetEmbeddingProfile returns GetEmbeddingProfileResponse.EmbeddingProfile, and is useful for accessing the field via an interface.
+func (v *GetEmbeddingProfileResponse) GetEmbeddingProfile() EmbeddingProfileDetails {
+	return v.EmbeddingProfile
+}
+
+// GetEvalMeshMonitorResponse is returned by GetEvalMeshMonitor on success.
+type GetEvalMeshMonitorResponse struct {
+	EvalMeshMonitor *EvalMeshMonitorDetails `json:"evalMeshMonitor"`
+}
+
+// GetEvalMeshMonitor returns GetEvalMeshMonitorResponse.EvalMeshMonitor, and is useful for accessing the field via an interface.
+func (v *GetEvalMeshMonitorResponse) GetEvalMeshMonitor() *EvalMeshMonitorDetails {
+	return v.EvalMeshMonitor
+}
+
+// GetInstalledParticleResponse is returned by GetInstalledParticle on success.
+type GetInstalledParticleResponse struct {
+	InstalledParticle *InstalledParticleDetails `json:"installedParticle"`
+}
+
+// GetInstalledParticle returns GetInstalledParticleResponse.InstalledParticle, and is useful for accessing the field via an interface.
+func (v *GetInstalledParticleResponse) GetInstalledParticle() *InstalledParticleDetails {
+	return v.InstalledParticle
+}
+
 // GetMcpConnectionResponse is returned by GetMcpConnection on success.
 type GetMcpConnectionResponse struct {
 	McpConnection *McpConnectionDetails `json:"mcpConnection"`
@@ -667,6 +1245,34 @@ type GetMcpConnectionResponse struct {
 
 // GetMcpConnection returns GetMcpConnectionResponse.McpConnection, and is useful for accessing the field via an interface.
 func (v *GetMcpConnectionResponse) GetMcpConnection() *McpConnectionDetails { return v.McpConnection }
+
+// GetMemoryInteractionProfileResponse is returned by GetMemoryInteractionProfile on success.
+type GetMemoryInteractionProfileResponse struct {
+	MemoryInteractionProfile *MemoryInteractionProfileDetails `json:"memoryInteractionProfile"`
+}
+
+// GetMemoryInteractionProfile returns GetMemoryInteractionProfileResponse.MemoryInteractionProfile, and is useful for accessing the field via an interface.
+func (v *GetMemoryInteractionProfileResponse) GetMemoryInteractionProfile() *MemoryInteractionProfileDetails {
+	return v.MemoryInteractionProfile
+}
+
+// GetMemoryStoreByNameResponse is returned by GetMemoryStoreByName on success.
+type GetMemoryStoreByNameResponse struct {
+	MemoryStoreByName *MemoryStoreDetails `json:"memoryStoreByName"`
+}
+
+// GetMemoryStoreByName returns GetMemoryStoreByNameResponse.MemoryStoreByName, and is useful for accessing the field via an interface.
+func (v *GetMemoryStoreByNameResponse) GetMemoryStoreByName() *MemoryStoreDetails {
+	return v.MemoryStoreByName
+}
+
+// GetMemoryStoreResponse is returned by GetMemoryStore on success.
+type GetMemoryStoreResponse struct {
+	MemoryStore *MemoryStoreDetails `json:"memoryStore"`
+}
+
+// GetMemoryStore returns GetMemoryStoreResponse.MemoryStore, and is useful for accessing the field via an interface.
+func (v *GetMemoryStoreResponse) GetMemoryStore() *MemoryStoreDetails { return v.MemoryStore }
 
 // GetMeshInputsMesh includes the requested fields of the GraphQL type Mesh.
 type GetMeshInputsMesh struct {
@@ -762,6 +1368,33 @@ type GetModelSetResponse struct {
 // GetModelSet returns GetModelSetResponse.ModelSet, and is useful for accessing the field via an interface.
 func (v *GetModelSetResponse) GetModelSet() ModelSetDetails { return v.ModelSet }
 
+// GetParticleArtifactResponse is returned by GetParticleArtifact on success.
+type GetParticleArtifactResponse struct {
+	ParticleArtifact *ParticleArtifactDetails `json:"particleArtifact"`
+}
+
+// GetParticleArtifact returns GetParticleArtifactResponse.ParticleArtifact, and is useful for accessing the field via an interface.
+func (v *GetParticleArtifactResponse) GetParticleArtifact() *ParticleArtifactDetails {
+	return v.ParticleArtifact
+}
+
+// GetRubricResponse is returned by GetRubric on success.
+type GetRubricResponse struct {
+	Rubric *RubricDetails `json:"rubric"`
+}
+
+// GetRubric returns GetRubricResponse.Rubric, and is useful for accessing the field via an interface.
+func (v *GetRubricResponse) GetRubric() *RubricDetails { return v.Rubric }
+
+// GetSystemMetricResponse is returned by GetSystemMetric on success.
+type GetSystemMetricResponse struct {
+	// A metric the product ships, by key. A key that names none is an error, not a null.
+	SystemMetric SystemMetricDetails `json:"systemMetric"`
+}
+
+// GetSystemMetric returns GetSystemMetricResponse.SystemMetric, and is useful for accessing the field via an interface.
+func (v *GetSystemMetricResponse) GetSystemMetric() SystemMetricDetails { return v.SystemMetric }
+
 // GetTaskDefinitionByNameResponse is returned by GetTaskDefinitionByName on success.
 type GetTaskDefinitionByNameResponse struct {
 	TaskDefinitionByName *TaskDefinitionDetails `json:"taskDefinitionByName"`
@@ -782,6 +1415,14 @@ func (v *GetTaskDefinitionResponse) GetTaskDefinition() *TaskDefinitionDetails {
 	return v.TaskDefinition
 }
 
+// GetUserMetricResponse is returned by GetUserMetric on success.
+type GetUserMetricResponse struct {
+	UserMetric *UserMetricDetails `json:"userMetric"`
+}
+
+// GetUserMetric returns GetUserMetricResponse.UserMetric, and is useful for accessing the field via an interface.
+func (v *GetUserMetricResponse) GetUserMetric() *UserMetricDetails { return v.UserMetric }
+
 // GetWebhookDestinationResponse is returned by GetWebhookDestination on success.
 type GetWebhookDestinationResponse struct {
 	WebhookDestination WebhookDestinationDetails `json:"webhookDestination"`
@@ -791,6 +1432,23 @@ type GetWebhookDestinationResponse struct {
 func (v *GetWebhookDestinationResponse) GetWebhookDestination() WebhookDestinationDetails {
 	return v.WebhookDestination
 }
+
+// GetWorkspaceByNameResponse is returned by GetWorkspaceByName on success.
+type GetWorkspaceByNameResponse struct {
+	// A workspace by the name it was created with. Names are unique. Null when no workspace has that name.
+	WorkspaceByName *WorkspaceDetails `json:"workspaceByName"`
+}
+
+// GetWorkspaceByName returns GetWorkspaceByNameResponse.WorkspaceByName, and is useful for accessing the field via an interface.
+func (v *GetWorkspaceByNameResponse) GetWorkspaceByName() *WorkspaceDetails { return v.WorkspaceByName }
+
+// GetWorkspaceResponse is returned by GetWorkspace on success.
+type GetWorkspaceResponse struct {
+	Workspace *WorkspaceDetails `json:"workspace"`
+}
+
+// GetWorkspace returns GetWorkspaceResponse.Workspace, and is useful for accessing the field via an interface.
+func (v *GetWorkspaceResponse) GetWorkspace() *WorkspaceDetails { return v.Workspace }
 
 // InputDetails includes the GraphQL fields of Input requested by the fragment InputDetails.
 type InputDetails struct {
@@ -854,6 +1512,144 @@ func (v *InputDetailsInputResponsesInputResponse) GetDescription() string { retu
 // GetMessageType returns InputDetailsInputResponsesInputResponse.MessageType, and is useful for accessing the field via an interface.
 func (v *InputDetailsInputResponsesInputResponse) GetMessageType() json.RawMessage {
 	return v.MessageType
+}
+
+// InstalledParticleDetails includes the GraphQL fields of InstalledParticle requested by the fragment InstalledParticleDetails.
+type InstalledParticleDetails struct {
+	Id string `json:"id"`
+	// User-chosen identifier. Unique across installs.
+	Name           string                                                 `json:"name"`
+	ActiveArtifact InstalledParticleDetailsActiveArtifactParticleArtifact `json:"activeArtifact"`
+	// Workspace backing this install's KV state.
+	// Null when the manifest doesn't grant the KV capability; in that
+	// case the install has no KV binding (and writing one is rejected).
+	KvWorkspace *InstalledParticleDetailsKvWorkspace `json:"kvWorkspace"`
+	// Mount bindings: each entry maps a manifest mount name to the
+	// Workspace whose fs.FS is exposed at that mount.
+	Mounts    []InstalledParticleDetailsMountsInstalledParticleMount `json:"mounts"`
+	CreatedAt string                                                 `json:"createdAt"`
+	UpdatedAt string                                                 `json:"updatedAt"`
+}
+
+// GetId returns InstalledParticleDetails.Id, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetails) GetId() string { return v.Id }
+
+// GetName returns InstalledParticleDetails.Name, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetails) GetName() string { return v.Name }
+
+// GetActiveArtifact returns InstalledParticleDetails.ActiveArtifact, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetails) GetActiveArtifact() InstalledParticleDetailsActiveArtifactParticleArtifact {
+	return v.ActiveArtifact
+}
+
+// GetKvWorkspace returns InstalledParticleDetails.KvWorkspace, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetails) GetKvWorkspace() *InstalledParticleDetailsKvWorkspace {
+	return v.KvWorkspace
+}
+
+// GetMounts returns InstalledParticleDetails.Mounts, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetails) GetMounts() []InstalledParticleDetailsMountsInstalledParticleMount {
+	return v.Mounts
+}
+
+// GetCreatedAt returns InstalledParticleDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns InstalledParticleDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// InstalledParticleDetailsActiveArtifactParticleArtifact includes the requested fields of the GraphQL type ParticleArtifact.
+type InstalledParticleDetailsActiveArtifactParticleArtifact struct {
+	Id string `json:"id"`
+	// Manifest's name field — the publisher's identity for this artifact.
+	Name string `json:"name"`
+	// Manifest's version field — publisher-supplied, NOT used by mesh for compatibility decisions.
+	Version string `json:"version"`
+}
+
+// GetId returns InstalledParticleDetailsActiveArtifactParticleArtifact.Id, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetailsActiveArtifactParticleArtifact) GetId() string { return v.Id }
+
+// GetName returns InstalledParticleDetailsActiveArtifactParticleArtifact.Name, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetailsActiveArtifactParticleArtifact) GetName() string { return v.Name }
+
+// GetVersion returns InstalledParticleDetailsActiveArtifactParticleArtifact.Version, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetailsActiveArtifactParticleArtifact) GetVersion() string {
+	return v.Version
+}
+
+// InstalledParticleDetailsKvWorkspace includes the requested fields of the GraphQL type Workspace.
+type InstalledParticleDetailsKvWorkspace struct {
+	Id string `json:"id"`
+}
+
+// GetId returns InstalledParticleDetailsKvWorkspace.Id, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetailsKvWorkspace) GetId() string { return v.Id }
+
+// InstalledParticleDetailsMountsInstalledParticleMount includes the requested fields of the GraphQL type InstalledParticleMount.
+type InstalledParticleDetailsMountsInstalledParticleMount struct {
+	MountName string                                                        `json:"mountName"`
+	Workspace InstalledParticleDetailsMountsInstalledParticleMountWorkspace `json:"workspace"`
+}
+
+// GetMountName returns InstalledParticleDetailsMountsInstalledParticleMount.MountName, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetailsMountsInstalledParticleMount) GetMountName() string {
+	return v.MountName
+}
+
+// GetWorkspace returns InstalledParticleDetailsMountsInstalledParticleMount.Workspace, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetailsMountsInstalledParticleMount) GetWorkspace() InstalledParticleDetailsMountsInstalledParticleMountWorkspace {
+	return v.Workspace
+}
+
+// InstalledParticleDetailsMountsInstalledParticleMountWorkspace includes the requested fields of the GraphQL type Workspace.
+type InstalledParticleDetailsMountsInstalledParticleMountWorkspace struct {
+	Id string `json:"id"`
+}
+
+// GetId returns InstalledParticleDetailsMountsInstalledParticleMountWorkspace.Id, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetailsMountsInstalledParticleMountWorkspace) GetId() string { return v.Id }
+
+// JudgeInputFieldDetails includes the GraphQL fields of JudgeInputField requested by the fragment JudgeInputFieldDetails.
+type JudgeInputFieldDetails struct {
+	Name        string              `json:"name"`
+	Label       string              `json:"label"`
+	Description string              `json:"description"`
+	Type        JudgeInputFieldType `json:"type"`
+	Required    bool                `json:"required"`
+}
+
+// GetName returns JudgeInputFieldDetails.Name, and is useful for accessing the field via an interface.
+func (v *JudgeInputFieldDetails) GetName() string { return v.Name }
+
+// GetLabel returns JudgeInputFieldDetails.Label, and is useful for accessing the field via an interface.
+func (v *JudgeInputFieldDetails) GetLabel() string { return v.Label }
+
+// GetDescription returns JudgeInputFieldDetails.Description, and is useful for accessing the field via an interface.
+func (v *JudgeInputFieldDetails) GetDescription() string { return v.Description }
+
+// GetType returns JudgeInputFieldDetails.Type, and is useful for accessing the field via an interface.
+func (v *JudgeInputFieldDetails) GetType() JudgeInputFieldType { return v.Type }
+
+// GetRequired returns JudgeInputFieldDetails.Required, and is useful for accessing the field via an interface.
+func (v *JudgeInputFieldDetails) GetRequired() bool { return v.Required }
+
+type JudgeInputFieldType string
+
+const (
+	JudgeInputFieldTypeString     JudgeInputFieldType = "STRING"
+	JudgeInputFieldTypeNumber     JudgeInputFieldType = "NUMBER"
+	JudgeInputFieldTypeBoolean    JudgeInputFieldType = "BOOLEAN"
+	JudgeInputFieldTypeStringList JudgeInputFieldType = "STRING_LIST"
+	JudgeInputFieldTypeJsonObject JudgeInputFieldType = "JSON_OBJECT"
+)
+
+var AllJudgeInputFieldType = []JudgeInputFieldType{
+	JudgeInputFieldTypeString,
+	JudgeInputFieldTypeNumber,
+	JudgeInputFieldTypeBoolean,
+	JudgeInputFieldTypeStringList,
+	JudgeInputFieldTypeJsonObject,
 }
 
 // LinkDetails includes the GraphQL fields of Link requested by the fragment LinkDetails.
@@ -953,6 +1749,329 @@ type LinkDetailsToAgentVersionAgent struct {
 
 // GetId returns LinkDetailsToAgentVersionAgent.Id, and is useful for accessing the field via an interface.
 func (v *LinkDetailsToAgentVersionAgent) GetId() string { return v.Id }
+
+// ListSystemMetricsMetricsMetricConnection includes the requested fields of the GraphQL type MetricConnection.
+type ListSystemMetricsMetricsMetricConnection struct {
+	TotalCount int                                                       `json:"totalCount"`
+	PageInfo   ListSystemMetricsMetricsMetricConnectionPageInfo          `json:"pageInfo"`
+	Edges      []ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge `json:"edges"`
+}
+
+// GetTotalCount returns ListSystemMetricsMetricsMetricConnection.TotalCount, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnection) GetTotalCount() int { return v.TotalCount }
+
+// GetPageInfo returns ListSystemMetricsMetricsMetricConnection.PageInfo, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnection) GetPageInfo() ListSystemMetricsMetricsMetricConnectionPageInfo {
+	return v.PageInfo
+}
+
+// GetEdges returns ListSystemMetricsMetricsMetricConnection.Edges, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnection) GetEdges() []ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge {
+	return v.Edges
+}
+
+// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge includes the requested fields of the GraphQL type MetricEdge.
+type ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge struct {
+	Node ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric `json:"-"`
+}
+
+// GetNode returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge.Node, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge) GetNode() ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric {
+	return v.Node
+}
+
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge
+		Node json.RawMessage `json:"node"`
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	{
+		dst := &v.Node
+		src := firstPass.Node
+		if len(src) != 0 && string(src) != "null" {
+			err = __unmarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(
+				src, dst)
+			if err != nil {
+				return fmt.Errorf(
+					"unable to unmarshal ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge.Node: %w", err)
+			}
+		}
+	}
+	return nil
+}
+
+type __premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdge struct {
+	Node json.RawMessage `json:"node"`
+}
+
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge) __premarshalJSON() (*__premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdge, error) {
+	var retval __premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdge
+
+	{
+
+		dst := &retval.Node
+		src := v.Node
+		var err error
+		*dst, err = __marshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(
+			&src)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"unable to marshal ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge.Node: %w", err)
+		}
+	}
+	return &retval, nil
+}
+
+// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric includes the requested fields of the GraphQL interface Metric.
+//
+// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric is implemented by the following types:
+// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric
+// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric
+type ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric interface {
+	implementsGraphQLInterfaceListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric()
+	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
+	GetTypename() *string
+}
+
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) implementsGraphQLInterfaceListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric() {
+}
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric) implementsGraphQLInterfaceListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric() {
+}
+
+func __unmarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(b []byte, v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric) error {
+	if string(b) == "null" {
+		return nil
+	}
+
+	var tn struct {
+		TypeName string `json:"__typename"`
+	}
+	err := json.Unmarshal(b, &tn)
+	if err != nil {
+		return err
+	}
+
+	switch tn.TypeName {
+	case "SystemMetric":
+		*v = new(ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric)
+		return json.Unmarshal(b, *v)
+	case "UserMetric":
+		*v = new(ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric)
+		return json.Unmarshal(b, *v)
+	case "":
+		return fmt.Errorf(
+			"response was missing Metric.__typename")
+	default:
+		return fmt.Errorf(
+			`unexpected concrete type for ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric: "%v"`, tn.TypeName)
+	}
+}
+
+func __marshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric) ([]byte, error) {
+
+	var typename string
+	switch v := (*v).(type) {
+	case *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric:
+		typename = "SystemMetric"
+
+		premarshaled, err := v.__premarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		result := struct {
+			TypeName string `json:"__typename"`
+			*__premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric
+		}{typename, premarshaled}
+		return json.Marshal(result)
+	case *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric:
+		typename = "UserMetric"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric
+		}{typename, v}
+		return json.Marshal(result)
+	case nil:
+		return []byte("null"), nil
+	default:
+		return nil, fmt.Errorf(
+			`unexpected concrete type for ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric: "%T"`, v)
+	}
+}
+
+// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric includes the requested fields of the GraphQL type SystemMetric.
+type ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric struct {
+	Typename            *string `json:"__typename"`
+	SystemMetricDetails `json:"-"`
+}
+
+// GetTypename returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Typename, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetTypename() *string {
+	return v.Typename
+}
+
+// GetKey returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Key, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetKey() string {
+	return v.SystemMetricDetails.Key
+}
+
+// GetType returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Type, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetType() MetricType {
+	return v.SystemMetricDetails.Type
+}
+
+// GetName returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Name, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetName() string {
+	return v.SystemMetricDetails.Name
+}
+
+// GetDescription returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Description, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetDescription() *string {
+	return v.SystemMetricDetails.Description
+}
+
+// GetComplexity returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Complexity, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetComplexity() *ModelComplexity {
+	return v.SystemMetricDetails.Complexity
+}
+
+// GetPrompt returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Prompt, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetPrompt() *string {
+	return v.SystemMetricDetails.Prompt
+}
+
+// GetExamples returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Examples, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetExamples() []SystemMetricDetailsExamplesScoreExample {
+	return v.SystemMetricDetails.Examples
+}
+
+// GetInputFields returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.InputFields, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetInputFields() []SystemMetricDetailsInputFieldsJudgeInputField {
+	return v.SystemMetricDetails.InputFields
+}
+
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.SystemMetricDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric struct {
+	Typename *string `json:"__typename"`
+
+	Key string `json:"key"`
+
+	Type MetricType `json:"type"`
+
+	Name string `json:"name"`
+
+	Description *string `json:"description"`
+
+	Complexity *ModelComplexity `json:"complexity"`
+
+	Prompt *string `json:"prompt"`
+
+	Examples []SystemMetricDetailsExamplesScoreExample `json:"examples"`
+
+	InputFields []SystemMetricDetailsInputFieldsJudgeInputField `json:"inputFields"`
+}
+
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) __premarshalJSON() (*__premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric, error) {
+	var retval __premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric
+
+	retval.Typename = v.Typename
+	retval.Key = v.SystemMetricDetails.Key
+	retval.Type = v.SystemMetricDetails.Type
+	retval.Name = v.SystemMetricDetails.Name
+	retval.Description = v.SystemMetricDetails.Description
+	retval.Complexity = v.SystemMetricDetails.Complexity
+	retval.Prompt = v.SystemMetricDetails.Prompt
+	retval.Examples = v.SystemMetricDetails.Examples
+	retval.InputFields = v.SystemMetricDetails.InputFields
+	return &retval, nil
+}
+
+// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric includes the requested fields of the GraphQL type UserMetric.
+type ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric struct {
+	Typename *string `json:"__typename"`
+}
+
+// GetTypename returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric.Typename, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric) GetTypename() *string {
+	return v.Typename
+}
+
+// ListSystemMetricsMetricsMetricConnectionPageInfo includes the requested fields of the GraphQL type PageInfo.
+type ListSystemMetricsMetricsMetricConnectionPageInfo struct {
+	HasNextPage bool    `json:"hasNextPage"`
+	EndCursor   *string `json:"endCursor"`
+}
+
+// GetHasNextPage returns ListSystemMetricsMetricsMetricConnectionPageInfo.HasNextPage, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionPageInfo) GetHasNextPage() bool {
+	return v.HasNextPage
+}
+
+// GetEndCursor returns ListSystemMetricsMetricsMetricConnectionPageInfo.EndCursor, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsMetricsMetricConnectionPageInfo) GetEndCursor() *string { return v.EndCursor }
+
+// ListSystemMetricsResponse is returned by ListSystemMetrics on success.
+type ListSystemMetricsResponse struct {
+	Metrics ListSystemMetricsMetricsMetricConnection `json:"metrics"`
+}
+
+// GetMetrics returns ListSystemMetricsResponse.Metrics, and is useful for accessing the field via an interface.
+func (v *ListSystemMetricsResponse) GetMetrics() ListSystemMetricsMetricsMetricConnection {
+	return v.Metrics
+}
 
 type McpAuthFlow string
 
@@ -1126,21 +2245,1004 @@ var AllMcpTransport = []McpTransport{
 	McpTransportServerInitiatedHttp,
 }
 
-type MemoryScope string
+// Which turns of a conversation the budget keeps, where it cannot hold them all.
+type MemoryHistorySelectionKind string
 
 const (
-	// The memory is accessible to all agents participating in the current conversation.
-	MemoryScopeGlobal MemoryScope = "GLOBAL"
-	// The memory is accessible only to the agent that created it.
-	MemoryScopeLocal MemoryScope = "LOCAL"
-	// The memory is accessible to all agents participating in the current conversation, but only for the duration of the current request.
-	MemoryScopeRequest MemoryScope = "REQUEST"
+	// The newest turns. The history walks back from the end of the conversation and
+	// stops where the budget runs out, so it holds an unbroken run ending at the
+	// newest turn.
+	MemoryHistorySelectionKindRecent MemoryHistorySelectionKind = "RECENT"
+	// The turns that answer the request best, wherever in the conversation they were
+	// said. The prompt states where the stretches it left out fall, so the agent
+	// reads the gaps as well as the turns.
+	MemoryHistorySelectionKindRelevant MemoryHistorySelectionKind = "RELEVANT"
 )
 
-var AllMemoryScope = []MemoryScope{
-	MemoryScopeGlobal,
-	MemoryScopeLocal,
-	MemoryScopeRequest,
+var AllMemoryHistorySelectionKind = []MemoryHistorySelectionKind{
+	MemoryHistorySelectionKindRecent,
+	MemoryHistorySelectionKindRelevant,
+}
+
+// MemoryInteractionProfileDetails includes the GraphQL fields of MemoryInteractionProfile requested by the fragment MemoryInteractionProfileDetails.
+type MemoryInteractionProfileDetails struct {
+	Id          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	// Gives the agent tools to read further around what an injection or a query
+	// tool returned: the chunks near a chunk, the facts under an observation, and
+	// the chunks a fact came from. Each of those tools is present only where the
+	// records it expands can reach the agent.
+	AllowExpansion bool `json:"allowExpansion"`
+	// Puts the conversation so far in the prompt. Absent for a profile that does not.
+	ConversationHistory *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory `json:"conversationHistory"`
+	ContextInjections   []MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection     `json:"contextInjections"`
+	QueryTools          []MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool                   `json:"queryTools"`
+	WriteTools          []MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool                   `json:"writeTools"`
+	CreatedAt           string                                                                       `json:"createdAt"`
+	UpdatedAt           string                                                                       `json:"updatedAt"`
+}
+
+// GetId returns MemoryInteractionProfileDetails.Id, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetId() string { return v.Id }
+
+// GetName returns MemoryInteractionProfileDetails.Name, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetName() string { return v.Name }
+
+// GetDescription returns MemoryInteractionProfileDetails.Description, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetDescription() *string { return v.Description }
+
+// GetAllowExpansion returns MemoryInteractionProfileDetails.AllowExpansion, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetAllowExpansion() bool { return v.AllowExpansion }
+
+// GetConversationHistory returns MemoryInteractionProfileDetails.ConversationHistory, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetConversationHistory() *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory {
+	return v.ConversationHistory
+}
+
+// GetContextInjections returns MemoryInteractionProfileDetails.ContextInjections, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetContextInjections() []MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection {
+	return v.ContextInjections
+}
+
+// GetQueryTools returns MemoryInteractionProfileDetails.QueryTools, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetQueryTools() []MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool {
+	return v.QueryTools
+}
+
+// GetWriteTools returns MemoryInteractionProfileDetails.WriteTools, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetWriteTools() []MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool {
+	return v.WriteTools
+}
+
+// GetCreatedAt returns MemoryInteractionProfileDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns MemoryInteractionProfileDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection includes the requested fields of the GraphQL type MemoryContextInjection.
+// The GraphQL type's documentation follows.
+//
+// Puts memory in the prompt of an agent, with no tool call to fetch it.
+type MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection struct {
+	// Identifies this injection to a person. It is not put in the prompt.
+	Name string `json:"name"`
+	// States what these memories are, for the agent that reads them: whose they
+	// are, what they cover, how far to trust them. It is written at the head of the
+	// section that holds them. An injection with none writes the records alone.
+	Description *string                                                                                        `json:"description"`
+	TokenBudget int                                                                                            `json:"tokenBudget"`
+	RecordTypes []MemoryRecordType                                                                             `json:"recordTypes"`
+	Selection   MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection `json:"selection"`
+	Query       MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource   `json:"query"`
+}
+
+// GetName returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection.Name, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection) GetName() string {
+	return v.Name
+}
+
+// GetDescription returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection.Description, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection) GetDescription() *string {
+	return v.Description
+}
+
+// GetTokenBudget returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection.TokenBudget, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection) GetTokenBudget() int {
+	return v.TokenBudget
+}
+
+// GetRecordTypes returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection.RecordTypes, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection) GetRecordTypes() []MemoryRecordType {
+	return v.RecordTypes
+}
+
+// GetSelection returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection.Selection, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection) GetSelection() MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection {
+	return v.Selection
+}
+
+// GetQuery returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection.Query, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjection) GetQuery() MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource {
+	return v.Query
+}
+
+// MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource includes the requested fields of the GraphQL type MemoryQuerySource.
+type MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource struct {
+	MemoryQuerySourceDetails `json:"-"`
+}
+
+// GetKind returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource.Kind, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource) GetKind() MemoryQuerySourceKind {
+	return v.MemoryQuerySourceDetails.Kind
+}
+
+// GetText returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource.Text, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource) GetText() *string {
+	return v.MemoryQuerySourceDetails.Text
+}
+
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.MemoryQuerySourceDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalMemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource struct {
+	Kind MemoryQuerySourceKind `json:"kind"`
+
+	Text *string `json:"text"`
+}
+
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource) __premarshalJSON() (*__premarshalMemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource, error) {
+	var retval __premarshalMemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionQueryMemoryQuerySource
+
+	retval.Kind = v.MemoryQuerySourceDetails.Kind
+	retval.Text = v.MemoryQuerySourceDetails.Text
+	return &retval, nil
+}
+
+// MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection includes the requested fields of the GraphQL type MemorySelection.
+type MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection struct {
+	MemorySelectionDetails `json:"-"`
+}
+
+// GetKind returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection.Kind, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection) GetKind() MemorySelectionKind {
+	return v.MemorySelectionDetails.Kind
+}
+
+// GetTags returns MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection.Tags, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection) GetTags() []MemorySelectionDetailsTagsMemorySelectionTag {
+	return v.MemorySelectionDetails.Tags
+}
+
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.MemorySelectionDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalMemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection struct {
+	Kind MemorySelectionKind `json:"kind"`
+
+	Tags []MemorySelectionDetailsTagsMemorySelectionTag `json:"tags"`
+}
+
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *MemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection) __premarshalJSON() (*__premarshalMemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection, error) {
+	var retval __premarshalMemoryInteractionProfileDetailsContextInjectionsMemoryContextInjectionSelectionMemorySelection
+
+	retval.Kind = v.MemorySelectionDetails.Kind
+	retval.Tags = v.MemorySelectionDetails.Tags
+	return &retval, nil
+}
+
+// MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory includes the requested fields of the GraphQL type MemoryConversationHistory.
+// The GraphQL type's documentation follows.
+//
+// Puts the conversation so far in the prompt of an agent.
+type MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory struct {
+	// How many tokens of history the prompt may hold.
+	TokenBudget int `json:"tokenBudget"`
+	// Which turns the budget keeps where it cannot hold them all.
+	Selection MemoryHistorySelectionKind `json:"selection"`
+	// What a RELEVANT selection searches the conversation for. A RECENT selection
+	// holds none and states none, and a RELEVANT selection that comes to no text
+	// reads as a RECENT one.
+	Query *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource `json:"query"`
+}
+
+// GetTokenBudget returns MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory.TokenBudget, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory) GetTokenBudget() int {
+	return v.TokenBudget
+}
+
+// GetSelection returns MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory.Selection, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory) GetSelection() MemoryHistorySelectionKind {
+	return v.Selection
+}
+
+// GetQuery returns MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory.Query, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistory) GetQuery() *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource {
+	return v.Query
+}
+
+// MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource includes the requested fields of the GraphQL type MemoryQuerySource.
+type MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource struct {
+	MemoryQuerySourceDetails `json:"-"`
+}
+
+// GetKind returns MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource.Kind, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource) GetKind() MemoryQuerySourceKind {
+	return v.MemoryQuerySourceDetails.Kind
+}
+
+// GetText returns MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource.Text, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource) GetText() *string {
+	return v.MemoryQuerySourceDetails.Text
+}
+
+func (v *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.MemoryQuerySourceDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalMemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource struct {
+	Kind MemoryQuerySourceKind `json:"kind"`
+
+	Text *string `json:"text"`
+}
+
+func (v *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *MemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource) __premarshalJSON() (*__premarshalMemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource, error) {
+	var retval __premarshalMemoryInteractionProfileDetailsConversationHistoryMemoryConversationHistoryQueryMemoryQuerySource
+
+	retval.Kind = v.MemoryQuerySourceDetails.Kind
+	retval.Text = v.MemoryQuerySourceDetails.Text
+	return &retval, nil
+}
+
+// MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool includes the requested fields of the GraphQL type MemoryQueryTool.
+// The GraphQL type's documentation follows.
+//
+// A tool that an agent calls to search memory itself.
+type MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool struct {
+	ToolName    string             `json:"toolName"`
+	Description string             `json:"description"`
+	RecordTypes []MemoryRecordType `json:"recordTypes"`
+	// How many tokens one call returns, for a tool that returns one amount.
+	TokenBudget *int                                                                             `json:"tokenBudget"`
+	Selection   MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection `json:"selection"`
+	// An amount for each level instead. The tool then takes a parameter that names
+	// the level. A tool holds either this or tokenBudget.
+	EffortLevels []MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolEffortLevelsMemoryEffortLevel `json:"effortLevels"`
+}
+
+// GetToolName returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool.ToolName, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool) GetToolName() string {
+	return v.ToolName
+}
+
+// GetDescription returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool.Description, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool) GetDescription() string {
+	return v.Description
+}
+
+// GetRecordTypes returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool.RecordTypes, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool) GetRecordTypes() []MemoryRecordType {
+	return v.RecordTypes
+}
+
+// GetTokenBudget returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool.TokenBudget, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool) GetTokenBudget() *int {
+	return v.TokenBudget
+}
+
+// GetSelection returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool.Selection, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool) GetSelection() MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection {
+	return v.Selection
+}
+
+// GetEffortLevels returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool.EffortLevels, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryTool) GetEffortLevels() []MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolEffortLevelsMemoryEffortLevel {
+	return v.EffortLevels
+}
+
+// MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolEffortLevelsMemoryEffortLevel includes the requested fields of the GraphQL type MemoryEffortLevel.
+// The GraphQL type's documentation follows.
+//
+// One amount of memory a query tool can be asked for, named so that a model can
+// choose between them.
+type MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolEffortLevelsMemoryEffortLevel struct {
+	// What the model names this amount, such as "quick" or "deep".
+	Level       string `json:"level"`
+	TokenBudget int    `json:"tokenBudget"`
+}
+
+// GetLevel returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolEffortLevelsMemoryEffortLevel.Level, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolEffortLevelsMemoryEffortLevel) GetLevel() string {
+	return v.Level
+}
+
+// GetTokenBudget returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolEffortLevelsMemoryEffortLevel.TokenBudget, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolEffortLevelsMemoryEffortLevel) GetTokenBudget() int {
+	return v.TokenBudget
+}
+
+// MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection includes the requested fields of the GraphQL type MemorySelection.
+type MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection struct {
+	MemorySelectionDetails `json:"-"`
+}
+
+// GetKind returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection.Kind, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection) GetKind() MemorySelectionKind {
+	return v.MemorySelectionDetails.Kind
+}
+
+// GetTags returns MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection.Tags, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection) GetTags() []MemorySelectionDetailsTagsMemorySelectionTag {
+	return v.MemorySelectionDetails.Tags
+}
+
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.MemorySelectionDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalMemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection struct {
+	Kind MemorySelectionKind `json:"kind"`
+
+	Tags []MemorySelectionDetailsTagsMemorySelectionTag `json:"tags"`
+}
+
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *MemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection) __premarshalJSON() (*__premarshalMemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection, error) {
+	var retval __premarshalMemoryInteractionProfileDetailsQueryToolsMemoryQueryToolSelectionMemorySelection
+
+	retval.Kind = v.MemorySelectionDetails.Kind
+	retval.Tags = v.MemorySelectionDetails.Tags
+	return &retval, nil
+}
+
+// MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool includes the requested fields of the GraphQL type MemoryWriteTool.
+// The GraphQL type's documentation follows.
+//
+// A tool that an agent calls to write a memory.
+type MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool struct {
+	ToolName    string `json:"toolName"`
+	Description string `json:"description"`
+	// The tags to put on what this tool writes. They apply in the order given, and
+	// a later mapping replaces the value of a key an earlier one set.
+	TagMappings []MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping `json:"tagMappings"`
+}
+
+// GetToolName returns MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool.ToolName, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool) GetToolName() string {
+	return v.ToolName
+}
+
+// GetDescription returns MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool.Description, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool) GetDescription() string {
+	return v.Description
+}
+
+// GetTagMappings returns MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool.TagMappings, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsWriteToolsMemoryWriteTool) GetTagMappings() []MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping {
+	return v.TagMappings
+}
+
+// MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping includes the requested fields of the GraphQL type MemoryTagMapping.
+// The GraphQL type's documentation follows.
+//
+// Tags to put on a memory an agent writes. The tags decide which scopes process
+// it, so a write tool that maps none produces a memory no scope reads.
+type MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping struct {
+	Kind     MemoryTagMappingKind `json:"kind"`
+	Keys     []string             `json:"keys"`
+	TagKey   *string              `json:"tagKey"`
+	TagValue *string              `json:"tagValue"`
+}
+
+// GetKind returns MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping.Kind, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping) GetKind() MemoryTagMappingKind {
+	return v.Kind
+}
+
+// GetKeys returns MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping.Keys, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping) GetKeys() []string {
+	return v.Keys
+}
+
+// GetTagKey returns MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping.TagKey, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping) GetTagKey() *string {
+	return v.TagKey
+}
+
+// GetTagValue returns MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping.TagValue, and is useful for accessing the field via an interface.
+func (v *MemoryInteractionProfileDetailsWriteToolsMemoryWriteToolTagMappingsMemoryTagMapping) GetTagValue() *string {
+	return v.TagValue
+}
+
+// MemoryQuerySourceDetails includes the GraphQL fields of MemoryQuerySource requested by the fragment MemoryQuerySourceDetails.
+type MemoryQuerySourceDetails struct {
+	Kind MemoryQuerySourceKind `json:"kind"`
+	Text *string               `json:"text"`
+}
+
+// GetKind returns MemoryQuerySourceDetails.Kind, and is useful for accessing the field via an interface.
+func (v *MemoryQuerySourceDetails) GetKind() MemoryQuerySourceKind { return v.Kind }
+
+// GetText returns MemoryQuerySourceDetails.Text, and is useful for accessing the field via an interface.
+func (v *MemoryQuerySourceDetails) GetText() *string { return v.Text }
+
+// Where the text of a memory search comes from.
+type MemoryQuerySourceKind string
+
+const (
+	// Text the profile holds, which is the same on every request.
+	MemoryQuerySourceKindFixed MemoryQuerySourceKind = "FIXED"
+	// Text derived from the request the agent is answering.
+	MemoryQuerySourceKindDerived MemoryQuerySourceKind = "DERIVED"
+)
+
+var AllMemoryQuerySourceKind = []MemoryQuerySourceKind{
+	MemoryQuerySourceKindFixed,
+	MemoryQuerySourceKindDerived,
+}
+
+// One of the kinds of record that a memory interaction reads.
+type MemoryRecordType string
+
+const (
+	// One part of the text of a document, which is what holds a turn as it was said.
+	MemoryRecordTypeChunk MemoryRecordType = "CHUNK"
+	// One claim in a distilled form.
+	MemoryRecordTypeFact MemoryRecordType = "FACT"
+	// A claim built from facts, which is the long term memory of a store.
+	MemoryRecordTypeObservation MemoryRecordType = "OBSERVATION"
+)
+
+var AllMemoryRecordType = []MemoryRecordType{
+	MemoryRecordTypeChunk,
+	MemoryRecordTypeFact,
+	MemoryRecordTypeObservation,
+}
+
+// How a scope divides the content that it selects.
+type MemoryScopeKind string
+
+const (
+	// The scope divides its content by the values of its tag key. A document that
+	// holds a tag with that key is processed one time for each value of the key,
+	// and each pass writes its own facts. A sliced scope holds no tag value and no
+	// match prefix.
+	MemoryScopeKindSliced MemoryScopeKind = "SLICED"
+	// The scope keeps its content whole. It selects each document that its match
+	// prefix matches, the document is processed one time, and every record it
+	// produces takes the tag key and the tag value of the scope.
+	MemoryScopeKindUnsliced MemoryScopeKind = "UNSLICED"
+)
+
+var AllMemoryScopeKind = []MemoryScopeKind{
+	MemoryScopeKindSliced,
+	MemoryScopeKindUnsliced,
+}
+
+// MemorySelectionDetails includes the GraphQL fields of MemorySelection requested by the fragment MemorySelectionDetails.
+type MemorySelectionDetails struct {
+	Kind MemorySelectionKind                            `json:"kind"`
+	Tags []MemorySelectionDetailsTagsMemorySelectionTag `json:"tags"`
+}
+
+// GetKind returns MemorySelectionDetails.Kind, and is useful for accessing the field via an interface.
+func (v *MemorySelectionDetails) GetKind() MemorySelectionKind { return v.Kind }
+
+// GetTags returns MemorySelectionDetails.Tags, and is useful for accessing the field via an interface.
+func (v *MemorySelectionDetails) GetTags() []MemorySelectionDetailsTagsMemorySelectionTag {
+	return v.Tags
+}
+
+// MemorySelectionDetailsTagsMemorySelectionTag includes the requested fields of the GraphQL type MemorySelectionTag.
+// The GraphQL type's documentation follows.
+//
+// One tag of a request mapped onto one tag of a memory store.
+//
+// The key a request is tagged by and the key a store is queried by are separate,
+// because a scope reads one key and writes another: a scope that matches user and
+// is keyed audience produces records tagged audience, and a request that carries
+// user:bob queries audience:bob.
+type MemorySelectionDetailsTagsMemorySelectionTag struct {
+	Source MemoryTagSource `json:"source"`
+	// The key this queries the store by.
+	TagKey string `json:"tagKey"`
+	// The value FIXED queries by.
+	TagValue *string `json:"tagValue"`
+	// The key of the request tag that REQUEST_TAG reads the value from. It is absent
+	// where the request is tagged by the key the store is queried by.
+	RequestTagKey *string `json:"requestTagKey"`
+}
+
+// GetSource returns MemorySelectionDetailsTagsMemorySelectionTag.Source, and is useful for accessing the field via an interface.
+func (v *MemorySelectionDetailsTagsMemorySelectionTag) GetSource() MemoryTagSource { return v.Source }
+
+// GetTagKey returns MemorySelectionDetailsTagsMemorySelectionTag.TagKey, and is useful for accessing the field via an interface.
+func (v *MemorySelectionDetailsTagsMemorySelectionTag) GetTagKey() string { return v.TagKey }
+
+// GetTagValue returns MemorySelectionDetailsTagsMemorySelectionTag.TagValue, and is useful for accessing the field via an interface.
+func (v *MemorySelectionDetailsTagsMemorySelectionTag) GetTagValue() *string { return v.TagValue }
+
+// GetRequestTagKey returns MemorySelectionDetailsTagsMemorySelectionTag.RequestTagKey, and is useful for accessing the field via an interface.
+func (v *MemorySelectionDetailsTagsMemorySelectionTag) GetRequestTagKey() *string {
+	return v.RequestTagKey
+}
+
+// How a memory interaction narrows the records it reads.
+type MemorySelectionKind string
+
+const (
+	// Every record of the memory stores the mesh has attached.
+	MemorySelectionKindAll MemorySelectionKind = "ALL"
+	// The records that carry the tags the selection maps. Each mapping is one key,
+	// and a record matches when it carries every key with any of the values that
+	// mapping produced. So a request tagged team:engineering and team:ui reads
+	// either team under one mapping of team, and two mappings read the records that
+	// carry both keys. A selection that produces no key reads nothing.
+	MemorySelectionKindTags MemorySelectionKind = "TAGS"
+)
+
+var AllMemorySelectionKind = []MemorySelectionKind{
+	MemorySelectionKindAll,
+	MemorySelectionKindTags,
+}
+
+// MemoryStoreDetails includes the GraphQL fields of MemoryStore requested by the fragment MemoryStoreDetails.
+type MemoryStoreDetails struct {
+	Id          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	// Whether each request of a conversation, and each output of those requests,
+	// is stored as a document of this memory.
+	IngestConversations bool `json:"ingestConversations"`
+	// Whether the documents of a conversation take an embedding, so that a search
+	// by meaning returns a turn. It is read only where ingestConversations is set.
+	IndexConversationMessages bool `json:"indexConversationMessages"`
+	// The model that the records of this store are embedded with. It is required
+	// where the store indexes conversation messages, and where any scope of the
+	// store extracts facts.
+	EmbeddingProfile *MemoryStoreDetailsEmbeddingProfile `json:"embeddingProfile"`
+	// The tag key that holds the name of the person a request came from. Ingest
+	// reads the value of that tag and writes it as the speaker of the document, so
+	// the memory engine resolves the same person to one entity across
+	// conversations.
+	//
+	// A store that names no key writes no speaker, and so does a request that holds
+	// no tag with this key. It is read only where ingestConversations is set.
+	UserNameTagKey *string `json:"userNameTagKey"`
+	// How often the memory engine packs the turns this store has taken into
+	// extraction work, in seconds.
+	ExtractIntervalSeconds int `json:"extractIntervalSeconds"`
+	// How often the memory engine queues the facts of this store into consolidation
+	// passes, in seconds. It is usually longer than extractIntervalSeconds: a pass
+	// reads a set that grows, so running it less often puts more facts in one pass.
+	ConsolidateIntervalSeconds int                                        `json:"consolidateIntervalSeconds"`
+	Scopes                     []MemoryStoreDetailsScopesMemoryStoreScope `json:"scopes"`
+	CreatedAt                  string                                     `json:"createdAt"`
+	UpdatedAt                  string                                     `json:"updatedAt"`
+}
+
+// GetId returns MemoryStoreDetails.Id, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetId() string { return v.Id }
+
+// GetName returns MemoryStoreDetails.Name, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetName() string { return v.Name }
+
+// GetDescription returns MemoryStoreDetails.Description, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetDescription() *string { return v.Description }
+
+// GetIngestConversations returns MemoryStoreDetails.IngestConversations, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetIngestConversations() bool { return v.IngestConversations }
+
+// GetIndexConversationMessages returns MemoryStoreDetails.IndexConversationMessages, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetIndexConversationMessages() bool { return v.IndexConversationMessages }
+
+// GetEmbeddingProfile returns MemoryStoreDetails.EmbeddingProfile, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetEmbeddingProfile() *MemoryStoreDetailsEmbeddingProfile {
+	return v.EmbeddingProfile
+}
+
+// GetUserNameTagKey returns MemoryStoreDetails.UserNameTagKey, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetUserNameTagKey() *string { return v.UserNameTagKey }
+
+// GetExtractIntervalSeconds returns MemoryStoreDetails.ExtractIntervalSeconds, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetExtractIntervalSeconds() int { return v.ExtractIntervalSeconds }
+
+// GetConsolidateIntervalSeconds returns MemoryStoreDetails.ConsolidateIntervalSeconds, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetConsolidateIntervalSeconds() int { return v.ConsolidateIntervalSeconds }
+
+// GetScopes returns MemoryStoreDetails.Scopes, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetScopes() []MemoryStoreDetailsScopesMemoryStoreScope { return v.Scopes }
+
+// GetCreatedAt returns MemoryStoreDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns MemoryStoreDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// MemoryStoreDetailsEmbeddingProfile includes the requested fields of the GraphQL type EmbeddingProfile.
+type MemoryStoreDetailsEmbeddingProfile struct {
+	Id string `json:"id"`
+}
+
+// GetId returns MemoryStoreDetailsEmbeddingProfile.Id, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsEmbeddingProfile) GetId() string { return v.Id }
+
+// MemoryStoreDetailsScopesMemoryStoreScope includes the requested fields of the GraphQL type MemoryStoreScope.
+type MemoryStoreDetailsScopesMemoryStoreScope struct {
+	MemoryStoreScopeDetails `json:"-"`
+}
+
+// GetId returns MemoryStoreDetailsScopesMemoryStoreScope.Id, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetId() string {
+	return v.MemoryStoreScopeDetails.Id
+}
+
+// GetDescription returns MemoryStoreDetailsScopesMemoryStoreScope.Description, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetDescription() *string {
+	return v.MemoryStoreScopeDetails.Description
+}
+
+// GetKind returns MemoryStoreDetailsScopesMemoryStoreScope.Kind, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetKind() MemoryScopeKind {
+	return v.MemoryStoreScopeDetails.Kind
+}
+
+// GetKey returns MemoryStoreDetailsScopesMemoryStoreScope.Key, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetKey() string {
+	return v.MemoryStoreScopeDetails.Key
+}
+
+// GetValue returns MemoryStoreDetailsScopesMemoryStoreScope.Value, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetValue() string {
+	return v.MemoryStoreScopeDetails.Value
+}
+
+// GetMatch returns MemoryStoreDetailsScopesMemoryStoreScope.Match, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetMatch() string {
+	return v.MemoryStoreScopeDetails.Match
+}
+
+// GetExtractionEnabled returns MemoryStoreDetailsScopesMemoryStoreScope.ExtractionEnabled, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetExtractionEnabled() bool {
+	return v.MemoryStoreScopeDetails.ExtractionEnabled
+}
+
+// GetExtractionPrompt returns MemoryStoreDetailsScopesMemoryStoreScope.ExtractionPrompt, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetExtractionPrompt() *string {
+	return v.MemoryStoreScopeDetails.ExtractionPrompt
+}
+
+// GetExtractionModelProfile returns MemoryStoreDetailsScopesMemoryStoreScope.ExtractionModelProfile, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetExtractionModelProfile() *MemoryStoreScopeDetailsExtractionModelProfile {
+	return v.MemoryStoreScopeDetails.ExtractionModelProfile
+}
+
+// GetConsolidationEnabled returns MemoryStoreDetailsScopesMemoryStoreScope.ConsolidationEnabled, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetConsolidationEnabled() bool {
+	return v.MemoryStoreScopeDetails.ConsolidationEnabled
+}
+
+// GetConsolidationPrompt returns MemoryStoreDetailsScopesMemoryStoreScope.ConsolidationPrompt, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetConsolidationPrompt() *string {
+	return v.MemoryStoreScopeDetails.ConsolidationPrompt
+}
+
+// GetConsolidationModelProfile returns MemoryStoreDetailsScopesMemoryStoreScope.ConsolidationModelProfile, and is useful for accessing the field via an interface.
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) GetConsolidationModelProfile() *MemoryStoreScopeDetailsConsolidationModelProfile {
+	return v.MemoryStoreScopeDetails.ConsolidationModelProfile
+}
+
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*MemoryStoreDetailsScopesMemoryStoreScope
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.MemoryStoreDetailsScopesMemoryStoreScope = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.MemoryStoreScopeDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalMemoryStoreDetailsScopesMemoryStoreScope struct {
+	Id string `json:"id"`
+
+	Description *string `json:"description"`
+
+	Kind MemoryScopeKind `json:"kind"`
+
+	Key string `json:"key"`
+
+	Value string `json:"value"`
+
+	Match string `json:"match"`
+
+	ExtractionEnabled bool `json:"extractionEnabled"`
+
+	ExtractionPrompt *string `json:"extractionPrompt"`
+
+	ExtractionModelProfile *MemoryStoreScopeDetailsExtractionModelProfile `json:"extractionModelProfile"`
+
+	ConsolidationEnabled bool `json:"consolidationEnabled"`
+
+	ConsolidationPrompt *string `json:"consolidationPrompt"`
+
+	ConsolidationModelProfile *MemoryStoreScopeDetailsConsolidationModelProfile `json:"consolidationModelProfile"`
+}
+
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *MemoryStoreDetailsScopesMemoryStoreScope) __premarshalJSON() (*__premarshalMemoryStoreDetailsScopesMemoryStoreScope, error) {
+	var retval __premarshalMemoryStoreDetailsScopesMemoryStoreScope
+
+	retval.Id = v.MemoryStoreScopeDetails.Id
+	retval.Description = v.MemoryStoreScopeDetails.Description
+	retval.Kind = v.MemoryStoreScopeDetails.Kind
+	retval.Key = v.MemoryStoreScopeDetails.Key
+	retval.Value = v.MemoryStoreScopeDetails.Value
+	retval.Match = v.MemoryStoreScopeDetails.Match
+	retval.ExtractionEnabled = v.MemoryStoreScopeDetails.ExtractionEnabled
+	retval.ExtractionPrompt = v.MemoryStoreScopeDetails.ExtractionPrompt
+	retval.ExtractionModelProfile = v.MemoryStoreScopeDetails.ExtractionModelProfile
+	retval.ConsolidationEnabled = v.MemoryStoreScopeDetails.ConsolidationEnabled
+	retval.ConsolidationPrompt = v.MemoryStoreScopeDetails.ConsolidationPrompt
+	retval.ConsolidationModelProfile = v.MemoryStoreScopeDetails.ConsolidationModelProfile
+	return &retval, nil
+}
+
+// MemoryStoreScopeDetails includes the GraphQL fields of MemoryStoreScope requested by the fragment MemoryStoreScopeDetails.
+type MemoryStoreScopeDetails struct {
+	Id          string          `json:"id"`
+	Description *string         `json:"description"`
+	Kind        MemoryScopeKind `json:"kind"`
+	// The tag key that every record of this scope takes. A record keeps every tag
+	// of its source except the ones that hold this key, which the tag of the scope
+	// replaces. Two scopes of a store may share a key, as long as the tags they
+	// apply differ.
+	Key string `json:"key"`
+	// The tag value that an unsliced scope applies with key. A sliced scope takes
+	// the value of each pass from the document, so it holds none.
+	Value string `json:"value"`
+	// The tag key that selects the documents of this scope. A sliced scope states
+	// one, and the values that key holds on a document are the passes that document
+	// takes. An unsliced scope that states none selects every document of the store.
+	Match             string `json:"match"`
+	ExtractionEnabled bool   `json:"extractionEnabled"`
+	// Added to the instructions of the call that extracts facts.
+	ExtractionPrompt       *string                                        `json:"extractionPrompt"`
+	ExtractionModelProfile *MemoryStoreScopeDetailsExtractionModelProfile `json:"extractionModelProfile"`
+	ConsolidationEnabled   bool                                           `json:"consolidationEnabled"`
+	// Added to the instructions of the call that folds facts into observations.
+	ConsolidationPrompt       *string                                           `json:"consolidationPrompt"`
+	ConsolidationModelProfile *MemoryStoreScopeDetailsConsolidationModelProfile `json:"consolidationModelProfile"`
+}
+
+// GetId returns MemoryStoreScopeDetails.Id, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetId() string { return v.Id }
+
+// GetDescription returns MemoryStoreScopeDetails.Description, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetDescription() *string { return v.Description }
+
+// GetKind returns MemoryStoreScopeDetails.Kind, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetKind() MemoryScopeKind { return v.Kind }
+
+// GetKey returns MemoryStoreScopeDetails.Key, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetKey() string { return v.Key }
+
+// GetValue returns MemoryStoreScopeDetails.Value, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetValue() string { return v.Value }
+
+// GetMatch returns MemoryStoreScopeDetails.Match, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetMatch() string { return v.Match }
+
+// GetExtractionEnabled returns MemoryStoreScopeDetails.ExtractionEnabled, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetExtractionEnabled() bool { return v.ExtractionEnabled }
+
+// GetExtractionPrompt returns MemoryStoreScopeDetails.ExtractionPrompt, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetExtractionPrompt() *string { return v.ExtractionPrompt }
+
+// GetExtractionModelProfile returns MemoryStoreScopeDetails.ExtractionModelProfile, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetExtractionModelProfile() *MemoryStoreScopeDetailsExtractionModelProfile {
+	return v.ExtractionModelProfile
+}
+
+// GetConsolidationEnabled returns MemoryStoreScopeDetails.ConsolidationEnabled, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetConsolidationEnabled() bool { return v.ConsolidationEnabled }
+
+// GetConsolidationPrompt returns MemoryStoreScopeDetails.ConsolidationPrompt, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetConsolidationPrompt() *string { return v.ConsolidationPrompt }
+
+// GetConsolidationModelProfile returns MemoryStoreScopeDetails.ConsolidationModelProfile, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetails) GetConsolidationModelProfile() *MemoryStoreScopeDetailsConsolidationModelProfile {
+	return v.ConsolidationModelProfile
+}
+
+// MemoryStoreScopeDetailsConsolidationModelProfile includes the requested fields of the GraphQL type ModelProfile.
+type MemoryStoreScopeDetailsConsolidationModelProfile struct {
+	Id string `json:"id"`
+}
+
+// GetId returns MemoryStoreScopeDetailsConsolidationModelProfile.Id, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetailsConsolidationModelProfile) GetId() string { return v.Id }
+
+// MemoryStoreScopeDetailsExtractionModelProfile includes the requested fields of the GraphQL type ModelProfile.
+type MemoryStoreScopeDetailsExtractionModelProfile struct {
+	Id string `json:"id"`
+}
+
+// GetId returns MemoryStoreScopeDetailsExtractionModelProfile.Id, and is useful for accessing the field via an interface.
+func (v *MemoryStoreScopeDetailsExtractionModelProfile) GetId() string { return v.Id }
+
+// Where the tags of a memory an agent writes come from.
+type MemoryTagMappingKind string
+
+const (
+	// Every tag of the request.
+	MemoryTagMappingKindAllFromRequest MemoryTagMappingKind = "ALL_FROM_REQUEST"
+	// The tags of the request whose keys this mapping names.
+	MemoryTagMappingKindKeysFromRequest MemoryTagMappingKind = "KEYS_FROM_REQUEST"
+	// One tag that the profile holds.
+	MemoryTagMappingKindFixed MemoryTagMappingKind = "FIXED"
+)
+
+var AllMemoryTagMappingKind = []MemoryTagMappingKind{
+	MemoryTagMappingKindAllFromRequest,
+	MemoryTagMappingKindKeysFromRequest,
+	MemoryTagMappingKindFixed,
+}
+
+// Where the value of one tag of a selection comes from.
+type MemoryTagSource string
+
+const (
+	// The value the configuration holds.
+	MemoryTagSourceFixed MemoryTagSource = "FIXED"
+	// The values the tags of the request hold under that key, which are
+	// alternatives. A request with no tag under that key produces nothing for this
+	// mapping.
+	MemoryTagSourceRequestTag MemoryTagSource = "REQUEST_TAG"
+)
+
+var AllMemoryTagSource = []MemoryTagSource{
+	MemoryTagSourceFixed,
+	MemoryTagSourceRequestTag,
 }
 
 // MeshDetails includes the GraphQL fields of Mesh requested by the fragment MeshDetails.
@@ -1201,6 +3303,18 @@ func (v *MeshDetailsDraftVersionMeshVersionModelSet) GetId() string { return v.I
 // GetName returns MeshDetailsDraftVersionMeshVersionModelSet.Name, and is useful for accessing the field via an interface.
 func (v *MeshDetailsDraftVersionMeshVersionModelSet) GetName() string { return v.Name }
 
+type MetricType string
+
+const (
+	MetricTypeComputed MetricType = "COMPUTED"
+	MetricTypeJudged   MetricType = "JUDGED"
+)
+
+var AllMetricType = []MetricType{
+	MetricTypeComputed,
+	MetricTypeJudged,
+}
+
 type ModelComplexity string
 
 const (
@@ -1221,6 +3335,7 @@ type ModelProfileDetails struct {
 	Name          string                                             `json:"name"`
 	Description   *string                                            `json:"description"`
 	Tags          []*Tag                                             `json:"tags"`
+	Provider      ModelProfileDetailsProviderModelProvider           `json:"provider"`
 	Configuration ModelProfileDetailsConfigurationModelProfileConfig `json:"-"`
 	CreatedAt     string                                             `json:"createdAt"`
 	UpdatedAt     string                                             `json:"updatedAt"`
@@ -1237,6 +3352,11 @@ func (v *ModelProfileDetails) GetDescription() *string { return v.Description }
 
 // GetTags returns ModelProfileDetails.Tags, and is useful for accessing the field via an interface.
 func (v *ModelProfileDetails) GetTags() []*Tag { return v.Tags }
+
+// GetProvider returns ModelProfileDetails.Provider, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetails) GetProvider() ModelProfileDetailsProviderModelProvider {
+	return v.Provider
+}
 
 // GetConfiguration returns ModelProfileDetails.Configuration, and is useful for accessing the field via an interface.
 func (v *ModelProfileDetails) GetConfiguration() ModelProfileDetailsConfigurationModelProfileConfig {
@@ -1291,6 +3411,8 @@ type __premarshalModelProfileDetails struct {
 
 	Tags []*Tag `json:"tags"`
 
+	Provider ModelProfileDetailsProviderModelProvider `json:"provider"`
+
 	Configuration json.RawMessage `json:"configuration"`
 
 	CreatedAt string `json:"createdAt"`
@@ -1313,6 +3435,7 @@ func (v *ModelProfileDetails) __premarshalJSON() (*__premarshalModelProfileDetai
 	retval.Name = v.Name
 	retval.Description = v.Description
 	retval.Tags = v.Tags
+	retval.Provider = v.Provider
 	{
 
 		dst := &retval.Configuration
@@ -1536,6 +3659,14 @@ func (v *ModelProfileDetailsConfigurationModelProfileConfigOpenAI) GetTopP() *fl
 func (v *ModelProfileDetailsConfigurationModelProfileConfigOpenAI) GetReasoningEffort() *OpenAIReasoningEffort {
 	return v.ReasoningEffort
 }
+
+// ModelProfileDetailsProviderModelProvider includes the requested fields of the GraphQL type ModelProvider.
+type ModelProfileDetailsProviderModelProvider struct {
+	Id string `json:"id"`
+}
+
+// GetId returns ModelProfileDetailsProviderModelProvider.Id, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsProviderModelProvider) GetId() string { return v.Id }
 
 // ModelProviderDetails includes the GraphQL fields of ModelProvider requested by the fragment ModelProviderDetails.
 type ModelProviderDetails struct {
@@ -1998,6 +4129,26 @@ type ModifyApiKeyResponse struct {
 // GetUpdateApiKey returns ModifyApiKeyResponse.UpdateApiKey, and is useful for accessing the field via an interface.
 func (v *ModifyApiKeyResponse) GetUpdateApiKey() ApiKeyDetails { return v.UpdateApiKey }
 
+// ModifyEmbeddingProfileResponse is returned by ModifyEmbeddingProfile on success.
+type ModifyEmbeddingProfileResponse struct {
+	UpdateEmbeddingProfile EmbeddingProfileDetails `json:"updateEmbeddingProfile"`
+}
+
+// GetUpdateEmbeddingProfile returns ModifyEmbeddingProfileResponse.UpdateEmbeddingProfile, and is useful for accessing the field via an interface.
+func (v *ModifyEmbeddingProfileResponse) GetUpdateEmbeddingProfile() EmbeddingProfileDetails {
+	return v.UpdateEmbeddingProfile
+}
+
+// ModifyEvalMeshMonitorResponse is returned by ModifyEvalMeshMonitor on success.
+type ModifyEvalMeshMonitorResponse struct {
+	UpdateEvalMeshMonitor EvalMeshMonitorDetails `json:"updateEvalMeshMonitor"`
+}
+
+// GetUpdateEvalMeshMonitor returns ModifyEvalMeshMonitorResponse.UpdateEvalMeshMonitor, and is useful for accessing the field via an interface.
+func (v *ModifyEvalMeshMonitorResponse) GetUpdateEvalMeshMonitor() EvalMeshMonitorDetails {
+	return v.UpdateEvalMeshMonitor
+}
+
 // ModifyInputResponse is returned by ModifyInput on success.
 type ModifyInputResponse struct {
 	UpdateInput InputDetails `json:"updateInput"`
@@ -2005,6 +4156,20 @@ type ModifyInputResponse struct {
 
 // GetUpdateInput returns ModifyInputResponse.UpdateInput, and is useful for accessing the field via an interface.
 func (v *ModifyInputResponse) GetUpdateInput() InputDetails { return v.UpdateInput }
+
+// ModifyInstalledParticleResponse is returned by ModifyInstalledParticle on success.
+type ModifyInstalledParticleResponse struct {
+	// General update on an installed particle. Any subset of fields may be
+	// supplied; an empty update beyond installedParticleID is a no-op. When
+	// changing the active artifact, call InstalledParticle.replacementRequirements
+	// first to determine what credentials need supplying.
+	UpdateInstalledParticle InstalledParticleDetails `json:"updateInstalledParticle"`
+}
+
+// GetUpdateInstalledParticle returns ModifyInstalledParticleResponse.UpdateInstalledParticle, and is useful for accessing the field via an interface.
+func (v *ModifyInstalledParticleResponse) GetUpdateInstalledParticle() InstalledParticleDetails {
+	return v.UpdateInstalledParticle
+}
 
 // ModifyLinkResponse is returned by ModifyLink on success.
 type ModifyLinkResponse struct {
@@ -2022,6 +4187,34 @@ type ModifyMcpConnectionResponse struct {
 // GetUpdateMcpConnection returns ModifyMcpConnectionResponse.UpdateMcpConnection, and is useful for accessing the field via an interface.
 func (v *ModifyMcpConnectionResponse) GetUpdateMcpConnection() McpConnectionDetails {
 	return v.UpdateMcpConnection
+}
+
+// ModifyMemoryInteractionProfileResponse is returned by ModifyMemoryInteractionProfile on success.
+type ModifyMemoryInteractionProfileResponse struct {
+	UpdateMemoryInteractionProfile MemoryInteractionProfileDetails `json:"updateMemoryInteractionProfile"`
+}
+
+// GetUpdateMemoryInteractionProfile returns ModifyMemoryInteractionProfileResponse.UpdateMemoryInteractionProfile, and is useful for accessing the field via an interface.
+func (v *ModifyMemoryInteractionProfileResponse) GetUpdateMemoryInteractionProfile() MemoryInteractionProfileDetails {
+	return v.UpdateMemoryInteractionProfile
+}
+
+// ModifyMemoryStoreResponse is returned by ModifyMemoryStore on success.
+type ModifyMemoryStoreResponse struct {
+	// Changes a memory store, and with it the scopes the input names. The store and
+	// every scope commit together, so a change that needs both is one call: an
+	// embedding profile can be cleared in the same update that stops the scopes
+	// which needed it.
+	//
+	// The scopes the input removes go first, then the ones it changes, then the
+	// ones it writes, so one call can replace a scope that holds a tag key with
+	// another that holds the same key.
+	UpdateMemoryStore MemoryStoreDetails `json:"updateMemoryStore"`
+}
+
+// GetUpdateMemoryStore returns ModifyMemoryStoreResponse.UpdateMemoryStore, and is useful for accessing the field via an interface.
+func (v *ModifyMemoryStoreResponse) GetUpdateMemoryStore() MemoryStoreDetails {
+	return v.UpdateMemoryStore
 }
 
 // ModifyMeshResponse is returned by ModifyMesh on success.
@@ -2052,6 +4245,13 @@ func (v *ModifyModelProfileResponse) GetUpdateModelProfile() ModelProfileDetails
 
 // ModifyModelProviderResponse is returned by ModifyModelProvider on success.
 type ModifyModelProviderResponse struct {
+	// Changes a model provider, and with it the profiles the input names. The
+	// provider and every profile commit together, so a change that needs both is
+	// one call.
+	//
+	// The profiles the input removes go first, then the ones it changes, then the
+	// ones it writes, so one call can replace a profile that holds a name with
+	// another that holds the same name.
 	UpdateModelProvider ModelProviderDetails `json:"updateModelProvider"`
 }
 
@@ -2068,6 +4268,14 @@ type ModifyModelSetResponse struct {
 // GetUpdateModelSet returns ModifyModelSetResponse.UpdateModelSet, and is useful for accessing the field via an interface.
 func (v *ModifyModelSetResponse) GetUpdateModelSet() ModelSetDetails { return v.UpdateModelSet }
 
+// ModifyRubricResponse is returned by ModifyRubric on success.
+type ModifyRubricResponse struct {
+	UpdateRubric RubricDetails `json:"updateRubric"`
+}
+
+// GetUpdateRubric returns ModifyRubricResponse.UpdateRubric, and is useful for accessing the field via an interface.
+func (v *ModifyRubricResponse) GetUpdateRubric() RubricDetails { return v.UpdateRubric }
+
 // ModifyTaskDefinitionResponse is returned by ModifyTaskDefinition on success.
 type ModifyTaskDefinitionResponse struct {
 	// Update an author-defined TaskDefinition. Any subset of input fields may be
@@ -2080,6 +4288,14 @@ func (v *ModifyTaskDefinitionResponse) GetUpdateTaskDefinition() TaskDefinitionD
 	return v.UpdateTaskDefinition
 }
 
+// ModifyUserMetricResponse is returned by ModifyUserMetric on success.
+type ModifyUserMetricResponse struct {
+	UpdateUserMetric UserMetricDetails `json:"updateUserMetric"`
+}
+
+// GetUpdateUserMetric returns ModifyUserMetricResponse.UpdateUserMetric, and is useful for accessing the field via an interface.
+func (v *ModifyUserMetricResponse) GetUpdateUserMetric() UserMetricDetails { return v.UpdateUserMetric }
+
 // ModifyWebhookDestinationResponse is returned by ModifyWebhookDestination on success.
 type ModifyWebhookDestinationResponse struct {
 	UpdateWebhookDestination WebhookDestinationDetails `json:"updateWebhookDestination"`
@@ -2089,6 +4305,52 @@ type ModifyWebhookDestinationResponse struct {
 func (v *ModifyWebhookDestinationResponse) GetUpdateWebhookDestination() WebhookDestinationDetails {
 	return v.UpdateWebhookDestination
 }
+
+type NewEvalMeshMonitor struct {
+	MeshID     string  `json:"meshID"`
+	RubricID   string  `json:"rubricID"`
+	ModelSetID string  `json:"modelSetID"`
+	Enabled    bool    `json:"enabled"`
+	SampleRate float64 `json:"sampleRate"`
+}
+
+// GetMeshID returns NewEvalMeshMonitor.MeshID, and is useful for accessing the field via an interface.
+func (v *NewEvalMeshMonitor) GetMeshID() string { return v.MeshID }
+
+// GetRubricID returns NewEvalMeshMonitor.RubricID, and is useful for accessing the field via an interface.
+func (v *NewEvalMeshMonitor) GetRubricID() string { return v.RubricID }
+
+// GetModelSetID returns NewEvalMeshMonitor.ModelSetID, and is useful for accessing the field via an interface.
+func (v *NewEvalMeshMonitor) GetModelSetID() string { return v.ModelSetID }
+
+// GetEnabled returns NewEvalMeshMonitor.Enabled, and is useful for accessing the field via an interface.
+func (v *NewEvalMeshMonitor) GetEnabled() bool { return v.Enabled }
+
+// GetSampleRate returns NewEvalMeshMonitor.SampleRate, and is useful for accessing the field via an interface.
+func (v *NewEvalMeshMonitor) GetSampleRate() float64 { return v.SampleRate }
+
+type NewJudgeInputField struct {
+	Name        string              `json:"name"`
+	Label       string              `json:"label"`
+	Description string              `json:"description"`
+	Type        JudgeInputFieldType `json:"type"`
+	Required    bool                `json:"required"`
+}
+
+// GetName returns NewJudgeInputField.Name, and is useful for accessing the field via an interface.
+func (v *NewJudgeInputField) GetName() string { return v.Name }
+
+// GetLabel returns NewJudgeInputField.Label, and is useful for accessing the field via an interface.
+func (v *NewJudgeInputField) GetLabel() string { return v.Label }
+
+// GetDescription returns NewJudgeInputField.Description, and is useful for accessing the field via an interface.
+func (v *NewJudgeInputField) GetDescription() string { return v.Description }
+
+// GetType returns NewJudgeInputField.Type, and is useful for accessing the field via an interface.
+func (v *NewJudgeInputField) GetType() JudgeInputFieldType { return v.Type }
+
+// GetRequired returns NewJudgeInputField.Required, and is useful for accessing the field via an interface.
+func (v *NewJudgeInputField) GetRequired() bool { return v.Required }
 
 type NewMcpConnection struct {
 	Name                              string                                          `json:"name"`
@@ -2137,6 +4399,113 @@ func (v *NewMcpConnection) GetHeaderCredentials() *McpConnectionHeaderCredential
 	return v.HeaderCredentials
 }
 
+type NewRubric struct {
+	Name        string            `json:"name"`
+	Description *string           `json:"description,omitempty"`
+	Metrics     []NewRubricMetric `json:"metrics"`
+}
+
+// GetName returns NewRubric.Name, and is useful for accessing the field via an interface.
+func (v *NewRubric) GetName() string { return v.Name }
+
+// GetDescription returns NewRubric.Description, and is useful for accessing the field via an interface.
+func (v *NewRubric) GetDescription() *string { return v.Description }
+
+// GetMetrics returns NewRubric.Metrics, and is useful for accessing the field via an interface.
+func (v *NewRubric) GetMetrics() []NewRubricMetric { return v.Metrics }
+
+type NewRubricMetric struct {
+	SystemMetricKey *string          `json:"systemMetricKey,omitempty"`
+	UserMetricID    *string          `json:"userMetricID,omitempty"`
+	TrialCount      *int             `json:"trialCount,omitempty"`
+	Complexity      *ModelComplexity `json:"complexity,omitempty"`
+	InputValues     *json.RawMessage `json:"inputValues,omitempty"`
+	ScoreFloor      *float64         `json:"scoreFloor,omitempty"`
+	ScoreCeiling    *float64         `json:"scoreCeiling,omitempty"`
+	LowerIsBetter   *bool            `json:"lowerIsBetter,omitempty"`
+	Weight          *float64         `json:"weight,omitempty"`
+}
+
+// GetSystemMetricKey returns NewRubricMetric.SystemMetricKey, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetSystemMetricKey() *string { return v.SystemMetricKey }
+
+// GetUserMetricID returns NewRubricMetric.UserMetricID, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetUserMetricID() *string { return v.UserMetricID }
+
+// GetTrialCount returns NewRubricMetric.TrialCount, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetTrialCount() *int { return v.TrialCount }
+
+// GetComplexity returns NewRubricMetric.Complexity, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetComplexity() *ModelComplexity { return v.Complexity }
+
+// GetInputValues returns NewRubricMetric.InputValues, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetInputValues() *json.RawMessage { return v.InputValues }
+
+// GetScoreFloor returns NewRubricMetric.ScoreFloor, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetScoreFloor() *float64 { return v.ScoreFloor }
+
+// GetScoreCeiling returns NewRubricMetric.ScoreCeiling, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetScoreCeiling() *float64 { return v.ScoreCeiling }
+
+// GetLowerIsBetter returns NewRubricMetric.LowerIsBetter, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetLowerIsBetter() *bool { return v.LowerIsBetter }
+
+// GetWeight returns NewRubricMetric.Weight, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetWeight() *float64 { return v.Weight }
+
+type NewScoreExample struct {
+	Rating   int    `json:"rating"`
+	Scenario string `json:"scenario"`
+	Judgment string `json:"judgment"`
+}
+
+// GetRating returns NewScoreExample.Rating, and is useful for accessing the field via an interface.
+func (v *NewScoreExample) GetRating() int { return v.Rating }
+
+// GetScenario returns NewScoreExample.Scenario, and is useful for accessing the field via an interface.
+func (v *NewScoreExample) GetScenario() string { return v.Scenario }
+
+// GetJudgment returns NewScoreExample.Judgment, and is useful for accessing the field via an interface.
+func (v *NewScoreExample) GetJudgment() string { return v.Judgment }
+
+type NewUserMetric struct {
+	Name        string               `json:"name"`
+	Description *string              `json:"description,omitempty"`
+	Prompt      string               `json:"prompt"`
+	Complexity  ModelComplexity      `json:"complexity"`
+	Examples    []NewScoreExample    `json:"examples"`
+	InputFields []NewJudgeInputField `json:"inputFields"`
+}
+
+// GetName returns NewUserMetric.Name, and is useful for accessing the field via an interface.
+func (v *NewUserMetric) GetName() string { return v.Name }
+
+// GetDescription returns NewUserMetric.Description, and is useful for accessing the field via an interface.
+func (v *NewUserMetric) GetDescription() *string { return v.Description }
+
+// GetPrompt returns NewUserMetric.Prompt, and is useful for accessing the field via an interface.
+func (v *NewUserMetric) GetPrompt() string { return v.Prompt }
+
+// GetComplexity returns NewUserMetric.Complexity, and is useful for accessing the field via an interface.
+func (v *NewUserMetric) GetComplexity() ModelComplexity { return v.Complexity }
+
+// GetExamples returns NewUserMetric.Examples, and is useful for accessing the field via an interface.
+func (v *NewUserMetric) GetExamples() []NewScoreExample { return v.Examples }
+
+// GetInputFields returns NewUserMetric.InputFields, and is useful for accessing the field via an interface.
+func (v *NewUserMetric) GetInputFields() []NewJudgeInputField { return v.InputFields }
+
+type NewWorkspace struct {
+	Name  string         `json:"name"`
+	Scope WorkspaceScope `json:"scope"`
+}
+
+// GetName returns NewWorkspace.Name, and is useful for accessing the field via an interface.
+func (v *NewWorkspace) GetName() string { return v.Name }
+
+// GetScope returns NewWorkspace.Scope, and is useful for accessing the field via an interface.
+func (v *NewWorkspace) GetScope() WorkspaceScope { return v.Scope }
+
 type OpenAIReasoningEffort string
 
 const (
@@ -2149,6 +4518,800 @@ var AllOpenAIReasoningEffort = []OpenAIReasoningEffort{
 	OpenAIReasoningEffortLow,
 	OpenAIReasoningEffortMedium,
 	OpenAIReasoningEffortHigh,
+}
+
+type ParticleApiKeyLocationKind string
+
+const (
+	ParticleApiKeyLocationKindHeader     ParticleApiKeyLocationKind = "HEADER"
+	ParticleApiKeyLocationKindQueryParam ParticleApiKeyLocationKind = "QUERY_PARAM"
+	ParticleApiKeyLocationKindAuthScheme ParticleApiKeyLocationKind = "AUTH_SCHEME"
+)
+
+var AllParticleApiKeyLocationKind = []ParticleApiKeyLocationKind{
+	ParticleApiKeyLocationKindHeader,
+	ParticleApiKeyLocationKindQueryParam,
+	ParticleApiKeyLocationKindAuthScheme,
+}
+
+// ParticleArtifactDetails includes the GraphQL fields of ParticleArtifact requested by the fragment ParticleArtifactDetails.
+type ParticleArtifactDetails struct {
+	Id string `json:"id"`
+	// Manifest's name field — the publisher's identity for this artifact.
+	Name string `json:"name"`
+	// Manifest's version field — publisher-supplied, NOT used by mesh for compatibility decisions.
+	Version      string                                                  `json:"version"`
+	Description  *string                                                 `json:"description"`
+	Capabilities ParticleArtifactDetailsCapabilitiesParticleCapabilities `json:"capabilities"`
+	// Credentials this artifact declares (manifest top-level `credentials`).
+	// Each entry is a named credential the install configures separately; the
+	// user picks one method from `methods` per credential at setup.
+	Credentials []ParticleArtifactDetailsCredentialsParticleArtifactCredential `json:"credentials"`
+	Tools       []ParticleArtifactDetailsToolsParticleTool                     `json:"tools"`
+	CreatedAt   string                                                         `json:"createdAt"`
+}
+
+// GetId returns ParticleArtifactDetails.Id, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetails) GetId() string { return v.Id }
+
+// GetName returns ParticleArtifactDetails.Name, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetails) GetName() string { return v.Name }
+
+// GetVersion returns ParticleArtifactDetails.Version, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetails) GetVersion() string { return v.Version }
+
+// GetDescription returns ParticleArtifactDetails.Description, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetails) GetDescription() *string { return v.Description }
+
+// GetCapabilities returns ParticleArtifactDetails.Capabilities, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetails) GetCapabilities() ParticleArtifactDetailsCapabilitiesParticleCapabilities {
+	return v.Capabilities
+}
+
+// GetCredentials returns ParticleArtifactDetails.Credentials, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetails) GetCredentials() []ParticleArtifactDetailsCredentialsParticleArtifactCredential {
+	return v.Credentials
+}
+
+// GetTools returns ParticleArtifactDetails.Tools, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetails) GetTools() []ParticleArtifactDetailsToolsParticleTool {
+	return v.Tools
+}
+
+// GetCreatedAt returns ParticleArtifactDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// ParticleArtifactDetailsCapabilitiesParticleCapabilities includes the requested fields of the GraphQL type ParticleCapabilities.
+type ParticleArtifactDetailsCapabilitiesParticleCapabilities struct {
+	Http *ParticleArtifactDetailsCapabilitiesParticleCapabilitiesHttpParticleHttpCapability `json:"http"`
+}
+
+// GetHttp returns ParticleArtifactDetailsCapabilitiesParticleCapabilities.Http, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCapabilitiesParticleCapabilities) GetHttp() *ParticleArtifactDetailsCapabilitiesParticleCapabilitiesHttpParticleHttpCapability {
+	return v.Http
+}
+
+// ParticleArtifactDetailsCapabilitiesParticleCapabilitiesHttpParticleHttpCapability includes the requested fields of the GraphQL type ParticleHttpCapability.
+type ParticleArtifactDetailsCapabilitiesParticleCapabilitiesHttpParticleHttpCapability struct {
+	AllowedHosts []string `json:"allowedHosts"`
+}
+
+// GetAllowedHosts returns ParticleArtifactDetailsCapabilitiesParticleCapabilitiesHttpParticleHttpCapability.AllowedHosts, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCapabilitiesParticleCapabilitiesHttpParticleHttpCapability) GetAllowedHosts() []string {
+	return v.AllowedHosts
+}
+
+// ParticleArtifactDetailsCredentialsParticleArtifactCredential includes the requested fields of the GraphQL type ParticleArtifactCredential.
+// The GraphQL type's documentation follows.
+//
+// ParticleArtifactCredential is one entry in the manifest's top-level
+// `credentials` map — a named slot the user provisions (independently
+// from other slots) with one of its declared methods.
+type ParticleArtifactDetailsCredentialsParticleArtifactCredential struct {
+	Name     string                                                                                        `json:"name"`
+	Hosts    []string                                                                                      `json:"hosts"`
+	Required bool                                                                                          `json:"required"`
+	Methods  []ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod `json:"methods"`
+}
+
+// GetName returns ParticleArtifactDetailsCredentialsParticleArtifactCredential.Name, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredential) GetName() string {
+	return v.Name
+}
+
+// GetHosts returns ParticleArtifactDetailsCredentialsParticleArtifactCredential.Hosts, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredential) GetHosts() []string {
+	return v.Hosts
+}
+
+// GetRequired returns ParticleArtifactDetailsCredentialsParticleArtifactCredential.Required, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredential) GetRequired() bool {
+	return v.Required
+}
+
+// GetMethods returns ParticleArtifactDetailsCredentialsParticleArtifactCredential.Methods, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredential) GetMethods() []ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod {
+	return v.Methods
+}
+
+// ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod includes the requested fields of the GraphQL type ParticleCredentialMethod.
+type ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod struct {
+	Name        string                       `json:"name"`
+	Type        ParticleCredentialMethodType `json:"type"`
+	Description *string                      `json:"description"`
+	// Set when type is APIKEY. Describes where the key value is injected into outbound HTTP requests.
+	ApiKeyLocation *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation `json:"apiKeyLocation"`
+	// Set when type is OAUTH2.
+	Oauth2 *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails `json:"oauth2"`
+	// Set when type is SIGNING_KEY.
+	SigningKey *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodSigningKeyParticleSigningKeyMethodDetails `json:"signingKey"`
+}
+
+// GetName returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod.Name, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod) GetName() string {
+	return v.Name
+}
+
+// GetType returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod.Type, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod) GetType() ParticleCredentialMethodType {
+	return v.Type
+}
+
+// GetDescription returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod.Description, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod) GetDescription() *string {
+	return v.Description
+}
+
+// GetApiKeyLocation returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod.ApiKeyLocation, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod) GetApiKeyLocation() *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation {
+	return v.ApiKeyLocation
+}
+
+// GetOauth2 returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod.Oauth2, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod) GetOauth2() *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails {
+	return v.Oauth2
+}
+
+// GetSigningKey returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod.SigningKey, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethod) GetSigningKey() *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodSigningKeyParticleSigningKeyMethodDetails {
+	return v.SigningKey
+}
+
+// ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation includes the requested fields of the GraphQL type ParticleApiKeyLocation.
+type ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation struct {
+	Kind ParticleApiKeyLocationKind `json:"kind"`
+	// Header name (kind = HEADER) or query parameter name (kind = QUERY_PARAM).
+	Name *string `json:"name"`
+	// Auth-scheme prefix (kind = AUTH_SCHEME), e.g. 'Bearer'.
+	Scheme *string `json:"scheme"`
+}
+
+// GetKind returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation.Kind, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation) GetKind() ParticleApiKeyLocationKind {
+	return v.Kind
+}
+
+// GetName returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation.Name, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation) GetName() *string {
+	return v.Name
+}
+
+// GetScheme returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation.Scheme, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodApiKeyLocationParticleApiKeyLocation) GetScheme() *string {
+	return v.Scheme
+}
+
+// ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails includes the requested fields of the GraphQL type ParticleOAuth2MethodDetails.
+type ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails struct {
+	AuthorizationUrl *string  `json:"authorizationUrl"`
+	TokenUrl         *string  `json:"tokenUrl"`
+	DeviceAuthUrl    *string  `json:"deviceAuthUrl"`
+	Scopes           []string `json:"scopes"`
+	// OAuth2 grant types the manifest declares this method supports. Unknown manifest values are dropped.
+	Flows []ParticleOAuth2Flow `json:"flows"`
+}
+
+// GetAuthorizationUrl returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails.AuthorizationUrl, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails) GetAuthorizationUrl() *string {
+	return v.AuthorizationUrl
+}
+
+// GetTokenUrl returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails.TokenUrl, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails) GetTokenUrl() *string {
+	return v.TokenUrl
+}
+
+// GetDeviceAuthUrl returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails.DeviceAuthUrl, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails) GetDeviceAuthUrl() *string {
+	return v.DeviceAuthUrl
+}
+
+// GetScopes returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails.Scopes, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails) GetScopes() []string {
+	return v.Scopes
+}
+
+// GetFlows returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails.Flows, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodOauth2ParticleOAuth2MethodDetails) GetFlows() []ParticleOAuth2Flow {
+	return v.Flows
+}
+
+// ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodSigningKeyParticleSigningKeyMethodDetails includes the requested fields of the GraphQL type ParticleSigningKeyMethodDetails.
+type ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodSigningKeyParticleSigningKeyMethodDetails struct {
+	Algorithm string `json:"algorithm"`
+}
+
+// GetAlgorithm returns ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodSigningKeyParticleSigningKeyMethodDetails.Algorithm, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsCredentialsParticleArtifactCredentialMethodsParticleCredentialMethodSigningKeyParticleSigningKeyMethodDetails) GetAlgorithm() string {
+	return v.Algorithm
+}
+
+// ParticleArtifactDetailsToolsParticleTool includes the requested fields of the GraphQL type ParticleTool.
+type ParticleArtifactDetailsToolsParticleTool struct {
+	Name        string          `json:"name"`
+	Description *string         `json:"description"`
+	InputSchema json.RawMessage `json:"inputSchema"`
+}
+
+// GetName returns ParticleArtifactDetailsToolsParticleTool.Name, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsToolsParticleTool) GetName() string { return v.Name }
+
+// GetDescription returns ParticleArtifactDetailsToolsParticleTool.Description, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsToolsParticleTool) GetDescription() *string { return v.Description }
+
+// GetInputSchema returns ParticleArtifactDetailsToolsParticleTool.InputSchema, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetailsToolsParticleTool) GetInputSchema() json.RawMessage {
+	return v.InputSchema
+}
+
+type ParticleCredentialMethodType string
+
+const (
+	ParticleCredentialMethodTypeBasic      ParticleCredentialMethodType = "BASIC"
+	ParticleCredentialMethodTypeApikey     ParticleCredentialMethodType = "APIKEY"
+	ParticleCredentialMethodTypeOauth2     ParticleCredentialMethodType = "OAUTH2"
+	ParticleCredentialMethodTypeSigningKey ParticleCredentialMethodType = "SIGNING_KEY"
+	ParticleCredentialMethodTypeRaw        ParticleCredentialMethodType = "RAW"
+)
+
+var AllParticleCredentialMethodType = []ParticleCredentialMethodType{
+	ParticleCredentialMethodTypeBasic,
+	ParticleCredentialMethodTypeApikey,
+	ParticleCredentialMethodTypeOauth2,
+	ParticleCredentialMethodTypeSigningKey,
+	ParticleCredentialMethodTypeRaw,
+}
+
+type ParticleOAuth2Flow string
+
+const (
+	// Browser-based; client-secret-bearing OAuth app (no PKCE).
+	ParticleOAuth2FlowAuthCode ParticleOAuth2Flow = "AUTH_CODE"
+	// Browser-based; PKCE-only client (typically no client secret).
+	ParticleOAuth2FlowAuthCodePkce ParticleOAuth2Flow = "AUTH_CODE_PKCE"
+	// Headless / SSH-friendly; user authorizes on a separate device.
+	ParticleOAuth2FlowDeviceCode ParticleOAuth2Flow = "DEVICE_CODE"
+)
+
+var AllParticleOAuth2Flow = []ParticleOAuth2Flow{
+	ParticleOAuth2FlowAuthCode,
+	ParticleOAuth2FlowAuthCodePkce,
+	ParticleOAuth2FlowDeviceCode,
+}
+
+// RenameWorkspaceResponse is returned by RenameWorkspace on success.
+type RenameWorkspaceResponse struct {
+	RenameWorkspace WorkspaceDetails `json:"renameWorkspace"`
+}
+
+// GetRenameWorkspace returns RenameWorkspaceResponse.RenameWorkspace, and is useful for accessing the field via an interface.
+func (v *RenameWorkspaceResponse) GetRenameWorkspace() WorkspaceDetails { return v.RenameWorkspace }
+
+// RubricDetails includes the GraphQL fields of Rubric requested by the fragment RubricDetails.
+type RubricDetails struct {
+	Id          string                             `json:"id"`
+	Name        string                             `json:"name"`
+	Description *string                            `json:"description"`
+	CreatedAt   string                             `json:"createdAt"`
+	UpdatedAt   string                             `json:"updatedAt"`
+	Metrics     []RubricDetailsMetricsRubricMetric `json:"-"`
+}
+
+// GetId returns RubricDetails.Id, and is useful for accessing the field via an interface.
+func (v *RubricDetails) GetId() string { return v.Id }
+
+// GetName returns RubricDetails.Name, and is useful for accessing the field via an interface.
+func (v *RubricDetails) GetName() string { return v.Name }
+
+// GetDescription returns RubricDetails.Description, and is useful for accessing the field via an interface.
+func (v *RubricDetails) GetDescription() *string { return v.Description }
+
+// GetCreatedAt returns RubricDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *RubricDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns RubricDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *RubricDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// GetMetrics returns RubricDetails.Metrics, and is useful for accessing the field via an interface.
+func (v *RubricDetails) GetMetrics() []RubricDetailsMetricsRubricMetric { return v.Metrics }
+
+func (v *RubricDetails) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*RubricDetails
+		Metrics []json.RawMessage `json:"metrics"`
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.RubricDetails = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	{
+		dst := &v.Metrics
+		src := firstPass.Metrics
+		*dst = make(
+			[]RubricDetailsMetricsRubricMetric,
+			len(src))
+		for i, src := range src {
+			dst := &(*dst)[i]
+			if len(src) != 0 && string(src) != "null" {
+				err = __unmarshalRubricDetailsMetricsRubricMetric(
+					src, dst)
+				if err != nil {
+					return fmt.Errorf(
+						"unable to unmarshal RubricDetails.Metrics: %w", err)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+type __premarshalRubricDetails struct {
+	Id string `json:"id"`
+
+	Name string `json:"name"`
+
+	Description *string `json:"description"`
+
+	CreatedAt string `json:"createdAt"`
+
+	UpdatedAt string `json:"updatedAt"`
+
+	Metrics []json.RawMessage `json:"metrics"`
+}
+
+func (v *RubricDetails) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *RubricDetails) __premarshalJSON() (*__premarshalRubricDetails, error) {
+	var retval __premarshalRubricDetails
+
+	retval.Id = v.Id
+	retval.Name = v.Name
+	retval.Description = v.Description
+	retval.CreatedAt = v.CreatedAt
+	retval.UpdatedAt = v.UpdatedAt
+	{
+
+		dst := &retval.Metrics
+		src := v.Metrics
+		*dst = make(
+			[]json.RawMessage,
+			len(src))
+		for i, src := range src {
+			dst := &(*dst)[i]
+			var err error
+			*dst, err = __marshalRubricDetailsMetricsRubricMetric(
+				&src)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"unable to marshal RubricDetails.Metrics: %w", err)
+			}
+		}
+	}
+	return &retval, nil
+}
+
+// RubricDetailsMetricsRubricMetric includes the requested fields of the GraphQL interface RubricMetric.
+//
+// RubricDetailsMetricsRubricMetric is implemented by the following types:
+// RubricDetailsMetricsRubricSystemMetric
+// RubricDetailsMetricsRubricUserMetric
+type RubricDetailsMetricsRubricMetric interface {
+	implementsGraphQLInterfaceRubricDetailsMetricsRubricMetric()
+	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
+	GetTypename() *string
+}
+
+func (v *RubricDetailsMetricsRubricSystemMetric) implementsGraphQLInterfaceRubricDetailsMetricsRubricMetric() {
+}
+func (v *RubricDetailsMetricsRubricUserMetric) implementsGraphQLInterfaceRubricDetailsMetricsRubricMetric() {
+}
+
+func __unmarshalRubricDetailsMetricsRubricMetric(b []byte, v *RubricDetailsMetricsRubricMetric) error {
+	if string(b) == "null" {
+		return nil
+	}
+
+	var tn struct {
+		TypeName string `json:"__typename"`
+	}
+	err := json.Unmarshal(b, &tn)
+	if err != nil {
+		return err
+	}
+
+	switch tn.TypeName {
+	case "RubricSystemMetric":
+		*v = new(RubricDetailsMetricsRubricSystemMetric)
+		return json.Unmarshal(b, *v)
+	case "RubricUserMetric":
+		*v = new(RubricDetailsMetricsRubricUserMetric)
+		return json.Unmarshal(b, *v)
+	case "":
+		return fmt.Errorf(
+			"response was missing RubricMetric.__typename")
+	default:
+		return fmt.Errorf(
+			`unexpected concrete type for RubricDetailsMetricsRubricMetric: "%v"`, tn.TypeName)
+	}
+}
+
+func __marshalRubricDetailsMetricsRubricMetric(v *RubricDetailsMetricsRubricMetric) ([]byte, error) {
+
+	var typename string
+	switch v := (*v).(type) {
+	case *RubricDetailsMetricsRubricSystemMetric:
+		typename = "RubricSystemMetric"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*RubricDetailsMetricsRubricSystemMetric
+		}{typename, v}
+		return json.Marshal(result)
+	case *RubricDetailsMetricsRubricUserMetric:
+		typename = "RubricUserMetric"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*RubricDetailsMetricsRubricUserMetric
+		}{typename, v}
+		return json.Marshal(result)
+	case nil:
+		return []byte("null"), nil
+	default:
+		return nil, fmt.Errorf(
+			`unexpected concrete type for RubricDetailsMetricsRubricMetric: "%T"`, v)
+	}
+}
+
+// RubricDetailsMetricsRubricSystemMetric includes the requested fields of the GraphQL type RubricSystemMetric.
+type RubricDetailsMetricsRubricSystemMetric struct {
+	Typename         *string                                            `json:"__typename"`
+	SystemEntryID    string                                             `json:"systemEntryID"`
+	SystemMetric     RubricDetailsMetricsRubricSystemMetricSystemMetric `json:"systemMetric"`
+	SystemTrialCount *int                                               `json:"systemTrialCount"`
+	Complexity       *ModelComplexity                                   `json:"complexity"`
+	InputValues      *json.RawMessage                                   `json:"inputValues"`
+	ScoreFloor       *float64                                           `json:"scoreFloor"`
+	ScoreCeiling     *float64                                           `json:"scoreCeiling"`
+	LowerIsBetter    *bool                                              `json:"lowerIsBetter"`
+	Weight           *float64                                           `json:"weight"`
+}
+
+// GetTypename returns RubricDetailsMetricsRubricSystemMetric.Typename, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetTypename() *string { return v.Typename }
+
+// GetSystemEntryID returns RubricDetailsMetricsRubricSystemMetric.SystemEntryID, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetSystemEntryID() string { return v.SystemEntryID }
+
+// GetSystemMetric returns RubricDetailsMetricsRubricSystemMetric.SystemMetric, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetSystemMetric() RubricDetailsMetricsRubricSystemMetricSystemMetric {
+	return v.SystemMetric
+}
+
+// GetSystemTrialCount returns RubricDetailsMetricsRubricSystemMetric.SystemTrialCount, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetSystemTrialCount() *int {
+	return v.SystemTrialCount
+}
+
+// GetComplexity returns RubricDetailsMetricsRubricSystemMetric.Complexity, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetComplexity() *ModelComplexity {
+	return v.Complexity
+}
+
+// GetInputValues returns RubricDetailsMetricsRubricSystemMetric.InputValues, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetInputValues() *json.RawMessage {
+	return v.InputValues
+}
+
+// GetScoreFloor returns RubricDetailsMetricsRubricSystemMetric.ScoreFloor, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetScoreFloor() *float64 { return v.ScoreFloor }
+
+// GetScoreCeiling returns RubricDetailsMetricsRubricSystemMetric.ScoreCeiling, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetScoreCeiling() *float64 { return v.ScoreCeiling }
+
+// GetLowerIsBetter returns RubricDetailsMetricsRubricSystemMetric.LowerIsBetter, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetLowerIsBetter() *bool { return v.LowerIsBetter }
+
+// GetWeight returns RubricDetailsMetricsRubricSystemMetric.Weight, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetric) GetWeight() *float64 { return v.Weight }
+
+// RubricDetailsMetricsRubricSystemMetricSystemMetric includes the requested fields of the GraphQL type SystemMetric.
+type RubricDetailsMetricsRubricSystemMetricSystemMetric struct {
+	Key string `json:"key"`
+}
+
+// GetKey returns RubricDetailsMetricsRubricSystemMetricSystemMetric.Key, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricSystemMetricSystemMetric) GetKey() string { return v.Key }
+
+// RubricDetailsMetricsRubricUserMetric includes the requested fields of the GraphQL type RubricUserMetric.
+type RubricDetailsMetricsRubricUserMetric struct {
+	Typename       *string                                        `json:"__typename"`
+	UserEntryID    string                                         `json:"userEntryID"`
+	UserMetric     RubricDetailsMetricsRubricUserMetricUserMetric `json:"userMetric"`
+	UserTrialCount int                                            `json:"userTrialCount"`
+	Complexity     *ModelComplexity                               `json:"complexity"`
+	InputValues    *json.RawMessage                               `json:"inputValues"`
+	Weight         *float64                                       `json:"weight"`
+}
+
+// GetTypename returns RubricDetailsMetricsRubricUserMetric.Typename, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricUserMetric) GetTypename() *string { return v.Typename }
+
+// GetUserEntryID returns RubricDetailsMetricsRubricUserMetric.UserEntryID, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricUserMetric) GetUserEntryID() string { return v.UserEntryID }
+
+// GetUserMetric returns RubricDetailsMetricsRubricUserMetric.UserMetric, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricUserMetric) GetUserMetric() RubricDetailsMetricsRubricUserMetricUserMetric {
+	return v.UserMetric
+}
+
+// GetUserTrialCount returns RubricDetailsMetricsRubricUserMetric.UserTrialCount, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricUserMetric) GetUserTrialCount() int { return v.UserTrialCount }
+
+// GetComplexity returns RubricDetailsMetricsRubricUserMetric.Complexity, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricUserMetric) GetComplexity() *ModelComplexity { return v.Complexity }
+
+// GetInputValues returns RubricDetailsMetricsRubricUserMetric.InputValues, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricUserMetric) GetInputValues() *json.RawMessage {
+	return v.InputValues
+}
+
+// GetWeight returns RubricDetailsMetricsRubricUserMetric.Weight, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricUserMetric) GetWeight() *float64 { return v.Weight }
+
+// RubricDetailsMetricsRubricUserMetricUserMetric includes the requested fields of the GraphQL type UserMetric.
+type RubricDetailsMetricsRubricUserMetricUserMetric struct {
+	Id string `json:"id"`
+}
+
+// GetId returns RubricDetailsMetricsRubricUserMetricUserMetric.Id, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricUserMetricUserMetric) GetId() string { return v.Id }
+
+// ScoreExampleDetails includes the GraphQL fields of ScoreExample requested by the fragment ScoreExampleDetails.
+type ScoreExampleDetails struct {
+	Rating   int    `json:"rating"`
+	Scenario string `json:"scenario"`
+	Judgment string `json:"judgment"`
+}
+
+// GetRating returns ScoreExampleDetails.Rating, and is useful for accessing the field via an interface.
+func (v *ScoreExampleDetails) GetRating() int { return v.Rating }
+
+// GetScenario returns ScoreExampleDetails.Scenario, and is useful for accessing the field via an interface.
+func (v *ScoreExampleDetails) GetScenario() string { return v.Scenario }
+
+// GetJudgment returns ScoreExampleDetails.Judgment, and is useful for accessing the field via an interface.
+func (v *ScoreExampleDetails) GetJudgment() string { return v.Judgment }
+
+// SystemMetricDetails includes the GraphQL fields of SystemMetric requested by the fragment SystemMetricDetails.
+type SystemMetricDetails struct {
+	Key         string                                          `json:"key"`
+	Type        MetricType                                      `json:"type"`
+	Name        string                                          `json:"name"`
+	Description *string                                         `json:"description"`
+	Complexity  *ModelComplexity                                `json:"complexity"`
+	Prompt      *string                                         `json:"prompt"`
+	Examples    []SystemMetricDetailsExamplesScoreExample       `json:"examples"`
+	InputFields []SystemMetricDetailsInputFieldsJudgeInputField `json:"inputFields"`
+}
+
+// GetKey returns SystemMetricDetails.Key, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetails) GetKey() string { return v.Key }
+
+// GetType returns SystemMetricDetails.Type, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetails) GetType() MetricType { return v.Type }
+
+// GetName returns SystemMetricDetails.Name, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetails) GetName() string { return v.Name }
+
+// GetDescription returns SystemMetricDetails.Description, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetails) GetDescription() *string { return v.Description }
+
+// GetComplexity returns SystemMetricDetails.Complexity, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetails) GetComplexity() *ModelComplexity { return v.Complexity }
+
+// GetPrompt returns SystemMetricDetails.Prompt, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetails) GetPrompt() *string { return v.Prompt }
+
+// GetExamples returns SystemMetricDetails.Examples, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetails) GetExamples() []SystemMetricDetailsExamplesScoreExample {
+	return v.Examples
+}
+
+// GetInputFields returns SystemMetricDetails.InputFields, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetails) GetInputFields() []SystemMetricDetailsInputFieldsJudgeInputField {
+	return v.InputFields
+}
+
+// SystemMetricDetailsExamplesScoreExample includes the requested fields of the GraphQL type ScoreExample.
+type SystemMetricDetailsExamplesScoreExample struct {
+	ScoreExampleDetails `json:"-"`
+}
+
+// GetRating returns SystemMetricDetailsExamplesScoreExample.Rating, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetailsExamplesScoreExample) GetRating() int {
+	return v.ScoreExampleDetails.Rating
+}
+
+// GetScenario returns SystemMetricDetailsExamplesScoreExample.Scenario, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetailsExamplesScoreExample) GetScenario() string {
+	return v.ScoreExampleDetails.Scenario
+}
+
+// GetJudgment returns SystemMetricDetailsExamplesScoreExample.Judgment, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetailsExamplesScoreExample) GetJudgment() string {
+	return v.ScoreExampleDetails.Judgment
+}
+
+func (v *SystemMetricDetailsExamplesScoreExample) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*SystemMetricDetailsExamplesScoreExample
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.SystemMetricDetailsExamplesScoreExample = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.ScoreExampleDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalSystemMetricDetailsExamplesScoreExample struct {
+	Rating int `json:"rating"`
+
+	Scenario string `json:"scenario"`
+
+	Judgment string `json:"judgment"`
+}
+
+func (v *SystemMetricDetailsExamplesScoreExample) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *SystemMetricDetailsExamplesScoreExample) __premarshalJSON() (*__premarshalSystemMetricDetailsExamplesScoreExample, error) {
+	var retval __premarshalSystemMetricDetailsExamplesScoreExample
+
+	retval.Rating = v.ScoreExampleDetails.Rating
+	retval.Scenario = v.ScoreExampleDetails.Scenario
+	retval.Judgment = v.ScoreExampleDetails.Judgment
+	return &retval, nil
+}
+
+// SystemMetricDetailsInputFieldsJudgeInputField includes the requested fields of the GraphQL type JudgeInputField.
+type SystemMetricDetailsInputFieldsJudgeInputField struct {
+	JudgeInputFieldDetails `json:"-"`
+}
+
+// GetName returns SystemMetricDetailsInputFieldsJudgeInputField.Name, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetName() string {
+	return v.JudgeInputFieldDetails.Name
+}
+
+// GetLabel returns SystemMetricDetailsInputFieldsJudgeInputField.Label, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetLabel() string {
+	return v.JudgeInputFieldDetails.Label
+}
+
+// GetDescription returns SystemMetricDetailsInputFieldsJudgeInputField.Description, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetDescription() string {
+	return v.JudgeInputFieldDetails.Description
+}
+
+// GetType returns SystemMetricDetailsInputFieldsJudgeInputField.Type, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetType() JudgeInputFieldType {
+	return v.JudgeInputFieldDetails.Type
+}
+
+// GetRequired returns SystemMetricDetailsInputFieldsJudgeInputField.Required, and is useful for accessing the field via an interface.
+func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetRequired() bool {
+	return v.JudgeInputFieldDetails.Required
+}
+
+func (v *SystemMetricDetailsInputFieldsJudgeInputField) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*SystemMetricDetailsInputFieldsJudgeInputField
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.SystemMetricDetailsInputFieldsJudgeInputField = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.JudgeInputFieldDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalSystemMetricDetailsInputFieldsJudgeInputField struct {
+	Name string `json:"name"`
+
+	Label string `json:"label"`
+
+	Description string `json:"description"`
+
+	Type JudgeInputFieldType `json:"type"`
+
+	Required bool `json:"required"`
+}
+
+func (v *SystemMetricDetailsInputFieldsJudgeInputField) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *SystemMetricDetailsInputFieldsJudgeInputField) __premarshalJSON() (*__premarshalSystemMetricDetailsInputFieldsJudgeInputField, error) {
+	var retval __premarshalSystemMetricDetailsInputFieldsJudgeInputField
+
+	retval.Name = v.JudgeInputFieldDetails.Name
+	retval.Label = v.JudgeInputFieldDetails.Label
+	retval.Description = v.JudgeInputFieldDetails.Description
+	retval.Type = v.JudgeInputFieldDetails.Type
+	retval.Required = v.JudgeInputFieldDetails.Required
+	return &retval, nil
 }
 
 // TaskDefinitionDetails includes the GraphQL fields of TaskDefinition requested by the fragment TaskDefinitionDetails.
@@ -2210,6 +5373,21 @@ var AllToolFilterType = []ToolFilterType{
 	ToolFilterTypePattern,
 }
 
+type UpdateEvalMeshMonitor struct {
+	ModelSetID *string  `json:"modelSetID,omitempty"`
+	Enabled    *bool    `json:"enabled,omitempty"`
+	SampleRate *float64 `json:"sampleRate,omitempty"`
+}
+
+// GetModelSetID returns UpdateEvalMeshMonitor.ModelSetID, and is useful for accessing the field via an interface.
+func (v *UpdateEvalMeshMonitor) GetModelSetID() *string { return v.ModelSetID }
+
+// GetEnabled returns UpdateEvalMeshMonitor.Enabled, and is useful for accessing the field via an interface.
+func (v *UpdateEvalMeshMonitor) GetEnabled() *bool { return v.Enabled }
+
+// GetSampleRate returns UpdateEvalMeshMonitor.SampleRate, and is useful for accessing the field via an interface.
+func (v *UpdateEvalMeshMonitor) GetSampleRate() *float64 { return v.SampleRate }
+
 type UpdateMcpConnection struct {
 	Name                              *string                                         `json:"name,omitempty"`
 	Transport                         *McpTransport                                   `json:"transport,omitempty"`
@@ -2255,6 +5433,202 @@ func (v *UpdateMcpConnection) GetBasicCredentials() *McpConnectionBasicCredentia
 // GetHeaderCredentials returns UpdateMcpConnection.HeaderCredentials, and is useful for accessing the field via an interface.
 func (v *UpdateMcpConnection) GetHeaderCredentials() *McpConnectionHeaderCredentials {
 	return v.HeaderCredentials
+}
+
+// UserMetricDetails includes the GraphQL fields of UserMetric requested by the fragment UserMetricDetails.
+type UserMetricDetails struct {
+	Id          string                                        `json:"id"`
+	Name        string                                        `json:"name"`
+	Description *string                                       `json:"description"`
+	Prompt      string                                        `json:"prompt"`
+	Complexity  ModelComplexity                               `json:"complexity"`
+	Examples    []UserMetricDetailsExamplesScoreExample       `json:"examples"`
+	InputFields []UserMetricDetailsInputFieldsJudgeInputField `json:"inputFields"`
+	CreatedAt   string                                        `json:"createdAt"`
+	UpdatedAt   string                                        `json:"updatedAt"`
+}
+
+// GetId returns UserMetricDetails.Id, and is useful for accessing the field via an interface.
+func (v *UserMetricDetails) GetId() string { return v.Id }
+
+// GetName returns UserMetricDetails.Name, and is useful for accessing the field via an interface.
+func (v *UserMetricDetails) GetName() string { return v.Name }
+
+// GetDescription returns UserMetricDetails.Description, and is useful for accessing the field via an interface.
+func (v *UserMetricDetails) GetDescription() *string { return v.Description }
+
+// GetPrompt returns UserMetricDetails.Prompt, and is useful for accessing the field via an interface.
+func (v *UserMetricDetails) GetPrompt() string { return v.Prompt }
+
+// GetComplexity returns UserMetricDetails.Complexity, and is useful for accessing the field via an interface.
+func (v *UserMetricDetails) GetComplexity() ModelComplexity { return v.Complexity }
+
+// GetExamples returns UserMetricDetails.Examples, and is useful for accessing the field via an interface.
+func (v *UserMetricDetails) GetExamples() []UserMetricDetailsExamplesScoreExample { return v.Examples }
+
+// GetInputFields returns UserMetricDetails.InputFields, and is useful for accessing the field via an interface.
+func (v *UserMetricDetails) GetInputFields() []UserMetricDetailsInputFieldsJudgeInputField {
+	return v.InputFields
+}
+
+// GetCreatedAt returns UserMetricDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *UserMetricDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns UserMetricDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *UserMetricDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// UserMetricDetailsExamplesScoreExample includes the requested fields of the GraphQL type ScoreExample.
+type UserMetricDetailsExamplesScoreExample struct {
+	ScoreExampleDetails `json:"-"`
+}
+
+// GetRating returns UserMetricDetailsExamplesScoreExample.Rating, and is useful for accessing the field via an interface.
+func (v *UserMetricDetailsExamplesScoreExample) GetRating() int { return v.ScoreExampleDetails.Rating }
+
+// GetScenario returns UserMetricDetailsExamplesScoreExample.Scenario, and is useful for accessing the field via an interface.
+func (v *UserMetricDetailsExamplesScoreExample) GetScenario() string {
+	return v.ScoreExampleDetails.Scenario
+}
+
+// GetJudgment returns UserMetricDetailsExamplesScoreExample.Judgment, and is useful for accessing the field via an interface.
+func (v *UserMetricDetailsExamplesScoreExample) GetJudgment() string {
+	return v.ScoreExampleDetails.Judgment
+}
+
+func (v *UserMetricDetailsExamplesScoreExample) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*UserMetricDetailsExamplesScoreExample
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.UserMetricDetailsExamplesScoreExample = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.ScoreExampleDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalUserMetricDetailsExamplesScoreExample struct {
+	Rating int `json:"rating"`
+
+	Scenario string `json:"scenario"`
+
+	Judgment string `json:"judgment"`
+}
+
+func (v *UserMetricDetailsExamplesScoreExample) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *UserMetricDetailsExamplesScoreExample) __premarshalJSON() (*__premarshalUserMetricDetailsExamplesScoreExample, error) {
+	var retval __premarshalUserMetricDetailsExamplesScoreExample
+
+	retval.Rating = v.ScoreExampleDetails.Rating
+	retval.Scenario = v.ScoreExampleDetails.Scenario
+	retval.Judgment = v.ScoreExampleDetails.Judgment
+	return &retval, nil
+}
+
+// UserMetricDetailsInputFieldsJudgeInputField includes the requested fields of the GraphQL type JudgeInputField.
+type UserMetricDetailsInputFieldsJudgeInputField struct {
+	JudgeInputFieldDetails `json:"-"`
+}
+
+// GetName returns UserMetricDetailsInputFieldsJudgeInputField.Name, and is useful for accessing the field via an interface.
+func (v *UserMetricDetailsInputFieldsJudgeInputField) GetName() string {
+	return v.JudgeInputFieldDetails.Name
+}
+
+// GetLabel returns UserMetricDetailsInputFieldsJudgeInputField.Label, and is useful for accessing the field via an interface.
+func (v *UserMetricDetailsInputFieldsJudgeInputField) GetLabel() string {
+	return v.JudgeInputFieldDetails.Label
+}
+
+// GetDescription returns UserMetricDetailsInputFieldsJudgeInputField.Description, and is useful for accessing the field via an interface.
+func (v *UserMetricDetailsInputFieldsJudgeInputField) GetDescription() string {
+	return v.JudgeInputFieldDetails.Description
+}
+
+// GetType returns UserMetricDetailsInputFieldsJudgeInputField.Type, and is useful for accessing the field via an interface.
+func (v *UserMetricDetailsInputFieldsJudgeInputField) GetType() JudgeInputFieldType {
+	return v.JudgeInputFieldDetails.Type
+}
+
+// GetRequired returns UserMetricDetailsInputFieldsJudgeInputField.Required, and is useful for accessing the field via an interface.
+func (v *UserMetricDetailsInputFieldsJudgeInputField) GetRequired() bool {
+	return v.JudgeInputFieldDetails.Required
+}
+
+func (v *UserMetricDetailsInputFieldsJudgeInputField) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*UserMetricDetailsInputFieldsJudgeInputField
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.UserMetricDetailsInputFieldsJudgeInputField = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.JudgeInputFieldDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalUserMetricDetailsInputFieldsJudgeInputField struct {
+	Name string `json:"name"`
+
+	Label string `json:"label"`
+
+	Description string `json:"description"`
+
+	Type JudgeInputFieldType `json:"type"`
+
+	Required bool `json:"required"`
+}
+
+func (v *UserMetricDetailsInputFieldsJudgeInputField) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *UserMetricDetailsInputFieldsJudgeInputField) __premarshalJSON() (*__premarshalUserMetricDetailsInputFieldsJudgeInputField, error) {
+	var retval __premarshalUserMetricDetailsInputFieldsJudgeInputField
+
+	retval.Name = v.JudgeInputFieldDetails.Name
+	retval.Label = v.JudgeInputFieldDetails.Label
+	retval.Description = v.JudgeInputFieldDetails.Description
+	retval.Type = v.JudgeInputFieldDetails.Type
+	retval.Required = v.JudgeInputFieldDetails.Required
+	return &retval, nil
 }
 
 // WebhookDestinationDetails includes the GraphQL fields of WebhookDestination requested by the fragment WebhookDestinationDetails.
@@ -2305,6 +5679,46 @@ type WebhookDestinationDetailsMesh struct {
 // GetId returns WebhookDestinationDetailsMesh.Id, and is useful for accessing the field via an interface.
 func (v *WebhookDestinationDetailsMesh) GetId() string { return v.Id }
 
+// WorkspaceDetails includes the GraphQL fields of Workspace requested by the fragment WorkspaceDetails.
+type WorkspaceDetails struct {
+	Id        string         `json:"id"`
+	Name      string         `json:"name"`
+	Scope     WorkspaceScope `json:"scope"`
+	CreatedAt string         `json:"createdAt"`
+	UpdatedAt string         `json:"updatedAt"`
+}
+
+// GetId returns WorkspaceDetails.Id, and is useful for accessing the field via an interface.
+func (v *WorkspaceDetails) GetId() string { return v.Id }
+
+// GetName returns WorkspaceDetails.Name, and is useful for accessing the field via an interface.
+func (v *WorkspaceDetails) GetName() string { return v.Name }
+
+// GetScope returns WorkspaceDetails.Scope, and is useful for accessing the field via an interface.
+func (v *WorkspaceDetails) GetScope() WorkspaceScope { return v.Scope }
+
+// GetCreatedAt returns WorkspaceDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *WorkspaceDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns WorkspaceDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *WorkspaceDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// Lifetime and visibility of a Workspace. GLOBAL state is shared across every
+// agent and conversation that wires to the workspace. CONVERSATION partitions
+// state per conversation — the workspace row is one template; each
+// conversation that uses it sees an isolated KV namespace and fs subtree.
+type WorkspaceScope string
+
+const (
+	WorkspaceScopeGlobal       WorkspaceScope = "GLOBAL"
+	WorkspaceScopeConversation WorkspaceScope = "CONVERSATION"
+)
+
+var AllWorkspaceScope = []WorkspaceScope{
+	WorkspaceScopeGlobal,
+	WorkspaceScopeConversation,
+}
+
 // __CreateAgentInput is used internally by genqlient
 type __CreateAgentInput struct {
 	Input *NewAgent `json:"input"`
@@ -2329,6 +5743,26 @@ func (v *__CreateApiKeyInput) GetDescription() *string { return v.Description }
 // GetScopes returns __CreateApiKeyInput.Scopes, and is useful for accessing the field via an interface.
 func (v *__CreateApiKeyInput) GetScopes() []string { return v.Scopes }
 
+// __CreateEmbeddingProfileInput is used internally by genqlient
+type __CreateEmbeddingProfileInput struct {
+	ProviderId string               `json:"providerId"`
+	Input      *NewEmbeddingProfile `json:"input"`
+}
+
+// GetProviderId returns __CreateEmbeddingProfileInput.ProviderId, and is useful for accessing the field via an interface.
+func (v *__CreateEmbeddingProfileInput) GetProviderId() string { return v.ProviderId }
+
+// GetInput returns __CreateEmbeddingProfileInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateEmbeddingProfileInput) GetInput() *NewEmbeddingProfile { return v.Input }
+
+// __CreateEvalMeshMonitorInput is used internally by genqlient
+type __CreateEvalMeshMonitorInput struct {
+	Input NewEvalMeshMonitor `json:"input"`
+}
+
+// GetInput returns __CreateEvalMeshMonitorInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateEvalMeshMonitorInput) GetInput() NewEvalMeshMonitor { return v.Input }
+
 // __CreateInputInput is used internally by genqlient
 type __CreateInputInput struct {
 	MeshId string    `json:"meshId"`
@@ -2340,6 +5774,14 @@ func (v *__CreateInputInput) GetMeshId() string { return v.MeshId }
 
 // GetInput returns __CreateInputInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateInputInput) GetInput() *NewInput { return v.Input }
+
+// __CreateInstalledParticleInput is used internally by genqlient
+type __CreateInstalledParticleInput struct {
+	Input *CreateInstalledParticleInput `json:"input"`
+}
+
+// GetInput returns __CreateInstalledParticleInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateInstalledParticleInput) GetInput() *CreateInstalledParticleInput { return v.Input }
 
 // __CreateLinkInput is used internally by genqlient
 type __CreateLinkInput struct {
@@ -2360,6 +5802,24 @@ type __CreateMcpConnectionInput struct {
 
 // GetInput returns __CreateMcpConnectionInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateMcpConnectionInput) GetInput() NewMcpConnection { return v.Input }
+
+// __CreateMemoryInteractionProfileInput is used internally by genqlient
+type __CreateMemoryInteractionProfileInput struct {
+	Input *NewMemoryInteractionProfile `json:"input"`
+}
+
+// GetInput returns __CreateMemoryInteractionProfileInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateMemoryInteractionProfileInput) GetInput() *NewMemoryInteractionProfile {
+	return v.Input
+}
+
+// __CreateMemoryStoreInput is used internally by genqlient
+type __CreateMemoryStoreInput struct {
+	Input *NewMemoryStore `json:"input"`
+}
+
+// GetInput returns __CreateMemoryStoreInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateMemoryStoreInput) GetInput() *NewMemoryStore { return v.Input }
 
 // __CreateMeshInput is used internally by genqlient
 type __CreateMeshInput struct {
@@ -2397,6 +5857,14 @@ type __CreateModelSetInput struct {
 // GetInput returns __CreateModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateModelSetInput) GetInput() *NewModelSet { return v.Input }
 
+// __CreateRubricInput is used internally by genqlient
+type __CreateRubricInput struct {
+	Input NewRubric `json:"input"`
+}
+
+// GetInput returns __CreateRubricInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateRubricInput) GetInput() NewRubric { return v.Input }
+
 // __CreateTaskDefinitionInput is used internally by genqlient
 type __CreateTaskDefinitionInput struct {
 	Input *NewTaskDefinition `json:"input"`
@@ -2405,6 +5873,14 @@ type __CreateTaskDefinitionInput struct {
 // GetInput returns __CreateTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateTaskDefinitionInput) GetInput() *NewTaskDefinition { return v.Input }
 
+// __CreateUserMetricInput is used internally by genqlient
+type __CreateUserMetricInput struct {
+	Input NewUserMetric `json:"input"`
+}
+
+// GetInput returns __CreateUserMetricInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateUserMetricInput) GetInput() NewUserMetric { return v.Input }
+
 // __CreateWebhookDestinationInput is used internally by genqlient
 type __CreateWebhookDestinationInput struct {
 	Input *NewWebhookDestination `json:"input"`
@@ -2412,6 +5888,14 @@ type __CreateWebhookDestinationInput struct {
 
 // GetInput returns __CreateWebhookDestinationInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateWebhookDestinationInput) GetInput() *NewWebhookDestination { return v.Input }
+
+// __CreateWorkspaceInput is used internally by genqlient
+type __CreateWorkspaceInput struct {
+	Input NewWorkspace `json:"input"`
+}
+
+// GetInput returns __CreateWorkspaceInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateWorkspaceInput) GetInput() NewWorkspace { return v.Input }
 
 // __DeleteAgentInput is used internally by genqlient
 type __DeleteAgentInput struct {
@@ -2429,6 +5913,22 @@ type __DeleteApiKeyInput struct {
 // GetId returns __DeleteApiKeyInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteApiKeyInput) GetId() string { return v.Id }
 
+// __DeleteEmbeddingProfileInput is used internally by genqlient
+type __DeleteEmbeddingProfileInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteEmbeddingProfileInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteEmbeddingProfileInput) GetId() string { return v.Id }
+
+// __DeleteEvalMeshMonitorInput is used internally by genqlient
+type __DeleteEvalMeshMonitorInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteEvalMeshMonitorInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteEvalMeshMonitorInput) GetId() string { return v.Id }
+
 // __DeleteInputInput is used internally by genqlient
 type __DeleteInputInput struct {
 	MeshId string `json:"meshId"`
@@ -2440,6 +5940,14 @@ func (v *__DeleteInputInput) GetMeshId() string { return v.MeshId }
 
 // GetName returns __DeleteInputInput.Name, and is useful for accessing the field via an interface.
 func (v *__DeleteInputInput) GetName() string { return v.Name }
+
+// __DeleteInstalledParticleInput is used internally by genqlient
+type __DeleteInstalledParticleInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteInstalledParticleInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteInstalledParticleInput) GetId() string { return v.Id }
 
 // __DeleteLinkInput is used internally by genqlient
 type __DeleteLinkInput struct {
@@ -2456,6 +5964,22 @@ type __DeleteMcpConnectionInput struct {
 
 // GetId returns __DeleteMcpConnectionInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteMcpConnectionInput) GetId() string { return v.Id }
+
+// __DeleteMemoryInteractionProfileInput is used internally by genqlient
+type __DeleteMemoryInteractionProfileInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteMemoryInteractionProfileInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteMemoryInteractionProfileInput) GetId() string { return v.Id }
+
+// __DeleteMemoryStoreInput is used internally by genqlient
+type __DeleteMemoryStoreInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteMemoryStoreInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteMemoryStoreInput) GetId() string { return v.Id }
 
 // __DeleteMeshInput is used internally by genqlient
 type __DeleteMeshInput struct {
@@ -2489,6 +6013,14 @@ type __DeleteModelSetInput struct {
 // GetId returns __DeleteModelSetInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteModelSetInput) GetId() string { return v.Id }
 
+// __DeleteRubricInput is used internally by genqlient
+type __DeleteRubricInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteRubricInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteRubricInput) GetId() string { return v.Id }
+
 // __DeleteTaskDefinitionInput is used internally by genqlient
 type __DeleteTaskDefinitionInput struct {
 	Id string `json:"id"`
@@ -2497,6 +6029,14 @@ type __DeleteTaskDefinitionInput struct {
 // GetId returns __DeleteTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteTaskDefinitionInput) GetId() string { return v.Id }
 
+// __DeleteUserMetricInput is used internally by genqlient
+type __DeleteUserMetricInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteUserMetricInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteUserMetricInput) GetId() string { return v.Id }
+
 // __DeleteWebhookDestinationInput is used internally by genqlient
 type __DeleteWebhookDestinationInput struct {
 	Id string `json:"id"`
@@ -2504,6 +6044,14 @@ type __DeleteWebhookDestinationInput struct {
 
 // GetId returns __DeleteWebhookDestinationInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteWebhookDestinationInput) GetId() string { return v.Id }
+
+// __DeleteWorkspaceInput is used internally by genqlient
+type __DeleteWorkspaceInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteWorkspaceInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteWorkspaceInput) GetId() string { return v.Id }
 
 // __GetAgentIDForVersionInput is used internally by genqlient
 type __GetAgentIDForVersionInput struct {
@@ -2529,6 +6077,42 @@ type __GetApiKeyInput struct {
 // GetId returns __GetApiKeyInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetApiKeyInput) GetId() string { return v.Id }
 
+// __GetEmbeddingProfileByProviderAndNameInput is used internally by genqlient
+type __GetEmbeddingProfileByProviderAndNameInput struct {
+	ProviderId string `json:"providerId"`
+	Name       string `json:"name"`
+}
+
+// GetProviderId returns __GetEmbeddingProfileByProviderAndNameInput.ProviderId, and is useful for accessing the field via an interface.
+func (v *__GetEmbeddingProfileByProviderAndNameInput) GetProviderId() string { return v.ProviderId }
+
+// GetName returns __GetEmbeddingProfileByProviderAndNameInput.Name, and is useful for accessing the field via an interface.
+func (v *__GetEmbeddingProfileByProviderAndNameInput) GetName() string { return v.Name }
+
+// __GetEmbeddingProfileInput is used internally by genqlient
+type __GetEmbeddingProfileInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetEmbeddingProfileInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetEmbeddingProfileInput) GetId() string { return v.Id }
+
+// __GetEvalMeshMonitorInput is used internally by genqlient
+type __GetEvalMeshMonitorInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetEvalMeshMonitorInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetEvalMeshMonitorInput) GetId() string { return v.Id }
+
+// __GetInstalledParticleInput is used internally by genqlient
+type __GetInstalledParticleInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetInstalledParticleInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetInstalledParticleInput) GetId() string { return v.Id }
+
 // __GetMcpConnectionInput is used internally by genqlient
 type __GetMcpConnectionInput struct {
 	Id string `json:"id"`
@@ -2536,6 +6120,30 @@ type __GetMcpConnectionInput struct {
 
 // GetId returns __GetMcpConnectionInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetMcpConnectionInput) GetId() string { return v.Id }
+
+// __GetMemoryInteractionProfileInput is used internally by genqlient
+type __GetMemoryInteractionProfileInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetMemoryInteractionProfileInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetMemoryInteractionProfileInput) GetId() string { return v.Id }
+
+// __GetMemoryStoreByNameInput is used internally by genqlient
+type __GetMemoryStoreByNameInput struct {
+	Name string `json:"name"`
+}
+
+// GetName returns __GetMemoryStoreByNameInput.Name, and is useful for accessing the field via an interface.
+func (v *__GetMemoryStoreByNameInput) GetName() string { return v.Name }
+
+// __GetMemoryStoreInput is used internally by genqlient
+type __GetMemoryStoreInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetMemoryStoreInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetMemoryStoreInput) GetId() string { return v.Id }
 
 // __GetMeshInput is used internally by genqlient
 type __GetMeshInput struct {
@@ -2597,6 +6205,30 @@ type __GetModelSetInput struct {
 // GetId returns __GetModelSetInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetModelSetInput) GetId() string { return v.Id }
 
+// __GetParticleArtifactInput is used internally by genqlient
+type __GetParticleArtifactInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetParticleArtifactInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetParticleArtifactInput) GetId() string { return v.Id }
+
+// __GetRubricInput is used internally by genqlient
+type __GetRubricInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetRubricInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetRubricInput) GetId() string { return v.Id }
+
+// __GetSystemMetricInput is used internally by genqlient
+type __GetSystemMetricInput struct {
+	Key string `json:"key"`
+}
+
+// GetKey returns __GetSystemMetricInput.Key, and is useful for accessing the field via an interface.
+func (v *__GetSystemMetricInput) GetKey() string { return v.Key }
+
 // __GetTaskDefinitionByNameInput is used internally by genqlient
 type __GetTaskDefinitionByNameInput struct {
 	Name string `json:"name"`
@@ -2613,6 +6245,14 @@ type __GetTaskDefinitionInput struct {
 // GetId returns __GetTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetTaskDefinitionInput) GetId() string { return v.Id }
 
+// __GetUserMetricInput is used internally by genqlient
+type __GetUserMetricInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetUserMetricInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetUserMetricInput) GetId() string { return v.Id }
+
 // __GetWebhookDestinationInput is used internally by genqlient
 type __GetWebhookDestinationInput struct {
 	Id string `json:"id"`
@@ -2620,6 +6260,34 @@ type __GetWebhookDestinationInput struct {
 
 // GetId returns __GetWebhookDestinationInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetWebhookDestinationInput) GetId() string { return v.Id }
+
+// __GetWorkspaceByNameInput is used internally by genqlient
+type __GetWorkspaceByNameInput struct {
+	Name string `json:"name"`
+}
+
+// GetName returns __GetWorkspaceByNameInput.Name, and is useful for accessing the field via an interface.
+func (v *__GetWorkspaceByNameInput) GetName() string { return v.Name }
+
+// __GetWorkspaceInput is used internally by genqlient
+type __GetWorkspaceInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetWorkspaceInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetWorkspaceInput) GetId() string { return v.Id }
+
+// __ListSystemMetricsInput is used internally by genqlient
+type __ListSystemMetricsInput struct {
+	First int     `json:"first"`
+	After *string `json:"after,omitempty"`
+}
+
+// GetFirst returns __ListSystemMetricsInput.First, and is useful for accessing the field via an interface.
+func (v *__ListSystemMetricsInput) GetFirst() int { return v.First }
+
+// GetAfter returns __ListSystemMetricsInput.After, and is useful for accessing the field via an interface.
+func (v *__ListSystemMetricsInput) GetAfter() *string { return v.After }
 
 // __ModifyAgentInput is used internally by genqlient
 type __ModifyAgentInput struct {
@@ -2653,6 +6321,30 @@ func (v *__ModifyApiKeyInput) GetDescription() *string { return v.Description }
 // GetScopes returns __ModifyApiKeyInput.Scopes, and is useful for accessing the field via an interface.
 func (v *__ModifyApiKeyInput) GetScopes() []string { return v.Scopes }
 
+// __ModifyEmbeddingProfileInput is used internally by genqlient
+type __ModifyEmbeddingProfileInput struct {
+	Id    string                  `json:"id"`
+	Input *UpdateEmbeddingProfile `json:"input"`
+}
+
+// GetId returns __ModifyEmbeddingProfileInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyEmbeddingProfileInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyEmbeddingProfileInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyEmbeddingProfileInput) GetInput() *UpdateEmbeddingProfile { return v.Input }
+
+// __ModifyEvalMeshMonitorInput is used internally by genqlient
+type __ModifyEvalMeshMonitorInput struct {
+	Id    string                `json:"id"`
+	Input UpdateEvalMeshMonitor `json:"input"`
+}
+
+// GetId returns __ModifyEvalMeshMonitorInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyEvalMeshMonitorInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyEvalMeshMonitorInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyEvalMeshMonitorInput) GetInput() UpdateEvalMeshMonitor { return v.Input }
+
 // __ModifyInputInput is used internally by genqlient
 type __ModifyInputInput struct {
 	MeshId string       `json:"meshId"`
@@ -2668,6 +6360,14 @@ func (v *__ModifyInputInput) GetName() string { return v.Name }
 
 // GetInput returns __ModifyInputInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyInputInput) GetInput() *UpdateInput { return v.Input }
+
+// __ModifyInstalledParticleInput is used internally by genqlient
+type __ModifyInstalledParticleInput struct {
+	Input *UpdateInstalledParticleInput `json:"input"`
+}
+
+// GetInput returns __ModifyInstalledParticleInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyInstalledParticleInput) GetInput() *UpdateInstalledParticleInput { return v.Input }
 
 // __ModifyLinkInput is used internally by genqlient
 type __ModifyLinkInput struct {
@@ -2692,6 +6392,32 @@ func (v *__ModifyMcpConnectionInput) GetId() string { return v.Id }
 
 // GetInput returns __ModifyMcpConnectionInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyMcpConnectionInput) GetInput() UpdateMcpConnection { return v.Input }
+
+// __ModifyMemoryInteractionProfileInput is used internally by genqlient
+type __ModifyMemoryInteractionProfileInput struct {
+	Id    string                          `json:"id"`
+	Input *UpdateMemoryInteractionProfile `json:"input"`
+}
+
+// GetId returns __ModifyMemoryInteractionProfileInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyMemoryInteractionProfileInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyMemoryInteractionProfileInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyMemoryInteractionProfileInput) GetInput() *UpdateMemoryInteractionProfile {
+	return v.Input
+}
+
+// __ModifyMemoryStoreInput is used internally by genqlient
+type __ModifyMemoryStoreInput struct {
+	Id    string             `json:"id"`
+	Input *UpdateMemoryStore `json:"input"`
+}
+
+// GetId returns __ModifyMemoryStoreInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyMemoryStoreInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyMemoryStoreInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyMemoryStoreInput) GetInput() *UpdateMemoryStore { return v.Input }
 
 // __ModifyMeshInput is used internally by genqlient
 type __ModifyMeshInput struct {
@@ -2741,6 +6467,18 @@ func (v *__ModifyModelSetInput) GetId() string { return v.Id }
 // GetInput returns __ModifyModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyModelSetInput) GetInput() *UpdateModelSet { return v.Input }
 
+// __ModifyRubricInput is used internally by genqlient
+type __ModifyRubricInput struct {
+	Id    string        `json:"id"`
+	Input *UpdateRubric `json:"input"`
+}
+
+// GetId returns __ModifyRubricInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyRubricInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyRubricInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyRubricInput) GetInput() *UpdateRubric { return v.Input }
+
 // __ModifyTaskDefinitionInput is used internally by genqlient
 type __ModifyTaskDefinitionInput struct {
 	Id    string                `json:"id"`
@@ -2753,6 +6491,18 @@ func (v *__ModifyTaskDefinitionInput) GetId() string { return v.Id }
 // GetInput returns __ModifyTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyTaskDefinitionInput) GetInput() *UpdateTaskDefinition { return v.Input }
 
+// __ModifyUserMetricInput is used internally by genqlient
+type __ModifyUserMetricInput struct {
+	Id    string            `json:"id"`
+	Input *UpdateUserMetric `json:"input"`
+}
+
+// GetId returns __ModifyUserMetricInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyUserMetricInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyUserMetricInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyUserMetricInput) GetInput() *UpdateUserMetric { return v.Input }
+
 // __ModifyWebhookDestinationInput is used internally by genqlient
 type __ModifyWebhookDestinationInput struct {
 	Id    string                    `json:"id"`
@@ -2764,6 +6514,18 @@ func (v *__ModifyWebhookDestinationInput) GetId() string { return v.Id }
 
 // GetInput returns __ModifyWebhookDestinationInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyWebhookDestinationInput) GetInput() *UpdateWebhookDestination { return v.Input }
+
+// __RenameWorkspaceInput is used internally by genqlient
+type __RenameWorkspaceInput struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// GetId returns __RenameWorkspaceInput.Id, and is useful for accessing the field via an interface.
+func (v *__RenameWorkspaceInput) GetId() string { return v.Id }
+
+// GetName returns __RenameWorkspaceInput.Name, and is useful for accessing the field via an interface.
+func (v *__RenameWorkspaceInput) GetName() string { return v.Name }
 
 // The mutation executed by CreateAgent.
 const CreateAgent_Operation = `
@@ -2791,7 +6553,6 @@ fragment AgentDetails on Agent {
 		taskInstructions
 		modelComplexity
 		inputMessageType
-		preserveConversationHistory
 		sendThinkingToUser
 		sendMessagesToUser
 		mcpConnections {
@@ -2809,15 +6570,17 @@ fragment AgentDetails on Agent {
 				name
 			}
 		}
-		memorySlots {
+		memoryInteractionProfiles {
 			id
 			name
-			description
-			memoryType
-			memoryScope
-			canRead
-			canWrite
-			createdAt
+		}
+		particles {
+			installedParticle {
+				id
+			}
+			filterType
+			toolNames
+			toolNamePattern
 		}
 	}
 }
@@ -2898,6 +6661,111 @@ func CreateApiKey(
 	return data_, err_
 }
 
+// The mutation executed by CreateEmbeddingProfile.
+const CreateEmbeddingProfile_Operation = `
+mutation CreateEmbeddingProfile ($providerId: ModelProviderID!, $input: NewEmbeddingProfile!) {
+	createEmbeddingProfile(providerID: $providerId, input: $input) {
+		... EmbeddingProfileDetails
+	}
+}
+fragment EmbeddingProfileDetails on EmbeddingProfile {
+	id
+	name
+	description
+	dimensions
+	configuration {
+		__typename
+		... on EmbeddingProfileConfigOpenAI {
+			model
+			dimensions
+			sendDimensions
+		}
+		... on EmbeddingProfileConfigGoogle {
+			model
+			dimensions
+			sendDimensions
+			taskType
+		}
+	}
+	provider {
+		id
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func CreateEmbeddingProfile(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	providerId string,
+	input *NewEmbeddingProfile,
+) (data_ *CreateEmbeddingProfileResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateEmbeddingProfile",
+		Query:  CreateEmbeddingProfile_Operation,
+		Variables: &__CreateEmbeddingProfileInput{
+			ProviderId: providerId,
+			Input:      input,
+		},
+	}
+
+	data_ = &CreateEmbeddingProfileResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateEvalMeshMonitor.
+const CreateEvalMeshMonitor_Operation = `
+mutation CreateEvalMeshMonitor ($input: NewEvalMeshMonitor!) {
+	createEvalMeshMonitor(input: $input) {
+		... EvalMeshMonitorDetails
+	}
+}
+fragment EvalMeshMonitorDetails on EvalMeshMonitor {
+	id
+	meshID
+	rubricID
+	modelSetID
+	enabled
+	sampleRate
+	createdAt
+	updatedAt
+}
+`
+
+func CreateEvalMeshMonitor(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input NewEvalMeshMonitor,
+) (data_ *CreateEvalMeshMonitorResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateEvalMeshMonitor",
+		Query:  CreateEvalMeshMonitor_Operation,
+		Variables: &__CreateEvalMeshMonitorInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateEvalMeshMonitorResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by CreateInput.
 const CreateInput_Operation = `
 mutation CreateInput ($meshId: MeshID!, $input: NewInput!) {
@@ -2939,6 +6807,60 @@ func CreateInput(
 	}
 
 	data_ = &CreateInputResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateInstalledParticle.
+const CreateInstalledParticle_Operation = `
+mutation CreateInstalledParticle ($input: CreateInstalledParticleInput!) {
+	createInstalledParticle(input: $input) {
+		... InstalledParticleDetails
+	}
+}
+fragment InstalledParticleDetails on InstalledParticle {
+	id
+	name
+	activeArtifact {
+		id
+		name
+		version
+	}
+	kvWorkspace {
+		id
+	}
+	mounts {
+		mountName
+		workspace {
+			id
+		}
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func CreateInstalledParticle(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *CreateInstalledParticleInput,
+) (data_ *CreateInstalledParticleResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateInstalledParticle",
+		Query:  CreateInstalledParticle_Operation,
+		Variables: &__CreateInstalledParticleInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateInstalledParticleResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -3061,6 +6983,173 @@ func CreateMcpConnection(
 	return data_, err_
 }
 
+// The mutation executed by CreateMemoryInteractionProfile.
+const CreateMemoryInteractionProfile_Operation = `
+mutation CreateMemoryInteractionProfile ($input: NewMemoryInteractionProfile!) {
+	createMemoryInteractionProfile(input: $input) {
+		... MemoryInteractionProfileDetails
+	}
+}
+fragment MemoryInteractionProfileDetails on MemoryInteractionProfile {
+	id
+	name
+	description
+	allowExpansion
+	conversationHistory {
+		tokenBudget
+		selection
+		query {
+			... MemoryQuerySourceDetails
+		}
+	}
+	contextInjections {
+		name
+		description
+		tokenBudget
+		recordTypes
+		selection {
+			... MemorySelectionDetails
+		}
+		query {
+			... MemoryQuerySourceDetails
+		}
+	}
+	queryTools {
+		toolName
+		description
+		recordTypes
+		tokenBudget
+		selection {
+			... MemorySelectionDetails
+		}
+		effortLevels {
+			level
+			tokenBudget
+		}
+	}
+	writeTools {
+		toolName
+		description
+		tagMappings {
+			kind
+			keys
+			tagKey
+			tagValue
+		}
+	}
+	createdAt
+	updatedAt
+}
+fragment MemoryQuerySourceDetails on MemoryQuerySource {
+	kind
+	text
+}
+fragment MemorySelectionDetails on MemorySelection {
+	kind
+	tags {
+		source
+		tagKey
+		tagValue
+		requestTagKey
+	}
+}
+`
+
+func CreateMemoryInteractionProfile(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewMemoryInteractionProfile,
+) (data_ *CreateMemoryInteractionProfileResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateMemoryInteractionProfile",
+		Query:  CreateMemoryInteractionProfile_Operation,
+		Variables: &__CreateMemoryInteractionProfileInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateMemoryInteractionProfileResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateMemoryStore.
+const CreateMemoryStore_Operation = `
+mutation CreateMemoryStore ($input: NewMemoryStore!) {
+	createMemoryStore(input: $input) {
+		... MemoryStoreDetails
+	}
+}
+fragment MemoryStoreDetails on MemoryStore {
+	id
+	name
+	description
+	ingestConversations
+	indexConversationMessages
+	embeddingProfile {
+		id
+	}
+	userNameTagKey
+	extractIntervalSeconds
+	consolidateIntervalSeconds
+	scopes {
+		... MemoryStoreScopeDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment MemoryStoreScopeDetails on MemoryStoreScope {
+	id
+	description
+	kind
+	key
+	value
+	match
+	extractionEnabled
+	extractionPrompt
+	extractionModelProfile {
+		id
+	}
+	consolidationEnabled
+	consolidationPrompt
+	consolidationModelProfile {
+		id
+	}
+}
+`
+
+func CreateMemoryStore(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewMemoryStore,
+) (data_ *CreateMemoryStoreResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateMemoryStore",
+		Query:  CreateMemoryStore_Operation,
+		Variables: &__CreateMemoryStoreInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateMemoryStoreResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by CreateMesh.
 const CreateMesh_Operation = `
 mutation CreateMesh ($input: NewMesh!) {
@@ -3124,6 +7213,9 @@ fragment ModelProfileDetails on ModelProfile {
 	name
 	description
 	tags
+	provider {
+		id
+	}
 	configuration {
 		__typename
 		... on ModelProfileConfigAnthropic {
@@ -3304,6 +7396,73 @@ func CreateModelSet(
 	return data_, err_
 }
 
+// The mutation executed by CreateRubric.
+const CreateRubric_Operation = `
+mutation CreateRubric ($input: NewRubric!) {
+	createRubric(input: $input) {
+		... RubricDetails
+	}
+}
+fragment RubricDetails on Rubric {
+	id
+	name
+	description
+	createdAt
+	updatedAt
+	metrics {
+		__typename
+		... on RubricUserMetric {
+			userEntryID: id
+			userMetric {
+				id
+			}
+			userTrialCount: trialCount
+			complexity
+			inputValues
+			weight
+		}
+		... on RubricSystemMetric {
+			systemEntryID: id
+			systemMetric {
+				key
+			}
+			systemTrialCount: trialCount
+			complexity
+			inputValues
+			scoreFloor
+			scoreCeiling
+			lowerIsBetter
+			weight
+		}
+	}
+}
+`
+
+func CreateRubric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input NewRubric,
+) (data_ *CreateRubricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateRubric",
+		Query:  CreateRubric_Operation,
+		Variables: &__CreateRubricInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateRubricResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by CreateTaskDefinition.
 const CreateTaskDefinition_Operation = `
 mutation CreateTaskDefinition ($input: NewTaskDefinition!) {
@@ -3336,6 +7495,67 @@ func CreateTaskDefinition(
 	}
 
 	data_ = &CreateTaskDefinitionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateUserMetric.
+const CreateUserMetric_Operation = `
+mutation CreateUserMetric ($input: NewUserMetric!) {
+	createUserMetric(input: $input) {
+		... UserMetricDetails
+	}
+}
+fragment UserMetricDetails on UserMetric {
+	id
+	name
+	description
+	prompt
+	complexity
+	examples {
+		... ScoreExampleDetails
+	}
+	inputFields {
+		... JudgeInputFieldDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment ScoreExampleDetails on ScoreExample {
+	rating
+	scenario
+	judgment
+}
+fragment JudgeInputFieldDetails on JudgeInputField {
+	name
+	label
+	description
+	type
+	required
+}
+`
+
+func CreateUserMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input NewUserMetric,
+) (data_ *CreateUserMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateUserMetric",
+		Query:  CreateUserMetric_Operation,
+		Variables: &__CreateUserMetricInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateUserMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -3383,6 +7603,47 @@ func CreateWebhookDestination(
 	}
 
 	data_ = &CreateWebhookDestinationResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateWorkspace.
+const CreateWorkspace_Operation = `
+mutation CreateWorkspace ($input: NewWorkspace!) {
+	createWorkspace(input: $input) {
+		... WorkspaceDetails
+	}
+}
+fragment WorkspaceDetails on Workspace {
+	id
+	name
+	scope
+	createdAt
+	updatedAt
+}
+`
+
+func CreateWorkspace(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input NewWorkspace,
+) (data_ *CreateWorkspaceResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateWorkspace",
+		Query:  CreateWorkspace_Operation,
+		Variables: &__CreateWorkspaceInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateWorkspaceResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -3462,6 +7723,74 @@ func DeleteApiKey(
 	return data_, err_
 }
 
+// The mutation executed by DeleteEmbeddingProfile.
+const DeleteEmbeddingProfile_Operation = `
+mutation DeleteEmbeddingProfile ($id: EmbeddingProfileID!) {
+	deleteEmbeddingProfiles(embeddingProfileIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteEmbeddingProfile(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteEmbeddingProfileResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteEmbeddingProfile",
+		Query:  DeleteEmbeddingProfile_Operation,
+		Variables: &__DeleteEmbeddingProfileInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteEmbeddingProfileResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteEvalMeshMonitor.
+const DeleteEvalMeshMonitor_Operation = `
+mutation DeleteEvalMeshMonitor ($id: EvalMeshMonitorID!) {
+	deleteEvalMeshMonitor(id: $id) {
+		id
+	}
+}
+`
+
+func DeleteEvalMeshMonitor(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteEvalMeshMonitorResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteEvalMeshMonitor",
+		Query:  DeleteEvalMeshMonitor_Operation,
+		Variables: &__DeleteEvalMeshMonitorInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteEvalMeshMonitorResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by DeleteInput.
 const DeleteInput_Operation = `
 mutation DeleteInput ($meshId: MeshID!, $name: String!) {
@@ -3487,6 +7816,40 @@ func DeleteInput(
 	}
 
 	data_ = &DeleteInputResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteInstalledParticle.
+const DeleteInstalledParticle_Operation = `
+mutation DeleteInstalledParticle ($id: InstalledParticleID!) {
+	deleteInstalledParticles(installedParticleIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteInstalledParticle(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteInstalledParticleResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteInstalledParticle",
+		Query:  DeleteInstalledParticle_Operation,
+		Variables: &__DeleteInstalledParticleInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteInstalledParticleResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -3555,6 +7918,74 @@ func DeleteMcpConnection(
 	}
 
 	data_ = &DeleteMcpConnectionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteMemoryInteractionProfile.
+const DeleteMemoryInteractionProfile_Operation = `
+mutation DeleteMemoryInteractionProfile ($id: MemoryInteractionProfileID!) {
+	deleteMemoryInteractionProfiles(memoryInteractionProfileIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteMemoryInteractionProfile(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteMemoryInteractionProfileResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteMemoryInteractionProfile",
+		Query:  DeleteMemoryInteractionProfile_Operation,
+		Variables: &__DeleteMemoryInteractionProfileInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteMemoryInteractionProfileResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteMemoryStore.
+const DeleteMemoryStore_Operation = `
+mutation DeleteMemoryStore ($id: MemoryStoreID!) {
+	deleteMemoryStores(memoryStoreIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteMemoryStore(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteMemoryStoreResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteMemoryStore",
+		Query:  DeleteMemoryStore_Operation,
+		Variables: &__DeleteMemoryStoreInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteMemoryStoreResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -3702,6 +8133,40 @@ func DeleteModelSet(
 	return data_, err_
 }
 
+// The mutation executed by DeleteRubric.
+const DeleteRubric_Operation = `
+mutation DeleteRubric ($id: RubricID!) {
+	deleteRubric(id: $id) {
+		id
+	}
+}
+`
+
+func DeleteRubric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteRubricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteRubric",
+		Query:  DeleteRubric_Operation,
+		Variables: &__DeleteRubricInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteRubricResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by DeleteTaskDefinition.
 const DeleteTaskDefinition_Operation = `
 mutation DeleteTaskDefinition ($id: TaskDefinitionID!) {
@@ -3725,6 +8190,40 @@ func DeleteTaskDefinition(
 	}
 
 	data_ = &DeleteTaskDefinitionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteUserMetric.
+const DeleteUserMetric_Operation = `
+mutation DeleteUserMetric ($id: UserMetricID!) {
+	deleteUserMetric(id: $id) {
+		id
+	}
+}
+`
+
+func DeleteUserMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteUserMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteUserMetric",
+		Query:  DeleteUserMetric_Operation,
+		Variables: &__DeleteUserMetricInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteUserMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -3770,6 +8269,40 @@ func DeleteWebhookDestination(
 	return data_, err_
 }
 
+// The mutation executed by DeleteWorkspace.
+const DeleteWorkspace_Operation = `
+mutation DeleteWorkspace ($id: WorkspaceID!) {
+	deleteWorkspaces(workspaceIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteWorkspace(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteWorkspaceResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteWorkspace",
+		Query:  DeleteWorkspace_Operation,
+		Variables: &__DeleteWorkspaceInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteWorkspaceResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetAgent.
 const GetAgent_Operation = `
 query GetAgent ($id: AgentID!) {
@@ -3794,7 +8327,6 @@ fragment AgentDetails on Agent {
 		taskInstructions
 		modelComplexity
 		inputMessageType
-		preserveConversationHistory
 		sendThinkingToUser
 		sendMessagesToUser
 		mcpConnections {
@@ -3812,15 +8344,17 @@ fragment AgentDetails on Agent {
 				name
 			}
 		}
-		memorySlots {
+		memoryInteractionProfiles {
 			id
 			name
-			description
-			memoryType
-			memoryScope
-			canRead
-			canWrite
-			createdAt
+		}
+		particles {
+			installedParticle {
+				id
+			}
+			filterType
+			toolNames
+			toolNamePattern
 		}
 	}
 }
@@ -3930,6 +8464,224 @@ func GetApiKey(
 	return data_, err_
 }
 
+// The query executed by GetEmbeddingProfile.
+const GetEmbeddingProfile_Operation = `
+query GetEmbeddingProfile ($id: EmbeddingProfileID!) {
+	embeddingProfile(id: $id) {
+		... EmbeddingProfileDetails
+	}
+}
+fragment EmbeddingProfileDetails on EmbeddingProfile {
+	id
+	name
+	description
+	dimensions
+	configuration {
+		__typename
+		... on EmbeddingProfileConfigOpenAI {
+			model
+			dimensions
+			sendDimensions
+		}
+		... on EmbeddingProfileConfigGoogle {
+			model
+			dimensions
+			sendDimensions
+			taskType
+		}
+	}
+	provider {
+		id
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func GetEmbeddingProfile(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetEmbeddingProfileResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetEmbeddingProfile",
+		Query:  GetEmbeddingProfile_Operation,
+		Variables: &__GetEmbeddingProfileInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetEmbeddingProfileResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetEmbeddingProfileByProviderAndName.
+const GetEmbeddingProfileByProviderAndName_Operation = `
+query GetEmbeddingProfileByProviderAndName ($providerId: ModelProviderID!, $name: String!) {
+	embeddingProfileByProviderAndName(providerID: $providerId, name: $name) {
+		... EmbeddingProfileDetails
+	}
+}
+fragment EmbeddingProfileDetails on EmbeddingProfile {
+	id
+	name
+	description
+	dimensions
+	configuration {
+		__typename
+		... on EmbeddingProfileConfigOpenAI {
+			model
+			dimensions
+			sendDimensions
+		}
+		... on EmbeddingProfileConfigGoogle {
+			model
+			dimensions
+			sendDimensions
+			taskType
+		}
+	}
+	provider {
+		id
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func GetEmbeddingProfileByProviderAndName(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	providerId string,
+	name string,
+) (data_ *GetEmbeddingProfileByProviderAndNameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetEmbeddingProfileByProviderAndName",
+		Query:  GetEmbeddingProfileByProviderAndName_Operation,
+		Variables: &__GetEmbeddingProfileByProviderAndNameInput{
+			ProviderId: providerId,
+			Name:       name,
+		},
+	}
+
+	data_ = &GetEmbeddingProfileByProviderAndNameResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetEvalMeshMonitor.
+const GetEvalMeshMonitor_Operation = `
+query GetEvalMeshMonitor ($id: EvalMeshMonitorID!) {
+	evalMeshMonitor(id: $id) {
+		... EvalMeshMonitorDetails
+	}
+}
+fragment EvalMeshMonitorDetails on EvalMeshMonitor {
+	id
+	meshID
+	rubricID
+	modelSetID
+	enabled
+	sampleRate
+	createdAt
+	updatedAt
+}
+`
+
+func GetEvalMeshMonitor(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetEvalMeshMonitorResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetEvalMeshMonitor",
+		Query:  GetEvalMeshMonitor_Operation,
+		Variables: &__GetEvalMeshMonitorInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetEvalMeshMonitorResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetInstalledParticle.
+const GetInstalledParticle_Operation = `
+query GetInstalledParticle ($id: InstalledParticleID!) {
+	installedParticle(id: $id) {
+		... InstalledParticleDetails
+	}
+}
+fragment InstalledParticleDetails on InstalledParticle {
+	id
+	name
+	activeArtifact {
+		id
+		name
+		version
+	}
+	kvWorkspace {
+		id
+	}
+	mounts {
+		mountName
+		workspace {
+			id
+		}
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func GetInstalledParticle(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetInstalledParticleResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetInstalledParticle",
+		Query:  GetInstalledParticle_Operation,
+		Variables: &__GetInstalledParticleInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetInstalledParticleResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetMcpConnection.
 const GetMcpConnection_Operation = `
 query GetMcpConnection ($id: McpConnectionID!) {
@@ -3969,6 +8721,243 @@ func GetMcpConnection(
 	}
 
 	data_ = &GetMcpConnectionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetMemoryInteractionProfile.
+const GetMemoryInteractionProfile_Operation = `
+query GetMemoryInteractionProfile ($id: MemoryInteractionProfileID!) {
+	memoryInteractionProfile(id: $id) {
+		... MemoryInteractionProfileDetails
+	}
+}
+fragment MemoryInteractionProfileDetails on MemoryInteractionProfile {
+	id
+	name
+	description
+	allowExpansion
+	conversationHistory {
+		tokenBudget
+		selection
+		query {
+			... MemoryQuerySourceDetails
+		}
+	}
+	contextInjections {
+		name
+		description
+		tokenBudget
+		recordTypes
+		selection {
+			... MemorySelectionDetails
+		}
+		query {
+			... MemoryQuerySourceDetails
+		}
+	}
+	queryTools {
+		toolName
+		description
+		recordTypes
+		tokenBudget
+		selection {
+			... MemorySelectionDetails
+		}
+		effortLevels {
+			level
+			tokenBudget
+		}
+	}
+	writeTools {
+		toolName
+		description
+		tagMappings {
+			kind
+			keys
+			tagKey
+			tagValue
+		}
+	}
+	createdAt
+	updatedAt
+}
+fragment MemoryQuerySourceDetails on MemoryQuerySource {
+	kind
+	text
+}
+fragment MemorySelectionDetails on MemorySelection {
+	kind
+	tags {
+		source
+		tagKey
+		tagValue
+		requestTagKey
+	}
+}
+`
+
+func GetMemoryInteractionProfile(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetMemoryInteractionProfileResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetMemoryInteractionProfile",
+		Query:  GetMemoryInteractionProfile_Operation,
+		Variables: &__GetMemoryInteractionProfileInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetMemoryInteractionProfileResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetMemoryStore.
+const GetMemoryStore_Operation = `
+query GetMemoryStore ($id: MemoryStoreID!) {
+	memoryStore(id: $id) {
+		... MemoryStoreDetails
+	}
+}
+fragment MemoryStoreDetails on MemoryStore {
+	id
+	name
+	description
+	ingestConversations
+	indexConversationMessages
+	embeddingProfile {
+		id
+	}
+	userNameTagKey
+	extractIntervalSeconds
+	consolidateIntervalSeconds
+	scopes {
+		... MemoryStoreScopeDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment MemoryStoreScopeDetails on MemoryStoreScope {
+	id
+	description
+	kind
+	key
+	value
+	match
+	extractionEnabled
+	extractionPrompt
+	extractionModelProfile {
+		id
+	}
+	consolidationEnabled
+	consolidationPrompt
+	consolidationModelProfile {
+		id
+	}
+}
+`
+
+func GetMemoryStore(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetMemoryStoreResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetMemoryStore",
+		Query:  GetMemoryStore_Operation,
+		Variables: &__GetMemoryStoreInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetMemoryStoreResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetMemoryStoreByName.
+const GetMemoryStoreByName_Operation = `
+query GetMemoryStoreByName ($name: String!) {
+	memoryStoreByName(name: $name) {
+		... MemoryStoreDetails
+	}
+}
+fragment MemoryStoreDetails on MemoryStore {
+	id
+	name
+	description
+	ingestConversations
+	indexConversationMessages
+	embeddingProfile {
+		id
+	}
+	userNameTagKey
+	extractIntervalSeconds
+	consolidateIntervalSeconds
+	scopes {
+		... MemoryStoreScopeDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment MemoryStoreScopeDetails on MemoryStoreScope {
+	id
+	description
+	kind
+	key
+	value
+	match
+	extractionEnabled
+	extractionPrompt
+	extractionModelProfile {
+		id
+	}
+	consolidationEnabled
+	consolidationPrompt
+	consolidationModelProfile {
+		id
+	}
+}
+`
+
+func GetMemoryStoreByName(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	name string,
+) (data_ *GetMemoryStoreByNameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetMemoryStoreByName",
+		Query:  GetMemoryStoreByName_Operation,
+		Variables: &__GetMemoryStoreByNameInput{
+			Name: name,
+		},
+	}
+
+	data_ = &GetMemoryStoreByNameResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -4158,6 +9147,9 @@ fragment ModelProfileDetails on ModelProfile {
 	name
 	description
 	tags
+	provider {
+		id
+	}
 	configuration {
 		__typename
 		... on ModelProfileConfigAnthropic {
@@ -4226,6 +9218,9 @@ fragment ModelProfileDetails on ModelProfile {
 	name
 	description
 	tags
+	provider {
+		id
+	}
 	configuration {
 		__typename
 		... on ModelProfileConfigAnthropic {
@@ -4406,6 +9401,209 @@ func GetModelSet(
 	return data_, err_
 }
 
+// The query executed by GetParticleArtifact.
+const GetParticleArtifact_Operation = `
+query GetParticleArtifact ($id: ParticleArtifactID!) {
+	particleArtifact(id: $id) {
+		... ParticleArtifactDetails
+	}
+}
+fragment ParticleArtifactDetails on ParticleArtifact {
+	id
+	name
+	version
+	description
+	capabilities {
+		http {
+			allowedHosts
+		}
+	}
+	credentials {
+		name
+		hosts
+		required
+		methods {
+			name
+			type
+			description
+			apiKeyLocation {
+				kind
+				name
+				scheme
+			}
+			oauth2 {
+				authorizationUrl
+				tokenUrl
+				deviceAuthUrl
+				scopes
+				flows
+			}
+			signingKey {
+				algorithm
+			}
+		}
+	}
+	tools {
+		name
+		description
+		inputSchema
+	}
+	createdAt
+}
+`
+
+func GetParticleArtifact(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetParticleArtifactResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetParticleArtifact",
+		Query:  GetParticleArtifact_Operation,
+		Variables: &__GetParticleArtifactInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetParticleArtifactResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetRubric.
+const GetRubric_Operation = `
+query GetRubric ($id: RubricID!) {
+	rubric(id: $id) {
+		... RubricDetails
+	}
+}
+fragment RubricDetails on Rubric {
+	id
+	name
+	description
+	createdAt
+	updatedAt
+	metrics {
+		__typename
+		... on RubricUserMetric {
+			userEntryID: id
+			userMetric {
+				id
+			}
+			userTrialCount: trialCount
+			complexity
+			inputValues
+			weight
+		}
+		... on RubricSystemMetric {
+			systemEntryID: id
+			systemMetric {
+				key
+			}
+			systemTrialCount: trialCount
+			complexity
+			inputValues
+			scoreFloor
+			scoreCeiling
+			lowerIsBetter
+			weight
+		}
+	}
+}
+`
+
+func GetRubric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetRubricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetRubric",
+		Query:  GetRubric_Operation,
+		Variables: &__GetRubricInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetRubricResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetSystemMetric.
+const GetSystemMetric_Operation = `
+query GetSystemMetric ($key: String!) {
+	systemMetric(key: $key) {
+		... SystemMetricDetails
+	}
+}
+fragment SystemMetricDetails on SystemMetric {
+	key
+	type
+	name
+	description
+	complexity
+	prompt
+	examples {
+		... ScoreExampleDetails
+	}
+	inputFields {
+		... JudgeInputFieldDetails
+	}
+}
+fragment ScoreExampleDetails on ScoreExample {
+	rating
+	scenario
+	judgment
+}
+fragment JudgeInputFieldDetails on JudgeInputField {
+	name
+	label
+	description
+	type
+	required
+}
+`
+
+func GetSystemMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	key string,
+) (data_ *GetSystemMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetSystemMetric",
+		Query:  GetSystemMetric_Operation,
+		Variables: &__GetSystemMetricInput{
+			Key: key,
+		},
+	}
+
+	data_ = &GetSystemMetricResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetTaskDefinition.
 const GetTaskDefinition_Operation = `
 query GetTaskDefinition ($id: TaskDefinitionID!) {
@@ -4492,6 +9690,67 @@ func GetTaskDefinitionByName(
 	return data_, err_
 }
 
+// The query executed by GetUserMetric.
+const GetUserMetric_Operation = `
+query GetUserMetric ($id: UserMetricID!) {
+	userMetric(id: $id) {
+		... UserMetricDetails
+	}
+}
+fragment UserMetricDetails on UserMetric {
+	id
+	name
+	description
+	prompt
+	complexity
+	examples {
+		... ScoreExampleDetails
+	}
+	inputFields {
+		... JudgeInputFieldDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment ScoreExampleDetails on ScoreExample {
+	rating
+	scenario
+	judgment
+}
+fragment JudgeInputFieldDetails on JudgeInputField {
+	name
+	label
+	description
+	type
+	required
+}
+`
+
+func GetUserMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetUserMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetUserMetric",
+		Query:  GetUserMetric_Operation,
+		Variables: &__GetUserMetricInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetUserMetricResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetWebhookDestination.
 const GetWebhookDestination_Operation = `
 query GetWebhookDestination ($id: WebhookDestinationID!) {
@@ -4539,6 +9798,162 @@ func GetWebhookDestination(
 	return data_, err_
 }
 
+// The query executed by GetWorkspace.
+const GetWorkspace_Operation = `
+query GetWorkspace ($id: WorkspaceID!) {
+	workspace(id: $id) {
+		... WorkspaceDetails
+	}
+}
+fragment WorkspaceDetails on Workspace {
+	id
+	name
+	scope
+	createdAt
+	updatedAt
+}
+`
+
+func GetWorkspace(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetWorkspaceResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetWorkspace",
+		Query:  GetWorkspace_Operation,
+		Variables: &__GetWorkspaceInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetWorkspaceResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetWorkspaceByName.
+const GetWorkspaceByName_Operation = `
+query GetWorkspaceByName ($name: String!) {
+	workspaceByName(name: $name) {
+		... WorkspaceDetails
+	}
+}
+fragment WorkspaceDetails on Workspace {
+	id
+	name
+	scope
+	createdAt
+	updatedAt
+}
+`
+
+func GetWorkspaceByName(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	name string,
+) (data_ *GetWorkspaceByNameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetWorkspaceByName",
+		Query:  GetWorkspaceByName_Operation,
+		Variables: &__GetWorkspaceByNameInput{
+			Name: name,
+		},
+	}
+
+	data_ = &GetWorkspaceByNameResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by ListSystemMetrics.
+const ListSystemMetrics_Operation = `
+query ListSystemMetrics ($first: Int!, $after: String) {
+	metrics(source: SYSTEM, first: $first, after: $after) {
+		totalCount
+		pageInfo {
+			hasNextPage
+			endCursor
+		}
+		edges {
+			node {
+				__typename
+				... on SystemMetric {
+					... SystemMetricDetails
+				}
+			}
+		}
+	}
+}
+fragment SystemMetricDetails on SystemMetric {
+	key
+	type
+	name
+	description
+	complexity
+	prompt
+	examples {
+		... ScoreExampleDetails
+	}
+	inputFields {
+		... JudgeInputFieldDetails
+	}
+}
+fragment ScoreExampleDetails on ScoreExample {
+	rating
+	scenario
+	judgment
+}
+fragment JudgeInputFieldDetails on JudgeInputField {
+	name
+	label
+	description
+	type
+	required
+}
+`
+
+func ListSystemMetrics(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	first int,
+	after *string,
+) (data_ *ListSystemMetricsResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ListSystemMetrics",
+		Query:  ListSystemMetrics_Operation,
+		Variables: &__ListSystemMetricsInput{
+			First: first,
+			After: after,
+		},
+	}
+
+	data_ = &ListSystemMetricsResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by ModifyAgent.
 const ModifyAgent_Operation = `
 mutation ModifyAgent ($id: AgentID!, $input: UpdateAgent!) {
@@ -4565,7 +9980,6 @@ fragment AgentDetails on Agent {
 		taskInstructions
 		modelComplexity
 		inputMessageType
-		preserveConversationHistory
 		sendThinkingToUser
 		sendMessagesToUser
 		mcpConnections {
@@ -4583,15 +9997,17 @@ fragment AgentDetails on Agent {
 				name
 			}
 		}
-		memorySlots {
+		memoryInteractionProfiles {
 			id
 			name
-			description
-			memoryType
-			memoryScope
-			canRead
-			canWrite
-			createdAt
+		}
+		particles {
+			installedParticle {
+				id
+			}
+			filterType
+			toolNames
+			toolNamePattern
 		}
 	}
 }
@@ -4673,6 +10089,113 @@ func ModifyApiKey(
 	return data_, err_
 }
 
+// The mutation executed by ModifyEmbeddingProfile.
+const ModifyEmbeddingProfile_Operation = `
+mutation ModifyEmbeddingProfile ($id: EmbeddingProfileID!, $input: UpdateEmbeddingProfile!) {
+	updateEmbeddingProfile(id: $id, input: $input) {
+		... EmbeddingProfileDetails
+	}
+}
+fragment EmbeddingProfileDetails on EmbeddingProfile {
+	id
+	name
+	description
+	dimensions
+	configuration {
+		__typename
+		... on EmbeddingProfileConfigOpenAI {
+			model
+			dimensions
+			sendDimensions
+		}
+		... on EmbeddingProfileConfigGoogle {
+			model
+			dimensions
+			sendDimensions
+			taskType
+		}
+	}
+	provider {
+		id
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyEmbeddingProfile(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateEmbeddingProfile,
+) (data_ *ModifyEmbeddingProfileResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyEmbeddingProfile",
+		Query:  ModifyEmbeddingProfile_Operation,
+		Variables: &__ModifyEmbeddingProfileInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyEmbeddingProfileResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyEvalMeshMonitor.
+const ModifyEvalMeshMonitor_Operation = `
+mutation ModifyEvalMeshMonitor ($id: EvalMeshMonitorID!, $input: UpdateEvalMeshMonitor!) {
+	updateEvalMeshMonitor(id: $id, input: $input) {
+		... EvalMeshMonitorDetails
+	}
+}
+fragment EvalMeshMonitorDetails on EvalMeshMonitor {
+	id
+	meshID
+	rubricID
+	modelSetID
+	enabled
+	sampleRate
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyEvalMeshMonitor(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input UpdateEvalMeshMonitor,
+) (data_ *ModifyEvalMeshMonitorResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyEvalMeshMonitor",
+		Query:  ModifyEvalMeshMonitor_Operation,
+		Variables: &__ModifyEvalMeshMonitorInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyEvalMeshMonitorResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by ModifyInput.
 const ModifyInput_Operation = `
 mutation ModifyInput ($meshId: MeshID!, $name: String!, $input: UpdateInput!) {
@@ -4716,6 +10239,60 @@ func ModifyInput(
 	}
 
 	data_ = &ModifyInputResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyInstalledParticle.
+const ModifyInstalledParticle_Operation = `
+mutation ModifyInstalledParticle ($input: UpdateInstalledParticleInput!) {
+	updateInstalledParticle(input: $input) {
+		... InstalledParticleDetails
+	}
+}
+fragment InstalledParticleDetails on InstalledParticle {
+	id
+	name
+	activeArtifact {
+		id
+		name
+		version
+	}
+	kvWorkspace {
+		id
+	}
+	mounts {
+		mountName
+		workspace {
+			id
+		}
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyInstalledParticle(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *UpdateInstalledParticleInput,
+) (data_ *ModifyInstalledParticleResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyInstalledParticle",
+		Query:  ModifyInstalledParticle_Operation,
+		Variables: &__ModifyInstalledParticleInput{
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyInstalledParticleResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -4840,6 +10417,177 @@ func ModifyMcpConnection(
 	return data_, err_
 }
 
+// The mutation executed by ModifyMemoryInteractionProfile.
+const ModifyMemoryInteractionProfile_Operation = `
+mutation ModifyMemoryInteractionProfile ($id: MemoryInteractionProfileID!, $input: UpdateMemoryInteractionProfile!) {
+	updateMemoryInteractionProfile(id: $id, input: $input) {
+		... MemoryInteractionProfileDetails
+	}
+}
+fragment MemoryInteractionProfileDetails on MemoryInteractionProfile {
+	id
+	name
+	description
+	allowExpansion
+	conversationHistory {
+		tokenBudget
+		selection
+		query {
+			... MemoryQuerySourceDetails
+		}
+	}
+	contextInjections {
+		name
+		description
+		tokenBudget
+		recordTypes
+		selection {
+			... MemorySelectionDetails
+		}
+		query {
+			... MemoryQuerySourceDetails
+		}
+	}
+	queryTools {
+		toolName
+		description
+		recordTypes
+		tokenBudget
+		selection {
+			... MemorySelectionDetails
+		}
+		effortLevels {
+			level
+			tokenBudget
+		}
+	}
+	writeTools {
+		toolName
+		description
+		tagMappings {
+			kind
+			keys
+			tagKey
+			tagValue
+		}
+	}
+	createdAt
+	updatedAt
+}
+fragment MemoryQuerySourceDetails on MemoryQuerySource {
+	kind
+	text
+}
+fragment MemorySelectionDetails on MemorySelection {
+	kind
+	tags {
+		source
+		tagKey
+		tagValue
+		requestTagKey
+	}
+}
+`
+
+func ModifyMemoryInteractionProfile(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateMemoryInteractionProfile,
+) (data_ *ModifyMemoryInteractionProfileResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyMemoryInteractionProfile",
+		Query:  ModifyMemoryInteractionProfile_Operation,
+		Variables: &__ModifyMemoryInteractionProfileInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyMemoryInteractionProfileResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyMemoryStore.
+const ModifyMemoryStore_Operation = `
+mutation ModifyMemoryStore ($id: MemoryStoreID!, $input: UpdateMemoryStore!) {
+	updateMemoryStore(id: $id, input: $input) {
+		... MemoryStoreDetails
+	}
+}
+fragment MemoryStoreDetails on MemoryStore {
+	id
+	name
+	description
+	ingestConversations
+	indexConversationMessages
+	embeddingProfile {
+		id
+	}
+	userNameTagKey
+	extractIntervalSeconds
+	consolidateIntervalSeconds
+	scopes {
+		... MemoryStoreScopeDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment MemoryStoreScopeDetails on MemoryStoreScope {
+	id
+	description
+	kind
+	key
+	value
+	match
+	extractionEnabled
+	extractionPrompt
+	extractionModelProfile {
+		id
+	}
+	consolidationEnabled
+	consolidationPrompt
+	consolidationModelProfile {
+		id
+	}
+}
+`
+
+func ModifyMemoryStore(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateMemoryStore,
+) (data_ *ModifyMemoryStoreResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyMemoryStore",
+		Query:  ModifyMemoryStore_Operation,
+		Variables: &__ModifyMemoryStoreInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyMemoryStoreResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by ModifyMesh.
 const ModifyMesh_Operation = `
 mutation ModifyMesh ($id: MeshID!, $input: UpdateMesh!) {
@@ -4905,6 +10653,9 @@ fragment ModelProfileDetails on ModelProfile {
 	name
 	description
 	tags
+	provider {
+		id
+	}
 	configuration {
 		__typename
 		... on ModelProfileConfigAnthropic {
@@ -5089,6 +10840,75 @@ func ModifyModelSet(
 	return data_, err_
 }
 
+// The mutation executed by ModifyRubric.
+const ModifyRubric_Operation = `
+mutation ModifyRubric ($id: RubricID!, $input: UpdateRubric!) {
+	updateRubric(id: $id, input: $input) {
+		... RubricDetails
+	}
+}
+fragment RubricDetails on Rubric {
+	id
+	name
+	description
+	createdAt
+	updatedAt
+	metrics {
+		__typename
+		... on RubricUserMetric {
+			userEntryID: id
+			userMetric {
+				id
+			}
+			userTrialCount: trialCount
+			complexity
+			inputValues
+			weight
+		}
+		... on RubricSystemMetric {
+			systemEntryID: id
+			systemMetric {
+				key
+			}
+			systemTrialCount: trialCount
+			complexity
+			inputValues
+			scoreFloor
+			scoreCeiling
+			lowerIsBetter
+			weight
+		}
+	}
+}
+`
+
+func ModifyRubric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateRubric,
+) (data_ *ModifyRubricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyRubric",
+		Query:  ModifyRubric_Operation,
+		Variables: &__ModifyRubricInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyRubricResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by ModifyTaskDefinition.
 const ModifyTaskDefinition_Operation = `
 mutation ModifyTaskDefinition ($id: TaskDefinitionID!, $input: UpdateTaskDefinition!) {
@@ -5123,6 +10943,69 @@ func ModifyTaskDefinition(
 	}
 
 	data_ = &ModifyTaskDefinitionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyUserMetric.
+const ModifyUserMetric_Operation = `
+mutation ModifyUserMetric ($id: UserMetricID!, $input: UpdateUserMetric!) {
+	updateUserMetric(id: $id, input: $input) {
+		... UserMetricDetails
+	}
+}
+fragment UserMetricDetails on UserMetric {
+	id
+	name
+	description
+	prompt
+	complexity
+	examples {
+		... ScoreExampleDetails
+	}
+	inputFields {
+		... JudgeInputFieldDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment ScoreExampleDetails on ScoreExample {
+	rating
+	scenario
+	judgment
+}
+fragment JudgeInputFieldDetails on JudgeInputField {
+	name
+	label
+	description
+	type
+	required
+}
+`
+
+func ModifyUserMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateUserMetric,
+) (data_ *ModifyUserMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyUserMetric",
+		Query:  ModifyUserMetric_Operation,
+		Variables: &__ModifyUserMetricInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyUserMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -5172,6 +11055,49 @@ func ModifyWebhookDestination(
 	}
 
 	data_ = &ModifyWebhookDestinationResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by RenameWorkspace.
+const RenameWorkspace_Operation = `
+mutation RenameWorkspace ($id: WorkspaceID!, $name: String!) {
+	renameWorkspace(id: $id, name: $name) {
+		... WorkspaceDetails
+	}
+}
+fragment WorkspaceDetails on Workspace {
+	id
+	name
+	scope
+	createdAt
+	updatedAt
+}
+`
+
+func RenameWorkspace(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	name string,
+) (data_ *RenameWorkspaceResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "RenameWorkspace",
+		Query:  RenameWorkspace_Operation,
+		Variables: &__RenameWorkspaceInput{
+			Id:   id,
+			Name: name,
+		},
+	}
+
+	data_ = &RenameWorkspaceResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

@@ -3,7 +3,6 @@ package provider
 import (
 	"maps"
 
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -88,37 +87,6 @@ func standardSchemaAttributes(attrs map[string]schema.Attribute) map[string]sche
 	}
 
 	return mergedAttrs
-}
-
-// Data source nested attribute objects.
-var memorySlotDataSourceType = dsschema.NestedAttributeObject{
-	Attributes: map[string]dsschema.Attribute{
-		"name": dsschema.StringAttribute{
-			MarkdownDescription: "Memory slot name",
-			Computed:            true,
-		},
-		"description": dsschema.StringAttribute{
-			MarkdownDescription: "Memory slot description",
-			Computed:            true,
-		},
-		"memory_type": dsschema.StringAttribute{
-			CustomType:          jsontypes.NormalizedType{},
-			MarkdownDescription: "Schema defining the structure of data stored in this memory slot",
-			Computed:            true,
-		},
-		"memory_scope": dsschema.StringAttribute{
-			MarkdownDescription: "Scope of the memory slot (e.g., 'conversation', 'user')",
-			Computed:            true,
-		},
-		"can_read": dsschema.StringAttribute{
-			MarkdownDescription: "Permission level for reading memory",
-			Computed:            true,
-		},
-		"can_write": dsschema.StringAttribute{
-			MarkdownDescription: "Permission level for writing memory",
-			Computed:            true,
-		},
-	},
 }
 
 var mcpConnectionDataSourceType = dsschema.NestedAttributeObject{

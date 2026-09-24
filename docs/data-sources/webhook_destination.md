@@ -25,6 +25,7 @@ Webhook Destination data source
 - `description` (String) Resource description
 - `external_id` (String) External ID for the webhook destination
 - `input_name` (String) Name of the input to invoke
+- `invoke_url` (String) URL to invoke the webhook destination
 - `mesh_id` (String) ID of the mesh associated with this webhook destination
 - `mesh_version_label` (String) Optional mesh version label
 - `name` (String) Resource name

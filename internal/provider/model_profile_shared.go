@@ -36,6 +36,7 @@ func (m *ModelProfileBaseModel) MapFromGraphQL(ctx context.Context, details pgql
 		&m.CreatedAt, details.CreatedAt,
 		&m.UpdatedAt, details.UpdatedAt,
 		&m.Tags, details.Tags,
+		&m.ModelProviderId, details.Provider.Id,
 	)
 
 	// Clear all blocks

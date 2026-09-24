@@ -1,6 +1,11 @@
 # Default genqlient config; for full documentation see:
 # https://github.com/Khan/genqlient/blob/main/docs/genqlient.yaml
-schema: ../mesh/pkg/graph/schema.graphqls
+# The enterprise schema extends the mesh one. Regenerating needs both
+# checkouts beside this repo; the generated code is committed, so building does
+# not.
+schema:
+  - ../mesh/pkg/graph/schema.graphqls
+  - ../mesh-enterprise/pkg/graph/schema.graphqls
 operations:
   - internal/graphql/genqlient.graphql
 generated: internal/graphql/generated.go
@@ -20,6 +25,10 @@ bindings:
     type: string
   MemorySlotID:
     type: string
+  ParticleArtifactID:
+    type: string
+  InstalledParticleID:
+    type: string
   MeshID:
     type: string
   MeshVersionID:
@@ -32,6 +41,26 @@ bindings:
     type: string
   ModelSetID:
     type: string
+  EmbeddingProfileID:
+    type: string
+  MemoryStoreID:
+    type: string
+  MemoryStoreScopeID:
+    type: string
+  MemoryInteractionProfileID:
+    type: string
+  WorkspaceID:
+    type: string
+  RubricID:
+    type: string
+  RubricUserMetricID:
+    type: string
+  RubricSystemMetricID:
+    type: string
+  UserMetricID:
+    type: string
+  EvalMeshMonitorID:
+    type: string
   TaskDefinitionID:
     type: string
   TaskAgentAssociationID:
@@ -39,6 +68,8 @@ bindings:
   SerializableType:
     type: "encoding/json.RawMessage"
   SerializableTMap:
+    type: "encoding/json.RawMessage"
+  JSON:
     type: "encoding/json.RawMessage"
   Tag:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.Tag"
@@ -80,3 +111,23 @@ bindings:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewTaskDefinition"
   UpdateTaskDefinition:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateTaskDefinition"
+  CreateInstalledParticleInput:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.CreateInstalledParticleInput"
+  UpdateInstalledParticleInput:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateInstalledParticleInput"
+  NewEmbeddingProfile:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewEmbeddingProfile"
+  UpdateEmbeddingProfile:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateEmbeddingProfile"
+  NewMemoryStore:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewMemoryStore"
+  UpdateMemoryStore:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateMemoryStore"
+  NewMemoryInteractionProfile:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewMemoryInteractionProfile"
+  UpdateUserMetric:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateUserMetric"
+  UpdateRubric:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateRubric"
+  UpdateMemoryInteractionProfile:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateMemoryInteractionProfile"

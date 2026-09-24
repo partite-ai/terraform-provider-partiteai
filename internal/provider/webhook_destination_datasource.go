@@ -52,6 +52,10 @@ func (d *WebhookDestinationDataSource) Schema(ctx context.Context, req datasourc
 				Computed:            true,
 				MarkdownDescription: "Name of the input to invoke",
 			},
+			"invoke_url": schema.StringAttribute{
+				Computed:            true,
+				MarkdownDescription: "URL to invoke the webhook destination",
+			},
 			"created_at": commonDataSourceSchemas.createdAt,
 			"updated_at": commonDataSourceSchemas.updatedAt,
 		},

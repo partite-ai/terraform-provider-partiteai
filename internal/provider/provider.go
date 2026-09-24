@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -30,9 +31,10 @@ type PartiteAIProvider struct {
 
 // PartiteAIProviderModel describes the provider data model.
 type PartiteAIProviderModel struct {
-	Endpoint  types.String `tfsdk:"endpoint"`
-	APIKey    types.String `tfsdk:"api_key"`
-	APISecret types.String `tfsdk:"api_secret"`
+	Endpoint   types.String `tfsdk:"endpoint"`
+	APIKey     types.String `tfsdk:"api_key"`
+	APISecret  types.String `tfsdk:"api_secret"`
+	Enterprise types.Bool   `tfsdk:"enterprise"`
 }
 
 func (p *PartiteAIProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -56,6 +58,13 @@ func (p *PartiteAIProvider) Schema(ctx context.Context, req provider.SchemaReque
 				MarkdownDescription: "The API secret used to authenticate with the Partite AI API.",
 				Optional:            true,
 				Sensitive:           true,
+			},
+			"enterprise": schema.BoolAttribute{
+				MarkdownDescription: "Whether the endpoint is an enterprise deployment. Some resources, " +
+					"such as `partiteai_rubric` and `partiteai_eval_mesh_monitor`, exist only there and the " +
+					"provider refuses to use them anywhere else. Defaults to true when the endpoint's host " +
+					"ends with `.partite.ai`, and false otherwise, so a self-hosted mesh does not have to set it.",
+				Optional: true,
 			},
 		},
 	}
@@ -87,6 +96,15 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 			"Unknown API Key",
 			"The provider cannot create the Partite.ai API client as there is an unknown configuration value for the API key. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or use the PARTITE_AI_API_KEY environment variable.",
+		)
+	}
+
+	if config.Enterprise.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("enterprise"),
+			"Unknown enterprise flag",
+			"The provider cannot tell whether this endpoint is an enterprise deployment because the value is unknown. "+
+				"Either target apply the source of the value first, or set it statically in the configuration.",
 		)
 	}
 
@@ -158,10 +176,35 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 		return
 	}
 
+	enterprise := isEnterpriseEndpoint(endpoint)
+	if !config.Enterprise.IsNull() {
+		enterprise = config.Enterprise.ValueBool()
+	}
+
 	if p.client != nil {
 		// Use the configured client if it was provided (e.g. for testing).
-		resp.DataSourceData = p.client
-		resp.ResourceData = p.client
+		// Resources and data sources always read a *providerData, so an
+		// injected client has to arrive wrapped in one.
+		baseURL, err := url.Parse(endpoint)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Invalid endpoint URL",
+				"The provider cannot create the Partite.ai API client because the endpoint URL is invalid: "+err.Error(),
+			)
+			return
+		}
+		graphqlURL := *baseURL
+		baseURL.Path = ""
+
+		data := &providerData{
+			client:     p.client,
+			baseURL:    baseURL,
+			httpClient: http.DefaultClient,
+			graphqlURL: &graphqlURL,
+			enterprise: enterprise,
+		}
+		resp.DataSourceData = data
+		resp.ResourceData = data
 		return
 	}
 
@@ -174,6 +217,15 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 
 	client := graphql.NewClient(endpoint, httpClient)
 
+	graphqlURL, err := url.Parse(endpoint)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Invalid endpoint URL",
+			"The provider cannot create the Partite.ai API client because the endpoint URL is invalid: "+err.Error(),
+		)
+		return
+	}
+
 	baseURL, err := url.Parse(endpoint)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -184,14 +236,15 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 	}
 	baseURL.Path = ""
 
-	resp.DataSourceData = &providerData{
-		client:  client,
-		baseURL: baseURL,
+	data := &providerData{
+		client:     client,
+		baseURL:    baseURL,
+		httpClient: httpClient,
+		graphqlURL: graphqlURL,
+		enterprise: enterprise,
 	}
-	resp.ResourceData = &providerData{
-		client:  client,
-		baseURL: baseURL,
-	}
+	resp.DataSourceData = data
+	resp.ResourceData = data
 }
 
 func (p *PartiteAIProvider) Resources(ctx context.Context) []func() resource.Resource {
@@ -207,6 +260,15 @@ func (p *PartiteAIProvider) Resources(ctx context.Context) []func() resource.Res
 		NewMeshLinkResource,
 		NewMeshInputResource,
 		NewTaskDefinitionResource,
+		NewParticleArtifactResource,
+		NewInstalledParticleResource,
+		NewEmbeddingProfileResource,
+		NewMemoryStoreResource,
+		NewMemoryInteractionProfileResource,
+		NewWorkspaceResource,
+		NewUserMetricResource,
+		NewRubricResource,
+		NewEvalMeshMonitorResource,
 	}
 }
 
@@ -227,6 +289,16 @@ func (p *PartiteAIProvider) DataSources(ctx context.Context) []func() datasource
 		NewModelProfileDataSource,
 		NewModelSetDataSource,
 		NewTaskDefinitionDataSource,
+		NewParticleArtifactDataSource,
+		NewInstalledParticleDataSource,
+		NewEmbeddingProfileDataSource,
+		NewMemoryStoreDataSource,
+		NewMemoryInteractionProfileDataSource,
+		NewWorkspaceDataSource,
+		NewUserMetricDataSource,
+		NewRubricDataSource,
+		NewEvalMeshMonitorDataSource,
+		NewSystemMetricDataSource,
 	}
 }
 
@@ -262,6 +334,25 @@ func (t *authTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 type providerData struct {
-	client  graphql.Client
-	baseURL *url.URL
+	client     graphql.Client
+	baseURL    *url.URL
+	httpClient *http.Client
+	graphqlURL *url.URL
+	// enterprise gates the resources that only an enterprise deployment
+	// serves.
+	enterprise bool
+}
+
+// enterpriseHostSuffix is the domain a Partite-run deployment answers on.
+const enterpriseHostSuffix = ".partite.ai"
+
+// isEnterpriseEndpoint is the default for the provider's `enterprise` flag: a
+// deployment Partite runs is an enterprise one, and anything else — a mesh
+// someone runs themselves — is not, until the configuration says otherwise.
+func isEnterpriseEndpoint(endpoint string) bool {
+	parsed, err := url.Parse(endpoint)
+	if err != nil {
+		return false
+	}
+	return strings.HasSuffix(strings.ToLower(parsed.Hostname()), enterpriseHostSuffix)
 }

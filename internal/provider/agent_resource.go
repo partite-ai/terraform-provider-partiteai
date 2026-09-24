@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
@@ -37,31 +36,6 @@ type AgentResource struct {
 
 type AgentResourceModel struct {
 	AgentBaseModel
-}
-
-var memorySlotType = schema.NestedAttributeObject{
-	Attributes: map[string]schema.Attribute{
-		"name": schema.StringAttribute{
-			MarkdownDescription: "Memory slot name",
-			Required:            true,
-		},
-		"description": schema.StringAttribute{
-			MarkdownDescription: "Memory slot description",
-			Optional:            true,
-		},
-		"memory_type": schema.StringAttribute{
-			CustomType:          jsontypes.NormalizedType{},
-			MarkdownDescription: "Schema defining the structure of data stored in this memory slot",
-			Required:            true,
-		},
-		"memory_scope": schema.StringAttribute{
-			MarkdownDescription: "Scope of the memory slot (e.g., 'conversation', 'user')",
-			Required:            true,
-			Validators: []validator.String{
-				commonValidators.memoryScope,
-			},
-		},
-	},
 }
 
 var mcpConnectionType = schema.NestedAttributeObject{
@@ -103,6 +77,36 @@ var taskAssociationType = schema.NestedAttributeObject{
 	},
 }
 
+var particleAssociationType = schema.NestedAttributeObject{
+	Attributes: map[string]schema.Attribute{
+		"id": schema.StringAttribute{
+			MarkdownDescription: "Installed particle identifier",
+			Required:            true,
+		},
+		"filter_type": schema.StringAttribute{
+			MarkdownDescription: "Tool filter type. One of 'NONE', 'LIST', or 'PATTERN'.",
+			Required:            true,
+			Validators: []validator.String{
+				stringvalidator.OneOf("NONE", "LIST", "PATTERN"),
+			},
+		},
+		"tool_names": schema.ListAttribute{
+			ElementType:         types.StringType,
+			MarkdownDescription: "Tool names to expose. Required (and non-empty) when filter_type is LIST.",
+			Optional:            true,
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+				listvalidator.UniqueValues(),
+				listvalidator.NoNullValues(),
+			},
+		},
+		"tool_name_pattern": schema.StringAttribute{
+			MarkdownDescription: "Regex matched against tool names. Required when filter_type is PATTERN.",
+			Optional:            true,
+		},
+	},
+}
+
 func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Agent resource",
@@ -134,12 +138,19 @@ func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				NestedObject:        taskAssociationType,
 				Default:             setdefault.StaticValue(types.SetValueMust(taskAssociationType.Type(), nil)),
 			},
-			"memory_slots": schema.SetNestedAttribute{
-				MarkdownDescription: "List of memory slots for the agent",
+			"particles": schema.SetNestedAttribute{
+				MarkdownDescription: "List of installed particles exposed to the agent.",
 				Optional:            true,
 				Computed:            true,
-				NestedObject:        memorySlotType,
-				Default:             setdefault.StaticValue(types.SetValueMust(memorySlotType.Type(), nil)),
+				NestedObject:        particleAssociationType,
+				Default:             setdefault.StaticValue(types.SetValueMust(particleAssociationType.Type(), nil)),
+			},
+			"memory_interaction_profile_ids": schema.SetAttribute{
+				MarkdownDescription: "IDs of the memory interaction profiles this agent holds. A profile decides what memory goes in the agent's prompt and which memory tools it can call.",
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, nil)),
 			},
 			"identity": schema.StringAttribute{
 				MarkdownDescription: "A brief description of the agent's identity, such as its role or persona.",
@@ -160,12 +171,6 @@ func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				CustomType:          jsontypes.NormalizedType{},
 				MarkdownDescription: "Schema defining the structure of input messages the agent can process",
 				Required:            true,
-			},
-			"preserve_conversation_history": schema.BoolAttribute{
-				MarkdownDescription: "Whether the agent should retain conversation history for context in future interactions",
-				Optional:            true,
-				Computed:            true,
-				Default:             booldefault.StaticBool(false),
 			},
 			"send_thinking_to_user": schema.BoolAttribute{
 				MarkdownDescription: "Whether the agent should send 'thinking' messages to the user",
@@ -198,24 +203,10 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	var memorySlots []pgql.NewMemorySlot
-	if !data.MemorySlots.IsNull() {
-		for _, v := range data.MemorySlots.Elements() {
-			var memorySlot memorySlotInfo
-			if diag := tfsdk.ValueAs(ctx, v, &memorySlot); diag.HasError() {
-				resp.Diagnostics.Append(diag...)
-				return
-			}
-
-			memorySlots = append(memorySlots, pgql.NewMemorySlot{
-				Name:        memorySlot.Name,
-				Description: memorySlot.Description,
-				MemoryType:  memorySlot.MemoryType.ValueString(),
-				Scope:       pgql.MemoryScope(memorySlot.MemoryScope),
-				CanRead:     pgql.OptPtr(memorySlot.CanRead.ValueStringPointer()),
-				CanWrite:    pgql.OptPtr(memorySlot.CanWrite.ValueStringPointer()),
-			})
-		}
+	memoryProfiles, diags := memoryProfileAssociations(ctx, data.MemoryInteractionProfileIds)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
 	var mcpConnections []pgql.NewMcpConnectionAgentAssociation
@@ -259,20 +250,49 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		}
 	}
 
+	var particles []pgql.NewParticleAgentAssociation
+	if !data.Particles.IsNull() {
+		var particleStructs []particleAssociationInfo
+		if diag := data.Particles.ElementsAs(ctx, &particleStructs, false); diag.HasError() {
+			resp.Diagnostics.Append(diag...)
+			return
+		}
+		for _, v := range particleStructs {
+			pa := pgql.NewParticleAgentAssociation{
+				InstalledParticleID: v.Id,
+				FilterType:          pgql.ToolFilterType(v.FilterType.ValueString()),
+			}
+			switch pa.FilterType {
+			case pgql.ToolFilterTypeList:
+				var toolNames []string
+				if !v.ToolNames.IsNull() {
+					if diag := v.ToolNames.ElementsAs(ctx, &toolNames, false); diag.HasError() {
+						resp.Diagnostics.Append(diag...)
+						return
+					}
+				}
+				pa.ToolNames = toolNames
+			case pgql.ToolFilterTypePattern:
+				pa.ToolNamePattern = v.ToolNamePattern.ValueStringPointer()
+			}
+			particles = append(particles, pa)
+		}
+	}
+
 	createResp, err := pgql.CreateAgent(ctx, r.GetClient(), &pgql.NewAgent{
-		Name:                        data.Name.ValueString(),
-		Description:                 pgql.OptPtr(data.Description.ValueStringPointer()),
-		Tags:                        tags,
-		Identity:                    pgql.OptPtr(data.Identity.ValueStringPointer()),
-		TaskInstructions:            data.TaskInstructions.ValueString(),
-		ModelComplexity:             pgql.ModelComplexity(data.ModelComplexity.ValueString()),
-		InputMessageType:            data.InputMessageType.ValueString(),
-		SendThinkingToUser:          pgql.OptPtr(data.SendThinkingToUser.ValueBoolPointer()),
-		SendMessagesToUser:          pgql.OptPtr(data.SendMessagesToUser.ValueBoolPointer()),
-		PreserveConversationHistory: pgql.OptPtr(data.PreserveConversationHistory.ValueBoolPointer()),
-		MemorySlots:                 memorySlots,
-		McpConnections:              mcpConnections,
-		Tasks:                       tasks,
+		Name:                      data.Name.ValueString(),
+		Description:               pgql.OptPtr(data.Description.ValueStringPointer()),
+		Tags:                      tags,
+		Identity:                  pgql.OptPtr(data.Identity.ValueStringPointer()),
+		TaskInstructions:          data.TaskInstructions.ValueString(),
+		ModelComplexity:           pgql.ModelComplexity(data.ModelComplexity.ValueString()),
+		InputMessageType:          data.InputMessageType.ValueString(),
+		SendThinkingToUser:        pgql.OptPtr(data.SendThinkingToUser.ValueBoolPointer()),
+		SendMessagesToUser:        pgql.OptPtr(data.SendMessagesToUser.ValueBoolPointer()),
+		McpConnections:            mcpConnections,
+		Particles:                 particles,
+		MemoryInteractionProfiles: memoryProfiles,
+		Tasks:                     tasks,
 	})
 
 	if err != nil {
@@ -357,32 +377,13 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		update.SendMessagesToUser = pgql.OptPtr(planData.SendMessagesToUser.ValueBoolPointer())
 	}
 
-	if !planData.PreserveConversationHistory.Equal(stateData.PreserveConversationHistory) {
-		update.PreserveConversationHistory = pgql.OptPtr(planData.PreserveConversationHistory.ValueBoolPointer())
-	}
-
-	if !planData.MemorySlots.Equal(stateData.MemorySlots) {
-		var memorySlots []pgql.NewMemorySlot
-		if !planData.MemorySlots.IsNull() {
-			for _, v := range planData.MemorySlots.Elements() {
-				var memorySlot memorySlotInfo
-				if diag := tfsdk.ValueAs(ctx, v, &memorySlot); diag.HasError() {
-					resp.Diagnostics.Append(diag...)
-					return
-				}
-
-				memorySlots = append(memorySlots, pgql.NewMemorySlot{
-					Name:        memorySlot.Name,
-					Description: memorySlot.Description,
-					MemoryType:  memorySlot.MemoryType.ValueString(),
-					Scope:       pgql.MemoryScope(memorySlot.MemoryScope),
-					CanRead:     pgql.OptPtr(memorySlot.CanRead.ValueStringPointer()),
-					CanWrite:    pgql.OptPtr(memorySlot.CanWrite.ValueStringPointer()),
-				})
-			}
+	if !planData.MemoryInteractionProfileIds.Equal(stateData.MemoryInteractionProfileIds) {
+		profiles, diags := memoryProfileAssociations(ctx, planData.MemoryInteractionProfileIds)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
 		}
-
-		update.MemorySlots = pgql.Opt(memorySlots)
+		update.MemoryInteractionProfiles = pgql.Opt(profiles)
 	}
 
 	if !planData.McpConnections.Equal(stateData.McpConnections) {
@@ -432,6 +433,38 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		update.Tasks = pgql.Opt(tasks)
 	}
 
+	if !planData.Particles.Equal(stateData.Particles) {
+		var particles []pgql.NewParticleAgentAssociation
+		if !planData.Particles.IsNull() {
+			var particleStructs []particleAssociationInfo
+			if diag := planData.Particles.ElementsAs(ctx, &particleStructs, false); diag.HasError() {
+				resp.Diagnostics.Append(diag...)
+				return
+			}
+			for _, v := range particleStructs {
+				pa := pgql.NewParticleAgentAssociation{
+					InstalledParticleID: v.Id,
+					FilterType:          pgql.ToolFilterType(v.FilterType.ValueString()),
+				}
+				switch pa.FilterType {
+				case pgql.ToolFilterTypeList:
+					var toolNames []string
+					if !v.ToolNames.IsNull() {
+						if diag := v.ToolNames.ElementsAs(ctx, &toolNames, false); diag.HasError() {
+							resp.Diagnostics.Append(diag...)
+							return
+						}
+					}
+					pa.ToolNames = toolNames
+				case pgql.ToolFilterTypePattern:
+					pa.ToolNamePattern = v.ToolNamePattern.ValueStringPointer()
+				}
+				particles = append(particles, pa)
+			}
+		}
+		update.Particles = pgql.Opt(particles)
+	}
+
 	updateResp, err := pgql.ModifyAgent(ctx, r.GetClient(), planData.Id.ValueString(), &update)
 	if err != nil {
 		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "agent", planData.Id.ValueString())
@@ -468,4 +501,26 @@ func (r *AgentResource) ImportState(ctx context.Context, req resource.ImportStat
 
 func (r *AgentResource) mapResponse(ctx context.Context, data *AgentResourceModel, agentDetails pgql.AgentDetails) diag.Diagnostics {
 	return data.MapFromGraphQL(ctx, agentDetails)
+}
+
+// memoryProfileAssociations turns the profile ids a configuration names into
+// the associations one agent version is written with.
+func memoryProfileAssociations(
+	ctx context.Context,
+	ids types.Set,
+) ([]pgql.NewMemoryInteractionProfileAgentAssociation, diag.Diagnostics) {
+	if ids.IsNull() || ids.IsUnknown() {
+		return nil, nil
+	}
+	var named []string
+	if diags := ids.ElementsAs(ctx, &named, false); diags.HasError() {
+		return nil, diags
+	}
+	out := make([]pgql.NewMemoryInteractionProfileAgentAssociation, 0, len(named))
+	for _, id := range named {
+		out = append(out, pgql.NewMemoryInteractionProfileAgentAssociation{
+			MemoryInteractionProfileID: id,
+		})
+	}
+	return out, nil
 }

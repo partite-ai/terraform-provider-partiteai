@@ -19,3 +19,4 @@ description: |-
 - `api_key` (String) The API key used to authenticate with the Partite AI API.
 - `api_secret` (String, Sensitive) The API secret used to authenticate with the Partite AI API.
 - `endpoint` (String) The base URL for the Partite AI API. For example, `https://api.partite.ai/graphql`
+- `enterprise` (Boolean) Whether the endpoint is an enterprise deployment. Some resources, such as `partiteai_rubric` and `partiteai_eval_mesh_monitor`, exist only there and the provider refuses to use them anywhere else. Defaults to true when the endpoint's host ends with `.partite.ai`, and false otherwise, so a self-hosted mesh does not have to set it.

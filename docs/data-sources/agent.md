@@ -26,10 +26,10 @@ Agent data source
 - `identity` (String) A brief description of the agent's identity, such as its role or persona.
 - `input_message_type` (String) Schema defining the structure of input messages the agent can process
 - `mcp_connections` (Attributes Set) List of MCP connections associated with the agent (see [below for nested schema](#nestedatt--mcp_connections))
-- `memory_slots` (Attributes Set) List of memory slots for the agent (see [below for nested schema](#nestedatt--memory_slots))
+- `memory_interaction_profile_ids` (Set of String) IDs of the memory interaction profiles this agent holds
 - `model_complexity` (String) Defines the complexity of the model the agent uses.
 - `name` (String) Resource name
-- `preserve_conversation_history` (Boolean) Whether the agent should retain conversation history for context in future interactions
+- `particles` (Attributes Set) List of installed particles exposed to the agent. (see [below for nested schema](#nestedatt--particles))
 - `send_messages_to_user` (Boolean) Whether the agent should send messages to the user
 - `send_thinking_to_user` (Boolean) Whether the agent should send 'thinking' messages to the user
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
@@ -51,17 +51,15 @@ Read-Only:
 - `tool_names` (List of String) List of tool names associated with the MCP connection
 
 
-<a id="nestedatt--memory_slots"></a>
-### Nested Schema for `memory_slots`
+<a id="nestedatt--particles"></a>
+### Nested Schema for `particles`
 
 Read-Only:
 
-- `can_read` (String) Permission level for reading memory
-- `can_write` (String) Permission level for writing memory
-- `description` (String) Memory slot description
-- `memory_scope` (String) Scope of the memory slot (e.g., 'conversation', 'user')
-- `memory_type` (String) Schema defining the structure of data stored in this memory slot
-- `name` (String) Memory slot name
+- `filter_type` (String)
+- `id` (String)
+- `tool_name_pattern` (String)
+- `tool_names` (List of String)
 
 
 <a id="nestedatt--tags"></a>

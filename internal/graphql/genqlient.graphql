@@ -16,7 +16,6 @@ fragment AgentDetails on Agent {
     taskInstructions
     modelComplexity
     inputMessageType
-    preserveConversationHistory
     sendThinkingToUser
     sendMessagesToUser
     mcpConnections {
@@ -34,15 +33,17 @@ fragment AgentDetails on Agent {
         name
       }
     }
-    memorySlots {
+    memoryInteractionProfiles {
       id
       name
-      description
-      memoryType
-      memoryScope
-      canRead
-      canWrite
-      createdAt
+    }
+    particles {
+      installedParticle {
+        id
+      }
+      filterType
+      toolNames
+      toolNamePattern
     }
   }
 }
@@ -248,6 +249,9 @@ fragment ModelProfileDetails on ModelProfile {
   name
   description
   tags
+  provider {
+    id
+  }
   configuration {
     ... on ModelProfileConfigAnthropic {
       model
@@ -608,7 +612,10 @@ mutation CreateTaskDefinition($input: NewTaskDefinition!) {
   }
 }
 
-mutation ModifyTaskDefinition($id: TaskDefinitionID!, $input: UpdateTaskDefinition!) {
+mutation ModifyTaskDefinition(
+  $id: TaskDefinitionID!
+  $input: UpdateTaskDefinition!
+) {
   # @genqlient(flatten: true)
   updateTaskDefinition(taskDefinitionID: $id, input: $input) {
     ...TaskDefinitionDetails
@@ -618,5 +625,598 @@ mutation ModifyTaskDefinition($id: TaskDefinitionID!, $input: UpdateTaskDefiniti
 mutation DeleteTaskDefinition($id: TaskDefinitionID!) {
   deleteTaskDefinitions(taskDefinitionIDs: [$id]) {
     ids
+  }
+}
+
+# @genqlient(typename: "ParticleArtifactDetails")
+fragment ParticleArtifactDetails on ParticleArtifact {
+  id
+  name
+  version
+  description
+  capabilities {
+    http {
+      allowedHosts
+    }
+  }
+  credentials {
+    name
+    hosts
+    required
+    methods {
+      name
+      type
+      description
+      apiKeyLocation {
+        kind
+        name
+        scheme
+      }
+      oauth2 {
+        authorizationUrl
+        tokenUrl
+        deviceAuthUrl
+        scopes
+        flows
+      }
+      signingKey {
+        algorithm
+      }
+    }
+  }
+  tools {
+    name
+    description
+    inputSchema
+  }
+  createdAt
+}
+
+query GetParticleArtifact($id: ParticleArtifactID!) {
+  # @genqlient(flatten: true)
+  particleArtifact(id: $id) {
+    ...ParticleArtifactDetails
+  }
+}
+
+# @genqlient(typename: "WorkspaceDetails")
+fragment WorkspaceDetails on Workspace {
+  id
+  name
+  scope
+  createdAt
+  updatedAt
+}
+
+query GetWorkspace($id: WorkspaceID!) {
+  # @genqlient(flatten: true)
+  workspace(id: $id) {
+    ...WorkspaceDetails
+  }
+}
+
+query GetWorkspaceByName($name: String!) {
+  # @genqlient(flatten: true)
+  workspaceByName(name: $name) {
+    ...WorkspaceDetails
+  }
+}
+
+mutation CreateWorkspace($input: NewWorkspace!) {
+  # @genqlient(flatten: true)
+  createWorkspace(input: $input) {
+    ...WorkspaceDetails
+  }
+}
+
+mutation RenameWorkspace($id: WorkspaceID!, $name: String!) {
+  # @genqlient(flatten: true)
+  renameWorkspace(id: $id, name: $name) {
+    ...WorkspaceDetails
+  }
+}
+
+mutation DeleteWorkspace($id: WorkspaceID!) {
+  deleteWorkspaces(workspaceIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "InstalledParticleDetails")
+fragment InstalledParticleDetails on InstalledParticle {
+  id
+  name
+  activeArtifact {
+    id
+    name
+    version
+  }
+  kvWorkspace {
+    id
+  }
+  mounts {
+    mountName
+    workspace {
+      id
+    }
+  }
+  createdAt
+  updatedAt
+}
+
+query GetInstalledParticle($id: InstalledParticleID!) {
+  # @genqlient(flatten: true)
+  installedParticle(id: $id) {
+    ...InstalledParticleDetails
+  }
+}
+
+mutation CreateInstalledParticle($input: CreateInstalledParticleInput!) {
+  # @genqlient(flatten: true)
+  createInstalledParticle(input: $input) {
+    ...InstalledParticleDetails
+  }
+}
+
+mutation ModifyInstalledParticle($input: UpdateInstalledParticleInput!) {
+  # @genqlient(flatten: true)
+  updateInstalledParticle(input: $input) {
+    ...InstalledParticleDetails
+  }
+}
+
+mutation DeleteInstalledParticle($id: InstalledParticleID!) {
+  deleteInstalledParticles(installedParticleIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "EmbeddingProfileDetails")
+fragment EmbeddingProfileDetails on EmbeddingProfile {
+  id
+  name
+  description
+  dimensions
+  configuration {
+    ... on EmbeddingProfileConfigOpenAI {
+      model
+      dimensions
+      sendDimensions
+    }
+    ... on EmbeddingProfileConfigGoogle {
+      model
+      dimensions
+      sendDimensions
+      taskType
+    }
+  }
+  provider {
+    id
+  }
+  createdAt
+  updatedAt
+}
+
+query GetEmbeddingProfile($id: EmbeddingProfileID!) {
+  # @genqlient(flatten: true)
+  embeddingProfile(id: $id) {
+    ...EmbeddingProfileDetails
+  }
+}
+
+query GetEmbeddingProfileByProviderAndName(
+  $providerId: ModelProviderID!
+  $name: String!
+) {
+  # @genqlient(flatten: true)
+  embeddingProfileByProviderAndName(providerID: $providerId, name: $name) {
+    ...EmbeddingProfileDetails
+  }
+}
+
+mutation CreateEmbeddingProfile(
+  $providerId: ModelProviderID!
+  $input: NewEmbeddingProfile!
+) {
+  # @genqlient(flatten: true)
+  createEmbeddingProfile(providerID: $providerId, input: $input) {
+    ...EmbeddingProfileDetails
+  }
+}
+
+mutation ModifyEmbeddingProfile(
+  $id: EmbeddingProfileID!
+  $input: UpdateEmbeddingProfile!
+) {
+  # @genqlient(flatten: true)
+  updateEmbeddingProfile(id: $id, input: $input) {
+    ...EmbeddingProfileDetails
+  }
+}
+
+mutation DeleteEmbeddingProfile($id: EmbeddingProfileID!) {
+  deleteEmbeddingProfiles(embeddingProfileIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "MemoryStoreScopeDetails")
+fragment MemoryStoreScopeDetails on MemoryStoreScope {
+  id
+  description
+  kind
+  key
+  value
+  match
+  extractionEnabled
+  extractionPrompt
+  extractionModelProfile {
+    id
+  }
+  consolidationEnabled
+  consolidationPrompt
+  consolidationModelProfile {
+    id
+  }
+}
+
+# @genqlient(typename: "MemoryStoreDetails")
+fragment MemoryStoreDetails on MemoryStore {
+  id
+  name
+  description
+  ingestConversations
+  indexConversationMessages
+  embeddingProfile {
+    id
+  }
+  userNameTagKey
+  extractIntervalSeconds
+  consolidateIntervalSeconds
+  scopes {
+    ...MemoryStoreScopeDetails
+  }
+  createdAt
+  updatedAt
+}
+
+query GetMemoryStore($id: MemoryStoreID!) {
+  # @genqlient(flatten: true)
+  memoryStore(id: $id) {
+    ...MemoryStoreDetails
+  }
+}
+
+query GetMemoryStoreByName($name: String!) {
+  # @genqlient(flatten: true)
+  memoryStoreByName(name: $name) {
+    ...MemoryStoreDetails
+  }
+}
+
+mutation CreateMemoryStore($input: NewMemoryStore!) {
+  # @genqlient(flatten: true)
+  createMemoryStore(input: $input) {
+    ...MemoryStoreDetails
+  }
+}
+
+mutation ModifyMemoryStore($id: MemoryStoreID!, $input: UpdateMemoryStore!) {
+  # @genqlient(flatten: true)
+  updateMemoryStore(id: $id, input: $input) {
+    ...MemoryStoreDetails
+  }
+}
+
+mutation DeleteMemoryStore($id: MemoryStoreID!) {
+  deleteMemoryStores(memoryStoreIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "MemorySelectionDetails")
+fragment MemorySelectionDetails on MemorySelection {
+  kind
+  tags {
+    source
+    tagKey
+    tagValue
+    requestTagKey
+  }
+}
+
+# @genqlient(typename: "MemoryQuerySourceDetails")
+fragment MemoryQuerySourceDetails on MemoryQuerySource {
+  kind
+  text
+}
+
+# @genqlient(typename: "MemoryInteractionProfileDetails")
+fragment MemoryInteractionProfileDetails on MemoryInteractionProfile {
+  id
+  name
+  description
+  allowExpansion
+  conversationHistory {
+    tokenBudget
+    selection
+    query {
+      ...MemoryQuerySourceDetails
+    }
+  }
+  contextInjections {
+    name
+    description
+    tokenBudget
+    recordTypes
+    selection {
+      ...MemorySelectionDetails
+    }
+    query {
+      ...MemoryQuerySourceDetails
+    }
+  }
+  queryTools {
+    toolName
+    description
+    recordTypes
+    tokenBudget
+    selection {
+      ...MemorySelectionDetails
+    }
+    effortLevels {
+      level
+      tokenBudget
+    }
+  }
+  writeTools {
+    toolName
+    description
+    tagMappings {
+      kind
+      keys
+      tagKey
+      tagValue
+    }
+  }
+  createdAt
+  updatedAt
+}
+
+query GetMemoryInteractionProfile($id: MemoryInteractionProfileID!) {
+  # @genqlient(flatten: true)
+  memoryInteractionProfile(id: $id) {
+    ...MemoryInteractionProfileDetails
+  }
+}
+
+mutation CreateMemoryInteractionProfile($input: NewMemoryInteractionProfile!) {
+  # @genqlient(flatten: true)
+  createMemoryInteractionProfile(input: $input) {
+    ...MemoryInteractionProfileDetails
+  }
+}
+
+mutation ModifyMemoryInteractionProfile(
+  $id: MemoryInteractionProfileID!
+  $input: UpdateMemoryInteractionProfile!
+) {
+  # @genqlient(flatten: true)
+  updateMemoryInteractionProfile(id: $id, input: $input) {
+    ...MemoryInteractionProfileDetails
+  }
+}
+
+mutation DeleteMemoryInteractionProfile($id: MemoryInteractionProfileID!) {
+  deleteMemoryInteractionProfiles(memoryInteractionProfileIDs: [$id]) {
+    ids
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Evaluation configuration. These live only on an enterprise deployment; the
+# provider refuses to use them against any other.
+# ---------------------------------------------------------------------------
+
+# @genqlient(typename: "ScoreExampleDetails")
+fragment ScoreExampleDetails on ScoreExample {
+  rating
+  scenario
+  judgment
+}
+
+# @genqlient(typename: "JudgeInputFieldDetails")
+fragment JudgeInputFieldDetails on JudgeInputField {
+  name
+  label
+  description
+  type
+  required
+}
+
+# @genqlient(typename: "SystemMetricDetails")
+fragment SystemMetricDetails on SystemMetric {
+  key
+  type
+  name
+  description
+  complexity
+  prompt
+  examples {
+    ...ScoreExampleDetails
+  }
+  inputFields {
+    ...JudgeInputFieldDetails
+  }
+}
+
+query GetSystemMetric($key: String!) {
+  # @genqlient(flatten: true)
+  systemMetric(key: $key) {
+    ...SystemMetricDetails
+  }
+}
+
+query ListSystemMetrics($first: Int!, $after: String) {
+  metrics(source: SYSTEM, first: $first, after: $after) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ... on SystemMetric {
+          ...SystemMetricDetails
+        }
+      }
+    }
+  }
+}
+
+# @genqlient(typename: "UserMetricDetails")
+fragment UserMetricDetails on UserMetric {
+  id
+  name
+  description
+  prompt
+  complexity
+  examples {
+    ...ScoreExampleDetails
+  }
+  inputFields {
+    ...JudgeInputFieldDetails
+  }
+  createdAt
+  updatedAt
+}
+
+query GetUserMetric($id: UserMetricID!) {
+  # @genqlient(flatten: true)
+  userMetric(id: $id) {
+    ...UserMetricDetails
+  }
+}
+
+mutation CreateUserMetric($input: NewUserMetric!) {
+  # @genqlient(flatten: true)
+  createUserMetric(input: $input) {
+    ...UserMetricDetails
+  }
+}
+
+mutation ModifyUserMetric($id: UserMetricID!, $input: UpdateUserMetric!) {
+  # @genqlient(flatten: true)
+  updateUserMetric(id: $id, input: $input) {
+    ...UserMetricDetails
+  }
+}
+
+mutation DeleteUserMetric($id: UserMetricID!) {
+  deleteUserMetric(id: $id) {
+    id
+  }
+}
+
+# @genqlient(typename: "RubricDetails")
+fragment RubricDetails on Rubric {
+  id
+  name
+  description
+  createdAt
+  updatedAt
+  metrics {
+    __typename
+    # The two members give their entry id and trial count different types, so
+    # each needs an alias of its own.
+    ... on RubricUserMetric {
+      userEntryID: id
+      userMetric {
+        id
+      }
+      userTrialCount: trialCount
+      complexity
+      inputValues
+      weight
+    }
+    ... on RubricSystemMetric {
+      systemEntryID: id
+      systemMetric {
+        key
+      }
+      systemTrialCount: trialCount
+      complexity
+      inputValues
+      scoreFloor
+      scoreCeiling
+      lowerIsBetter
+      weight
+    }
+  }
+}
+
+query GetRubric($id: RubricID!) {
+  # @genqlient(flatten: true)
+  rubric(id: $id) {
+    ...RubricDetails
+  }
+}
+
+mutation CreateRubric($input: NewRubric!) {
+  # @genqlient(flatten: true)
+  createRubric(input: $input) {
+    ...RubricDetails
+  }
+}
+
+mutation ModifyRubric($id: RubricID!, $input: UpdateRubric!) {
+  # @genqlient(flatten: true)
+  updateRubric(id: $id, input: $input) {
+    ...RubricDetails
+  }
+}
+
+mutation DeleteRubric($id: RubricID!) {
+  deleteRubric(id: $id) {
+    id
+  }
+}
+
+# @genqlient(typename: "EvalMeshMonitorDetails")
+fragment EvalMeshMonitorDetails on EvalMeshMonitor {
+  id
+  meshID
+  rubricID
+  modelSetID
+  enabled
+  sampleRate
+  createdAt
+  updatedAt
+}
+
+query GetEvalMeshMonitor($id: EvalMeshMonitorID!) {
+  # @genqlient(flatten: true)
+  evalMeshMonitor(id: $id) {
+    ...EvalMeshMonitorDetails
+  }
+}
+
+mutation CreateEvalMeshMonitor($input: NewEvalMeshMonitor!) {
+  # @genqlient(flatten: true)
+  createEvalMeshMonitor(input: $input) {
+    ...EvalMeshMonitorDetails
+  }
+}
+
+mutation ModifyEvalMeshMonitor($id: EvalMeshMonitorID!, $input: UpdateEvalMeshMonitor!) {
+  # @genqlient(flatten: true)
+  updateEvalMeshMonitor(id: $id, input: $input) {
+    ...EvalMeshMonitorDetails
+  }
+}
+
+mutation DeleteEvalMeshMonitor($id: EvalMeshMonitorID!) {
+  deleteEvalMeshMonitor(id: $id) {
+    id
   }
 }

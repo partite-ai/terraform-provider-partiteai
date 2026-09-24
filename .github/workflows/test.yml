@@ -1,8 +1,6 @@
 # Terraform Provider testing workflow.
 name: Tests
 
-# This GitHub action runs your tests for each pull request and push.
-# Optionally, you can turn it on using a schedule for regular testing.
 on:
   pull_request:
     paths-ignore:
@@ -11,7 +9,6 @@ on:
     paths-ignore:
       - 'README.md'
 
-# Testing only needs permissions to read the repository contents.
 permissions:
   contents: read
 
@@ -52,34 +49,156 @@ jobs:
           git diff --compact-summary --exit-code || \
             (echo; echo "Unexpected difference in directories after code generation. Run 'make generate' command and commit."; exit 1)
 
-  # Run acceptance tests in a matrix with Terraform CLI versions
-  test:
-    name: Terraform Provider Acceptance Tests
-    needs: build
+  # Schema snapshots, schema/model consistency and mapping unit tests. These
+  # need no backend and no Terraform binary, so they always run.
+  unit:
+    name: Unit Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        # list whatever Terraform versions here you would like to support
-        terraform:
-          - '1.0.*'
-          - '1.1.*'
-          - '1.2.*'
-          - '1.3.*'
-          - '1.4.*'
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
           go-version-file: 'go.mod'
           cache: true
+      - run: go mod download
+      - run: make testunit
+
+  # Acceptance tests drive real Terraform against a mesh server in local mode.
+  # They need a mesh checkout beside this one, and mesh itself depends on
+  # private modules, so the job needs both a token to clone with and a key the
+  # go tool can fetch modules with. Without them the tests skip themselves
+  # rather than fail, which is what happens on a pull request from a fork.
+  acceptance:
+    name: Acceptance Tests
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # Write-only attributes need 1.11 or newer.
+        terraform:
+          - '1.11.*'
+          - '1.14.*'
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          path: terraform-provider-partiteai
+
+      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
+        id: app-token
+        continue-on-error: true
+        with:
+          app-id: ${{ vars.REPO_ACCESS_APP_ID }}
+          private-key: ${{ secrets.REPO_ACCESS_PEM }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Check out mesh
+        id: mesh
+        if: steps.app-token.outcome == 'success'
+        continue-on-error: true
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: partite-ai/mesh
+          path: mesh
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: false
+
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version-file: terraform-provider-partiteai/go.mod
+          cache: true
+          cache-dependency-path: terraform-provider-partiteai/go.sum
+
+      # mesh depends on private modules. This is the pattern mesh-enterprise
+      # builds with: a deploy key in an agent, and git sending github.com over
+      # SSH so the go tool can reach every one of them, not just the repository
+      # a token was minted for. It comes after the checkouts on purpose — those
+      # authenticate over HTTPS.
+      - name: Add SSH Go module private key
+        if: steps.mesh.outcome == 'success'
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.GO_MODULE_PRIVATE_KEY }}"
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          git config --global url."ssh://git@github.com/".insteadOf https://github.com/
+
       - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
         with:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
-      - run: go mod download
-      - env:
-          TF_ACC: "1"
-        run: go test -v -cover ./internal/provider/
-        timeout-minutes: 10
+
+      - name: Run acceptance tests
+        working-directory: terraform-provider-partiteai
+        env:
+          PARTITE_MESH_DIR: ${{ github.workspace }}/mesh
+          PARTITE_SKIP_MESH_TESTS: ${{ steps.mesh.outcome == 'success' && '' || '1' }}
+        run: go test -timeout=30m -parallel=4 ./...
+
+  # The same acceptance tests against mesh-enterprise. That checkout ships the
+  # harness that brings its backend up and tears it down again; this job needs
+  # Docker, the checkout, and the key its private modules are fetched with.
+  enterprise:
+    name: Enterprise Acceptance Tests
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          path: terraform-provider-partiteai
+
+      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
+        id: app-token
+        continue-on-error: true
+        with:
+          app-id: ${{ vars.REPO_ACCESS_APP_ID }}
+          private-key: ${{ secrets.REPO_ACCESS_PEM }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Check out mesh-enterprise
+        id: enterprise
+        if: steps.app-token.outcome == 'success'
+        continue-on-error: true
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: partite-ai/mesh-enterprise
+          path: mesh-enterprise
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: false
+
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version-file: terraform-provider-partiteai/go.mod
+          cache: true
+          cache-dependency-path: terraform-provider-partiteai/go.sum
+
+      - name: Add SSH Go module private key
+        if: steps.enterprise.outcome == 'success'
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.GO_MODULE_PRIVATE_KEY }}"
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          git config --global url."ssh://git@github.com/".insteadOf https://github.com/
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_version: '1.14.*'
+          terraform_wrapper: false
+
+      - name: Run enterprise acceptance tests
+        working-directory: terraform-provider-partiteai
+        env:
+          PARTITE_TEST_BACKENDS: enterprise
+          PARTITE_MESH_ENTERPRISE_DIR: ${{ github.workspace }}/mesh-enterprise
+          PARTITE_SKIP_MESH_TESTS: ${{ steps.enterprise.outcome == 'success' && '' || '1' }}
+        run: go test -timeout=45m -parallel=4 ./...

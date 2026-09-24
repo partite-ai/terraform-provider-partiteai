@@ -1,35 +1,37 @@
 package graphql
 
+import "encoding/json"
+
 type NewAgent struct {
-	Name                        string                             `json:"name"`
-	Description                 Optional[string]                   `json:"description,omitzero"`
-	Tags                        []*Tag                             `json:"tags"`
-	Identity                    Optional[string]                   `json:"identity,omitzero"`
-	TaskInstructions            string                             `json:"taskInstructions"`
-	ModelComplexity             ModelComplexity                    `json:"modelComplexity"`
-	InputMessageType            string                             `json:"inputMessageType"`
-	SendThinkingToUser          Optional[bool]                     `json:"sendThinkingToUser,omitzero"`
-	SendMessagesToUser          Optional[bool]                     `json:"sendMessagesToUser,omitzero"`
-	PreserveConversationHistory Optional[bool]                     `json:"preserveConversationHistory,omitzero"`
-	MemorySlots                 []NewMemorySlot                    `json:"memorySlots"`
-	McpConnections              []NewMcpConnectionAgentAssociation `json:"mcpConnections"`
-	Tasks                       []NewTaskAgentAssociation          `json:"tasks"`
+	Name                      string                                        `json:"name"`
+	Description               Optional[string]                              `json:"description,omitzero"`
+	Tags                      []*Tag                                        `json:"tags"`
+	Identity                  Optional[string]                              `json:"identity,omitzero"`
+	TaskInstructions          string                                        `json:"taskInstructions"`
+	ModelComplexity           ModelComplexity                               `json:"modelComplexity"`
+	InputMessageType          string                                        `json:"inputMessageType"`
+	SendThinkingToUser        Optional[bool]                                `json:"sendThinkingToUser,omitzero"`
+	SendMessagesToUser        Optional[bool]                                `json:"sendMessagesToUser,omitzero"`
+	McpConnections            []NewMcpConnectionAgentAssociation            `json:"mcpConnections"`
+	Particles                 []NewParticleAgentAssociation                 `json:"particles"`
+	MemoryInteractionProfiles []NewMemoryInteractionProfileAgentAssociation `json:"memoryInteractionProfiles"`
+	Tasks                     []NewTaskAgentAssociation                     `json:"tasks"`
 }
 
 type UpdateAgent struct {
-	Name                        Optional[string]                             `json:"name,omitzero"`
-	Description                 Optional[string]                             `json:"description,omitzero"`
-	Tags                        Optional[[]*Tag]                             `json:"tags,omitzero"`
-	Identity                    Optional[string]                             `json:"identity,omitzero"`
-	TaskInstructions            Optional[string]                             `json:"taskInstructions,omitzero"`
-	ModelComplexity             Optional[ModelComplexity]                    `json:"modelComplexity,omitzero"`
-	InputMessageType            Optional[string]                             `json:"inputMessageType,omitzero"`
-	SendThinkingToUser          Optional[bool]                               `json:"sendThinkingToUser,omitzero"`
-	SendMessagesToUser          Optional[bool]                               `json:"sendMessagesToUser,omitzero"`
-	PreserveConversationHistory Optional[bool]                               `json:"preserveConversationHistory,omitzero"`
-	MemorySlots                 Optional[[]NewMemorySlot]                    `json:"memorySlots,omitzero"`
-	McpConnections              Optional[[]NewMcpConnectionAgentAssociation] `json:"mcpConnections,omitzero"`
-	Tasks                       Optional[[]NewTaskAgentAssociation]          `json:"tasks,omitzero"`
+	Name                      Optional[string]                                        `json:"name,omitzero"`
+	Description               Optional[string]                                        `json:"description,omitzero"`
+	Tags                      Optional[[]*Tag]                                        `json:"tags,omitzero"`
+	Identity                  Optional[string]                                        `json:"identity,omitzero"`
+	TaskInstructions          Optional[string]                                        `json:"taskInstructions,omitzero"`
+	ModelComplexity           Optional[ModelComplexity]                               `json:"modelComplexity,omitzero"`
+	InputMessageType          Optional[string]                                        `json:"inputMessageType,omitzero"`
+	SendThinkingToUser        Optional[bool]                                          `json:"sendThinkingToUser,omitzero"`
+	SendMessagesToUser        Optional[bool]                                          `json:"sendMessagesToUser,omitzero"`
+	McpConnections            Optional[[]NewMcpConnectionAgentAssociation]            `json:"mcpConnections,omitzero"`
+	Particles                 Optional[[]NewParticleAgentAssociation]                 `json:"particles,omitzero"`
+	MemoryInteractionProfiles Optional[[]NewMemoryInteractionProfileAgentAssociation] `json:"memoryInteractionProfiles,omitzero"`
+	Tasks                     Optional[[]NewTaskAgentAssociation]                     `json:"tasks,omitzero"`
 }
 
 type NewMcpConnectionAgentAssociation struct {
@@ -52,19 +54,10 @@ type NewTaskAgentAssociation struct {
 	TaskDefinitionID string `json:"taskDefinitionID"`
 }
 
-type NewMemorySlot struct {
-	// The name of the memory slot. Must be unique within the agent.
-	Name string `json:"name"`
-	// The scope of the memory slot. Determines where the memory is accessible.
-	Scope MemoryScope `json:"scope"`
-	// A description of the data the memory slot is intended to hold, and when it should be used.
-	Description string `json:"description"`
-	// A JSON schema describing the structure of the data to be stored in the memory slot.
-	MemoryType string `json:"memoryType"`
-	// An optional expression defining whether this memory slot is currently readable.
-	CanRead Optional[string] `json:"canRead,omitzero"`
-	// An optional expression defining whether this memory slot is currently writable.
-	CanWrite Optional[string] `json:"canWrite,omitzero"`
+// NewMemoryInteractionProfileAgentAssociation gives one agent version a memory
+// interaction profile.
+type NewMemoryInteractionProfileAgentAssociation struct {
+	MemoryInteractionProfileID string `json:"memoryInteractionProfileID"`
 }
 
 type NewModelProvider struct {
@@ -272,4 +265,290 @@ type UpdateTaskDefinition struct {
 	Description       Optional[string] `json:"description,omitzero"`
 	InputMessageType  Optional[string] `json:"inputMessageType,omitzero"`
 	OutputMessageType Optional[string] `json:"outputMessageType,omitzero"`
+}
+
+type NewParticleAgentAssociation struct {
+	InstalledParticleID string         `json:"installedParticleID"`
+	FilterType          ToolFilterType `json:"filterType"`
+	ToolNames           []string       `json:"toolNames"`
+	ToolNamePattern     *string        `json:"toolNamePattern,omitempty"`
+}
+
+type CreateInstalledParticleInput struct {
+	Name        string                    `json:"name"`
+	ArtifactID  string                    `json:"artifactID"`
+	Credentials []ParticleCredentialInput `json:"credentials"`
+	// KvWorkspaceID is required when the artifact's manifest grants the KV
+	// capability, and rejected when it does not.
+	KvWorkspaceID Optional[string] `json:"kvWorkspaceID,omitzero"`
+	// Mounts is a required non-null list in the API. An install of an artifact
+	// that declares no filesystem mounts sends it empty; sending nothing at all
+	// is a validation error.
+	Mounts []NewInstalledParticleMount `json:"mounts"`
+}
+
+// NewInstalledParticleMount binds one manifest mount name to a workspace.
+type NewInstalledParticleMount struct {
+	MountName   string `json:"mountName"`
+	WorkspaceID string `json:"workspaceID"`
+}
+
+type UpdateInstalledParticleInput struct {
+	InstalledParticleID string                              `json:"installedParticleID"`
+	Name                Optional[string]                    `json:"name,omitzero"`
+	ArtifactID          Optional[string]                    `json:"artifactID,omitzero"`
+	Credentials         Optional[[]ParticleCredentialInput] `json:"credentials,omitzero"`
+	// KvWorkspaceID repoints the install's KV state. Omitting it leaves the
+	// existing binding alone.
+	KvWorkspaceID Optional[string] `json:"kvWorkspaceID,omitzero"`
+	// Mounts replaces the bindings wholesale rather than merging. Omitting it
+	// leaves them alone; an empty list clears them.
+	Mounts Optional[[]NewInstalledParticleMount] `json:"mounts,omitzero"`
+}
+
+type ParticleCredentialInput struct {
+	CredentialName          string                                          `json:"credentialName"`
+	Method                  string                                          `json:"method"`
+	Basic                   *BasicParticleCredentialInput                   `json:"basic,omitempty"`
+	Apikey                  *ApiKeyParticleCredentialInput                  `json:"apikey,omitempty"`
+	SigningKey              *SigningKeyParticleCredentialInput              `json:"signingKey,omitempty"`
+	Raw                     *RawParticleCredentialInput                     `json:"raw,omitempty"`
+	OAuth2ClientCredentials *OAuth2ClientCredentialsParticleCredentialInput `json:"oauth2ClientCredentials,omitempty"`
+}
+
+type BasicParticleCredentialInput struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type ApiKeyParticleCredentialInput struct {
+	Key string `json:"key"`
+}
+
+type SigningKeyParticleCredentialInput struct {
+	Algorithm string `json:"algorithm"`
+	Key       string `json:"key"`
+}
+
+type RawParticleCredentialInput struct {
+	Value string `json:"value"`
+}
+
+type OAuth2ClientCredentialsParticleCredentialInput struct {
+	ClientID     string  `json:"clientID"`
+	ClientSecret string  `json:"clientSecret"`
+	TokenUrl     *string `json:"tokenUrl,omitempty"`
+}
+
+// EmbeddingProfileConfigInputOpenAI is the configuration of an embedding
+// profile of an OpenAI provider.
+type EmbeddingProfileConfigInputOpenAI struct {
+	Model          string         `json:"model"`
+	Dimensions     int            `json:"dimensions"`
+	SendDimensions Optional[bool] `json:"sendDimensions,omitzero"`
+}
+
+// EmbeddingProfileConfigInputGoogle is the same for a Google provider.
+type EmbeddingProfileConfigInputGoogle struct {
+	Model          string           `json:"model"`
+	Dimensions     int              `json:"dimensions"`
+	SendDimensions Optional[bool]   `json:"sendDimensions,omitzero"`
+	TaskType       Optional[string] `json:"taskType,omitzero"`
+}
+
+type NewEmbeddingProfile struct {
+	Name                string                             `json:"name"`
+	Description         Optional[string]                   `json:"description,omitzero"`
+	ConfigurationOpenAI *EmbeddingProfileConfigInputOpenAI `json:"configurationOpenAI,omitempty"`
+	ConfigurationGoogle *EmbeddingProfileConfigInputGoogle `json:"configurationGoogle,omitempty"`
+}
+
+type UpdateEmbeddingProfile struct {
+	Name                Optional[string]                   `json:"name,omitzero"`
+	Description         Optional[string]                   `json:"description,omitzero"`
+	ConfigurationOpenAI *EmbeddingProfileConfigInputOpenAI `json:"configurationOpenAI,omitempty"`
+	ConfigurationGoogle *EmbeddingProfileConfigInputGoogle `json:"configurationGoogle,omitempty"`
+}
+
+// NewMemoryStoreScope is one scope written with its store, or added to one.
+type NewMemoryStoreScope struct {
+	Description                 Optional[string] `json:"description,omitzero"`
+	Kind                        string           `json:"kind"`
+	Key                         string           `json:"key"`
+	Value                       Optional[string] `json:"value,omitzero"`
+	Match                       Optional[string] `json:"match,omitzero"`
+	ExtractionEnabled           bool             `json:"extractionEnabled"`
+	ExtractionPrompt            Optional[string] `json:"extractionPrompt,omitzero"`
+	ExtractionModelProfileID    Optional[string] `json:"extractionModelProfileID,omitzero"`
+	ConsolidationEnabled        bool             `json:"consolidationEnabled"`
+	ConsolidationPrompt         Optional[string] `json:"consolidationPrompt,omitzero"`
+	ConsolidationModelProfileID Optional[string] `json:"consolidationModelProfileID,omitzero"`
+}
+
+// UpdateMemoryStoreScope changes one scope. The key, the kind and the value of
+// a scope never change, because the records it already produced carry them.
+type UpdateMemoryStoreScope struct {
+	Description                 Optional[string] `json:"description,omitzero"`
+	Match                       Optional[string] `json:"match,omitzero"`
+	ExtractionEnabled           Optional[bool]   `json:"extractionEnabled,omitzero"`
+	ExtractionPrompt            Optional[string] `json:"extractionPrompt,omitzero"`
+	ExtractionModelProfileID    Optional[string] `json:"extractionModelProfileID,omitzero"`
+	ConsolidationEnabled        Optional[bool]   `json:"consolidationEnabled,omitzero"`
+	ConsolidationPrompt         Optional[string] `json:"consolidationPrompt,omitzero"`
+	ConsolidationModelProfileID Optional[string] `json:"consolidationModelProfileID,omitzero"`
+}
+
+// MemoryStoreScopeEdit names one scope of a store and what to change about it.
+type MemoryStoreScopeEdit struct {
+	ID      string                  `json:"id"`
+	Changes *UpdateMemoryStoreScope `json:"changes"`
+}
+
+type NewMemoryStore struct {
+	Name                       string                 `json:"name"`
+	Description                Optional[string]       `json:"description,omitzero"`
+	IngestConversations        bool                   `json:"ingestConversations"`
+	IndexConversationMessages  bool                   `json:"indexConversationMessages"`
+	EmbeddingProfileID         Optional[string]       `json:"embeddingProfileID,omitzero"`
+	UserNameTagKey             Optional[string]       `json:"userNameTagKey,omitzero"`
+	ExtractIntervalSeconds     int                    `json:"extractIntervalSeconds"`
+	ConsolidateIntervalSeconds int                    `json:"consolidateIntervalSeconds"`
+	Scopes                     []*NewMemoryStoreScope `json:"scopes,omitempty"`
+}
+
+type UpdateMemoryStore struct {
+	Name                       Optional[string]        `json:"name,omitzero"`
+	Description                Optional[string]        `json:"description,omitzero"`
+	IngestConversations        Optional[bool]          `json:"ingestConversations,omitzero"`
+	IndexConversationMessages  Optional[bool]          `json:"indexConversationMessages,omitzero"`
+	EmbeddingProfileID         Optional[string]        `json:"embeddingProfileID,omitzero"`
+	UserNameTagKey             Optional[string]        `json:"userNameTagKey,omitzero"`
+	ExtractIntervalSeconds     Optional[int]           `json:"extractIntervalSeconds,omitzero"`
+	ConsolidateIntervalSeconds Optional[int]           `json:"consolidateIntervalSeconds,omitzero"`
+	DeleteScopeIDs             []string                `json:"deleteScopeIDs,omitempty"`
+	UpdateScopes               []*MemoryStoreScopeEdit `json:"updateScopes,omitempty"`
+	CreateScopes               []*NewMemoryStoreScope  `json:"createScopes,omitempty"`
+}
+
+// MemoryQuerySourceInput is the text one injection or history searches for.
+type MemoryQuerySourceInput struct {
+	Kind string           `json:"kind"`
+	Text Optional[string] `json:"text,omitzero"`
+}
+
+// MemorySelectionTagInput maps one tag of a request onto one tag of a memory.
+type MemorySelectionTagInput struct {
+	Source        string           `json:"source"`
+	TagKey        string           `json:"tagKey"`
+	TagValue      Optional[string] `json:"tagValue,omitzero"`
+	RequestTagKey Optional[string] `json:"requestTagKey,omitzero"`
+}
+
+// MemorySelectionInput narrows the memory that one injection or tool reads.
+type MemorySelectionInput struct {
+	Kind string                     `json:"kind"`
+	Tags []*MemorySelectionTagInput `json:"tags,omitempty"`
+}
+
+type MemoryConversationHistoryInput struct {
+	TokenBudget int                     `json:"tokenBudget"`
+	Selection   string                  `json:"selection"`
+	Query       *MemoryQuerySourceInput `json:"query,omitempty"`
+}
+
+type MemoryContextInjectionInput struct {
+	Name        string                  `json:"name"`
+	Description Optional[string]        `json:"description,omitzero"`
+	TokenBudget int                     `json:"tokenBudget"`
+	RecordTypes []string                `json:"recordTypes"`
+	Selection   *MemorySelectionInput   `json:"selection"`
+	Query       *MemoryQuerySourceInput `json:"query"`
+}
+
+type MemoryEffortLevelInput struct {
+	Level       string `json:"level"`
+	TokenBudget int    `json:"tokenBudget"`
+}
+
+type MemoryQueryToolInput struct {
+	ToolName     string                    `json:"toolName"`
+	Description  string                    `json:"description"`
+	RecordTypes  []string                  `json:"recordTypes"`
+	Selection    *MemorySelectionInput     `json:"selection"`
+	TokenBudget  Optional[int]             `json:"tokenBudget,omitzero"`
+	EffortLevels []*MemoryEffortLevelInput `json:"effortLevels,omitempty"`
+}
+
+type MemoryTagMappingInput struct {
+	Kind     string           `json:"kind"`
+	Keys     []string         `json:"keys,omitempty"`
+	TagKey   Optional[string] `json:"tagKey,omitzero"`
+	TagValue Optional[string] `json:"tagValue,omitzero"`
+}
+
+type MemoryWriteToolInput struct {
+	ToolName    string                   `json:"toolName"`
+	Description string                   `json:"description"`
+	TagMappings []*MemoryTagMappingInput `json:"tagMappings,omitempty"`
+}
+
+type NewMemoryInteractionProfile struct {
+	Name                string                          `json:"name"`
+	Description         Optional[string]                `json:"description,omitzero"`
+	ConversationHistory *MemoryConversationHistoryInput `json:"conversationHistory,omitempty"`
+	ContextInjections   []*MemoryContextInjectionInput  `json:"contextInjections,omitempty"`
+	QueryTools          []*MemoryQueryToolInput         `json:"queryTools,omitempty"`
+	WriteTools          []*MemoryWriteToolInput         `json:"writeTools,omitempty"`
+	AllowExpansion      bool                            `json:"allowExpansion"`
+}
+
+// UpdateMemoryInteractionProfile changes one profile. Each list is optional so
+// that a list left out keeps what the profile held, and an empty list given
+// empties it.
+type UpdateMemoryInteractionProfile struct {
+	Name                Optional[string]                          `json:"name,omitzero"`
+	Description         Optional[string]                          `json:"description,omitzero"`
+	ConversationHistory Optional[*MemoryConversationHistoryInput] `json:"conversationHistory,omitzero"`
+	ContextInjections   Optional[[]*MemoryContextInjectionInput]  `json:"contextInjections,omitzero"`
+	QueryTools          Optional[[]*MemoryQueryToolInput]         `json:"queryTools,omitzero"`
+	WriteTools          Optional[[]*MemoryWriteToolInput]         `json:"writeTools,omitzero"`
+	AllowExpansion      Optional[bool]                            `json:"allowExpansion,omitzero"`
+}
+
+// The evaluation update inputs are written by hand rather than generated so a
+// null reaches the API instead of being left out. The API leaves alone what it
+// is not told about, which is right for a patch but means a generated input,
+// where a nil pointer is omitted, could never clear a field. Terraform needs
+// to: a description removed from the configuration has to be removed from the
+// resource.
+
+type UpdateUserMetric struct {
+	Name        *string              `json:"name"`
+	Description *string              `json:"description"`
+	Prompt      *string              `json:"prompt"`
+	Complexity  *ModelComplexity     `json:"complexity"`
+	Examples    []NewScoreExample    `json:"examples"`
+	InputFields []NewJudgeInputField `json:"inputFields"`
+}
+
+// UpdateRubricMetric keeps omitempty, unlike the inputs above: the API rejects
+// the scoring fields outright on a metric a model judges, so a field that does
+// not apply has to be left out rather than sent as null.
+type UpdateRubricMetric struct {
+	ID            string           `json:"ID"`
+	TrialCount    *int             `json:"trialCount,omitempty"`
+	Complexity    *ModelComplexity `json:"complexity,omitempty"`
+	InputValues   *json.RawMessage `json:"inputValues,omitempty"`
+	ScoreFloor    *float64         `json:"scoreFloor,omitempty"`
+	ScoreCeiling  *float64         `json:"scoreCeiling,omitempty"`
+	LowerIsBetter *bool            `json:"lowerIsBetter,omitempty"`
+	Weight        *float64         `json:"weight,omitempty"`
+}
+
+type UpdateRubric struct {
+	Name             *string              `json:"name"`
+	Description      *string              `json:"description"`
+	DeletedMetricIDs []string             `json:"deletedMetricIDs"`
+	UpdatedMetrics   []UpdateRubricMetric `json:"updatedMetrics"`
+	NewMetrics       []NewRubricMetric    `json:"newMetrics"`
 }

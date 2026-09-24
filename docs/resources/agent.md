@@ -27,8 +27,8 @@ Agent resource
 - `description` (String) Resource description
 - `identity` (String) A brief description of the agent's identity, such as its role or persona.
 - `mcp_connections` (Attributes Set) List of MCP connections associated with the agent (see [below for nested schema](#nestedatt--mcp_connections))
-- `memory_slots` (Attributes Set) List of memory slots for the agent (see [below for nested schema](#nestedatt--memory_slots))
-- `preserve_conversation_history` (Boolean) Whether the agent should retain conversation history for context in future interactions
+- `memory_interaction_profile_ids` (Set of String) IDs of the memory interaction profiles this agent holds. A profile decides what memory goes in the agent's prompt and which memory tools it can call.
+- `particles` (Attributes Set) List of installed particles exposed to the agent. (see [below for nested schema](#nestedatt--particles))
 - `send_messages_to_user` (Boolean) Whether the agent should send messages to the user
 - `send_thinking_to_user` (Boolean) Whether the agent should send 'thinking' messages to the user
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
@@ -57,18 +57,18 @@ Optional:
 - `tool_names` (List of String) List of tool names associated with the MCP connection
 
 
-<a id="nestedatt--memory_slots"></a>
-### Nested Schema for `memory_slots`
+<a id="nestedatt--particles"></a>
+### Nested Schema for `particles`
 
 Required:
 
-- `memory_scope` (String) Scope of the memory slot (e.g., 'conversation', 'user')
-- `memory_type` (String) Schema defining the structure of data stored in this memory slot
-- `name` (String) Memory slot name
+- `filter_type` (String) Tool filter type. One of 'NONE', 'LIST', or 'PATTERN'.
+- `id` (String) Installed particle identifier
 
 Optional:
 
-- `description` (String) Memory slot description
+- `tool_name_pattern` (String) Regex matched against tool names. Required when filter_type is PATTERN.
+- `tool_names` (List of String) Tool names to expose. Required (and non-empty) when filter_type is LIST.
 
 
 <a id="nestedatt--tags"></a>

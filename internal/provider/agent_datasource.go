@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -57,10 +58,22 @@ func (d *AgentDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Computed:            true,
 				NestedObject:        taskAssociationDataSourceType,
 			},
-			"memory_slots": schema.SetNestedAttribute{
-				MarkdownDescription: "List of memory slots for the agent",
+			"particles": schema.SetNestedAttribute{
+				MarkdownDescription: "List of installed particles exposed to the agent.",
 				Computed:            true,
-				NestedObject:        memorySlotDataSourceType,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id":                schema.StringAttribute{Computed: true},
+						"filter_type":       schema.StringAttribute{Computed: true},
+						"tool_names":        schema.ListAttribute{ElementType: types.StringType, Computed: true},
+						"tool_name_pattern": schema.StringAttribute{Computed: true},
+					},
+				},
+			},
+			"memory_interaction_profile_ids": schema.SetAttribute{
+				MarkdownDescription: "IDs of the memory interaction profiles this agent holds",
+				ElementType:         types.StringType,
+				Computed:            true,
 			},
 			"identity": schema.StringAttribute{
 				MarkdownDescription: "A brief description of the agent's identity, such as its role or persona.",
@@ -77,10 +90,6 @@ func (d *AgentDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 			"input_message_type": schema.StringAttribute{
 				CustomType:          jsontypes.NormalizedType{},
 				MarkdownDescription: "Schema defining the structure of input messages the agent can process",
-				Computed:            true,
-			},
-			"preserve_conversation_history": schema.BoolAttribute{
-				MarkdownDescription: "Whether the agent should retain conversation history for context in future interactions",
 				Computed:            true,
 			},
 			"send_thinking_to_user": schema.BoolAttribute{

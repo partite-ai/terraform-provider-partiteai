@@ -70,8 +70,16 @@ type stdioTransportStruct struct {
 func (t *stdioTransportStruct) FromGQL(src *pgql.McpConnectionDetailsStdioTransportStdioMcpTransport) diag.Diagnostics {
 	var diags diag.Diagnostics
 	t.Command = src.Command
-	t.Arguments = src.Arguments
 
+	// Both attributes default to an empty list in the schema. A nil Go slice
+	// maps to a null list, which Terraform rejects as an inconsistent result
+	// after apply, so keep them non-nil.
+	t.Arguments = src.Arguments
+	if t.Arguments == nil {
+		t.Arguments = []string{}
+	}
+
+	t.Environment = make([]envVarStruct, 0, len(src.Environment))
 	for _, ev := range src.Environment {
 		name, value, _ := strings.Cut(ev, "=")
 		t.Environment = append(t.Environment, envVarStruct{Name: name, Value: value})
