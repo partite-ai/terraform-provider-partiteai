@@ -3,7 +3,6 @@ fragment AgentDetails on Agent {
   id
   name
   description
-  tags
   createdAt
   updatedAt
   latestVersion {

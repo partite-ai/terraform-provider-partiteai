@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -70,6 +71,39 @@ resource "partiteai_agent" "test" {
 			ResourceName:      "partiteai_agent.test",
 			ImportState:       true,
 			ImportStateVerify: true,
+		},
+	)
+}
+
+// TestAccAgent_tagsMakeAVersion pins where the tags of an agent live. They pick
+// the model it runs on, so they belong to the version, and changing them alone
+// has to advance the ordinal and come back on the read.
+func TestAccAgent_tagsMakeAVersion(t *testing.T) {
+	const agent = `
+resource "partiteai_agent" "test" {
+  name               = "acc-agent-tags"
+  model_complexity   = "LOW"
+  task_instructions  = "Do the thing."
+  input_message_type = jsonencode({ type = "object", properties = {} })
+  tags               = %s
+}
+`
+
+	accTest(t,
+		resource.TestStep{
+			Config: fmt.Sprintf(agent, `[{ name = "team", value = "ui" }]`),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("partiteai_agent.test", "tags.#", "1"),
+				resource.TestCheckResourceAttr("partiteai_agent.test", "tags.0.value", "ui"),
+				resource.TestCheckResourceAttr("partiteai_agent.test", "version_ordinal", "1"),
+			),
+		},
+		resource.TestStep{
+			Config: fmt.Sprintf(agent, `[{ name = "team", value = "platform" }]`),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("partiteai_agent.test", "tags.0.value", "platform"),
+				resource.TestCheckResourceAttr("partiteai_agent.test", "version_ordinal", "2"),
+			),
 		},
 	)
 }

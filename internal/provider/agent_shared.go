@@ -56,7 +56,7 @@ func (m *AgentBaseModel) MapFromGraphQL(ctx context.Context, agentDetails pgql.A
 		&m.InputMessageType, agentDetails.LatestVersion.InputMessageType,
 		&m.SendThinkingToUser, agentDetails.LatestVersion.SendThinkingToUser,
 		&m.SendMessagesToUser, agentDetails.LatestVersion.SendMessagesToUser,
-		&m.Tags, agentDetails.Tags,
+		&m.Tags, agentDetails.LatestVersion.Tags,
 		&m.MemoryInteractionProfileIds, memoryInteractionProfileIDs(agentDetails.LatestVersion.MemoryInteractionProfiles),
 		&m.McpConnections, newStructSliceMappable(agentDetails.LatestVersion.McpConnections, mcpConnectionInfo{}),
 		&m.Tasks, newStructSliceMappable(agentDetails.LatestVersion.Tasks, taskInfo{}),

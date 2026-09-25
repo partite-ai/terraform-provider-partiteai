@@ -15,7 +15,6 @@ type AgentDetails struct {
 	Id            string                                `json:"id"`
 	Name          string                                `json:"name"`
 	Description   *string                               `json:"description"`
-	Tags          []*Tag                                `json:"tags"`
 	CreatedAt     string                                `json:"createdAt"`
 	UpdatedAt     string                                `json:"updatedAt"`
 	LatestVersion AgentDetailsLatestVersionAgentVersion `json:"latestVersion"`
@@ -29,9 +28,6 @@ func (v *AgentDetails) GetName() string { return v.Name }
 
 // GetDescription returns AgentDetails.Description, and is useful for accessing the field via an interface.
 func (v *AgentDetails) GetDescription() *string { return v.Description }
-
-// GetTags returns AgentDetails.Tags, and is useful for accessing the field via an interface.
-func (v *AgentDetails) GetTags() []*Tag { return v.Tags }
 
 // GetCreatedAt returns AgentDetails.CreatedAt, and is useful for accessing the field via an interface.
 func (v *AgentDetails) GetCreatedAt() string { return v.CreatedAt }
@@ -1388,7 +1384,7 @@ func (v *GetRubricResponse) GetRubric() *RubricDetails { return v.Rubric }
 
 // GetSystemMetricResponse is returned by GetSystemMetric on success.
 type GetSystemMetricResponse struct {
-	// A metric the product ships, by key. A key that names none is an error, not a null.
+	// A metric the product ships, by key.
 	SystemMetric SystemMetricDetails `json:"systemMetric"`
 }
 
@@ -6540,7 +6536,6 @@ fragment AgentDetails on Agent {
 	id
 	name
 	description
-	tags
 	createdAt
 	updatedAt
 	latestVersion {
@@ -8314,7 +8309,6 @@ fragment AgentDetails on Agent {
 	id
 	name
 	description
-	tags
 	createdAt
 	updatedAt
 	latestVersion {
@@ -9967,7 +9961,6 @@ fragment AgentDetails on Agent {
 	id
 	name
 	description
-	tags
 	createdAt
 	updatedAt
 	latestVersion {
