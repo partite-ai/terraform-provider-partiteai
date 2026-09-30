@@ -17,15 +17,13 @@ Model Profile resource
 
 ### Required
 
+- `configuration` (Attributes) The model and the settings it is called with. Which of these a model accepts is reported by its provider, as a model's supported parameters, rather than being fixed by the vendor, so this is one block for every provider. (see [below for nested schema](#nestedatt--configuration))
 - `model_provider_id` (String) ID of the Model Provider
 - `name` (String) Resource name
 
 ### Optional
 
-- `anthropic` (Attributes) Anthropic profile config (see [below for nested schema](#nestedatt--anthropic))
 - `description` (String) Resource description
-- `google` (Attributes) Google profile config (see [below for nested schema](#nestedatt--google))
-- `openai` (Attributes) OpenAI profile config (see [below for nested schema](#nestedatt--openai))
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only
@@ -34,51 +32,21 @@ Model Profile resource
 - `id` (String) Resource identifier
 - `updated_at` (String) Timestamp when the resource was last updated
 
-<a id="nestedatt--anthropic"></a>
-### Nested Schema for `anthropic`
+<a id="nestedatt--configuration"></a>
+### Nested Schema for `configuration`
 
 Required:
 
-- `max_tokens` (Number) Maximum tokens
-- `model` (String) Anthropic model name
+- `model` (String) The name the service knows the model by.
 
 Optional:
 
-- `temperature` (Number) Temperature
-- `thinking_budget_tokens` (Number) Thinking budget tokens
-- `top_k` (Number) Top K
-- `top_p` (Number) Top P
-
-
-<a id="nestedatt--google"></a>
-### Nested Schema for `google`
-
-Required:
-
-- `model` (String) Google model name
-
-Optional:
-
-- `max_tokens` (Number) Maximum tokens
-- `temperature` (Number) Temperature
-- `thinking_budget_tokens` (Number) Thinking budget tokens
-- `top_k` (Number) Top K
-- `top_p` (Number) Top P
-
-
-<a id="nestedatt--openai"></a>
-### Nested Schema for `openai`
-
-Required:
-
-- `model` (String) OpenAI model name
-
-Optional:
-
-- `max_tokens` (Number) Maximum tokens
-- `reasoning_effort` (String) Reasoning effort (LOW, MEDIUM, HIGH)
-- `temperature` (Number) Temperature
-- `top_p` (Number) Top P
+- `max_tokens` (Number) The most tokens the model may produce in one response.
+- `reasoning_effort` (String) How hard the model should think: NONE, MINIMAL, LOW, MEDIUM, HIGH, XHIGH or MAX.
+- `temperature` (Number) How much the model is allowed to vary its output.
+- `thinking_budget_tokens` (Number) Tokens the model may spend reasoning before it answers.
+- `top_k` (Number) How many candidate tokens the model considers.
+- `top_p` (Number) Nucleus sampling cutoff.
 
 
 <a id="nestedatt--tags"></a>

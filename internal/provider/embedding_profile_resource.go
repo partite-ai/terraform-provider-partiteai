@@ -47,12 +47,14 @@ func (r *EmbeddingProfileResource) Schema(ctx context.Context, req resource.Sche
 				MarkdownDescription: "The width of the vectors this profile produces. A memory store keeps every vector of one width together, so changing it means re-embedding what the store already holds.",
 				Computed:            true,
 			},
-			"openai": schema.SingleNestedAttribute{
-				MarkdownDescription: "OpenAI embedding configuration",
-				Optional:            true,
+			"configuration": schema.SingleNestedAttribute{
+				MarkdownDescription: "The embedding model and how it is asked for vectors. Which settings a " +
+					"model accepts is the provider's business, not a fixed shape per vendor, so this is one " +
+					"block for every provider.",
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"model": schema.StringAttribute{
-						MarkdownDescription: "The name the service knows the embedding model by, such as text-embedding-3-small",
+						MarkdownDescription: "The name the service knows the embedding model by, such as text-embedding-3-small or gemini-embedding-001",
 						Required:            true,
 					},
 					"dimensions": schema.Int64Attribute{
@@ -65,28 +67,8 @@ func (r *EmbeddingProfileResource) Schema(ctx context.Context, req resource.Sche
 						Computed:            true,
 						Default:             booldefault.StaticBool(false),
 					},
-				},
-			},
-			"google": schema.SingleNestedAttribute{
-				MarkdownDescription: "Google embedding configuration",
-				Optional:            true,
-				Attributes: map[string]schema.Attribute{
-					"model": schema.StringAttribute{
-						MarkdownDescription: "The name the service knows the embedding model by, such as gemini-embedding-001",
-						Required:            true,
-					},
-					"dimensions": schema.Int64Attribute{
-						MarkdownDescription: "The width of the vectors this profile produces",
-						Required:            true,
-					},
-					"send_dimensions": schema.BoolAttribute{
-						MarkdownDescription: "Ask the service for that width with each request",
-						Optional:            true,
-						Computed:            true,
-						Default:             booldefault.StaticBool(false),
-					},
 					"task_type": schema.StringAttribute{
-						MarkdownDescription: "What the embedding is for, such as RETRIEVAL_DOCUMENT",
+						MarkdownDescription: "What the embedding is for, such as RETRIEVAL_DOCUMENT. Google only.",
 						Optional:            true,
 					},
 				},
@@ -104,17 +86,16 @@ func (r *EmbeddingProfileResource) Create(ctx context.Context, req resource.Crea
 
 	logResourceOperation(ctx, "creating", "embedding_profile", "")
 
-	openAI, google, ok := embeddingProfileConfig(ctx, data, &resp.Diagnostics)
+	config, ok := embeddingProfileConfig(ctx, data, &resp.Diagnostics)
 	if !ok {
 		return
 	}
 
 	createResp, err := pgql.CreateEmbeddingProfile(ctx, r.GetClient(),
 		data.ModelProviderId.ValueString(), &pgql.NewEmbeddingProfile{
-			Name:                data.Name.ValueString(),
-			Description:         pgql.OptPtr(data.Description.ValueStringPointer()),
-			ConfigurationOpenAI: openAI,
-			ConfigurationGoogle: google,
+			Name:          data.Name.ValueString(),
+			Description:   pgql.OptPtr(data.Description.ValueStringPointer()),
+			Configuration: *config,
 		})
 	if err != nil {
 		handleAPIError(&resp.Diagnostics, err, "create embedding profile")
@@ -164,15 +145,12 @@ func (r *EmbeddingProfileResource) Update(ctx context.Context, req resource.Upda
 		update.Description = pgql.OptNil(planData.Description.ValueStringPointer())
 	}
 
-	openAI, google, ok := embeddingProfileConfig(ctx, planData, &resp.Diagnostics)
-	if !ok {
-		return
-	}
-	if !planData.OpenAI.Equal(stateData.OpenAI) {
-		update.ConfigurationOpenAI = openAI
-	}
-	if !planData.Google.Equal(stateData.Google) {
-		update.ConfigurationGoogle = google
+	if !planData.Configuration.Equal(stateData.Configuration) {
+		config, ok := embeddingProfileConfig(ctx, planData, &resp.Diagnostics)
+		if !ok {
+			return
+		}
+		update.Configuration = config
 	}
 
 	updateResp, err := pgql.ModifyEmbeddingProfile(ctx, r.GetClient(), planData.Id.ValueString(), &update)
@@ -208,39 +186,19 @@ func (r *EmbeddingProfileResource) ImportState(ctx context.Context, req resource
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-// embeddingProfileConfig reads whichever provider block the configuration set.
-// Exactly one of them is allowed, because a profile belongs to one provider.
+// embeddingProfileConfig reads the configuration block.
 func embeddingProfileConfig(
 	ctx context.Context,
 	data EmbeddingProfileResourceModel,
 	diags *diag.Diagnostics,
-) (*pgql.EmbeddingProfileConfigInputOpenAI, *pgql.EmbeddingProfileConfigInputGoogle, bool) {
-	hasOpenAI := !data.OpenAI.IsNull() && !data.OpenAI.IsUnknown()
-	hasGoogle := !data.Google.IsNull() && !data.Google.IsUnknown()
-	if hasOpenAI == hasGoogle {
-		diags.AddError("Invalid configuration", "Set exactly one of openai or google.")
-		return nil, nil, false
-	}
-
-	if hasOpenAI {
-		var block embeddingProfileOpenAIBlock
-		if d := tfsdk.ValueAs(ctx, data.OpenAI, &block); d.HasError() {
-			diags.Append(d...)
-			return nil, nil, false
-		}
-		return &pgql.EmbeddingProfileConfigInputOpenAI{
-			Model:          block.Model,
-			Dimensions:     int(block.Dimensions),
-			SendDimensions: pgql.OptPtr(block.SendDimensions.ValueBoolPointer()),
-		}, nil, true
-	}
-
-	var block embeddingProfileGoogleBlock
-	if d := tfsdk.ValueAs(ctx, data.Google, &block); d.HasError() {
+) (*pgql.EmbeddingProfileConfigInput, bool) {
+	var block embeddingProfileConfigBlock
+	if d := tfsdk.ValueAs(ctx, data.Configuration, &block); d.HasError() {
 		diags.Append(d...)
-		return nil, nil, false
+		return nil, false
 	}
-	return nil, &pgql.EmbeddingProfileConfigInputGoogle{
+
+	return &pgql.EmbeddingProfileConfigInput{
 		Model:          block.Model,
 		Dimensions:     int(block.Dimensions),
 		SendDimensions: pgql.OptPtr(block.SendDimensions.ValueBoolPointer()),

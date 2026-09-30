@@ -384,6 +384,49 @@ func (v *CreateMcpConnectionResponse) GetCreateMcpConnection() McpConnectionDeta
 	return v.CreateMcpConnection
 }
 
+// CreateMcpConnectionSubscriptionResponse is returned by CreateMcpConnectionSubscription on success.
+type CreateMcpConnectionSubscriptionResponse struct {
+	CreateMcpConnectionSubscription McpConnectionSubscriptionDetails `json:"createMcpConnectionSubscription"`
+}
+
+// GetCreateMcpConnectionSubscription returns CreateMcpConnectionSubscriptionResponse.CreateMcpConnectionSubscription, and is useful for accessing the field via an interface.
+func (v *CreateMcpConnectionSubscriptionResponse) GetCreateMcpConnectionSubscription() McpConnectionSubscriptionDetails {
+	return v.CreateMcpConnectionSubscription
+}
+
+// CreateMcpConnectionTunnelKeyCreateMcpConnectionTunnelKeyNewMcpConnectionTunnelKeyResult includes the requested fields of the GraphQL type NewMcpConnectionTunnelKeyResult.
+// The GraphQL type's documentation follows.
+//
+// A newly created relay credential. The secret exists in this form once and is
+// never readable again.
+type CreateMcpConnectionTunnelKeyCreateMcpConnectionTunnelKeyNewMcpConnectionTunnelKeyResult struct {
+	// The credential to configure on a relay, as a single string.
+	Credential string                        `json:"credential"`
+	TunnelKey  McpConnectionTunnelKeyDetails `json:"tunnelKey"`
+}
+
+// GetCredential returns CreateMcpConnectionTunnelKeyCreateMcpConnectionTunnelKeyNewMcpConnectionTunnelKeyResult.Credential, and is useful for accessing the field via an interface.
+func (v *CreateMcpConnectionTunnelKeyCreateMcpConnectionTunnelKeyNewMcpConnectionTunnelKeyResult) GetCredential() string {
+	return v.Credential
+}
+
+// GetTunnelKey returns CreateMcpConnectionTunnelKeyCreateMcpConnectionTunnelKeyNewMcpConnectionTunnelKeyResult.TunnelKey, and is useful for accessing the field via an interface.
+func (v *CreateMcpConnectionTunnelKeyCreateMcpConnectionTunnelKeyNewMcpConnectionTunnelKeyResult) GetTunnelKey() McpConnectionTunnelKeyDetails {
+	return v.TunnelKey
+}
+
+// CreateMcpConnectionTunnelKeyResponse is returned by CreateMcpConnectionTunnelKey on success.
+type CreateMcpConnectionTunnelKeyResponse struct {
+	// Issues a relay credential. The secret is in the result and is never readable
+	// again, so it has to be stored when it is returned.
+	CreateMcpConnectionTunnelKey CreateMcpConnectionTunnelKeyCreateMcpConnectionTunnelKeyNewMcpConnectionTunnelKeyResult `json:"createMcpConnectionTunnelKey"`
+}
+
+// GetCreateMcpConnectionTunnelKey returns CreateMcpConnectionTunnelKeyResponse.CreateMcpConnectionTunnelKey, and is useful for accessing the field via an interface.
+func (v *CreateMcpConnectionTunnelKeyResponse) GetCreateMcpConnectionTunnelKey() CreateMcpConnectionTunnelKeyCreateMcpConnectionTunnelKeyNewMcpConnectionTunnelKeyResult {
+	return v.CreateMcpConnectionTunnelKey
+}
+
 // CreateMemoryInteractionProfileResponse is returned by CreateMemoryInteractionProfile on success.
 type CreateMemoryInteractionProfileResponse struct {
 	CreateMemoryInteractionProfile MemoryInteractionProfileDetails `json:"createMemoryInteractionProfile"`
@@ -641,6 +684,26 @@ func (v *DeleteMcpConnectionResponse) GetDeleteMcpConnections() DeleteMcpConnect
 	return v.DeleteMcpConnections
 }
 
+// DeleteMcpConnectionSubscriptionDeleteMcpConnectionSubscriptionsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteMcpConnectionSubscriptionDeleteMcpConnectionSubscriptionsDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteMcpConnectionSubscriptionDeleteMcpConnectionSubscriptionsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteMcpConnectionSubscriptionDeleteMcpConnectionSubscriptionsDeleteResults) GetIds() []string {
+	return v.Ids
+}
+
+// DeleteMcpConnectionSubscriptionResponse is returned by DeleteMcpConnectionSubscription on success.
+type DeleteMcpConnectionSubscriptionResponse struct {
+	DeleteMcpConnectionSubscriptions DeleteMcpConnectionSubscriptionDeleteMcpConnectionSubscriptionsDeleteResults `json:"deleteMcpConnectionSubscriptions"`
+}
+
+// GetDeleteMcpConnectionSubscriptions returns DeleteMcpConnectionSubscriptionResponse.DeleteMcpConnectionSubscriptions, and is useful for accessing the field via an interface.
+func (v *DeleteMcpConnectionSubscriptionResponse) GetDeleteMcpConnectionSubscriptions() DeleteMcpConnectionSubscriptionDeleteMcpConnectionSubscriptionsDeleteResults {
+	return v.DeleteMcpConnectionSubscriptions
+}
+
 // DeleteMemoryInteractionProfileDeleteMemoryInteractionProfilesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
 type DeleteMemoryInteractionProfileDeleteMemoryInteractionProfilesDeleteResults struct {
 	Ids []string `json:"ids"`
@@ -853,7 +916,7 @@ type EmbeddingProfileDetails struct {
 	Description *string `json:"description"`
 	// The size of the vectors this profile produces.
 	Dimensions    int                                                        `json:"dimensions"`
-	Configuration EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig `json:"-"`
+	Configuration EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig `json:"configuration"`
 	Provider      EmbeddingProfileDetailsProviderModelProvider               `json:"provider"`
 	CreatedAt     string                                                     `json:"createdAt"`
 	UpdatedAt     string                                                     `json:"updatedAt"`
@@ -887,223 +950,35 @@ func (v *EmbeddingProfileDetails) GetCreatedAt() string { return v.CreatedAt }
 // GetUpdatedAt returns EmbeddingProfileDetails.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *EmbeddingProfileDetails) GetUpdatedAt() string { return v.UpdatedAt }
 
-func (v *EmbeddingProfileDetails) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*EmbeddingProfileDetails
-		Configuration json.RawMessage `json:"configuration"`
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.EmbeddingProfileDetails = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	{
-		dst := &v.Configuration
-		src := firstPass.Configuration
-		if len(src) != 0 && string(src) != "null" {
-			err = __unmarshalEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig(
-				src, dst)
-			if err != nil {
-				return fmt.Errorf(
-					"unable to unmarshal EmbeddingProfileDetails.Configuration: %w", err)
-			}
-		}
-	}
-	return nil
-}
-
-type __premarshalEmbeddingProfileDetails struct {
-	Id string `json:"id"`
-
-	Name string `json:"name"`
-
-	Description *string `json:"description"`
-
-	Dimensions int `json:"dimensions"`
-
-	Configuration json.RawMessage `json:"configuration"`
-
-	Provider EmbeddingProfileDetailsProviderModelProvider `json:"provider"`
-
-	CreatedAt string `json:"createdAt"`
-
-	UpdatedAt string `json:"updatedAt"`
-}
-
-func (v *EmbeddingProfileDetails) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *EmbeddingProfileDetails) __premarshalJSON() (*__premarshalEmbeddingProfileDetails, error) {
-	var retval __premarshalEmbeddingProfileDetails
-
-	retval.Id = v.Id
-	retval.Name = v.Name
-	retval.Description = v.Description
-	retval.Dimensions = v.Dimensions
-	{
-
-		dst := &retval.Configuration
-		src := v.Configuration
-		var err error
-		*dst, err = __marshalEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig(
-			&src)
-		if err != nil {
-			return nil, fmt.Errorf(
-				"unable to marshal EmbeddingProfileDetails.Configuration: %w", err)
-		}
-	}
-	retval.Provider = v.Provider
-	retval.CreatedAt = v.CreatedAt
-	retval.UpdatedAt = v.UpdatedAt
-	return &retval, nil
-}
-
-// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig includes the requested fields of the GraphQL interface EmbeddingProfileConfig.
+// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig includes the requested fields of the GraphQL type EmbeddingProfileConfig.
+// The GraphQL type's documentation follows.
 //
-// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig is implemented by the following types:
-// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle
-// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI
-type EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig interface {
-	implementsGraphQLInterfaceEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig()
-	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
-	GetTypename() *string
-}
-
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) implementsGraphQLInterfaceEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig() {
-}
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) implementsGraphQLInterfaceEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig() {
-}
-
-func __unmarshalEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig(b []byte, v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig) error {
-	if string(b) == "null" {
-		return nil
-	}
-
-	var tn struct {
-		TypeName string `json:"__typename"`
-	}
-	err := json.Unmarshal(b, &tn)
-	if err != nil {
-		return err
-	}
-
-	switch tn.TypeName {
-	case "EmbeddingProfileConfigGoogle":
-		*v = new(EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle)
-		return json.Unmarshal(b, *v)
-	case "EmbeddingProfileConfigOpenAI":
-		*v = new(EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI)
-		return json.Unmarshal(b, *v)
-	case "":
-		return fmt.Errorf(
-			"response was missing EmbeddingProfileConfig.__typename")
-	default:
-		return fmt.Errorf(
-			`unexpected concrete type for EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig: "%v"`, tn.TypeName)
-	}
-}
-
-func __marshalEmbeddingProfileDetailsConfigurationEmbeddingProfileConfig(v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig) ([]byte, error) {
-
-	var typename string
-	switch v := (*v).(type) {
-	case *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle:
-		typename = "EmbeddingProfileConfigGoogle"
-
-		result := struct {
-			TypeName string `json:"__typename"`
-			*EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle
-		}{typename, v}
-		return json.Marshal(result)
-	case *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI:
-		typename = "EmbeddingProfileConfigOpenAI"
-
-		result := struct {
-			TypeName string `json:"__typename"`
-			*EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI
-		}{typename, v}
-		return json.Marshal(result)
-	case nil:
-		return []byte("null"), nil
-	default:
-		return nil, fmt.Errorf(
-			`unexpected concrete type for EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig: "%T"`, v)
-	}
-}
-
-// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle includes the requested fields of the GraphQL type EmbeddingProfileConfigGoogle.
-type EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle struct {
-	Typename       *string `json:"__typename"`
+// What an embedding profile holds. taskType is accepted by Google only.
+type EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig struct {
 	Model          string  `json:"model"`
 	Dimensions     int     `json:"dimensions"`
 	SendDimensions bool    `json:"sendDimensions"`
 	TaskType       *string `json:"taskType"`
 }
 
-// GetTypename returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.Typename, and is useful for accessing the field via an interface.
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetTypename() *string {
-	return v.Typename
-}
-
-// GetModel returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.Model, and is useful for accessing the field via an interface.
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetModel() string {
+// GetModel returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig.Model, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig) GetModel() string {
 	return v.Model
 }
 
-// GetDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.Dimensions, and is useful for accessing the field via an interface.
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetDimensions() int {
+// GetDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig.Dimensions, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig) GetDimensions() int {
 	return v.Dimensions
 }
 
-// GetSendDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.SendDimensions, and is useful for accessing the field via an interface.
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetSendDimensions() bool {
+// GetSendDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig.SendDimensions, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig) GetSendDimensions() bool {
 	return v.SendDimensions
 }
 
-// GetTaskType returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle.TaskType, and is useful for accessing the field via an interface.
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle) GetTaskType() *string {
+// GetTaskType returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig.TaskType, and is useful for accessing the field via an interface.
+func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig) GetTaskType() *string {
 	return v.TaskType
-}
-
-// EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI includes the requested fields of the GraphQL type EmbeddingProfileConfigOpenAI.
-type EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI struct {
-	Typename       *string `json:"__typename"`
-	Model          string  `json:"model"`
-	Dimensions     int     `json:"dimensions"`
-	SendDimensions bool    `json:"sendDimensions"`
-}
-
-// GetTypename returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI.Typename, and is useful for accessing the field via an interface.
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) GetTypename() *string {
-	return v.Typename
-}
-
-// GetModel returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI.Model, and is useful for accessing the field via an interface.
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) GetModel() string {
-	return v.Model
-}
-
-// GetDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI.Dimensions, and is useful for accessing the field via an interface.
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) GetDimensions() int {
-	return v.Dimensions
-}
-
-// GetSendDimensions returns EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI.SendDimensions, and is useful for accessing the field via an interface.
-func (v *EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI) GetSendDimensions() bool {
-	return v.SendDimensions
 }
 
 // EmbeddingProfileDetailsProviderModelProvider includes the requested fields of the GraphQL type ModelProvider.
@@ -1241,6 +1116,39 @@ type GetMcpConnectionResponse struct {
 
 // GetMcpConnection returns GetMcpConnectionResponse.McpConnection, and is useful for accessing the field via an interface.
 func (v *GetMcpConnectionResponse) GetMcpConnection() *McpConnectionDetails { return v.McpConnection }
+
+// GetMcpConnectionSubscriptionsMcpConnection includes the requested fields of the GraphQL type McpConnection.
+type GetMcpConnectionSubscriptionsMcpConnection struct {
+	TunnelTransport *GetMcpConnectionSubscriptionsMcpConnectionTunnelTransportTunnelMcpTransport `json:"tunnelTransport"`
+}
+
+// GetTunnelTransport returns GetMcpConnectionSubscriptionsMcpConnection.TunnelTransport, and is useful for accessing the field via an interface.
+func (v *GetMcpConnectionSubscriptionsMcpConnection) GetTunnelTransport() *GetMcpConnectionSubscriptionsMcpConnectionTunnelTransportTunnelMcpTransport {
+	return v.TunnelTransport
+}
+
+// GetMcpConnectionSubscriptionsMcpConnectionTunnelTransportTunnelMcpTransport includes the requested fields of the GraphQL type TunnelMcpTransport.
+type GetMcpConnectionSubscriptionsMcpConnectionTunnelTransportTunnelMcpTransport struct {
+	// Subscriptions decide which relays serve which conversations. A conversation
+	// tagged env=dev reaches a development relay, one tagged developer=bob reaches
+	// Bob's workstation, one tagged region=eu reaches the deployment there.
+	Subscriptions []McpConnectionSubscriptionWithKeys `json:"subscriptions"`
+}
+
+// GetSubscriptions returns GetMcpConnectionSubscriptionsMcpConnectionTunnelTransportTunnelMcpTransport.Subscriptions, and is useful for accessing the field via an interface.
+func (v *GetMcpConnectionSubscriptionsMcpConnectionTunnelTransportTunnelMcpTransport) GetSubscriptions() []McpConnectionSubscriptionWithKeys {
+	return v.Subscriptions
+}
+
+// GetMcpConnectionSubscriptionsResponse is returned by GetMcpConnectionSubscriptions on success.
+type GetMcpConnectionSubscriptionsResponse struct {
+	McpConnection *GetMcpConnectionSubscriptionsMcpConnection `json:"mcpConnection"`
+}
+
+// GetMcpConnection returns GetMcpConnectionSubscriptionsResponse.McpConnection, and is useful for accessing the field via an interface.
+func (v *GetMcpConnectionSubscriptionsResponse) GetMcpConnection() *GetMcpConnectionSubscriptionsMcpConnection {
+	return v.McpConnection
+}
 
 // GetMemoryInteractionProfileResponse is returned by GetMemoryInteractionProfile on success.
 type GetMemoryInteractionProfileResponse struct {
@@ -2100,13 +2008,13 @@ func (v *McpConnectionBasicCredentials) GetPassword() string { return v.Password
 
 // McpConnectionDetails includes the GraphQL fields of McpConnection requested by the fragment McpConnectionDetails.
 type McpConnectionDetails struct {
-	Id             string                                               `json:"id"`
-	Name           string                                               `json:"name"`
-	Transport      McpTransport                                         `json:"transport"`
-	HttpTransport  *McpConnectionDetailsHttpTransportHttpMcpTransport   `json:"httpTransport"`
-	StdioTransport *McpConnectionDetailsStdioTransportStdioMcpTransport `json:"stdioTransport"`
-	CreatedAt      string                                               `json:"createdAt"`
-	UpdatedAt      string                                               `json:"updatedAt"`
+	Id              string                                                 `json:"id"`
+	Name            string                                                 `json:"name"`
+	Transport       McpTransport                                           `json:"transport"`
+	HttpTransport   *McpConnectionDetailsHttpTransportHttpMcpTransport     `json:"httpTransport"`
+	TunnelTransport *McpConnectionDetailsTunnelTransportTunnelMcpTransport `json:"tunnelTransport"`
+	CreatedAt       string                                                 `json:"createdAt"`
+	UpdatedAt       string                                                 `json:"updatedAt"`
 }
 
 // GetId returns McpConnectionDetails.Id, and is useful for accessing the field via an interface.
@@ -2123,9 +2031,9 @@ func (v *McpConnectionDetails) GetHttpTransport() *McpConnectionDetailsHttpTrans
 	return v.HttpTransport
 }
 
-// GetStdioTransport returns McpConnectionDetails.StdioTransport, and is useful for accessing the field via an interface.
-func (v *McpConnectionDetails) GetStdioTransport() *McpConnectionDetailsStdioTransportStdioMcpTransport {
-	return v.StdioTransport
+// GetTunnelTransport returns McpConnectionDetails.TunnelTransport, and is useful for accessing the field via an interface.
+func (v *McpConnectionDetails) GetTunnelTransport() *McpConnectionDetailsTunnelTransportTunnelMcpTransport {
+	return v.TunnelTransport
 }
 
 // GetCreatedAt returns McpConnectionDetails.CreatedAt, and is useful for accessing the field via an interface.
@@ -2148,24 +2056,67 @@ func (v *McpConnectionDetailsHttpTransportHttpMcpTransport) GetAuthFlow() McpAut
 	return v.AuthFlow
 }
 
-// McpConnectionDetailsStdioTransportStdioMcpTransport includes the requested fields of the GraphQL type StdioMcpTransport.
-type McpConnectionDetailsStdioTransportStdioMcpTransport struct {
-	Command     string   `json:"command"`
-	Arguments   []string `json:"arguments"`
-	Environment []string `json:"environment"`
+// McpConnectionDetailsTunnelTransportTunnelMcpTransport includes the requested fields of the GraphQL type TunnelMcpTransport.
+type McpConnectionDetailsTunnelTransportTunnelMcpTransport struct {
+	// Subscriptions decide which relays serve which conversations. A conversation
+	// tagged env=dev reaches a development relay, one tagged developer=bob reaches
+	// Bob's workstation, one tagged region=eu reaches the deployment there.
+	Subscriptions []McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription `json:"subscriptions"`
 }
 
-// GetCommand returns McpConnectionDetailsStdioTransportStdioMcpTransport.Command, and is useful for accessing the field via an interface.
-func (v *McpConnectionDetailsStdioTransportStdioMcpTransport) GetCommand() string { return v.Command }
-
-// GetArguments returns McpConnectionDetailsStdioTransportStdioMcpTransport.Arguments, and is useful for accessing the field via an interface.
-func (v *McpConnectionDetailsStdioTransportStdioMcpTransport) GetArguments() []string {
-	return v.Arguments
+// GetSubscriptions returns McpConnectionDetailsTunnelTransportTunnelMcpTransport.Subscriptions, and is useful for accessing the field via an interface.
+func (v *McpConnectionDetailsTunnelTransportTunnelMcpTransport) GetSubscriptions() []McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription {
+	return v.Subscriptions
 }
 
-// GetEnvironment returns McpConnectionDetailsStdioTransportStdioMcpTransport.Environment, and is useful for accessing the field via an interface.
-func (v *McpConnectionDetailsStdioTransportStdioMcpTransport) GetEnvironment() []string {
-	return v.Environment
+// McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription includes the requested fields of the GraphQL type McpConnectionSubscription.
+// The GraphQL type's documentation follows.
+//
+// A named set of selection criteria over conversation tags.
+//
+// Matching happens when a relay polls, not when a message is queued, so a message
+// is never bound to a subscription: a newly configured subscription immediately
+// drains work already waiting, and overlapping subscriptions are eligibility rather
+// than ambiguity. Subscriptions do not rank against each other; whichever eligible
+// relay polls first takes the message.
+type McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	// Every criterion must be satisfied for a conversation to be eligible. An empty
+	// list matches every conversation, which is what a connection that does no
+	// routing has.
+	Criteria []McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscriptionCriteriaMcpConnectionSubscriptionCriterion `json:"criteria"`
+}
+
+// GetId returns McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription.Id, and is useful for accessing the field via an interface.
+func (v *McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription) GetId() string {
+	return v.Id
+}
+
+// GetName returns McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription.Name, and is useful for accessing the field via an interface.
+func (v *McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription) GetName() string {
+	return v.Name
+}
+
+// GetCriteria returns McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription.Criteria, and is useful for accessing the field via an interface.
+func (v *McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscription) GetCriteria() []McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscriptionCriteriaMcpConnectionSubscriptionCriterion {
+	return v.Criteria
+}
+
+// McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscriptionCriteriaMcpConnectionSubscriptionCriterion includes the requested fields of the GraphQL type McpConnectionSubscriptionCriterion.
+type McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscriptionCriteriaMcpConnectionSubscriptionCriterion struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscriptionCriteriaMcpConnectionSubscriptionCriterion.Name, and is useful for accessing the field via an interface.
+func (v *McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscriptionCriteriaMcpConnectionSubscriptionCriterion) GetName() string {
+	return v.Name
+}
+
+// GetValue returns McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscriptionCriteriaMcpConnectionSubscriptionCriterion.Value, and is useful for accessing the field via an interface.
+func (v *McpConnectionDetailsTunnelTransportTunnelMcpTransportSubscriptionsMcpConnectionSubscriptionCriteriaMcpConnectionSubscriptionCriterion) GetValue() string {
+	return v.Value
 }
 
 type McpConnectionHeaderCredentials struct {
@@ -2179,9 +2130,28 @@ func (v *McpConnectionHeaderCredentials) GetName() string { return v.Name }
 // GetValue returns McpConnectionHeaderCredentials.Value, and is useful for accessing the field via an interface.
 func (v *McpConnectionHeaderCredentials) GetValue() string { return v.Value }
 
+type McpConnectionHttpHeaderInput struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns McpConnectionHttpHeaderInput.Name, and is useful for accessing the field via an interface.
+func (v *McpConnectionHttpHeaderInput) GetName() string { return v.Name }
+
+// GetValue returns McpConnectionHttpHeaderInput.Value, and is useful for accessing the field via an interface.
+func (v *McpConnectionHttpHeaderInput) GetValue() string { return v.Value }
+
 type McpConnectionHttpTransportSettings struct {
 	Url      string      `json:"url"`
 	AuthFlow McpAuthFlow `json:"authFlow"`
+	// Headers sent on every request to this server. On an update, leaving this out
+	// keeps the connection's existing headers; passing null or an empty list clears
+	// them; passing a list replaces them.
+	//
+	// A name must be a valid HTTP field name, a value cannot contain a line break,
+	// and a name cannot repeat. A header the connection's authentication sets is not
+	// replaced by one configured here.
+	Headers []McpConnectionHttpHeaderInput `json:"headers"`
 }
 
 // GetUrl returns McpConnectionHttpTransportSettings.Url, and is useful for accessing the field via an interface.
@@ -2189,6 +2159,11 @@ func (v *McpConnectionHttpTransportSettings) GetUrl() string { return v.Url }
 
 // GetAuthFlow returns McpConnectionHttpTransportSettings.AuthFlow, and is useful for accessing the field via an interface.
 func (v *McpConnectionHttpTransportSettings) GetAuthFlow() McpAuthFlow { return v.AuthFlow }
+
+// GetHeaders returns McpConnectionHttpTransportSettings.Headers, and is useful for accessing the field via an interface.
+func (v *McpConnectionHttpTransportSettings) GetHeaders() []McpConnectionHttpHeaderInput {
+	return v.Headers
+}
 
 type McpConnectionOauthAuthorizationCodeCredentials struct {
 	ExchangeID string `json:"exchangeID"`
@@ -2212,33 +2187,300 @@ func (v *McpConnectionOauthClientCredentials) GetClientSecret() string { return 
 // GetScopes returns McpConnectionOauthClientCredentials.Scopes, and is useful for accessing the field via an interface.
 func (v *McpConnectionOauthClientCredentials) GetScopes() []string { return v.Scopes }
 
-type McpConnectionStdioTransportSettings struct {
-	Command     string   `json:"command"`
-	Arguments   []string `json:"arguments"`
-	Environment []string `json:"environment"`
+type McpConnectionSubscriptionChanges struct {
+	Name *string `json:"name,omitempty"`
+	// Setting this to null clears every criterion, which makes the subscription
+	// match every conversation. Leaving it out leaves the criteria unchanged.
+	Criteria []McpConnectionSubscriptionCriterionInput `json:"criteria"`
+	// Unattached keys to attach to this subscription. Keys already attached stay
+	// attached; this adds to them. Removing a key is revoking it.
+	AddTunnelKeyIDs []string `json:"addTunnelKeyIDs"`
 }
 
-// GetCommand returns McpConnectionStdioTransportSettings.Command, and is useful for accessing the field via an interface.
-func (v *McpConnectionStdioTransportSettings) GetCommand() string { return v.Command }
+// GetName returns McpConnectionSubscriptionChanges.Name, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionChanges) GetName() *string { return v.Name }
 
-// GetArguments returns McpConnectionStdioTransportSettings.Arguments, and is useful for accessing the field via an interface.
-func (v *McpConnectionStdioTransportSettings) GetArguments() []string { return v.Arguments }
+// GetCriteria returns McpConnectionSubscriptionChanges.Criteria, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionChanges) GetCriteria() []McpConnectionSubscriptionCriterionInput {
+	return v.Criteria
+}
 
-// GetEnvironment returns McpConnectionStdioTransportSettings.Environment, and is useful for accessing the field via an interface.
-func (v *McpConnectionStdioTransportSettings) GetEnvironment() []string { return v.Environment }
+// GetAddTunnelKeyIDs returns McpConnectionSubscriptionChanges.AddTunnelKeyIDs, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionChanges) GetAddTunnelKeyIDs() []string { return v.AddTunnelKeyIDs }
+
+type McpConnectionSubscriptionCriterionInput struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns McpConnectionSubscriptionCriterionInput.Name, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionCriterionInput) GetName() string { return v.Name }
+
+// GetValue returns McpConnectionSubscriptionCriterionInput.Value, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionCriterionInput) GetValue() string { return v.Value }
+
+// McpConnectionSubscriptionDetails includes the GraphQL fields of McpConnectionSubscription requested by the fragment McpConnectionSubscriptionDetails.
+// The GraphQL type's documentation follows.
+//
+// A named set of selection criteria over conversation tags.
+//
+// Matching happens when a relay polls, not when a message is queued, so a message
+// is never bound to a subscription: a newly configured subscription immediately
+// drains work already waiting, and overlapping subscriptions are eligibility rather
+// than ambiguity. Subscriptions do not rank against each other; whichever eligible
+// relay polls first takes the message.
+type McpConnectionSubscriptionDetails struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	// Every criterion must be satisfied for a conversation to be eligible. An empty
+	// list matches every conversation, which is what a connection that does no
+	// routing has.
+	Criteria  []McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion `json:"criteria"`
+	CreatedAt string                                                                       `json:"createdAt"`
+	UpdatedAt string                                                                       `json:"updatedAt"`
+}
+
+// GetId returns McpConnectionSubscriptionDetails.Id, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionDetails) GetId() string { return v.Id }
+
+// GetName returns McpConnectionSubscriptionDetails.Name, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionDetails) GetName() string { return v.Name }
+
+// GetCriteria returns McpConnectionSubscriptionDetails.Criteria, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionDetails) GetCriteria() []McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion {
+	return v.Criteria
+}
+
+// GetCreatedAt returns McpConnectionSubscriptionDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns McpConnectionSubscriptionDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion includes the requested fields of the GraphQL type McpConnectionSubscriptionCriterion.
+type McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion.Name, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion) GetName() string {
+	return v.Name
+}
+
+// GetValue returns McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion.Value, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion) GetValue() string {
+	return v.Value
+}
+
+type McpConnectionSubscriptionSettings struct {
+	// Omitted to create a subscription, supplied to update the one it names.
+	Id   *string `json:"id,omitempty"`
+	Name string  `json:"name"`
+	// Every criterion must be satisfied for a conversation to be eligible. An empty
+	// list matches every conversation, which is what a connection that does no
+	// routing has.
+	Criteria []McpConnectionSubscriptionCriterionInput `json:"criteria"`
+	// Keys to attach to this subscription. A key is minted unattached and
+	// authenticates nothing until it is attached here, which is what lets the secret
+	// be shown when it is asked for rather than after a save.
+	//
+	// Keys already attached stay attached; this adds to them. Removing a key is
+	// revoking it.
+	TunnelKeyIDs []string `json:"tunnelKeyIDs"`
+}
+
+// GetId returns McpConnectionSubscriptionSettings.Id, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionSettings) GetId() *string { return v.Id }
+
+// GetName returns McpConnectionSubscriptionSettings.Name, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionSettings) GetName() string { return v.Name }
+
+// GetCriteria returns McpConnectionSubscriptionSettings.Criteria, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionSettings) GetCriteria() []McpConnectionSubscriptionCriterionInput {
+	return v.Criteria
+}
+
+// GetTunnelKeyIDs returns McpConnectionSubscriptionSettings.TunnelKeyIDs, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionSettings) GetTunnelKeyIDs() []string { return v.TunnelKeyIDs }
+
+// McpConnectionSubscriptionWithKeys includes the requested fields of the GraphQL type McpConnectionSubscription.
+// The GraphQL type's documentation follows.
+//
+// A named set of selection criteria over conversation tags.
+//
+// Matching happens when a relay polls, not when a message is queued, so a message
+// is never bound to a subscription: a newly configured subscription immediately
+// drains work already waiting, and overlapping subscriptions are eligibility rather
+// than ambiguity. Subscriptions do not rank against each other; whichever eligible
+// relay polls first takes the message.
+type McpConnectionSubscriptionWithKeys struct {
+	McpConnectionSubscriptionDetails `json:"-"`
+	// Credentials issued for this subscription. Several may exist at once, which is
+	// what allows rotation with an overlap window and one credential per relay. The
+	// secret is returned only when a key is created.
+	TunnelKeys []McpConnectionTunnelKeyDetails `json:"tunnelKeys"`
+}
+
+// GetTunnelKeys returns McpConnectionSubscriptionWithKeys.TunnelKeys, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionWithKeys) GetTunnelKeys() []McpConnectionTunnelKeyDetails {
+	return v.TunnelKeys
+}
+
+// GetId returns McpConnectionSubscriptionWithKeys.Id, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionWithKeys) GetId() string {
+	return v.McpConnectionSubscriptionDetails.Id
+}
+
+// GetName returns McpConnectionSubscriptionWithKeys.Name, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionWithKeys) GetName() string {
+	return v.McpConnectionSubscriptionDetails.Name
+}
+
+// GetCriteria returns McpConnectionSubscriptionWithKeys.Criteria, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionWithKeys) GetCriteria() []McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion {
+	return v.McpConnectionSubscriptionDetails.Criteria
+}
+
+// GetCreatedAt returns McpConnectionSubscriptionWithKeys.CreatedAt, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionWithKeys) GetCreatedAt() string {
+	return v.McpConnectionSubscriptionDetails.CreatedAt
+}
+
+// GetUpdatedAt returns McpConnectionSubscriptionWithKeys.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *McpConnectionSubscriptionWithKeys) GetUpdatedAt() string {
+	return v.McpConnectionSubscriptionDetails.UpdatedAt
+}
+
+func (v *McpConnectionSubscriptionWithKeys) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*McpConnectionSubscriptionWithKeys
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.McpConnectionSubscriptionWithKeys = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.McpConnectionSubscriptionDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalMcpConnectionSubscriptionWithKeys struct {
+	TunnelKeys []McpConnectionTunnelKeyDetails `json:"tunnelKeys"`
+
+	Id string `json:"id"`
+
+	Name string `json:"name"`
+
+	Criteria []McpConnectionSubscriptionDetailsCriteriaMcpConnectionSubscriptionCriterion `json:"criteria"`
+
+	CreatedAt string `json:"createdAt"`
+
+	UpdatedAt string `json:"updatedAt"`
+}
+
+func (v *McpConnectionSubscriptionWithKeys) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *McpConnectionSubscriptionWithKeys) __premarshalJSON() (*__premarshalMcpConnectionSubscriptionWithKeys, error) {
+	var retval __premarshalMcpConnectionSubscriptionWithKeys
+
+	retval.TunnelKeys = v.TunnelKeys
+	retval.Id = v.McpConnectionSubscriptionDetails.Id
+	retval.Name = v.McpConnectionSubscriptionDetails.Name
+	retval.Criteria = v.McpConnectionSubscriptionDetails.Criteria
+	retval.CreatedAt = v.McpConnectionSubscriptionDetails.CreatedAt
+	retval.UpdatedAt = v.McpConnectionSubscriptionDetails.UpdatedAt
+	return &retval, nil
+}
+
+// McpConnectionTunnelKeyDetails includes the GraphQL fields of McpConnectionTunnelKey requested by the fragment McpConnectionTunnelKeyDetails.
+// The GraphQL type's documentation follows.
+//
+// A relay credential.
+//
+// A key names exactly one subscription and a relay names nothing, so there is no
+// subscription parameter for mesh to validate and no way for a relay to reach
+// anything else.
+type McpConnectionTunnelKeyDetails struct {
+	Id string `json:"id"`
+	// Names the key for an operator, so laptop-bob can be told from ci without
+	// resolving anything.
+	Label string `json:"label"`
+	// False until a subscription has taken this key. An unattached key authenticates
+	// nothing, and is discarded if nothing claims it.
+	Attached  bool    `json:"attached"`
+	ExpiresAt *string `json:"expiresAt"`
+	RevokedAt *string `json:"revokedAt"`
+	CreatedAt string  `json:"createdAt"`
+}
+
+// GetId returns McpConnectionTunnelKeyDetails.Id, and is useful for accessing the field via an interface.
+func (v *McpConnectionTunnelKeyDetails) GetId() string { return v.Id }
+
+// GetLabel returns McpConnectionTunnelKeyDetails.Label, and is useful for accessing the field via an interface.
+func (v *McpConnectionTunnelKeyDetails) GetLabel() string { return v.Label }
+
+// GetAttached returns McpConnectionTunnelKeyDetails.Attached, and is useful for accessing the field via an interface.
+func (v *McpConnectionTunnelKeyDetails) GetAttached() bool { return v.Attached }
+
+// GetExpiresAt returns McpConnectionTunnelKeyDetails.ExpiresAt, and is useful for accessing the field via an interface.
+func (v *McpConnectionTunnelKeyDetails) GetExpiresAt() *string { return v.ExpiresAt }
+
+// GetRevokedAt returns McpConnectionTunnelKeyDetails.RevokedAt, and is useful for accessing the field via an interface.
+func (v *McpConnectionTunnelKeyDetails) GetRevokedAt() *string { return v.RevokedAt }
+
+// GetCreatedAt returns McpConnectionTunnelKeyDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *McpConnectionTunnelKeyDetails) GetCreatedAt() string { return v.CreatedAt }
+
+type McpConnectionTunnelTransportSettings struct {
+	// The connection's subscriptions. This is a set, not a sequence: subscriptions do
+	// not rank against each other, so the order of the list means nothing and a
+	// conversation eligible for several is served by whichever relay polls first.
+	//
+	// It is the whole set. An item with an id is updated, an item without one is
+	// created, and a subscription the list leaves out is deleted. Leaving the field
+	// out entirely keeps the existing subscriptions unchanged.
+	//
+	// Saving them with the connection makes a save one call rather than a series of
+	// creates, updates and deletes that can half-fail.
+	Subscriptions []McpConnectionSubscriptionSettings `json:"subscriptions"`
+}
+
+// GetSubscriptions returns McpConnectionTunnelTransportSettings.Subscriptions, and is useful for accessing the field via an interface.
+func (v *McpConnectionTunnelTransportSettings) GetSubscriptions() []McpConnectionSubscriptionSettings {
+	return v.Subscriptions
+}
 
 type McpTransport string
 
 const (
-	McpTransportHttp                McpTransport = "HTTP"
-	McpTransportStdio               McpTransport = "STDIO"
-	McpTransportServerInitiatedHttp McpTransport = "SERVER_INITIATED_HTTP"
+	McpTransportHttp McpTransport = "HTTP"
+	// The server connects outwards to mesh and requests are queued for it, so it needs
+	// no inbound endpoint. A relay speaks this on the server's behalf.
+	McpTransportTunnel McpTransport = "TUNNEL"
 )
 
 var AllMcpTransport = []McpTransport{
 	McpTransportHttp,
-	McpTransportStdio,
-	McpTransportServerInitiatedHttp,
+	McpTransportTunnel,
 }
 
 // Which turns of a conversation the budget keeps, where it cannot hold them all.
@@ -3299,6 +3541,24 @@ func (v *MeshDetailsDraftVersionMeshVersionModelSet) GetId() string { return v.I
 // GetName returns MeshDetailsDraftVersionMeshVersionModelSet.Name, and is useful for accessing the field via an interface.
 func (v *MeshDetailsDraftVersionMeshVersionModelSet) GetName() string { return v.Name }
 
+type MetricCategory string
+
+const (
+	MetricCategoryQuality     MetricCategory = "QUALITY"
+	MetricCategorySafety      MetricCategory = "SAFETY"
+	MetricCategorySecurity    MetricCategory = "SECURITY"
+	MetricCategoryReliability MetricCategory = "RELIABILITY"
+	MetricCategoryEfficiency  MetricCategory = "EFFICIENCY"
+)
+
+var AllMetricCategory = []MetricCategory{
+	MetricCategoryQuality,
+	MetricCategorySafety,
+	MetricCategorySecurity,
+	MetricCategoryReliability,
+	MetricCategoryEfficiency,
+}
+
 type MetricType string
 
 const (
@@ -3332,7 +3592,7 @@ type ModelProfileDetails struct {
 	Description   *string                                            `json:"description"`
 	Tags          []*Tag                                             `json:"tags"`
 	Provider      ModelProfileDetailsProviderModelProvider           `json:"provider"`
-	Configuration ModelProfileDetailsConfigurationModelProfileConfig `json:"-"`
+	Configuration ModelProfileDetailsConfigurationModelProfileConfig `json:"configuration"`
 	CreatedAt     string                                             `json:"createdAt"`
 	UpdatedAt     string                                             `json:"updatedAt"`
 }
@@ -3365,294 +3625,44 @@ func (v *ModelProfileDetails) GetCreatedAt() string { return v.CreatedAt }
 // GetUpdatedAt returns ModelProfileDetails.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *ModelProfileDetails) GetUpdatedAt() string { return v.UpdatedAt }
 
-func (v *ModelProfileDetails) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*ModelProfileDetails
-		Configuration json.RawMessage `json:"configuration"`
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.ModelProfileDetails = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	{
-		dst := &v.Configuration
-		src := firstPass.Configuration
-		if len(src) != 0 && string(src) != "null" {
-			err = __unmarshalModelProfileDetailsConfigurationModelProfileConfig(
-				src, dst)
-			if err != nil {
-				return fmt.Errorf(
-					"unable to unmarshal ModelProfileDetails.Configuration: %w", err)
-			}
-		}
-	}
-	return nil
-}
-
-type __premarshalModelProfileDetails struct {
-	Id string `json:"id"`
-
-	Name string `json:"name"`
-
-	Description *string `json:"description"`
-
-	Tags []*Tag `json:"tags"`
-
-	Provider ModelProfileDetailsProviderModelProvider `json:"provider"`
-
-	Configuration json.RawMessage `json:"configuration"`
-
-	CreatedAt string `json:"createdAt"`
-
-	UpdatedAt string `json:"updatedAt"`
-}
-
-func (v *ModelProfileDetails) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *ModelProfileDetails) __premarshalJSON() (*__premarshalModelProfileDetails, error) {
-	var retval __premarshalModelProfileDetails
-
-	retval.Id = v.Id
-	retval.Name = v.Name
-	retval.Description = v.Description
-	retval.Tags = v.Tags
-	retval.Provider = v.Provider
-	{
-
-		dst := &retval.Configuration
-		src := v.Configuration
-		var err error
-		*dst, err = __marshalModelProfileDetailsConfigurationModelProfileConfig(
-			&src)
-		if err != nil {
-			return nil, fmt.Errorf(
-				"unable to marshal ModelProfileDetails.Configuration: %w", err)
-		}
-	}
-	retval.CreatedAt = v.CreatedAt
-	retval.UpdatedAt = v.UpdatedAt
-	return &retval, nil
-}
-
-// ModelProfileDetailsConfigurationModelProfileConfig includes the requested fields of the GraphQL interface ModelProfileConfig.
+// ModelProfileDetailsConfigurationModelProfileConfig includes the requested fields of the GraphQL type ModelProfileConfig.
+// The GraphQL type's documentation follows.
 //
-// ModelProfileDetailsConfigurationModelProfileConfig is implemented by the following types:
-// ModelProfileDetailsConfigurationModelProfileConfigAnthropic
-// ModelProfileDetailsConfigurationModelProfileConfigGoogle
-// ModelProfileDetailsConfigurationModelProfileConfigOpenAI
-type ModelProfileDetailsConfigurationModelProfileConfig interface {
-	implementsGraphQLInterfaceModelProfileDetailsConfigurationModelProfileConfig()
-	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
-	GetTypename() *string
+// What a model profile holds. The same fields for every provider; a provider accepts a subset.
+type ModelProfileDetailsConfigurationModelProfileConfig struct {
+	Model                string           `json:"model"`
+	MaxTokens            *int             `json:"maxTokens"`
+	Temperature          *float64         `json:"temperature"`
+	TopP                 *float64         `json:"topP"`
+	TopK                 *int             `json:"topK"`
+	ThinkingBudgetTokens *int             `json:"thinkingBudgetTokens"`
+	ReasoningEffort      *ReasoningEffort `json:"reasoningEffort"`
 }
 
-func (v *ModelProfileDetailsConfigurationModelProfileConfigAnthropic) implementsGraphQLInterfaceModelProfileDetailsConfigurationModelProfileConfig() {
-}
-func (v *ModelProfileDetailsConfigurationModelProfileConfigGoogle) implementsGraphQLInterfaceModelProfileDetailsConfigurationModelProfileConfig() {
-}
-func (v *ModelProfileDetailsConfigurationModelProfileConfigOpenAI) implementsGraphQLInterfaceModelProfileDetailsConfigurationModelProfileConfig() {
-}
+// GetModel returns ModelProfileDetailsConfigurationModelProfileConfig.Model, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetModel() string { return v.Model }
 
-func __unmarshalModelProfileDetailsConfigurationModelProfileConfig(b []byte, v *ModelProfileDetailsConfigurationModelProfileConfig) error {
-	if string(b) == "null" {
-		return nil
-	}
+// GetMaxTokens returns ModelProfileDetailsConfigurationModelProfileConfig.MaxTokens, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetMaxTokens() *int { return v.MaxTokens }
 
-	var tn struct {
-		TypeName string `json:"__typename"`
-	}
-	err := json.Unmarshal(b, &tn)
-	if err != nil {
-		return err
-	}
-
-	switch tn.TypeName {
-	case "ModelProfileConfigAnthropic":
-		*v = new(ModelProfileDetailsConfigurationModelProfileConfigAnthropic)
-		return json.Unmarshal(b, *v)
-	case "ModelProfileConfigGoogle":
-		*v = new(ModelProfileDetailsConfigurationModelProfileConfigGoogle)
-		return json.Unmarshal(b, *v)
-	case "ModelProfileConfigOpenAI":
-		*v = new(ModelProfileDetailsConfigurationModelProfileConfigOpenAI)
-		return json.Unmarshal(b, *v)
-	case "":
-		return fmt.Errorf(
-			"response was missing ModelProfileConfig.__typename")
-	default:
-		return fmt.Errorf(
-			`unexpected concrete type for ModelProfileDetailsConfigurationModelProfileConfig: "%v"`, tn.TypeName)
-	}
-}
-
-func __marshalModelProfileDetailsConfigurationModelProfileConfig(v *ModelProfileDetailsConfigurationModelProfileConfig) ([]byte, error) {
-
-	var typename string
-	switch v := (*v).(type) {
-	case *ModelProfileDetailsConfigurationModelProfileConfigAnthropic:
-		typename = "ModelProfileConfigAnthropic"
-
-		result := struct {
-			TypeName string `json:"__typename"`
-			*ModelProfileDetailsConfigurationModelProfileConfigAnthropic
-		}{typename, v}
-		return json.Marshal(result)
-	case *ModelProfileDetailsConfigurationModelProfileConfigGoogle:
-		typename = "ModelProfileConfigGoogle"
-
-		result := struct {
-			TypeName string `json:"__typename"`
-			*ModelProfileDetailsConfigurationModelProfileConfigGoogle
-		}{typename, v}
-		return json.Marshal(result)
-	case *ModelProfileDetailsConfigurationModelProfileConfigOpenAI:
-		typename = "ModelProfileConfigOpenAI"
-
-		result := struct {
-			TypeName string `json:"__typename"`
-			*ModelProfileDetailsConfigurationModelProfileConfigOpenAI
-		}{typename, v}
-		return json.Marshal(result)
-	case nil:
-		return []byte("null"), nil
-	default:
-		return nil, fmt.Errorf(
-			`unexpected concrete type for ModelProfileDetailsConfigurationModelProfileConfig: "%T"`, v)
-	}
-}
-
-// ModelProfileDetailsConfigurationModelProfileConfigAnthropic includes the requested fields of the GraphQL type ModelProfileConfigAnthropic.
-type ModelProfileDetailsConfigurationModelProfileConfigAnthropic struct {
-	Typename             *string  `json:"__typename"`
-	Model                string   `json:"model"`
-	MaxTokens            *int     `json:"maxTokens"`
-	Temperature          *float64 `json:"temperature"`
-	TopP                 *float64 `json:"topP"`
-	TopK                 *int     `json:"topK"`
-	ThinkingBudgetTokens *int     `json:"thinkingBudgetTokens"`
-}
-
-// GetTypename returns ModelProfileDetailsConfigurationModelProfileConfigAnthropic.Typename, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigAnthropic) GetTypename() *string {
-	return v.Typename
-}
-
-// GetModel returns ModelProfileDetailsConfigurationModelProfileConfigAnthropic.Model, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigAnthropic) GetModel() string {
-	return v.Model
-}
-
-// GetMaxTokens returns ModelProfileDetailsConfigurationModelProfileConfigAnthropic.MaxTokens, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigAnthropic) GetMaxTokens() *int {
-	return v.MaxTokens
-}
-
-// GetTemperature returns ModelProfileDetailsConfigurationModelProfileConfigAnthropic.Temperature, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigAnthropic) GetTemperature() *float64 {
+// GetTemperature returns ModelProfileDetailsConfigurationModelProfileConfig.Temperature, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetTemperature() *float64 {
 	return v.Temperature
 }
 
-// GetTopP returns ModelProfileDetailsConfigurationModelProfileConfigAnthropic.TopP, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigAnthropic) GetTopP() *float64 {
-	return v.TopP
-}
+// GetTopP returns ModelProfileDetailsConfigurationModelProfileConfig.TopP, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetTopP() *float64 { return v.TopP }
 
-// GetTopK returns ModelProfileDetailsConfigurationModelProfileConfigAnthropic.TopK, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigAnthropic) GetTopK() *int { return v.TopK }
+// GetTopK returns ModelProfileDetailsConfigurationModelProfileConfig.TopK, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetTopK() *int { return v.TopK }
 
-// GetThinkingBudgetTokens returns ModelProfileDetailsConfigurationModelProfileConfigAnthropic.ThinkingBudgetTokens, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigAnthropic) GetThinkingBudgetTokens() *int {
+// GetThinkingBudgetTokens returns ModelProfileDetailsConfigurationModelProfileConfig.ThinkingBudgetTokens, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetThinkingBudgetTokens() *int {
 	return v.ThinkingBudgetTokens
 }
 
-// ModelProfileDetailsConfigurationModelProfileConfigGoogle includes the requested fields of the GraphQL type ModelProfileConfigGoogle.
-type ModelProfileDetailsConfigurationModelProfileConfigGoogle struct {
-	Typename             *string  `json:"__typename"`
-	Model                string   `json:"model"`
-	MaxTokens            *int     `json:"maxTokens"`
-	Temperature          *float64 `json:"temperature"`
-	TopP                 *float64 `json:"topP"`
-	TopK                 *int     `json:"topK"`
-	ThinkingBudgetTokens *int     `json:"thinkingBudgetTokens"`
-}
-
-// GetTypename returns ModelProfileDetailsConfigurationModelProfileConfigGoogle.Typename, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigGoogle) GetTypename() *string {
-	return v.Typename
-}
-
-// GetModel returns ModelProfileDetailsConfigurationModelProfileConfigGoogle.Model, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigGoogle) GetModel() string { return v.Model }
-
-// GetMaxTokens returns ModelProfileDetailsConfigurationModelProfileConfigGoogle.MaxTokens, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigGoogle) GetMaxTokens() *int {
-	return v.MaxTokens
-}
-
-// GetTemperature returns ModelProfileDetailsConfigurationModelProfileConfigGoogle.Temperature, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigGoogle) GetTemperature() *float64 {
-	return v.Temperature
-}
-
-// GetTopP returns ModelProfileDetailsConfigurationModelProfileConfigGoogle.TopP, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigGoogle) GetTopP() *float64 { return v.TopP }
-
-// GetTopK returns ModelProfileDetailsConfigurationModelProfileConfigGoogle.TopK, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigGoogle) GetTopK() *int { return v.TopK }
-
-// GetThinkingBudgetTokens returns ModelProfileDetailsConfigurationModelProfileConfigGoogle.ThinkingBudgetTokens, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigGoogle) GetThinkingBudgetTokens() *int {
-	return v.ThinkingBudgetTokens
-}
-
-// ModelProfileDetailsConfigurationModelProfileConfigOpenAI includes the requested fields of the GraphQL type ModelProfileConfigOpenAI.
-type ModelProfileDetailsConfigurationModelProfileConfigOpenAI struct {
-	Typename        *string                `json:"__typename"`
-	Model           string                 `json:"model"`
-	MaxTokens       *int                   `json:"maxTokens"`
-	Temperature     *float64               `json:"temperature"`
-	TopP            *float64               `json:"topP"`
-	ReasoningEffort *OpenAIReasoningEffort `json:"reasoningEffort"`
-}
-
-// GetTypename returns ModelProfileDetailsConfigurationModelProfileConfigOpenAI.Typename, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigOpenAI) GetTypename() *string {
-	return v.Typename
-}
-
-// GetModel returns ModelProfileDetailsConfigurationModelProfileConfigOpenAI.Model, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigOpenAI) GetModel() string { return v.Model }
-
-// GetMaxTokens returns ModelProfileDetailsConfigurationModelProfileConfigOpenAI.MaxTokens, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigOpenAI) GetMaxTokens() *int {
-	return v.MaxTokens
-}
-
-// GetTemperature returns ModelProfileDetailsConfigurationModelProfileConfigOpenAI.Temperature, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigOpenAI) GetTemperature() *float64 {
-	return v.Temperature
-}
-
-// GetTopP returns ModelProfileDetailsConfigurationModelProfileConfigOpenAI.TopP, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigOpenAI) GetTopP() *float64 { return v.TopP }
-
-// GetReasoningEffort returns ModelProfileDetailsConfigurationModelProfileConfigOpenAI.ReasoningEffort, and is useful for accessing the field via an interface.
-func (v *ModelProfileDetailsConfigurationModelProfileConfigOpenAI) GetReasoningEffort() *OpenAIReasoningEffort {
+// GetReasoningEffort returns ModelProfileDetailsConfigurationModelProfileConfig.ReasoningEffort, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetReasoningEffort() *ReasoningEffort {
 	return v.ReasoningEffort
 }
 
@@ -3790,6 +3800,8 @@ func (v *ModelProviderDetails) __premarshalJSON() (*__premarshalModelProviderDet
 //
 // ModelProviderDetailsProviderConfigModelProviderConfig is implemented by the following types:
 // ModelProviderDetailsProviderConfigModelProviderConfigAnthropic
+// ModelProviderDetailsProviderConfigModelProviderConfigCerebras
+// ModelProviderDetailsProviderConfigModelProviderConfigFireworks
 // ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI
 // ModelProviderDetailsProviderConfigModelProviderConfigOpenAI
 // ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible
@@ -3800,6 +3812,10 @@ type ModelProviderDetailsProviderConfigModelProviderConfig interface {
 }
 
 func (v *ModelProviderDetailsProviderConfigModelProviderConfigAnthropic) implementsGraphQLInterfaceModelProviderDetailsProviderConfigModelProviderConfig() {
+}
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigCerebras) implementsGraphQLInterfaceModelProviderDetailsProviderConfigModelProviderConfig() {
+}
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigFireworks) implementsGraphQLInterfaceModelProviderDetailsProviderConfigModelProviderConfig() {
 }
 func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI) implementsGraphQLInterfaceModelProviderDetailsProviderConfigModelProviderConfig() {
 }
@@ -3824,6 +3840,12 @@ func __unmarshalModelProviderDetailsProviderConfigModelProviderConfig(b []byte, 
 	switch tn.TypeName {
 	case "ModelProviderConfigAnthropic":
 		*v = new(ModelProviderDetailsProviderConfigModelProviderConfigAnthropic)
+		return json.Unmarshal(b, *v)
+	case "ModelProviderConfigCerebras":
+		*v = new(ModelProviderDetailsProviderConfigModelProviderConfigCerebras)
+		return json.Unmarshal(b, *v)
+	case "ModelProviderConfigFireworks":
+		*v = new(ModelProviderDetailsProviderConfigModelProviderConfigFireworks)
 		return json.Unmarshal(b, *v)
 	case "ModelProviderConfigGoogleGenAI":
 		*v = new(ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI)
@@ -3853,6 +3875,22 @@ func __marshalModelProviderDetailsProviderConfigModelProviderConfig(v *ModelProv
 		result := struct {
 			TypeName string `json:"__typename"`
 			*ModelProviderDetailsProviderConfigModelProviderConfigAnthropic
+		}{typename, v}
+		return json.Marshal(result)
+	case *ModelProviderDetailsProviderConfigModelProviderConfigCerebras:
+		typename = "ModelProviderConfigCerebras"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ModelProviderDetailsProviderConfigModelProviderConfigCerebras
+		}{typename, v}
+		return json.Marshal(result)
+	case *ModelProviderDetailsProviderConfigModelProviderConfigFireworks:
+		typename = "ModelProviderConfigFireworks"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ModelProviderDetailsProviderConfigModelProviderConfigFireworks
 		}{typename, v}
 		return json.Marshal(result)
 	case *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI:
@@ -3901,6 +3939,26 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigAnthropic) GetType
 // GetApiKey returns ModelProviderDetailsProviderConfigModelProviderConfigAnthropic.ApiKey, and is useful for accessing the field via an interface.
 func (v *ModelProviderDetailsProviderConfigModelProviderConfigAnthropic) GetApiKey() string {
 	return v.ApiKey
+}
+
+// ModelProviderDetailsProviderConfigModelProviderConfigCerebras includes the requested fields of the GraphQL type ModelProviderConfigCerebras.
+type ModelProviderDetailsProviderConfigModelProviderConfigCerebras struct {
+	Typename *string `json:"__typename"`
+}
+
+// GetTypename returns ModelProviderDetailsProviderConfigModelProviderConfigCerebras.Typename, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigCerebras) GetTypename() *string {
+	return v.Typename
+}
+
+// ModelProviderDetailsProviderConfigModelProviderConfigFireworks includes the requested fields of the GraphQL type ModelProviderConfigFireworks.
+type ModelProviderDetailsProviderConfigModelProviderConfigFireworks struct {
+	Typename *string `json:"__typename"`
+}
+
+// GetTypename returns ModelProviderDetailsProviderConfigModelProviderConfigFireworks.Typename, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigFireworks) GetTypename() *string {
+	return v.Typename
 }
 
 // ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI includes the requested fields of the GraphQL type ModelProviderConfigGoogleGenAI.
@@ -4002,6 +4060,8 @@ const (
 	ModelProviderTypeOpenAi           ModelProviderType = "OPEN_AI"
 	ModelProviderTypeGoogleGenAi      ModelProviderType = "GOOGLE_GEN_AI"
 	ModelProviderTypeOpenAiCompatible ModelProviderType = "OPEN_AI_COMPATIBLE"
+	ModelProviderTypeFireworks        ModelProviderType = "FIREWORKS"
+	ModelProviderTypeCerebras         ModelProviderType = "CEREBRAS"
 )
 
 var AllModelProviderType = []ModelProviderType{
@@ -4009,6 +4069,8 @@ var AllModelProviderType = []ModelProviderType{
 	ModelProviderTypeOpenAi,
 	ModelProviderTypeGoogleGenAi,
 	ModelProviderTypeOpenAiCompatible,
+	ModelProviderTypeFireworks,
+	ModelProviderTypeCerebras,
 }
 
 // ModelSetDetails includes the GraphQL fields of ModelSet requested by the fragment ModelSetDetails.
@@ -4185,6 +4247,16 @@ func (v *ModifyMcpConnectionResponse) GetUpdateMcpConnection() McpConnectionDeta
 	return v.UpdateMcpConnection
 }
 
+// ModifyMcpConnectionSubscriptionResponse is returned by ModifyMcpConnectionSubscription on success.
+type ModifyMcpConnectionSubscriptionResponse struct {
+	UpdateMcpConnectionSubscription McpConnectionSubscriptionDetails `json:"updateMcpConnectionSubscription"`
+}
+
+// GetUpdateMcpConnectionSubscription returns ModifyMcpConnectionSubscriptionResponse.UpdateMcpConnectionSubscription, and is useful for accessing the field via an interface.
+func (v *ModifyMcpConnectionSubscriptionResponse) GetUpdateMcpConnectionSubscription() McpConnectionSubscriptionDetails {
+	return v.UpdateMcpConnectionSubscription
+}
+
 // ModifyMemoryInteractionProfileResponse is returned by ModifyMemoryInteractionProfile on success.
 type ModifyMemoryInteractionProfileResponse struct {
 	UpdateMemoryInteractionProfile MemoryInteractionProfileDetails `json:"updateMemoryInteractionProfile"`
@@ -4352,7 +4424,7 @@ type NewMcpConnection struct {
 	Name                              string                                          `json:"name"`
 	Transport                         McpTransport                                    `json:"transport"`
 	HttpTransport                     *McpConnectionHttpTransportSettings             `json:"httpTransport,omitempty"`
-	StdioTransport                    *McpConnectionStdioTransportSettings            `json:"stdioTransport,omitempty"`
+	TunnelTransport                   *McpConnectionTunnelTransportSettings           `json:"tunnelTransport,omitempty"`
 	OauthClientCredentials            *McpConnectionOauthClientCredentials            `json:"oauthClientCredentials,omitempty"`
 	OauthAuthorizationCodeCredentials *McpConnectionOauthAuthorizationCodeCredentials `json:"oauthAuthorizationCodeCredentials,omitempty"`
 	BasicCredentials                  *McpConnectionBasicCredentials                  `json:"basicCredentials,omitempty"`
@@ -4370,9 +4442,9 @@ func (v *NewMcpConnection) GetHttpTransport() *McpConnectionHttpTransportSetting
 	return v.HttpTransport
 }
 
-// GetStdioTransport returns NewMcpConnection.StdioTransport, and is useful for accessing the field via an interface.
-func (v *NewMcpConnection) GetStdioTransport() *McpConnectionStdioTransportSettings {
-	return v.StdioTransport
+// GetTunnelTransport returns NewMcpConnection.TunnelTransport, and is useful for accessing the field via an interface.
+func (v *NewMcpConnection) GetTunnelTransport() *McpConnectionTunnelTransportSettings {
+	return v.TunnelTransport
 }
 
 // GetOauthClientCredentials returns NewMcpConnection.OauthClientCredentials, and is useful for accessing the field via an interface.
@@ -4393,6 +4465,52 @@ func (v *NewMcpConnection) GetBasicCredentials() *McpConnectionBasicCredentials 
 // GetHeaderCredentials returns NewMcpConnection.HeaderCredentials, and is useful for accessing the field via an interface.
 func (v *NewMcpConnection) GetHeaderCredentials() *McpConnectionHeaderCredentials {
 	return v.HeaderCredentials
+}
+
+type NewMcpConnectionSubscription struct {
+	McpConnectionID string                                    `json:"mcpConnectionID"`
+	Name            string                                    `json:"name"`
+	Criteria        []McpConnectionSubscriptionCriterionInput `json:"criteria"`
+	// Unattached keys to attach to this subscription as it is created.
+	TunnelKeyIDs []string `json:"tunnelKeyIDs"`
+}
+
+// GetMcpConnectionID returns NewMcpConnectionSubscription.McpConnectionID, and is useful for accessing the field via an interface.
+func (v *NewMcpConnectionSubscription) GetMcpConnectionID() string { return v.McpConnectionID }
+
+// GetName returns NewMcpConnectionSubscription.Name, and is useful for accessing the field via an interface.
+func (v *NewMcpConnectionSubscription) GetName() string { return v.Name }
+
+// GetCriteria returns NewMcpConnectionSubscription.Criteria, and is useful for accessing the field via an interface.
+func (v *NewMcpConnectionSubscription) GetCriteria() []McpConnectionSubscriptionCriterionInput {
+	return v.Criteria
+}
+
+// GetTunnelKeyIDs returns NewMcpConnectionSubscription.TunnelKeyIDs, and is useful for accessing the field via an interface.
+func (v *NewMcpConnectionSubscription) GetTunnelKeyIDs() []string { return v.TunnelKeyIDs }
+
+type NewMcpConnectionTunnelKey struct {
+	Label     string  `json:"label"`
+	ExpiresAt *string `json:"expiresAt,omitempty"`
+	// The subscription to attach this key to. Left out, the key is created
+	// unattached: it exists and its secret is returned, but it authenticates nothing
+	// until a subscription takes it.
+	//
+	// That is what lets a key be minted before the subscription it will serve has
+	// been saved, so the secret can be shown at the moment it is asked for. An
+	// unattached key is discarded if nothing claims it.
+	McpConnectionSubscriptionID *string `json:"mcpConnectionSubscriptionID,omitempty"`
+}
+
+// GetLabel returns NewMcpConnectionTunnelKey.Label, and is useful for accessing the field via an interface.
+func (v *NewMcpConnectionTunnelKey) GetLabel() string { return v.Label }
+
+// GetExpiresAt returns NewMcpConnectionTunnelKey.ExpiresAt, and is useful for accessing the field via an interface.
+func (v *NewMcpConnectionTunnelKey) GetExpiresAt() *string { return v.ExpiresAt }
+
+// GetMcpConnectionSubscriptionID returns NewMcpConnectionTunnelKey.McpConnectionSubscriptionID, and is useful for accessing the field via an interface.
+func (v *NewMcpConnectionTunnelKey) GetMcpConnectionSubscriptionID() *string {
+	return v.McpConnectionSubscriptionID
 }
 
 type NewRubric struct {
@@ -4467,6 +4585,7 @@ func (v *NewScoreExample) GetJudgment() string { return v.Judgment }
 type NewUserMetric struct {
 	Name        string               `json:"name"`
 	Description *string              `json:"description,omitempty"`
+	Category    MetricCategory       `json:"category"`
 	Prompt      string               `json:"prompt"`
 	Complexity  ModelComplexity      `json:"complexity"`
 	Examples    []NewScoreExample    `json:"examples"`
@@ -4478,6 +4597,9 @@ func (v *NewUserMetric) GetName() string { return v.Name }
 
 // GetDescription returns NewUserMetric.Description, and is useful for accessing the field via an interface.
 func (v *NewUserMetric) GetDescription() *string { return v.Description }
+
+// GetCategory returns NewUserMetric.Category, and is useful for accessing the field via an interface.
+func (v *NewUserMetric) GetCategory() MetricCategory { return v.Category }
 
 // GetPrompt returns NewUserMetric.Prompt, and is useful for accessing the field via an interface.
 func (v *NewUserMetric) GetPrompt() string { return v.Prompt }
@@ -4501,20 +4623,6 @@ func (v *NewWorkspace) GetName() string { return v.Name }
 
 // GetScope returns NewWorkspace.Scope, and is useful for accessing the field via an interface.
 func (v *NewWorkspace) GetScope() WorkspaceScope { return v.Scope }
-
-type OpenAIReasoningEffort string
-
-const (
-	OpenAIReasoningEffortLow    OpenAIReasoningEffort = "LOW"
-	OpenAIReasoningEffortMedium OpenAIReasoningEffort = "MEDIUM"
-	OpenAIReasoningEffortHigh   OpenAIReasoningEffort = "HIGH"
-)
-
-var AllOpenAIReasoningEffort = []OpenAIReasoningEffort{
-	OpenAIReasoningEffortLow,
-	OpenAIReasoningEffortMedium,
-	OpenAIReasoningEffortHigh,
-}
 
 type ParticleApiKeyLocationKind string
 
@@ -4795,6 +4903,29 @@ var AllParticleOAuth2Flow = []ParticleOAuth2Flow{
 	ParticleOAuth2FlowDeviceCode,
 }
 
+// The effort a reasoning model spends. Each provider accepts its own subset.
+type ReasoningEffort string
+
+const (
+	ReasoningEffortNone    ReasoningEffort = "NONE"
+	ReasoningEffortMinimal ReasoningEffort = "MINIMAL"
+	ReasoningEffortLow     ReasoningEffort = "LOW"
+	ReasoningEffortMedium  ReasoningEffort = "MEDIUM"
+	ReasoningEffortHigh    ReasoningEffort = "HIGH"
+	ReasoningEffortXhigh   ReasoningEffort = "XHIGH"
+	ReasoningEffortMax     ReasoningEffort = "MAX"
+)
+
+var AllReasoningEffort = []ReasoningEffort{
+	ReasoningEffortNone,
+	ReasoningEffortMinimal,
+	ReasoningEffortLow,
+	ReasoningEffortMedium,
+	ReasoningEffortHigh,
+	ReasoningEffortXhigh,
+	ReasoningEffortMax,
+}
+
 // RenameWorkspaceResponse is returned by RenameWorkspace on success.
 type RenameWorkspaceResponse struct {
 	RenameWorkspace WorkspaceDetails `json:"renameWorkspace"`
@@ -4802,6 +4933,18 @@ type RenameWorkspaceResponse struct {
 
 // GetRenameWorkspace returns RenameWorkspaceResponse.RenameWorkspace, and is useful for accessing the field via an interface.
 func (v *RenameWorkspaceResponse) GetRenameWorkspace() WorkspaceDetails { return v.RenameWorkspace }
+
+// RevokeMcpConnectionTunnelKeyResponse is returned by RevokeMcpConnectionTunnelKey on success.
+type RevokeMcpConnectionTunnelKeyResponse struct {
+	// Withdraws a relay credential. It takes effect on the next message dispatched to
+	// any relay holding it, rather than by closing connections.
+	RevokeMcpConnectionTunnelKey McpConnectionTunnelKeyDetails `json:"revokeMcpConnectionTunnelKey"`
+}
+
+// GetRevokeMcpConnectionTunnelKey returns RevokeMcpConnectionTunnelKeyResponse.RevokeMcpConnectionTunnelKey, and is useful for accessing the field via an interface.
+func (v *RevokeMcpConnectionTunnelKeyResponse) GetRevokeMcpConnectionTunnelKey() McpConnectionTunnelKeyDetails {
+	return v.RevokeMcpConnectionTunnelKey
+}
 
 // RubricDetails includes the GraphQL fields of Rubric requested by the fragment RubricDetails.
 type RubricDetails struct {
@@ -5388,7 +5531,7 @@ type UpdateMcpConnection struct {
 	Name                              *string                                         `json:"name,omitempty"`
 	Transport                         *McpTransport                                   `json:"transport,omitempty"`
 	HttpTransport                     *McpConnectionHttpTransportSettings             `json:"httpTransport,omitempty"`
-	StdioTransport                    *McpConnectionStdioTransportSettings            `json:"stdioTransport,omitempty"`
+	TunnelTransport                   *McpConnectionTunnelTransportSettings           `json:"tunnelTransport,omitempty"`
 	OauthClientCredentials            *McpConnectionOauthClientCredentials            `json:"oauthClientCredentials,omitempty"`
 	OauthAuthorizationCodeCredentials *McpConnectionOauthAuthorizationCodeCredentials `json:"oauthAuthorizationCodeCredentials,omitempty"`
 	BasicCredentials                  *McpConnectionBasicCredentials                  `json:"basicCredentials,omitempty"`
@@ -5406,9 +5549,9 @@ func (v *UpdateMcpConnection) GetHttpTransport() *McpConnectionHttpTransportSett
 	return v.HttpTransport
 }
 
-// GetStdioTransport returns UpdateMcpConnection.StdioTransport, and is useful for accessing the field via an interface.
-func (v *UpdateMcpConnection) GetStdioTransport() *McpConnectionStdioTransportSettings {
-	return v.StdioTransport
+// GetTunnelTransport returns UpdateMcpConnection.TunnelTransport, and is useful for accessing the field via an interface.
+func (v *UpdateMcpConnection) GetTunnelTransport() *McpConnectionTunnelTransportSettings {
+	return v.TunnelTransport
 }
 
 // GetOauthClientCredentials returns UpdateMcpConnection.OauthClientCredentials, and is useful for accessing the field via an interface.
@@ -5799,6 +5942,24 @@ type __CreateMcpConnectionInput struct {
 // GetInput returns __CreateMcpConnectionInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateMcpConnectionInput) GetInput() NewMcpConnection { return v.Input }
 
+// __CreateMcpConnectionSubscriptionInput is used internally by genqlient
+type __CreateMcpConnectionSubscriptionInput struct {
+	Input NewMcpConnectionSubscription `json:"input"`
+}
+
+// GetInput returns __CreateMcpConnectionSubscriptionInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateMcpConnectionSubscriptionInput) GetInput() NewMcpConnectionSubscription {
+	return v.Input
+}
+
+// __CreateMcpConnectionTunnelKeyInput is used internally by genqlient
+type __CreateMcpConnectionTunnelKeyInput struct {
+	Input NewMcpConnectionTunnelKey `json:"input"`
+}
+
+// GetInput returns __CreateMcpConnectionTunnelKeyInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateMcpConnectionTunnelKeyInput) GetInput() NewMcpConnectionTunnelKey { return v.Input }
+
 // __CreateMemoryInteractionProfileInput is used internally by genqlient
 type __CreateMemoryInteractionProfileInput struct {
 	Input *NewMemoryInteractionProfile `json:"input"`
@@ -5961,6 +6122,14 @@ type __DeleteMcpConnectionInput struct {
 // GetId returns __DeleteMcpConnectionInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteMcpConnectionInput) GetId() string { return v.Id }
 
+// __DeleteMcpConnectionSubscriptionInput is used internally by genqlient
+type __DeleteMcpConnectionSubscriptionInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteMcpConnectionSubscriptionInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteMcpConnectionSubscriptionInput) GetId() string { return v.Id }
+
 // __DeleteMemoryInteractionProfileInput is used internally by genqlient
 type __DeleteMemoryInteractionProfileInput struct {
 	Id string `json:"id"`
@@ -6116,6 +6285,14 @@ type __GetMcpConnectionInput struct {
 
 // GetId returns __GetMcpConnectionInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetMcpConnectionInput) GetId() string { return v.Id }
+
+// __GetMcpConnectionSubscriptionsInput is used internally by genqlient
+type __GetMcpConnectionSubscriptionsInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetMcpConnectionSubscriptionsInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetMcpConnectionSubscriptionsInput) GetId() string { return v.Id }
 
 // __GetMemoryInteractionProfileInput is used internally by genqlient
 type __GetMemoryInteractionProfileInput struct {
@@ -6389,6 +6566,20 @@ func (v *__ModifyMcpConnectionInput) GetId() string { return v.Id }
 // GetInput returns __ModifyMcpConnectionInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyMcpConnectionInput) GetInput() UpdateMcpConnection { return v.Input }
 
+// __ModifyMcpConnectionSubscriptionInput is used internally by genqlient
+type __ModifyMcpConnectionSubscriptionInput struct {
+	Id      string                           `json:"id"`
+	Changes McpConnectionSubscriptionChanges `json:"changes"`
+}
+
+// GetId returns __ModifyMcpConnectionSubscriptionInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyMcpConnectionSubscriptionInput) GetId() string { return v.Id }
+
+// GetChanges returns __ModifyMcpConnectionSubscriptionInput.Changes, and is useful for accessing the field via an interface.
+func (v *__ModifyMcpConnectionSubscriptionInput) GetChanges() McpConnectionSubscriptionChanges {
+	return v.Changes
+}
+
 // __ModifyMemoryInteractionProfileInput is used internally by genqlient
 type __ModifyMemoryInteractionProfileInput struct {
 	Id    string                          `json:"id"`
@@ -6522,6 +6713,14 @@ func (v *__RenameWorkspaceInput) GetId() string { return v.Id }
 
 // GetName returns __RenameWorkspaceInput.Name, and is useful for accessing the field via an interface.
 func (v *__RenameWorkspaceInput) GetName() string { return v.Name }
+
+// __RevokeMcpConnectionTunnelKeyInput is used internally by genqlient
+type __RevokeMcpConnectionTunnelKeyInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __RevokeMcpConnectionTunnelKeyInput.Id, and is useful for accessing the field via an interface.
+func (v *__RevokeMcpConnectionTunnelKeyInput) GetId() string { return v.Id }
 
 // The mutation executed by CreateAgent.
 const CreateAgent_Operation = `
@@ -6669,18 +6868,10 @@ fragment EmbeddingProfileDetails on EmbeddingProfile {
 	description
 	dimensions
 	configuration {
-		__typename
-		... on EmbeddingProfileConfigOpenAI {
-			model
-			dimensions
-			sendDimensions
-		}
-		... on EmbeddingProfileConfigGoogle {
-			model
-			dimensions
-			sendDimensions
-			taskType
-		}
+		model
+		dimensions
+		sendDimensions
+		taskType
 	}
 	provider {
 		id
@@ -6943,10 +7134,15 @@ fragment McpConnectionDetails on McpConnection {
 		url
 		authFlow
 	}
-	stdioTransport {
-		command
-		arguments
-		environment
+	tunnelTransport {
+		subscriptions {
+			id
+			name
+			criteria {
+				name
+				value
+			}
+		}
 	}
 	createdAt
 	updatedAt
@@ -6967,6 +7163,95 @@ func CreateMcpConnection(
 	}
 
 	data_ = &CreateMcpConnectionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateMcpConnectionSubscription.
+const CreateMcpConnectionSubscription_Operation = `
+mutation CreateMcpConnectionSubscription ($input: NewMcpConnectionSubscription!) {
+	createMcpConnectionSubscription(input: $input) {
+		... McpConnectionSubscriptionDetails
+	}
+}
+fragment McpConnectionSubscriptionDetails on McpConnectionSubscription {
+	id
+	name
+	criteria {
+		name
+		value
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func CreateMcpConnectionSubscription(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input NewMcpConnectionSubscription,
+) (data_ *CreateMcpConnectionSubscriptionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateMcpConnectionSubscription",
+		Query:  CreateMcpConnectionSubscription_Operation,
+		Variables: &__CreateMcpConnectionSubscriptionInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateMcpConnectionSubscriptionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateMcpConnectionTunnelKey.
+const CreateMcpConnectionTunnelKey_Operation = `
+mutation CreateMcpConnectionTunnelKey ($input: NewMcpConnectionTunnelKey!) {
+	createMcpConnectionTunnelKey(input: $input) {
+		credential
+		tunnelKey {
+			... McpConnectionTunnelKeyDetails
+		}
+	}
+}
+fragment McpConnectionTunnelKeyDetails on McpConnectionTunnelKey {
+	id
+	label
+	attached
+	expiresAt
+	revokedAt
+	createdAt
+}
+`
+
+func CreateMcpConnectionTunnelKey(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input NewMcpConnectionTunnelKey,
+) (data_ *CreateMcpConnectionTunnelKeyResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateMcpConnectionTunnelKey",
+		Query:  CreateMcpConnectionTunnelKey_Operation,
+		Variables: &__CreateMcpConnectionTunnelKeyInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateMcpConnectionTunnelKeyResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -7212,30 +7497,13 @@ fragment ModelProfileDetails on ModelProfile {
 		id
 	}
 	configuration {
-		__typename
-		... on ModelProfileConfigAnthropic {
-			model
-			maxTokens
-			temperature
-			topP
-			topK
-			thinkingBudgetTokens
-		}
-		... on ModelProfileConfigOpenAI {
-			model
-			maxTokens
-			temperature
-			topP
-			reasoningEffort
-		}
-		... on ModelProfileConfigGoogle {
-			model
-			maxTokens
-			temperature
-			topP
-			topK
-			thinkingBudgetTokens
-		}
+		model
+		maxTokens
+		temperature
+		topP
+		topK
+		thinkingBudgetTokens
+		reasoningEffort
 	}
 	createdAt
 	updatedAt
@@ -7924,6 +8192,40 @@ func DeleteMcpConnection(
 	return data_, err_
 }
 
+// The mutation executed by DeleteMcpConnectionSubscription.
+const DeleteMcpConnectionSubscription_Operation = `
+mutation DeleteMcpConnectionSubscription ($id: McpConnectionSubscriptionID!) {
+	deleteMcpConnectionSubscriptions(mcpConnectionSubscriptionIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteMcpConnectionSubscription(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteMcpConnectionSubscriptionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteMcpConnectionSubscription",
+		Query:  DeleteMcpConnectionSubscription_Operation,
+		Variables: &__DeleteMcpConnectionSubscriptionInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteMcpConnectionSubscriptionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by DeleteMemoryInteractionProfile.
 const DeleteMemoryInteractionProfile_Operation = `
 mutation DeleteMemoryInteractionProfile ($id: MemoryInteractionProfileID!) {
@@ -8471,18 +8773,10 @@ fragment EmbeddingProfileDetails on EmbeddingProfile {
 	description
 	dimensions
 	configuration {
-		__typename
-		... on EmbeddingProfileConfigOpenAI {
-			model
-			dimensions
-			sendDimensions
-		}
-		... on EmbeddingProfileConfigGoogle {
-			model
-			dimensions
-			sendDimensions
-			taskType
-		}
+		model
+		dimensions
+		sendDimensions
+		taskType
 	}
 	provider {
 		id
@@ -8530,18 +8824,10 @@ fragment EmbeddingProfileDetails on EmbeddingProfile {
 	description
 	dimensions
 	configuration {
-		__typename
-		... on EmbeddingProfileConfigOpenAI {
-			model
-			dimensions
-			sendDimensions
-		}
-		... on EmbeddingProfileConfigGoogle {
-			model
-			dimensions
-			sendDimensions
-			taskType
-		}
+		model
+		dimensions
+		sendDimensions
+		taskType
 	}
 	provider {
 		id
@@ -8691,10 +8977,15 @@ fragment McpConnectionDetails on McpConnection {
 		url
 		authFlow
 	}
-	stdioTransport {
-		command
-		arguments
-		environment
+	tunnelTransport {
+		subscriptions {
+			id
+			name
+			criteria {
+				name
+				value
+			}
+		}
 	}
 	createdAt
 	updatedAt
@@ -8715,6 +9006,67 @@ func GetMcpConnection(
 	}
 
 	data_ = &GetMcpConnectionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetMcpConnectionSubscriptions.
+const GetMcpConnectionSubscriptions_Operation = `
+query GetMcpConnectionSubscriptions ($id: McpConnectionID!) {
+	mcpConnection(id: $id) {
+		tunnelTransport {
+			subscriptions {
+				... McpConnectionSubscriptionDetails
+				tunnelKeys {
+					... McpConnectionTunnelKeyDetails
+				}
+			}
+		}
+	}
+}
+fragment McpConnectionSubscriptionDetails on McpConnectionSubscription {
+	id
+	name
+	criteria {
+		name
+		value
+	}
+	createdAt
+	updatedAt
+}
+fragment McpConnectionTunnelKeyDetails on McpConnectionTunnelKey {
+	id
+	label
+	attached
+	expiresAt
+	revokedAt
+	createdAt
+}
+`
+
+// Subscriptions and their keys are reached through the connection, since neither
+// has a top-level query of its own.
+func GetMcpConnectionSubscriptions(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetMcpConnectionSubscriptionsResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetMcpConnectionSubscriptions",
+		Query:  GetMcpConnectionSubscriptions_Operation,
+		Variables: &__GetMcpConnectionSubscriptionsInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetMcpConnectionSubscriptionsResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -9145,30 +9497,13 @@ fragment ModelProfileDetails on ModelProfile {
 		id
 	}
 	configuration {
-		__typename
-		... on ModelProfileConfigAnthropic {
-			model
-			maxTokens
-			temperature
-			topP
-			topK
-			thinkingBudgetTokens
-		}
-		... on ModelProfileConfigOpenAI {
-			model
-			maxTokens
-			temperature
-			topP
-			reasoningEffort
-		}
-		... on ModelProfileConfigGoogle {
-			model
-			maxTokens
-			temperature
-			topP
-			topK
-			thinkingBudgetTokens
-		}
+		model
+		maxTokens
+		temperature
+		topP
+		topK
+		thinkingBudgetTokens
+		reasoningEffort
 	}
 	createdAt
 	updatedAt
@@ -9216,30 +9551,13 @@ fragment ModelProfileDetails on ModelProfile {
 		id
 	}
 	configuration {
-		__typename
-		... on ModelProfileConfigAnthropic {
-			model
-			maxTokens
-			temperature
-			topP
-			topK
-			thinkingBudgetTokens
-		}
-		... on ModelProfileConfigOpenAI {
-			model
-			maxTokens
-			temperature
-			topP
-			reasoningEffort
-		}
-		... on ModelProfileConfigGoogle {
-			model
-			maxTokens
-			temperature
-			topP
-			topK
-			thinkingBudgetTokens
-		}
+		model
+		maxTokens
+		temperature
+		topP
+		topK
+		thinkingBudgetTokens
+		reasoningEffort
 	}
 	createdAt
 	updatedAt
@@ -10095,18 +10413,10 @@ fragment EmbeddingProfileDetails on EmbeddingProfile {
 	description
 	dimensions
 	configuration {
-		__typename
-		... on EmbeddingProfileConfigOpenAI {
-			model
-			dimensions
-			sendDimensions
-		}
-		... on EmbeddingProfileConfigGoogle {
-			model
-			dimensions
-			sendDimensions
-			taskType
-		}
+		model
+		dimensions
+		sendDimensions
+		taskType
 	}
 	provider {
 		id
@@ -10373,10 +10683,15 @@ fragment McpConnectionDetails on McpConnection {
 		url
 		authFlow
 	}
-	stdioTransport {
-		command
-		arguments
-		environment
+	tunnelTransport {
+		subscriptions {
+			id
+			name
+			criteria {
+				name
+				value
+			}
+		}
 	}
 	createdAt
 	updatedAt
@@ -10399,6 +10714,52 @@ func ModifyMcpConnection(
 	}
 
 	data_ = &ModifyMcpConnectionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyMcpConnectionSubscription.
+const ModifyMcpConnectionSubscription_Operation = `
+mutation ModifyMcpConnectionSubscription ($id: McpConnectionSubscriptionID!, $changes: McpConnectionSubscriptionChanges!) {
+	updateMcpConnectionSubscription(mcpConnectionSubscriptionID: $id, changes: $changes) {
+		... McpConnectionSubscriptionDetails
+	}
+}
+fragment McpConnectionSubscriptionDetails on McpConnectionSubscription {
+	id
+	name
+	criteria {
+		name
+		value
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyMcpConnectionSubscription(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	changes McpConnectionSubscriptionChanges,
+) (data_ *ModifyMcpConnectionSubscriptionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyMcpConnectionSubscription",
+		Query:  ModifyMcpConnectionSubscription_Operation,
+		Variables: &__ModifyMcpConnectionSubscriptionInput{
+			Id:      id,
+			Changes: changes,
+		},
+	}
+
+	data_ = &ModifyMcpConnectionSubscriptionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -10650,30 +11011,13 @@ fragment ModelProfileDetails on ModelProfile {
 		id
 	}
 	configuration {
-		__typename
-		... on ModelProfileConfigAnthropic {
-			model
-			maxTokens
-			temperature
-			topP
-			topK
-			thinkingBudgetTokens
-		}
-		... on ModelProfileConfigOpenAI {
-			model
-			maxTokens
-			temperature
-			topP
-			reasoningEffort
-		}
-		... on ModelProfileConfigGoogle {
-			model
-			maxTokens
-			temperature
-			topP
-			topK
-			thinkingBudgetTokens
-		}
+		model
+		maxTokens
+		temperature
+		topP
+		topK
+		thinkingBudgetTokens
+		reasoningEffort
 	}
 	createdAt
 	updatedAt
@@ -11091,6 +11435,48 @@ func RenameWorkspace(
 	}
 
 	data_ = &RenameWorkspaceResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by RevokeMcpConnectionTunnelKey.
+const RevokeMcpConnectionTunnelKey_Operation = `
+mutation RevokeMcpConnectionTunnelKey ($id: McpConnectionTunnelKeyID!) {
+	revokeMcpConnectionTunnelKey(mcpConnectionTunnelKeyID: $id) {
+		... McpConnectionTunnelKeyDetails
+	}
+}
+fragment McpConnectionTunnelKeyDetails on McpConnectionTunnelKey {
+	id
+	label
+	attached
+	expiresAt
+	revokedAt
+	createdAt
+}
+`
+
+func RevokeMcpConnectionTunnelKey(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *RevokeMcpConnectionTunnelKeyResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "RevokeMcpConnectionTunnelKey",
+		Query:  RevokeMcpConnectionTunnelKey_Operation,
+		Variables: &__RevokeMcpConnectionTunnelKeyInput{
+			Id: id,
+		},
+	}
+
+	data_ = &RevokeMcpConnectionTunnelKeyResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

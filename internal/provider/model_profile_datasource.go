@@ -36,88 +36,36 @@ func (d *ModelProfileDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "ID of the Model Provider",
 				Computed:            true,
 			},
-			"anthropic": schema.SingleNestedAttribute{
-				MarkdownDescription: "Anthropic profile config",
-				Optional:            true,
-				Attributes: map[string]schema.Attribute{
-					"model": schema.StringAttribute{
-						MarkdownDescription: "Anthropic model name",
-						Computed:            true,
-					},
-					"max_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Maximum tokens",
-						Computed:            true,
-					},
-					"temperature": schema.Float64Attribute{
-						MarkdownDescription: "Temperature",
-						Computed:            true,
-					},
-					"top_p": schema.Float64Attribute{
-						MarkdownDescription: "Top P",
-						Computed:            true,
-					},
-					"top_k": schema.Int64Attribute{
-						MarkdownDescription: "Top K",
-						Computed:            true,
-					},
-					"thinking_budget_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Thinking budget tokens",
-						Computed:            true,
-					},
-				},
-			},
-			"openai": schema.SingleNestedAttribute{
-				MarkdownDescription: "OpenAI profile config",
+			"configuration": schema.SingleNestedAttribute{
+				MarkdownDescription: "The model and the settings it is called with.",
 				Computed:            true,
 				Attributes: map[string]schema.Attribute{
 					"model": schema.StringAttribute{
-						MarkdownDescription: "OpenAI model name",
+						MarkdownDescription: "The name the service knows the model by",
 						Computed:            true,
 					},
 					"max_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Maximum tokens",
+						MarkdownDescription: "The most tokens the model may produce in one response",
 						Computed:            true,
 					},
 					"temperature": schema.Float64Attribute{
-						MarkdownDescription: "Temperature",
+						MarkdownDescription: "How much the model is allowed to vary its output",
 						Computed:            true,
 					},
 					"top_p": schema.Float64Attribute{
-						MarkdownDescription: "Top P",
+						MarkdownDescription: "Nucleus sampling cutoff",
+						Computed:            true,
+					},
+					"top_k": schema.Int64Attribute{
+						MarkdownDescription: "How many candidate tokens the model considers",
+						Computed:            true,
+					},
+					"thinking_budget_tokens": schema.Int64Attribute{
+						MarkdownDescription: "Tokens the model may spend reasoning before it answers",
 						Computed:            true,
 					},
 					"reasoning_effort": schema.StringAttribute{
-						MarkdownDescription: "Reasoning effort (LOW, MEDIUM, HIGH)",
-						Computed:            true,
-					},
-				},
-			},
-			"google": schema.SingleNestedAttribute{
-				MarkdownDescription: "Google profile config",
-				Computed:            true,
-				Attributes: map[string]schema.Attribute{
-					"model": schema.StringAttribute{
-						MarkdownDescription: "Google model name",
-						Computed:            true,
-					},
-					"max_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Maximum tokens",
-						Computed:            true,
-					},
-					"temperature": schema.Float64Attribute{
-						MarkdownDescription: "Temperature",
-						Computed:            true,
-					},
-					"top_p": schema.Float64Attribute{
-						MarkdownDescription: "Top P",
-						Computed:            true,
-					},
-					"top_k": schema.Int64Attribute{
-						MarkdownDescription: "Top K",
-						Computed:            true,
-					},
-					"thinking_budget_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Thinking budget tokens",
+						MarkdownDescription: "How hard the model should think",
 						Computed:            true,
 					},
 				},

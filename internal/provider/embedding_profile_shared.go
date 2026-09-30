@@ -19,8 +19,7 @@ type EmbeddingProfileBaseModel struct {
 	Name            types.String      `tfsdk:"name"`
 	Description     types.String      `tfsdk:"description"`
 	Dimensions      types.Int64       `tfsdk:"dimensions"`
-	OpenAI          types.Object      `tfsdk:"openai"`
-	Google          types.Object      `tfsdk:"google"`
+	Configuration   types.Object      `tfsdk:"configuration"`
 	CreatedAt       timetypes.RFC3339 `tfsdk:"created_at"`
 	UpdatedAt       timetypes.RFC3339 `tfsdk:"updated_at"`
 }
@@ -41,52 +40,29 @@ func (m *EmbeddingProfileBaseModel) MapFromGraphQL(
 	m.ModelProviderId = types.StringValue(details.Provider.Id)
 	m.Dimensions = types.Int64Value(int64(details.Dimensions))
 
-	m.OpenAI = types.ObjectNull(embeddingProfileOpenAIAttributes)
-	m.Google = types.ObjectNull(embeddingProfileGoogleAttributes)
-
-	switch c := details.Configuration.(type) {
-	case *pgql.EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigOpenAI:
-		m.OpenAI = types.ObjectValueMust(embeddingProfileOpenAIAttributes, map[string]attr.Value{
-			"model":           types.StringValue(c.Model),
-			"dimensions":      types.Int64Value(int64(c.Dimensions)),
-			"send_dimensions": types.BoolValue(c.SendDimensions),
-		})
-	case *pgql.EmbeddingProfileDetailsConfigurationEmbeddingProfileConfigGoogle:
-		m.Google = types.ObjectValueMust(embeddingProfileGoogleAttributes, map[string]attr.Value{
-			"model":           types.StringValue(c.Model),
-			"dimensions":      types.Int64Value(int64(c.Dimensions)),
-			"send_dimensions": types.BoolValue(c.SendDimensions),
-			"task_type":       types.StringPointerValue(c.TaskType),
-		})
-	}
+	// One configuration for every provider. Which settings a model accepts is the
+	// provider's business, so there is nothing to discriminate on here.
+	config := details.Configuration
+	m.Configuration = types.ObjectValueMust(embeddingProfileConfigAttributes, map[string]attr.Value{
+		"model":           types.StringValue(config.Model),
+		"dimensions":      types.Int64Value(int64(config.Dimensions)),
+		"send_dimensions": types.BoolValue(config.SendDimensions),
+		"task_type":       types.StringPointerValue(config.TaskType),
+	})
 
 	return diags
 }
 
-// embeddingProfileOpenAIAttributes and embeddingProfileGoogleAttributes are the
-// settings each kind of provider takes.
-var embeddingProfileOpenAIAttributes = map[string]attr.Type{
-	"model":           types.StringType,
-	"dimensions":      types.Int64Type,
-	"send_dimensions": types.BoolType,
-}
-
-var embeddingProfileGoogleAttributes = map[string]attr.Type{
+// embeddingProfileConfigAttributes is the shape of the configuration block.
+var embeddingProfileConfigAttributes = map[string]attr.Type{
 	"model":           types.StringType,
 	"dimensions":      types.Int64Type,
 	"send_dimensions": types.BoolType,
 	"task_type":       types.StringType,
 }
 
-// embeddingProfileOpenAIBlock and embeddingProfileGoogleBlock are what a
-// configuration writes under each provider.
-type embeddingProfileOpenAIBlock struct {
-	Model          string     `tfsdk:"model"`
-	Dimensions     int64      `tfsdk:"dimensions"`
-	SendDimensions types.Bool `tfsdk:"send_dimensions"`
-}
-
-type embeddingProfileGoogleBlock struct {
+// embeddingProfileConfigBlock is what a configuration writes.
+type embeddingProfileConfigBlock struct {
 	Model          string       `tfsdk:"model"`
 	Dimensions     int64        `tfsdk:"dimensions"`
 	SendDimensions types.Bool   `tfsdk:"send_dimensions"`

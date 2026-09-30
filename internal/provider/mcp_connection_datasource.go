@@ -5,7 +5,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -51,28 +50,8 @@ func (d *McpConnectionDataSource) Schema(ctx context.Context, req datasource.Sch
 					},
 				},
 			},
-			"stdio_transport": schema.SingleNestedAttribute{
-				MarkdownDescription: "Standard I/O transport configuration for the MCP connection.",
-				Computed:            true,
-				Attributes: map[string]schema.Attribute{
-					"command": schema.StringAttribute{
-						MarkdownDescription: "The command to execute for the standard I/O transport.",
-						Computed:            true,
-					},
-					"arguments": schema.ListAttribute{
-						MarkdownDescription: "The arguments to pass to the command.",
-						ElementType:         types.StringType,
-						Computed:            true,
-					},
-					"environment": schema.ListNestedAttribute{
-						MarkdownDescription: "Environment variables for the command.",
-						Computed:            true,
-						NestedObject:        envVarDataSourceType,
-					},
-				},
-			},
-			"server_initiated_http_transport": schema.SingleNestedAttribute{
-				MarkdownDescription: "Server-initiated HTTP transport configuration for the MCP connection.",
+			"tunnel_transport": schema.SingleNestedAttribute{
+				MarkdownDescription: "Tunnel transport configuration. The server reaches mesh by connecting outwards, so it needs no inbound endpoint, and a relay speaks the tunnel protocol on its behalf. Which relays serve which conversations is decided by partiteai_mcp_connection_subscription resources.",
 				Computed:            true,
 				Attributes:          map[string]schema.Attribute{},
 			},

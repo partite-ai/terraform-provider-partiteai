@@ -24,8 +24,7 @@ MCP connection data source
 - `created_at` (String) Timestamp when the resource was created
 - `http_transport` (Attributes) HTTP transport configuration for the MCP connection. (see [below for nested schema](#nestedatt--http_transport))
 - `name` (String) Resource name
-- `server_initiated_http_transport` (Attributes) Server-initiated HTTP transport configuration for the MCP connection. (see [below for nested schema](#nestedatt--server_initiated_http_transport))
-- `stdio_transport` (Attributes) Standard I/O transport configuration for the MCP connection. (see [below for nested schema](#nestedatt--stdio_transport))
+- `tunnel_transport` (Attributes) Tunnel transport configuration. The server reaches mesh by connecting outwards, so it needs no inbound endpoint, and a relay speaks the tunnel protocol on its behalf. Which relays serve which conversations is decided by partiteai_mcp_connection_subscription resources. (see [below for nested schema](#nestedatt--tunnel_transport))
 - `updated_at` (String) Timestamp when the resource was last updated
 
 <a id="nestedatt--http_transport"></a>
@@ -37,23 +36,5 @@ Read-Only:
 - `url` (String) The URL of the HTTP endpoint.
 
 
-<a id="nestedatt--server_initiated_http_transport"></a>
-### Nested Schema for `server_initiated_http_transport`
-
-
-<a id="nestedatt--stdio_transport"></a>
-### Nested Schema for `stdio_transport`
-
-Read-Only:
-
-- `arguments` (List of String) The arguments to pass to the command.
-- `command` (String) The command to execute for the standard I/O transport.
-- `environment` (Attributes List) Environment variables for the command. (see [below for nested schema](#nestedatt--stdio_transport--environment))
-
-<a id="nestedatt--stdio_transport--environment"></a>
-### Nested Schema for `stdio_transport.environment`
-
-Read-Only:
-
-- `name` (String) The name of the environment variable.
-- `value` (String, Sensitive) The value of the environment variable.
+<a id="nestedatt--tunnel_transport"></a>
+### Nested Schema for `tunnel_transport`

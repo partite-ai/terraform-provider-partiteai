@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -10,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -37,20 +35,6 @@ type McpConnectionResource struct {
 // McpConnectionResourceModel extends the base model with resource-specific fields (none currently).
 type McpConnectionResourceModel struct {
 	McpConnectionBaseModel
-}
-
-var envVarType = schema.NestedAttributeObject{
-	Attributes: map[string]schema.Attribute{
-		"name": schema.StringAttribute{
-			MarkdownDescription: "The name of the environment variable.",
-			Required:            true,
-		},
-		"value": schema.StringAttribute{
-			MarkdownDescription: "The value of the environment variable.",
-			Required:            true,
-			Sensitive:           true,
-		},
-	},
 }
 
 var oauthClientCredentialsType = schema.SingleNestedAttribute{
@@ -156,32 +140,8 @@ func (r *McpConnectionResource) Schema(ctx context.Context, req resource.SchemaR
 					},
 				},
 			},
-			"stdio_transport": schema.SingleNestedAttribute{
-				MarkdownDescription: "Standard I/O transport configuration for the MCP connection.",
-				Optional:            true,
-				Attributes: map[string]schema.Attribute{
-					"command": schema.StringAttribute{
-						MarkdownDescription: "The command to execute for the standard I/O transport.",
-						Required:            true,
-					},
-					"arguments": schema.ListAttribute{
-						MarkdownDescription: "The arguments to pass to the command.",
-						ElementType:         types.StringType,
-						Optional:            true,
-						Computed:            true,
-						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, nil)),
-					},
-					"environment": schema.ListNestedAttribute{
-						MarkdownDescription: "Environment variables for the command.",
-						Optional:            true,
-						Computed:            true,
-						NestedObject:        envVarType,
-						Default:             listdefault.StaticValue(types.ListValueMust(envVarType.Type(), nil)),
-					},
-				},
-			},
-			"server_initiated_http_transport": schema.SingleNestedAttribute{
-				MarkdownDescription: "Server-initiated HTTP transport configuration for the MCP connection.",
+			"tunnel_transport": schema.SingleNestedAttribute{
+				MarkdownDescription: "Tunnel transport configuration. The server reaches mesh by connecting outwards, so it needs no inbound endpoint, and a relay speaks the tunnel protocol on its behalf. Which relays serve which conversations is decided by partiteai_mcp_connection_subscription resources.",
 				Optional:            true,
 				Attributes:          map[string]schema.Attribute{},
 			},
@@ -236,7 +196,6 @@ func (r *McpConnectionResource) Create(ctx context.Context, req resource.CreateR
 		ctx, data,
 		&createReq.Transport,
 		&createReq.HttpTransport, &createReq.OauthClientCredentials, &createReq.BasicCredentials, &createReq.HeaderCredentials,
-		&createReq.StdioTransport,
 		true,
 	); diag.HasError() {
 		resp.Diagnostics.Append(diag...)
@@ -290,8 +249,7 @@ func (r *McpConnectionResource) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	if !planData.HttpTransport.Equal(stateData.HttpTransport) ||
-		!planData.StdioTransport.Equal(stateData.StdioTransport) ||
-		!planData.ServerInitiatedHttpTransport.Equal(stateData.ServerInitiatedHttpTransport) {
+		!planData.TunnelTransport.Equal(stateData.TunnelTransport) {
 		updateCreds := false
 		if !planData.HttpTransport.Equal(stateData.HttpTransport) {
 			authModeChanged := false
@@ -331,7 +289,6 @@ func (r *McpConnectionResource) Update(ctx context.Context, req resource.UpdateR
 		resp.Diagnostics.Append(fillMcpConnectionUpdateMessage(
 			ctx, planData, &t,
 			&update.HttpTransport, &update.OauthClientCredentials, &update.BasicCredentials, &update.HeaderCredentials,
-			&update.StdioTransport,
 			updateCreds,
 		)...)
 		update.Transport = &t
@@ -383,7 +340,6 @@ func fillMcpConnectionUpdateMessage(
 	oauthClientCreds **pgql.McpConnectionOauthClientCredentials,
 	basicCreds **pgql.McpConnectionBasicCredentials,
 	headerCreds **pgql.McpConnectionHeaderCredentials,
-	stdioTransport **pgql.McpConnectionStdioTransportSettings,
 	updateCredentials bool,
 ) diag.Diagnostics {
 	switch {
@@ -440,33 +396,8 @@ func fillMcpConnectionUpdateMessage(
 			}
 		}
 		*httpTransport = ht
-	case !data.StdioTransport.IsNull() && !data.StdioTransport.IsUnknown():
-		*pTransport = pgql.McpTransportStdio
-		var st pgql.McpConnectionStdioTransportSettings
-		if diag := tfsdk.ValueAs(ctx, data.StdioTransport.Attributes()["command"], &st.Command); diag.HasError() {
-			return diag
-		}
-		if v, ok := data.StdioTransport.Attributes()["arguments"]; ok && !v.IsNull() && !v.IsUnknown() {
-			if diag := tfsdk.ValueAs(ctx, v, &st.Arguments); diag.HasError() {
-				return diag
-			}
-		}
-
-		var envVars []struct {
-			Name  string `tfsdk:"name"`
-			Value string `tfsdk:"value"`
-		}
-		if v, ok := data.StdioTransport.Attributes()["environment"]; ok && !v.IsNull() && !v.IsUnknown() {
-			if diag := tfsdk.ValueAs(ctx, v, &envVars); diag.HasError() {
-				return diag
-			}
-		}
-		for _, ev := range envVars {
-			st.Environment = append(st.Environment, fmt.Sprintf("%s=%s", ev.Name, ev.Value))
-		}
-		*stdioTransport = &st
-	case !data.ServerInitiatedHttpTransport.IsNull() && !data.ServerInitiatedHttpTransport.IsUnknown():
-		*pTransport = pgql.McpTransportServerInitiatedHttp
+	case !data.TunnelTransport.IsNull() && !data.TunnelTransport.IsUnknown():
+		*pTransport = pgql.McpTransportTunnel
 	}
 	return nil
 }

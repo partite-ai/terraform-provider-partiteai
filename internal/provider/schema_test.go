@@ -114,7 +114,12 @@ func TestEveryResourceHasADataSource(t *testing.T) {
 	schemas := providerSchema(t)
 
 	// Resources with no read-only counterpart by design.
-	exempt := map[string]bool{}
+	exempt := map[string]bool{
+		// A tunnel key is its credential, and that is readable only when the key is
+		// created. A data source could return nothing a subscription does not
+		// already expose.
+		"partiteai_mcp_connection_tunnel_key": true,
+	}
 
 	for name := range schemas.ResourceSchemas {
 		if exempt[name] {

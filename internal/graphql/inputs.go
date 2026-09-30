@@ -111,47 +111,33 @@ type ModelProviderConfigInputOpenAICompatible struct {
 }
 
 type NewModelProfile struct {
-	Name                   string                            `json:"name"`
-	Description            Optional[string]                  `json:"description,omitzero"`
-	ConfigurationAnthropic *ModelProfileConfigInputAnthropic `json:"configurationAnthropic,omitempty"`
-	ConfigurationOpenAI    *ModelProfileConfigInputOpenAI    `json:"configurationOpenAI,omitempty"`
-	ConfigurationGoogle    *ModelProfileConfigInputGoogle    `json:"configurationGoogle,omitempty"`
-	Tags                   []*Tag                            `json:"tags"`
+	Name          string                  `json:"name"`
+	Description   Optional[string]        `json:"description,omitzero"`
+	Configuration ModelProfileConfigInput `json:"configuration"`
+	Tags          []*Tag                  `json:"tags"`
 }
 
 type UpdateModelProfile struct {
-	Name                   Optional[string]                  `json:"name,omitzero"`
-	Description            Optional[string]                  `json:"description,omitzero"`
-	ConfigurationAnthropic *ModelProfileConfigInputAnthropic `json:"configurationAnthropic,omitempty"`
-	ConfigurationOpenAI    *ModelProfileConfigInputOpenAI    `json:"configurationOpenAI,omitempty"`
-	ConfigurationGoogle    *ModelProfileConfigInputGoogle    `json:"configurationGoogle,omitempty"`
-	Tags                   Optional[[]*Tag]                  `json:"tags,omitzero"`
+	Name          Optional[string]         `json:"name,omitzero"`
+	Description   Optional[string]         `json:"description,omitzero"`
+	Configuration *ModelProfileConfigInput `json:"configuration,omitempty"`
+	Tags          Optional[[]*Tag]         `json:"tags,omitzero"`
 }
 
-type ModelProfileConfigInputAnthropic struct {
-	Model                string            `json:"model"`
-	MaxTokens            int               `json:"maxTokens"`
-	Temperature          Optional[float64] `json:"temperature,omitzero"`
-	TopP                 Optional[float64] `json:"topP,omitzero"`
-	TopK                 Optional[int64]   `json:"topK,omitzero"`
-	ThinkingBudgetTokens Optional[int64]   `json:"thinkingBudgetTokens,omitzero"`
-}
-
-type ModelProfileConfigInputOpenAI struct {
-	Model           string            `json:"model"`
-	MaxTokens       Optional[int64]   `json:"maxTokens,omitzero"`
-	Temperature     Optional[float64] `json:"temperature,omitzero"`
-	TopP            Optional[float64] `json:"topP,omitzero"`
-	ReasoningEffort Optional[string]  `json:"reasoningEffort,omitzero"`
-}
-
-type ModelProfileConfigInputGoogle struct {
+// ModelProfileConfigInput is one set of settings for whatever model the profile
+// names.
+//
+// There is no longer a shape per vendor. Which of these a model actually accepts
+// is reported by the provider, as ModelInfo.supportedParameters, rather than being
+// fixed by the vendor's type.
+type ModelProfileConfigInput struct {
 	Model                string            `json:"model"`
 	MaxTokens            Optional[int64]   `json:"maxTokens,omitzero"`
 	Temperature          Optional[float64] `json:"temperature,omitzero"`
 	TopP                 Optional[float64] `json:"topP,omitzero"`
 	TopK                 Optional[int64]   `json:"topK,omitzero"`
 	ThinkingBudgetTokens Optional[int64]   `json:"thinkingBudgetTokens,omitzero"`
+	ReasoningEffort      Optional[string]  `json:"reasoningEffort,omitzero"`
 }
 
 type ModelSetRuleInput struct {
@@ -340,34 +326,29 @@ type OAuth2ClientCredentialsParticleCredentialInput struct {
 	TokenUrl     *string `json:"tokenUrl,omitempty"`
 }
 
-// EmbeddingProfileConfigInputOpenAI is the configuration of an embedding
-// profile of an OpenAI provider.
-type EmbeddingProfileConfigInputOpenAI struct {
-	Model          string         `json:"model"`
-	Dimensions     int            `json:"dimensions"`
+// EmbeddingProfileConfigInput is one set of settings for whatever model the
+// profile names. As with model profiles, there is no longer a shape per vendor.
+type EmbeddingProfileConfigInput struct {
+	Model      string `json:"model"`
+	Dimensions int    `json:"dimensions"`
+	// SendDimensions asks the service for that size with each request. Set it for
+	// a model that can be asked for fewer dimensions than it produces.
 	SendDimensions Optional[bool] `json:"sendDimensions,omitzero"`
-}
-
-// EmbeddingProfileConfigInputGoogle is the same for a Google provider.
-type EmbeddingProfileConfigInputGoogle struct {
-	Model          string           `json:"model"`
-	Dimensions     int              `json:"dimensions"`
-	SendDimensions Optional[bool]   `json:"sendDimensions,omitzero"`
-	TaskType       Optional[string] `json:"taskType,omitzero"`
+	// TaskType is what the embedding is for, such as RETRIEVAL_DOCUMENT. Google
+	// only.
+	TaskType Optional[string] `json:"taskType,omitzero"`
 }
 
 type NewEmbeddingProfile struct {
-	Name                string                             `json:"name"`
-	Description         Optional[string]                   `json:"description,omitzero"`
-	ConfigurationOpenAI *EmbeddingProfileConfigInputOpenAI `json:"configurationOpenAI,omitempty"`
-	ConfigurationGoogle *EmbeddingProfileConfigInputGoogle `json:"configurationGoogle,omitempty"`
+	Name          string                      `json:"name"`
+	Description   Optional[string]            `json:"description,omitzero"`
+	Configuration EmbeddingProfileConfigInput `json:"configuration"`
 }
 
 type UpdateEmbeddingProfile struct {
-	Name                Optional[string]                   `json:"name,omitzero"`
-	Description         Optional[string]                   `json:"description,omitzero"`
-	ConfigurationOpenAI *EmbeddingProfileConfigInputOpenAI `json:"configurationOpenAI,omitempty"`
-	ConfigurationGoogle *EmbeddingProfileConfigInputGoogle `json:"configurationGoogle,omitempty"`
+	Name          Optional[string]             `json:"name,omitzero"`
+	Description   Optional[string]             `json:"description,omitzero"`
+	Configuration *EmbeddingProfileConfigInput `json:"configuration,omitempty"`
 }
 
 // NewMemoryStoreScope is one scope written with its store, or added to one.

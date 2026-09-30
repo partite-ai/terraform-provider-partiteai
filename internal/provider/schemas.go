@@ -120,21 +120,6 @@ var taskAssociationDataSourceType = dsschema.NestedAttributeObject{
 	},
 }
 
-// More data source nested attribute objects for MCP connections.
-var envVarDataSourceType = dsschema.NestedAttributeObject{
-	Attributes: map[string]dsschema.Attribute{
-		"name": dsschema.StringAttribute{
-			MarkdownDescription: "The name of the environment variable.",
-			Computed:            true,
-		},
-		"value": dsschema.StringAttribute{
-			MarkdownDescription: "The value of the environment variable.",
-			Computed:            true,
-			Sensitive:           true,
-		},
-	},
-}
-
 // Data source schemas - similar to resource schemas but with required ID and all computed.
 var commonDataSourceSchemas = struct {
 	id          dsschema.StringAttribute

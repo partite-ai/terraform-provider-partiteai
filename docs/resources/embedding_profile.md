@@ -17,14 +17,13 @@ An embedding profile: the model a memory store writes its vectors with.
 
 ### Required
 
+- `configuration` (Attributes) The embedding model and how it is asked for vectors. Which settings a model accepts is the provider's business, not a fixed shape per vendor, so this is one block for every provider. (see [below for nested schema](#nestedatt--configuration))
 - `model_provider_id` (String) ID of the model provider this profile belongs to
 - `name` (String) Resource name
 
 ### Optional
 
 - `description` (String) Resource description
-- `google` (Attributes) Google embedding configuration (see [below for nested schema](#nestedatt--google))
-- `openai` (Attributes) OpenAI embedding configuration (see [below for nested schema](#nestedatt--openai))
 
 ### Read-Only
 
@@ -33,28 +32,15 @@ An embedding profile: the model a memory store writes its vectors with.
 - `id` (String) Resource identifier
 - `updated_at` (String) Timestamp when the resource was last updated
 
-<a id="nestedatt--google"></a>
-### Nested Schema for `google`
+<a id="nestedatt--configuration"></a>
+### Nested Schema for `configuration`
 
 Required:
 
 - `dimensions` (Number) The width of the vectors this profile produces
-- `model` (String) The name the service knows the embedding model by, such as gemini-embedding-001
-
-Optional:
-
-- `send_dimensions` (Boolean) Ask the service for that width with each request
-- `task_type` (String) What the embedding is for, such as RETRIEVAL_DOCUMENT
-
-
-<a id="nestedatt--openai"></a>
-### Nested Schema for `openai`
-
-Required:
-
-- `dimensions` (Number) The width of the vectors this profile produces
-- `model` (String) The name the service knows the embedding model by, such as text-embedding-3-small
+- `model` (String) The name the service knows the embedding model by, such as text-embedding-3-small or gemini-embedding-001
 
 Optional:
 
 - `send_dimensions` (Boolean) Ask the service for that width with each request. Set it only for a model that can be asked for fewer dimensions than it produces by default.
+- `task_type` (String) What the embedding is for, such as RETRIEVAL_DOCUMENT. Google only.

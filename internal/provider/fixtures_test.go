@@ -17,7 +17,7 @@ resource "partiteai_model_provider" "base" {
 resource "partiteai_model_profile" "base" {
   name              = "base-profile"
   model_provider_id = partiteai_model_provider.base.id
-  openai = {
+  configuration = {
     model      = "gpt-5"
     max_tokens = 1024
   }

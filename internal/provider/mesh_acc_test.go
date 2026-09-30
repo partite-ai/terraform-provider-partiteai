@@ -82,7 +82,7 @@ resource "partiteai_model_provider" "base" {
 resource "partiteai_model_profile" "base" {
   name              = "base-profile"
   model_provider_id = partiteai_model_provider.base.id
-  openai = {
+  configuration = {
     model      = "gpt-5"
     max_tokens = 1024
   }
@@ -91,7 +91,7 @@ resource "partiteai_model_profile" "base" {
 resource "partiteai_model_profile" "second" {
   name              = "second-profile"
   model_provider_id = partiteai_model_provider.base.id
-  openai = {
+  configuration = {
     model      = "gpt-5-mini"
     max_tokens = 512
   }
@@ -136,7 +136,7 @@ resource "partiteai_model_provider" "test" {
 resource "partiteai_model_profile" "test" {
   name              = "acc-profile"
   model_provider_id = partiteai_model_provider.test.id
-  anthropic = {
+  configuration = {
     model                  = "claude-opus-5"
     max_tokens             = 4096
     temperature            = 0.5
@@ -149,12 +149,12 @@ data "partiteai_model_profile" "test" {
 }
 `,
 			Check: resource.ComposeAggregateTestCheckFunc(
-				resource.TestCheckResourceAttr("partiteai_model_profile.test", "anthropic.model", "claude-opus-5"),
-				resource.TestCheckResourceAttr("partiteai_model_profile.test", "anthropic.max_tokens", "4096"),
-				resource.TestCheckResourceAttr("partiteai_model_profile.test", "anthropic.temperature", "0.5"),
+				resource.TestCheckResourceAttr("partiteai_model_profile.test", "configuration.model", "claude-opus-5"),
+				resource.TestCheckResourceAttr("partiteai_model_profile.test", "configuration.max_tokens", "4096"),
+				resource.TestCheckResourceAttr("partiteai_model_profile.test", "configuration.temperature", "0.5"),
 				resource.TestCheckResourceAttrPair(
-					"data.partiteai_model_profile.test", "anthropic.model",
-					"partiteai_model_profile.test", "anthropic.model"),
+					"data.partiteai_model_profile.test", "configuration.model",
+					"partiteai_model_profile.test", "configuration.model"),
 			),
 		},
 		resource.TestStep{
@@ -167,7 +167,7 @@ resource "partiteai_model_provider" "test" {
 resource "partiteai_model_profile" "test" {
   name              = "acc-profile"
   model_provider_id = partiteai_model_provider.test.id
-  anthropic = {
+  configuration = {
     model                  = "claude-opus-5"
     max_tokens             = 4096
     temperature            = 0.5

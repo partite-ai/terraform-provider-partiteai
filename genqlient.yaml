@@ -23,6 +23,10 @@ bindings:
     type: string
   McpConnectionID:
     type: string
+  McpConnectionSubscriptionID:
+    type: string
+  McpConnectionTunnelKeyID:
+    type: string
   MemorySlotID:
     type: string
   ParticleArtifactID:

@@ -146,23 +146,17 @@ func TestAccAgent_mcpConnectionFilters(t *testing.T) {
 		Config: `
 resource "partiteai_mcp_connection" "none" {
   name = "filter-none"
-  stdio_transport = {
-    command = "echo"
-  }
+  tunnel_transport = {}
 }
 
 resource "partiteai_mcp_connection" "list" {
   name = "filter-list"
-  stdio_transport = {
-    command = "echo"
-  }
+  tunnel_transport = {}
 }
 
 resource "partiteai_mcp_connection" "pattern" {
   name = "filter-pattern"
-  stdio_transport = {
-    command = "echo"
-  }
+  tunnel_transport = {}
 }
 
 resource "partiteai_agent" "test" {

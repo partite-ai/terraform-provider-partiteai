@@ -42,26 +42,8 @@ func (d *EmbeddingProfileDataSource) Schema(ctx context.Context, req datasource.
 				MarkdownDescription: "The width of the vectors this profile produces",
 				Computed:            true,
 			},
-			"openai": schema.SingleNestedAttribute{
-				MarkdownDescription: "OpenAI embedding configuration",
-				Computed:            true,
-				Attributes: map[string]schema.Attribute{
-					"model": schema.StringAttribute{
-						MarkdownDescription: "The name the service knows the embedding model by",
-						Computed:            true,
-					},
-					"dimensions": schema.Int64Attribute{
-						MarkdownDescription: "The width of the vectors this profile produces",
-						Computed:            true,
-					},
-					"send_dimensions": schema.BoolAttribute{
-						MarkdownDescription: "Whether the width is asked for with each request",
-						Computed:            true,
-					},
-				},
-			},
-			"google": schema.SingleNestedAttribute{
-				MarkdownDescription: "Google embedding configuration",
+			"configuration": schema.SingleNestedAttribute{
+				MarkdownDescription: "The embedding model and how it is asked for vectors.",
 				Computed:            true,
 				Attributes: map[string]schema.Attribute{
 					"model": schema.StringAttribute{

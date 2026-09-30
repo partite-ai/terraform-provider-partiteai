@@ -253,24 +253,3 @@ func newStructSliceMappable[S any, T any, PT interface {
 }](src []S, targetExample T) tfMappable { //nolint:unparam
 	return structSliceMappable[S, T, PT]{src: src}
 }
-
-type structMappable[S any, T any, PT interface {
-	*T
-	fromGQL[S]
-}] struct {
-	src S
-}
-
-func (l structMappable[S, T, PT]) mapToTF(ctx context.Context, target tfTypeable) diag.Diagnostics {
-	var diags diag.Diagnostics
-	var t T
-	diags.Append(PT(&t).FromGQL(l.src)...)
-	return tfsdk.ValueFrom(ctx, t, target.Type(ctx), target)
-}
-
-func newStructMappable[S any, T any, PT interface {
-	*T
-	fromGQL[S]
-}](src S, targetExample T) tfMappable { //nolint:unparam
-	return structMappable[S, T, PT]{src: src}
-}

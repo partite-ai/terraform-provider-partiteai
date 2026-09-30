@@ -21,17 +21,16 @@ An embedding profile: the model a memory store writes its vectors with.
 
 ### Read-Only
 
+- `configuration` (Attributes) The embedding model and how it is asked for vectors. (see [below for nested schema](#nestedatt--configuration))
 - `created_at` (String) Timestamp when the resource was created
 - `description` (String) Resource description
 - `dimensions` (Number) The width of the vectors this profile produces
-- `google` (Attributes) Google embedding configuration (see [below for nested schema](#nestedatt--google))
 - `model_provider_id` (String) ID of the model provider this profile belongs to
 - `name` (String) Resource name
-- `openai` (Attributes) OpenAI embedding configuration (see [below for nested schema](#nestedatt--openai))
 - `updated_at` (String) Timestamp when the resource was last updated
 
-<a id="nestedatt--google"></a>
-### Nested Schema for `google`
+<a id="nestedatt--configuration"></a>
+### Nested Schema for `configuration`
 
 Read-Only:
 
@@ -39,13 +38,3 @@ Read-Only:
 - `model` (String) The name the service knows the embedding model by
 - `send_dimensions` (Boolean) Whether the width is asked for with each request
 - `task_type` (String) What the embedding is for, such as RETRIEVAL_DOCUMENT
-
-
-<a id="nestedatt--openai"></a>
-### Nested Schema for `openai`
-
-Read-Only:
-
-- `dimensions` (Number) The width of the vectors this profile produces
-- `model` (String) The name the service knows the embedding model by
-- `send_dimensions` (Boolean) Whether the width is asked for with each request

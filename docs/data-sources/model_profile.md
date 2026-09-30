@@ -19,57 +19,28 @@ Model Profile data source
 
 - `id` (String) Resource identifier
 
-### Optional
-
-- `anthropic` (Attributes) Anthropic profile config (see [below for nested schema](#nestedatt--anthropic))
-
 ### Read-Only
 
+- `configuration` (Attributes) The model and the settings it is called with. (see [below for nested schema](#nestedatt--configuration))
 - `created_at` (String) Timestamp when the resource was created
 - `description` (String) Resource description
-- `google` (Attributes) Google profile config (see [below for nested schema](#nestedatt--google))
 - `model_provider_id` (String) ID of the Model Provider
 - `name` (String) Resource name
-- `openai` (Attributes) OpenAI profile config (see [below for nested schema](#nestedatt--openai))
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
 - `updated_at` (String) Timestamp when the resource was last updated
 
-<a id="nestedatt--anthropic"></a>
-### Nested Schema for `anthropic`
+<a id="nestedatt--configuration"></a>
+### Nested Schema for `configuration`
 
 Read-Only:
 
-- `max_tokens` (Number) Maximum tokens
-- `model` (String) Anthropic model name
-- `temperature` (Number) Temperature
-- `thinking_budget_tokens` (Number) Thinking budget tokens
-- `top_k` (Number) Top K
-- `top_p` (Number) Top P
-
-
-<a id="nestedatt--google"></a>
-### Nested Schema for `google`
-
-Read-Only:
-
-- `max_tokens` (Number) Maximum tokens
-- `model` (String) Google model name
-- `temperature` (Number) Temperature
-- `thinking_budget_tokens` (Number) Thinking budget tokens
-- `top_k` (Number) Top K
-- `top_p` (Number) Top P
-
-
-<a id="nestedatt--openai"></a>
-### Nested Schema for `openai`
-
-Read-Only:
-
-- `max_tokens` (Number) Maximum tokens
-- `model` (String) OpenAI model name
-- `reasoning_effort` (String) Reasoning effort (LOW, MEDIUM, HIGH)
-- `temperature` (Number) Temperature
-- `top_p` (Number) Top P
+- `max_tokens` (Number) The most tokens the model may produce in one response
+- `model` (String) The name the service knows the model by
+- `reasoning_effort` (String) How hard the model should think
+- `temperature` (Number) How much the model is allowed to vary its output
+- `thinking_budget_tokens` (Number) Tokens the model may spend reasoning before it answers
+- `top_k` (Number) How many candidate tokens the model considers
+- `top_p` (Number) Nucleus sampling cutoff
 
 
 <a id="nestedatt--tags"></a>

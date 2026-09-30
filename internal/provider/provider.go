@@ -251,6 +251,8 @@ func (p *PartiteAIProvider) Resources(ctx context.Context) []func() resource.Res
 	return []func() resource.Resource{
 		NewAgentResource,
 		NewMcpConnectionResource,
+		NewMcpConnectionSubscriptionResource,
+		NewMcpConnectionTunnelKeyResource,
 		NewApiKeyResource,
 		NewWebhookDestinationResource,
 		NewModelProviderResource,
@@ -282,6 +284,7 @@ func (p *PartiteAIProvider) DataSources(ctx context.Context) []func() datasource
 		NewApiKeyDataSource,
 		NewWebhookDestinationDataSource,
 		NewMcpConnectionDataSource,
+		NewMcpConnectionSubscriptionDataSource,
 		NewMeshDataSource,
 		NewMeshInputDataSource,
 		NewMeshLinkDataSource,

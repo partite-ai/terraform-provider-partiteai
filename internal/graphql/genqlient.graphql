@@ -86,10 +86,15 @@ fragment McpConnectionDetails on McpConnection {
     url
     authFlow
   }
-  stdioTransport {
-    command
-    arguments
-    environment
+  tunnelTransport {
+    subscriptions {
+      id
+      name
+      criteria {
+        name
+        value
+      }
+    }
   }
   createdAt
   updatedAt
@@ -122,6 +127,89 @@ mutation ModifyMcpConnection(
 mutation DeleteMcpConnection($id: McpConnectionID!) {
   deleteMcpConnections(mcpConnectionIDs: [$id]) {
     ids
+  }
+}
+
+# @genqlient(typename: "McpConnectionSubscriptionDetails")
+fragment McpConnectionSubscriptionDetails on McpConnectionSubscription {
+  id
+  name
+  criteria {
+    name
+    value
+  }
+  createdAt
+  updatedAt
+}
+
+mutation CreateMcpConnectionSubscription($input: NewMcpConnectionSubscription!) {
+  # @genqlient(flatten: true)
+  createMcpConnectionSubscription(input: $input) {
+    ...McpConnectionSubscriptionDetails
+  }
+}
+
+mutation ModifyMcpConnectionSubscription(
+  $id: McpConnectionSubscriptionID!
+  $changes: McpConnectionSubscriptionChanges!
+) {
+  # @genqlient(flatten: true)
+  updateMcpConnectionSubscription(
+    mcpConnectionSubscriptionID: $id
+    changes: $changes
+  ) {
+    ...McpConnectionSubscriptionDetails
+  }
+}
+
+mutation DeleteMcpConnectionSubscription($id: McpConnectionSubscriptionID!) {
+  deleteMcpConnectionSubscriptions(mcpConnectionSubscriptionIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "McpConnectionTunnelKeyDetails")
+fragment McpConnectionTunnelKeyDetails on McpConnectionTunnelKey {
+  id
+  label
+  attached
+  expiresAt
+  revokedAt
+  createdAt
+}
+
+mutation CreateMcpConnectionTunnelKey($input: NewMcpConnectionTunnelKey!) {
+  createMcpConnectionTunnelKey(input: $input) {
+    # The credential exists in this form once and is never readable again.
+    credential
+    # @genqlient(flatten: true)
+    tunnelKey {
+      ...McpConnectionTunnelKeyDetails
+    }
+  }
+}
+
+mutation RevokeMcpConnectionTunnelKey($id: McpConnectionTunnelKeyID!) {
+  # @genqlient(flatten: true)
+  revokeMcpConnectionTunnelKey(mcpConnectionTunnelKeyID: $id) {
+    ...McpConnectionTunnelKeyDetails
+  }
+}
+
+# Subscriptions and their keys are reached through the connection, since neither
+# has a top-level query of its own.
+query GetMcpConnectionSubscriptions($id: McpConnectionID!) {
+  mcpConnection(id: $id) {
+    tunnelTransport {
+      # @genqlient(typename: "McpConnectionSubscriptionWithKeys")
+      subscriptions {
+        ...McpConnectionSubscriptionDetails
+        # @genqlient(flatten: true)
+        tunnelKeys {
+          ...McpConnectionTunnelKeyDetails
+        }
+      }
+    }
   }
 }
 
@@ -251,30 +339,17 @@ fragment ModelProfileDetails on ModelProfile {
   provider {
     id
   }
+  # Mesh collapsed the per-vendor configuration union into one flat type, so the
+  # fields are selected directly. Deciding which HCL block to map them back onto
+  # is a separate change; see ModelProfileBaseModel.MapFromGraphQL.
   configuration {
-    ... on ModelProfileConfigAnthropic {
-      model
-      maxTokens
-      temperature
-      topP
-      topK
-      thinkingBudgetTokens
-    }
-    ... on ModelProfileConfigOpenAI {
-      model
-      maxTokens
-      temperature
-      topP
-      reasoningEffort
-    }
-    ... on ModelProfileConfigGoogle {
-      model
-      maxTokens
-      temperature
-      topP
-      topK
-      thinkingBudgetTokens
-    }
+    model
+    maxTokens
+    temperature
+    topP
+    topK
+    thinkingBudgetTokens
+    reasoningEffort
   }
   createdAt
   updatedAt
@@ -776,18 +851,13 @@ fragment EmbeddingProfileDetails on EmbeddingProfile {
   name
   description
   dimensions
+  # Collapsed to a flat type, as with model profiles. See
+  # EmbeddingProfileBaseModel.MapFromGraphQL.
   configuration {
-    ... on EmbeddingProfileConfigOpenAI {
-      model
-      dimensions
-      sendDimensions
-    }
-    ... on EmbeddingProfileConfigGoogle {
-      model
-      dimensions
-      sendDimensions
-      taskType
-    }
+    model
+    dimensions
+    sendDimensions
+    taskType
   }
   provider {
     id

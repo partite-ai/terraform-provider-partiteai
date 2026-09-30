@@ -6,43 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestAccMcpConnection_stdio(t *testing.T) {
-	accTest(t, resource.TestStep{
-		Config: `
-resource "partiteai_mcp_connection" "test" {
-  name = "acc-stdio"
-  stdio_transport = {
-    command   = "echo"
-    arguments = ["hello"]
-    environment = [
-      { name = "FOO", value = "bar" },
-    ]
-  }
-}
-`,
-		Check: resource.ComposeAggregateTestCheckFunc(
-			resource.TestCheckResourceAttr("partiteai_mcp_connection.test", "name", "acc-stdio"),
-			resource.TestCheckResourceAttr("partiteai_mcp_connection.test", "stdio_transport.command", "echo"),
-		),
-	})
-}
-
-// TestAccMcpConnection_stdioMinimal pins the case where the optional stdio
-// fields are left out entirely.
-func TestAccMcpConnection_stdioMinimal(t *testing.T) {
-	accTest(t, resource.TestStep{
-		Config: `
-resource "partiteai_mcp_connection" "test" {
-  name = "acc-stdio-minimal"
-  stdio_transport = {
-    command = "echo"
-  }
-}
-`,
-		Check: resource.TestCheckResourceAttr("partiteai_mcp_connection.test", "stdio_transport.command", "echo"),
-	})
-}
-
 // TestAccMcpConnection_httpCredentials covers the write-only credential blocks.
 // OAUTH2_CLIENT_CREDENTIALS is left out on purpose: creating one fetches the
 // authorization server's metadata document, so it cannot run without network
@@ -85,16 +48,50 @@ resource "partiteai_mcp_connection" "none" {
   }
 }
 
-resource "partiteai_mcp_connection" "sih" {
-  name                            = "acc-sih"
-  server_initiated_http_transport = {}
+resource "partiteai_mcp_connection" "tunnel" {
+  name             = "acc-tunnel"
+  tunnel_transport = {}
+}
+
+# Subscriptions are their own resource, since a key has to reference one and they
+# do not rank against each other.
+resource "partiteai_mcp_connection_subscription" "dev" {
+  mcp_connection_id = partiteai_mcp_connection.tunnel.id
+  name              = "dev"
+  criteria = [
+    {
+      name  = "env"
+      value = "dev"
+    },
+  ]
+}
+
+# No criteria, so it accepts every conversation on the connection.
+resource "partiteai_mcp_connection_subscription" "catch_all" {
+  mcp_connection_id = partiteai_mcp_connection.tunnel.id
+  name              = "catch-all"
+}
+
+resource "partiteai_mcp_connection_tunnel_key" "bob" {
+  mcp_connection_id              = partiteai_mcp_connection.tunnel.id
+  mcp_connection_subscription_id = partiteai_mcp_connection_subscription.dev.id
+  label                          = "laptop-bob"
 }
 `,
 		Check: resource.ComposeAggregateTestCheckFunc(
 			resource.TestCheckResourceAttr("partiteai_mcp_connection.basic", "http_transport.authentication_method", "BASIC"),
 			resource.TestCheckResourceAttr("partiteai_mcp_connection.header", "http_transport.authentication_method", "HEADER"),
 			resource.TestCheckResourceAttrSet("partiteai_mcp_connection.none", "id"),
-			resource.TestCheckResourceAttrSet("partiteai_mcp_connection.sih", "id"),
+			resource.TestCheckResourceAttrSet("partiteai_mcp_connection.tunnel", "tunnel_transport.%"),
+			resource.TestCheckResourceAttr("partiteai_mcp_connection_subscription.dev", "criteria.0.name", "env"),
+			resource.TestCheckResourceAttr("partiteai_mcp_connection_subscription.dev", "criteria.0.value", "dev"),
+			// No criteria reads back null rather than an empty set, matching an
+			// omitted attribute.
+			resource.TestCheckNoResourceAttr("partiteai_mcp_connection_subscription.catch_all", "criteria"),
+			// The credential exists once, at create, and is held in state.
+			resource.TestCheckResourceAttrSet("partiteai_mcp_connection_tunnel_key.bob", "credential"),
+			resource.TestCheckResourceAttr("partiteai_mcp_connection_tunnel_key.bob", "label", "laptop-bob"),
+			resource.TestCheckResourceAttrSet("partiteai_mcp_connection.tunnel", "id"),
 		),
 	})
 }

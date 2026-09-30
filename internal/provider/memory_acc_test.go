@@ -15,7 +15,7 @@ resource "partiteai_model_provider" "embed" {
 resource "partiteai_embedding_profile" "test" {
   name              = "acc-embedding"
   model_provider_id = partiteai_model_provider.embed.id
-  openai = {
+  configuration = {
     model      = "text-embedding-3-small"
     dimensions = 1536
   }
@@ -31,7 +31,7 @@ data "partiteai_embedding_profile" "test" {
 }
 `,
 			Check: resource.ComposeAggregateTestCheckFunc(
-				resource.TestCheckResourceAttr("partiteai_embedding_profile.test", "openai.model", "text-embedding-3-small"),
+				resource.TestCheckResourceAttr("partiteai_embedding_profile.test", "configuration.model", "text-embedding-3-small"),
 				resource.TestCheckResourceAttr("partiteai_embedding_profile.test", "dimensions", "1536"),
 				resource.TestCheckResourceAttrPair(
 					"data.partiteai_embedding_profile.test", "dimensions",

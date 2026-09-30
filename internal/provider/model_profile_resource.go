@@ -8,7 +8,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -39,88 +38,38 @@ func (r *ModelProfileResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "ID of the Model Provider",
 				Required:            true,
 			},
-			"anthropic": schema.SingleNestedAttribute{
-				MarkdownDescription: "Anthropic profile config",
-				Optional:            true,
+			"configuration": schema.SingleNestedAttribute{
+				MarkdownDescription: "The model and the settings it is called with. Which of these a model " +
+					"accepts is reported by its provider, as a model's supported parameters, rather than being " +
+					"fixed by the vendor, so this is one block for every provider.",
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"model": schema.StringAttribute{
-						MarkdownDescription: "Anthropic model name",
+						MarkdownDescription: "The name the service knows the model by.",
 						Required:            true,
 					},
 					"max_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Maximum tokens",
-						Required:            true,
+						MarkdownDescription: "The most tokens the model may produce in one response.",
+						Optional:            true,
 					},
 					"temperature": schema.Float64Attribute{
-						MarkdownDescription: "Temperature",
+						MarkdownDescription: "How much the model is allowed to vary its output.",
 						Optional:            true,
 					},
 					"top_p": schema.Float64Attribute{
-						MarkdownDescription: "Top P",
+						MarkdownDescription: "Nucleus sampling cutoff.",
 						Optional:            true,
 					},
 					"top_k": schema.Int64Attribute{
-						MarkdownDescription: "Top K",
+						MarkdownDescription: "How many candidate tokens the model considers.",
 						Optional:            true,
 					},
 					"thinking_budget_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Thinking budget tokens",
-						Optional:            true,
-					},
-				},
-			},
-			"openai": schema.SingleNestedAttribute{
-				MarkdownDescription: "OpenAI profile config",
-				Optional:            true,
-				Attributes: map[string]schema.Attribute{
-					"model": schema.StringAttribute{
-						MarkdownDescription: "OpenAI model name",
-						Required:            true,
-					},
-					"max_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Maximum tokens",
-						Optional:            true,
-					},
-					"temperature": schema.Float64Attribute{
-						MarkdownDescription: "Temperature",
-						Optional:            true,
-					},
-					"top_p": schema.Float64Attribute{
-						MarkdownDescription: "Top P",
+						MarkdownDescription: "Tokens the model may spend reasoning before it answers.",
 						Optional:            true,
 					},
 					"reasoning_effort": schema.StringAttribute{
-						MarkdownDescription: "Reasoning effort (LOW, MEDIUM, HIGH)",
-						Optional:            true,
-					},
-				},
-			},
-			"google": schema.SingleNestedAttribute{
-				MarkdownDescription: "Google profile config",
-				Optional:            true,
-				Attributes: map[string]schema.Attribute{
-					"model": schema.StringAttribute{
-						MarkdownDescription: "Google model name",
-						Required:            true,
-					},
-					"max_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Maximum tokens",
-						Optional:            true,
-					},
-					"temperature": schema.Float64Attribute{
-						MarkdownDescription: "Temperature",
-						Optional:            true,
-					},
-					"top_p": schema.Float64Attribute{
-						MarkdownDescription: "Top P",
-						Optional:            true,
-					},
-					"top_k": schema.Int64Attribute{
-						MarkdownDescription: "Top K",
-						Optional:            true,
-					},
-					"thinking_budget_tokens": schema.Int64Attribute{
-						MarkdownDescription: "Thinking budget tokens",
+						MarkdownDescription: "How hard the model should think: NONE, MINIMAL, LOW, MEDIUM, HIGH, XHIGH or MAX.",
 						Optional:            true,
 					},
 				},
@@ -153,81 +102,11 @@ func (r *ModelProfileResource) Create(ctx context.Context, req resource.CreateRe
 		}
 	}
 
-	// Only one config block should be set
-	numSet := 0
-	if !data.Anthropic.IsNull() && !data.Anthropic.IsUnknown() {
-		numSet++
-	}
-	if !data.OpenAI.IsNull() && !data.OpenAI.IsUnknown() {
-		numSet++
-	}
-	if !data.Google.IsNull() && !data.Google.IsUnknown() {
-		numSet++
-	}
-	if numSet != 1 {
-		resp.Diagnostics.AddError("Invalid config", "Exactly one of anthropic, openai, or google must be set.")
+	config, ok := modelProfileConfig(ctx, data.Configuration, &resp.Diagnostics)
+	if !ok {
 		return
 	}
-
-	createReq.ConfigurationAnthropic = nil
-	createReq.ConfigurationOpenAI = nil
-	createReq.ConfigurationGoogle = nil
-
-	if !data.Anthropic.IsNull() && !data.Anthropic.IsUnknown() {
-		var block struct {
-			Model                string        `tfsdk:"model"`
-			MaxTokens            int64         `tfsdk:"max_tokens"`
-			Temperature          types.Float64 `tfsdk:"temperature"`
-			TopP                 types.Float64 `tfsdk:"top_p"`
-			TopK                 types.Int64   `tfsdk:"top_k"`
-			ThinkingBudgetTokens types.Int64   `tfsdk:"thinking_budget_tokens"`
-		}
-		_ = tfsdk.ValueAs(ctx, data.Anthropic, &block)
-		createReq.ConfigurationAnthropic = &pgql.ModelProfileConfigInputAnthropic{
-			Model:                block.Model,
-			MaxTokens:            int(block.MaxTokens),
-			Temperature:          pgql.OptPtr(block.Temperature.ValueFloat64Pointer()),
-			TopP:                 pgql.OptPtr(block.TopP.ValueFloat64Pointer()),
-			TopK:                 pgql.OptPtr(block.TopK.ValueInt64Pointer()),
-			ThinkingBudgetTokens: pgql.OptPtr(block.ThinkingBudgetTokens.ValueInt64Pointer()),
-		}
-	}
-	if !data.OpenAI.IsNull() && !data.OpenAI.IsUnknown() {
-		var block struct {
-			Model           string        `tfsdk:"model"`
-			MaxTokens       types.Int64   `tfsdk:"max_tokens"`
-			Temperature     types.Float64 `tfsdk:"temperature"`
-			TopP            types.Float64 `tfsdk:"top_p"`
-			ReasoningEffort types.String  `tfsdk:"reasoning_effort"`
-		}
-		_ = tfsdk.ValueAs(ctx, data.OpenAI, &block)
-		createReq.ConfigurationOpenAI = &pgql.ModelProfileConfigInputOpenAI{
-			Model:           block.Model,
-			MaxTokens:       pgql.OptPtr(block.MaxTokens.ValueInt64Pointer()),
-			Temperature:     pgql.OptPtr(block.Temperature.ValueFloat64Pointer()),
-			TopP:            pgql.OptPtr(block.TopP.ValueFloat64Pointer()),
-			ReasoningEffort: pgql.OptPtr(block.ReasoningEffort.ValueStringPointer()),
-		}
-	}
-	if !data.Google.IsNull() && !data.Google.IsUnknown() {
-		var block struct {
-			Model                string        `tfsdk:"model"`
-			MaxTokens            types.Int64   `tfsdk:"max_tokens"`
-			Temperature          types.Float64 `tfsdk:"temperature"`
-			TopP                 types.Float64 `tfsdk:"top_p"`
-			TopK                 types.Int64   `tfsdk:"top_k"`
-			ThinkingBudgetTokens types.Int64   `tfsdk:"thinking_budget_tokens"`
-		}
-		_ = tfsdk.ValueAs(ctx, data.Google, &block)
-		createReq.ConfigurationGoogle = &pgql.ModelProfileConfigInputGoogle{
-			Model:                block.Model,
-			MaxTokens:            pgql.OptPtr(block.MaxTokens.ValueInt64Pointer()),
-			Temperature:          pgql.OptPtr(block.Temperature.ValueFloat64Pointer()),
-			TopP:                 pgql.OptPtr(block.TopP.ValueFloat64Pointer()),
-			TopK:                 pgql.OptPtr(block.TopK.ValueInt64Pointer()),
-			ThinkingBudgetTokens: pgql.OptPtr(block.ThinkingBudgetTokens.ValueInt64Pointer()),
-		}
-	}
+	createReq.Configuration = *config
 
 	createResp, err := pgql.CreateModelProfile(ctx, r.GetClient(), data.ModelProviderId.ValueString(), &createReq)
 	if err != nil {
@@ -278,92 +157,12 @@ func (r *ModelProfileResource) Update(ctx context.Context, req resource.UpdateRe
 		update.Description = pgql.OptNil(planData.Description.ValueStringPointer())
 	}
 
-	// Only one config block should be set
-	numSet := 0
-	if !planData.Anthropic.IsNull() && !planData.Anthropic.IsUnknown() {
-		numSet++
-	}
-	if !planData.OpenAI.IsNull() && !planData.OpenAI.IsUnknown() {
-		numSet++
-	}
-	if !planData.Google.IsNull() && !planData.Google.IsUnknown() {
-		numSet++
-	}
-	if numSet != 1 {
-		resp.Diagnostics.AddError("Invalid config", "Exactly one of anthropic, openai, or google must be set.")
-		return
-	}
-
-	update.ConfigurationAnthropic = nil
-	update.ConfigurationOpenAI = nil
-	update.ConfigurationGoogle = nil
-
-	if !planData.Anthropic.Equal(stateData.Anthropic) && !planData.Anthropic.IsNull() {
-		var block struct {
-			Model                string        `tfsdk:"model"`
-			MaxTokens            int64         `tfsdk:"max_tokens"`
-			Temperature          types.Float64 `tfsdk:"temperature"`
-			TopP                 types.Float64 `tfsdk:"top_p"`
-			TopK                 types.Int64   `tfsdk:"top_k"`
-			ThinkingBudgetTokens types.Int64   `tfsdk:"thinking_budget_tokens"`
+	if !planData.Configuration.Equal(stateData.Configuration) {
+		config, ok := modelProfileConfig(ctx, planData.Configuration, &resp.Diagnostics)
+		if !ok {
+			return
 		}
-		_ = tfsdk.ValueAs(ctx, planData.Anthropic, &block)
-		update.ConfigurationAnthropic = &pgql.ModelProfileConfigInputAnthropic{
-			Model:                block.Model,
-			MaxTokens:            int(block.MaxTokens),
-			Temperature:          pgql.OptPtr(block.Temperature.ValueFloat64Pointer()),
-			TopP:                 pgql.OptPtr(block.TopP.ValueFloat64Pointer()),
-			TopK:                 pgql.OptPtr(block.TopK.ValueInt64Pointer()),
-			ThinkingBudgetTokens: pgql.OptPtr(block.ThinkingBudgetTokens.ValueInt64Pointer()),
-		}
-	}
-	if !planData.OpenAI.Equal(stateData.OpenAI) && !planData.OpenAI.IsNull() {
-		var block struct {
-			Model           string        `tfsdk:"model"`
-			MaxTokens       types.Int64   `tfsdk:"max_tokens"`
-			Temperature     types.Float64 `tfsdk:"temperature"`
-			TopP            types.Float64 `tfsdk:"top_p"`
-			ReasoningEffort types.String  `tfsdk:"reasoning_effort"`
-		}
-		_ = tfsdk.ValueAs(ctx, planData.OpenAI, &block)
-		update.ConfigurationOpenAI = &pgql.ModelProfileConfigInputOpenAI{
-			Model:           block.Model,
-			MaxTokens:       pgql.OptPtr(block.MaxTokens.ValueInt64Pointer()),
-			Temperature:     pgql.OptPtr(block.Temperature.ValueFloat64Pointer()),
-			TopP:            pgql.OptPtr(block.TopP.ValueFloat64Pointer()),
-			ReasoningEffort: pgql.OptPtr(block.ReasoningEffort.ValueStringPointer()),
-		}
-	}
-	if !planData.Google.Equal(stateData.Google) && !planData.Google.IsNull() {
-		var block struct {
-			Model                string        `tfsdk:"model"`
-			MaxTokens            types.Int64   `tfsdk:"max_tokens"`
-			Temperature          types.Float64 `tfsdk:"temperature"`
-			TopP                 types.Float64 `tfsdk:"top_p"`
-			TopK                 types.Int64   `tfsdk:"top_k"`
-			ThinkingBudgetTokens types.Int64   `tfsdk:"thinking_budget_tokens"`
-		}
-		_ = tfsdk.ValueAs(ctx, planData.Google, &block)
-		update.ConfigurationGoogle = &pgql.ModelProfileConfigInputGoogle{
-			Model:                block.Model,
-			MaxTokens:            pgql.OptPtr(block.MaxTokens.ValueInt64Pointer()),
-			Temperature:          pgql.OptPtr(block.Temperature.ValueFloat64Pointer()),
-			TopP:                 pgql.OptPtr(block.TopP.ValueFloat64Pointer()),
-			TopK:                 pgql.OptPtr(block.TopK.ValueInt64Pointer()),
-			ThinkingBudgetTokens: pgql.OptPtr(block.ThinkingBudgetTokens.ValueInt64Pointer()),
-		}
-	}
-	if !planData.Tags.Equal(stateData.Tags) {
-		var tags []struct {
-			Name  string `tfsdk:"name"`
-			Value string `tfsdk:"value"`
-		}
-		_ = tfsdk.ValueAs(ctx, planData.Tags, &tags)
-		var gqlTags []*pgql.Tag
-		for _, tag := range tags {
-			gqlTags = append(gqlTags, &pgql.Tag{Name: tag.Name, Value: tag.Value})
-		}
-		update.Tags = pgql.Opt(gqlTags)
+		update.Configuration = config
 	}
 
 	updateResp, err := pgql.ModifyModelProfile(ctx, r.GetClient(), planData.Id.ValueString(), &update)
