@@ -120,6 +120,15 @@ var taskAssociationDataSourceType = dsschema.NestedAttributeObject{
 	},
 }
 
+var skillAssociationDataSourceType = dsschema.NestedAttributeObject{
+	Attributes: map[string]dsschema.Attribute{
+		"id": dsschema.StringAttribute{
+			MarkdownDescription: "Skill identifier",
+			Computed:            true,
+		},
+	},
+}
+
 // Data source schemas - similar to resource schemas but with required ID and all computed.
 var commonDataSourceSchemas = struct {
 	id          dsschema.StringAttribute

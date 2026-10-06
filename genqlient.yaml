@@ -57,17 +57,21 @@ bindings:
     type: string
   RubricID:
     type: string
-  RubricUserMetricID:
+  RubricJudgeMetricID:
     type: string
-  RubricSystemMetricID:
+  RubricComputedMetricID:
     type: string
-  UserMetricID:
+  JudgeMetricID:
     type: string
   EvalMeshMonitorID:
     type: string
   TaskDefinitionID:
     type: string
   TaskAgentAssociationID:
+    type: string
+  SkillID:
+    type: string
+  SkillFileID:
     type: string
   SerializableType:
     type: "encoding/json.RawMessage"
@@ -115,6 +119,10 @@ bindings:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewTaskDefinition"
   UpdateTaskDefinition:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateTaskDefinition"
+  NewSkill:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewSkill"
+  UpdateSkill:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateSkill"
   CreateInstalledParticleInput:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.CreateInstalledParticleInput"
   UpdateInstalledParticleInput:
@@ -129,8 +137,8 @@ bindings:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateMemoryStore"
   NewMemoryInteractionProfile:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewMemoryInteractionProfile"
-  UpdateUserMetric:
-    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateUserMetric"
+  UpdateJudgeMetric:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateJudgeMetric"
   UpdateRubric:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateRubric"
   UpdateMemoryInteractionProfile:

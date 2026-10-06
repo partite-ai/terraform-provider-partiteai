@@ -64,28 +64,30 @@ func TestAccEval_needsEnterprise(t *testing.T) {
 				Config: server.ProviderConfig() + `
 resource "partiteai_rubric" "test" {
   name    = "no-enterprise"
-  metrics = [{ system_metric_key = "latency" }]
+  metrics = [{ computed_metric_key = "latency" }]
 }
 `,
 				ExpectError: regexp.MustCompile(`(?s)partiteai_rubric is only available`),
 			},
 			{
 				Config: server.ProviderConfig() + `
-data "partiteai_system_metric" "test" {
+data "partiteai_computed_metric" "test" {
   key = "latency"
 }
 `,
-				ExpectError: regexp.MustCompile(`(?s)partiteai_system_metric is only available`),
+				ExpectError: regexp.MustCompile(`(?s)partiteai_computed_metric is only available`),
 			},
 			{
 				Config: server.ProviderConfig() + `
-resource "partiteai_user_metric" "test" {
+resource "partiteai_judge_metric" "test" {
   name       = "no-enterprise"
+  category   = "QUALITY"
+  scope      = "HOP"
   prompt     = "p"
   complexity = "LOW"
 }
 `,
-				ExpectError: regexp.MustCompile(`(?s)partiteai_user_metric is only available`),
+				ExpectError: regexp.MustCompile(`(?s)partiteai_judge_metric is only available`),
 			},
 		},
 	})
@@ -106,7 +108,7 @@ func TestAccEval_enterpriseFlagOverrides(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{{
 			Config: server.ProviderConfigEnterprise() + `
-data "partiteai_system_metric" "test" {
+data "partiteai_computed_metric" "test" {
   key = "latency"
 }
 `,

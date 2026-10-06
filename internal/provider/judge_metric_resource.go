@@ -13,33 +13,47 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &UserMetricResource{}
-var _ resource.ResourceWithImportState = &UserMetricResource{}
+var _ resource.Resource = &JudgeMetricResource{}
+var _ resource.ResourceWithImportState = &JudgeMetricResource{}
 
-func NewUserMetricResource() resource.Resource {
-	return &UserMetricResource{
-		BaseResource: NewBaseResource("user_metric"),
+func NewJudgeMetricResource() resource.Resource {
+	return &JudgeMetricResource{
+		BaseResource: NewBaseResource("judge_metric"),
 	}
 }
 
-// UserMetricResource defines the resource implementation.
-type UserMetricResource struct {
+// JudgeMetricResource defines the resource implementation.
+type JudgeMetricResource struct {
 	BaseResource
 }
 
-// UserMetricResourceModel extends the base model with resource-specific fields.
-type UserMetricResourceModel struct {
-	UserMetricBaseModel
+// JudgeMetricResourceModel extends the base model with resource-specific fields.
+type JudgeMetricResourceModel struct {
+	JudgeMetricBaseModel
 }
 
-func (r *UserMetricResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *JudgeMetricResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "A metric of your own for a model to judge a conversation against. " +
-			"Put one in a rubric to have it scored. Requires an enterprise deployment.",
+		MarkdownDescription: "A metric a model judges a conversation against. Put one in a rubric to have " +
+			"it scored. Every organization starts with a set of built-in judge metrics, which can be edited " +
+			"like any other; find one with the `partiteai_judge_metric` data source. Requires an enterprise " +
+			"deployment.",
 		Attributes: map[string]schema.Attribute{
 			"id":          commonSchemas.id,
 			"name":        commonSchemas.name,
 			"description": commonSchemas.description,
+			"category": schema.StringAttribute{
+				MarkdownDescription: "What the metric measures. One of `QUALITY`, `SAFETY`, `SECURITY`, " +
+					"`RELIABILITY` or `EFFICIENCY`.",
+				Required:   true,
+				Validators: []validator.String{stringvalidator.OneOf(metricCategories...)},
+			},
+			"scope": schema.StringAttribute{
+				MarkdownDescription: "What the model judges: the whole request (`REQUEST`) or each hop between " +
+					"agents (`HOP`).",
+				Required:   true,
+				Validators: []validator.String{stringvalidator.OneOf(judgeScopes...)},
+			},
 			"prompt": schema.StringAttribute{
 				MarkdownDescription: "What the judging model is asked.",
 				Required:            true,
@@ -69,12 +83,12 @@ func (r *UserMetricResource) Schema(ctx context.Context, req resource.SchemaRequ
 	}
 }
 
-func (r *UserMetricResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *JudgeMetricResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	if !r.RequireEnterprise(&resp.Diagnostics) {
 		return
 	}
 
-	var data UserMetricResourceModel
+	var data JudgeMetricResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -85,66 +99,68 @@ func (r *UserMetricResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	logResourceOperation(ctx, "creating", "user_metric", "")
+	logResourceOperation(ctx, "creating", "judge_metric", "")
 
-	createResp, err := pgql.CreateUserMetric(ctx, r.GetClient(), pgql.NewUserMetric{
+	createResp, err := pgql.CreateJudgeMetric(ctx, r.GetClient(), pgql.NewJudgeMetric{
 		Name:        data.Name.ValueString(),
 		Description: data.Description.ValueStringPointer(),
+		Category:    pgql.MetricCategory(data.Category.ValueString()),
+		Scope:       pgql.JudgeScope(data.Scope.ValueString()),
 		Prompt:      data.Prompt.ValueString(),
 		Complexity:  pgql.ModelComplexity(data.Complexity.ValueString()),
 		Examples:    examples,
 		InputFields: inputFields,
 	})
 	if err != nil {
-		handleAPIError(&resp.Diagnostics, err, "create user_metric")
+		handleAPIError(&resp.Diagnostics, err, "create judge_metric")
 		return
 	}
 
-	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, &createResp.CreateUserMetric)...)
+	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, &createResp.CreateJudgeMetric)...)
 
-	logResourceOperation(ctx, "created", "user_metric", data.Id.ValueString())
+	logResourceOperation(ctx, "created", "judge_metric", data.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *UserMetricResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *JudgeMetricResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	if !r.RequireEnterprise(&resp.Diagnostics) {
 		return
 	}
 
-	var data UserMetricResourceModel
+	var data JudgeMetricResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	logResourceOperation(ctx, "reading", "user_metric", data.Id.ValueString())
+	logResourceOperation(ctx, "reading", "judge_metric", data.Id.ValueString())
 
-	getResp, err := pgql.GetUserMetric(ctx, r.GetClient(), data.Id.ValueString())
+	getResp, err := pgql.GetJudgeMetric(ctx, r.GetClient(), data.Id.ValueString())
 	if err != nil {
-		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "user_metric", data.Id.ValueString())
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "judge_metric", data.Id.ValueString())
 		return
 	}
-	if getResp.UserMetric == nil {
+	if getResp.JudgeMetric == nil {
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, getResp.UserMetric)...)
+	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, getResp.JudgeMetric)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *UserMetricResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *JudgeMetricResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	if !r.RequireEnterprise(&resp.Diagnostics) {
 		return
 	}
 
-	var planData UserMetricResourceModel
+	var planData JudgeMetricResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	logResourceOperation(ctx, "updating", "user_metric", planData.Id.ValueString())
+	logResourceOperation(ctx, "updating", "judge_metric", planData.Id.ValueString())
 
 	examples, inputFields, ok := r.readJudgeConfig(ctx, planData, &resp.Diagnostics)
 	if !ok {
@@ -155,52 +171,56 @@ func (r *UserMetricResource) Update(ctx context.Context, req resource.UpdateRequ
 	// what it is not told about, so sending only what changed could never
 	// clear a field the configuration dropped.
 	complexity := pgql.ModelComplexity(planData.Complexity.ValueString())
-	update := pgql.UpdateUserMetric{
+	category := pgql.MetricCategory(planData.Category.ValueString())
+	scope := pgql.JudgeScope(planData.Scope.ValueString())
+	update := pgql.UpdateJudgeMetric{
 		Name:        planData.Name.ValueStringPointer(),
 		Description: planData.Description.ValueStringPointer(),
+		Category:    &category,
+		Scope:       &scope,
 		Prompt:      planData.Prompt.ValueStringPointer(),
 		Complexity:  &complexity,
 		Examples:    examples,
 		InputFields: inputFields,
 	}
 
-	updateResp, err := pgql.ModifyUserMetric(ctx, r.GetClient(), planData.Id.ValueString(), &update)
+	updateResp, err := pgql.ModifyJudgeMetric(ctx, r.GetClient(), planData.Id.ValueString(), &update)
 	if err != nil {
-		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "user_metric", planData.Id.ValueString())
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "judge_metric", planData.Id.ValueString())
 		return
 	}
 
-	resp.Diagnostics.Append(planData.MapFromGraphQL(ctx, &updateResp.UpdateUserMetric)...)
+	resp.Diagnostics.Append(planData.MapFromGraphQL(ctx, &updateResp.UpdateJudgeMetric)...)
 
-	logResourceOperation(ctx, "updated", "user_metric", planData.Id.ValueString())
+	logResourceOperation(ctx, "updated", "judge_metric", planData.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
 }
 
-func (r *UserMetricResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *JudgeMetricResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	if !r.RequireEnterprise(&resp.Diagnostics) {
 		return
 	}
 
-	var data UserMetricResourceModel
+	var data JudgeMetricResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	logResourceOperation(ctx, "deleting", "user_metric", data.Id.ValueString())
+	logResourceOperation(ctx, "deleting", "judge_metric", data.Id.ValueString())
 
-	if _, err := pgql.DeleteUserMetric(ctx, r.GetClient(), data.Id.ValueString()); err != nil {
-		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "user_metric", data.Id.ValueString())
+	if _, err := pgql.DeleteJudgeMetric(ctx, r.GetClient(), data.Id.ValueString()); err != nil {
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "judge_metric", data.Id.ValueString())
 		return
 	}
 
-	logResourceOperation(ctx, "deleted", "user_metric", data.Id.ValueString())
+	logResourceOperation(ctx, "deleted", "judge_metric", data.Id.ValueString())
 }
 
 // readJudgeConfig reads the two list attributes both create and update send.
-func (r *UserMetricResource) readJudgeConfig(
+func (r *JudgeMetricResource) readJudgeConfig(
 	ctx context.Context,
-	data UserMetricResourceModel,
+	data JudgeMetricResourceModel,
 	diags *diag.Diagnostics,
 ) ([]pgql.NewScoreExample, []pgql.NewJudgeInputField, bool) {
 	examples, d := scoreExampleInputs(ctx, data.Examples)

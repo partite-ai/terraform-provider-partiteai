@@ -124,6 +124,27 @@ resource "partiteai_model_set" "base" {
 	)
 }
 
+// thinkingProfileConfig moves the profile to adaptive thinking that shows
+// only progress updates.
+const thinkingProfileConfig = `
+resource "partiteai_model_provider" "test" {
+  name = "profile-provider"
+  anthropic = { api_key = "sk-ant" }
+}
+
+resource "partiteai_model_profile" "test" {
+  name              = "acc-profile"
+  model_provider_id = partiteai_model_provider.test.id
+  configuration = {
+    model            = "claude-opus-5-5"
+    max_tokens       = 4096
+    reasoning_effort = "HIGH"
+    thinking_type    = "ADAPTIVE"
+    thinking_display = "UPDATES"
+  }
+}
+`
+
 func TestAccModelProfile_basic(t *testing.T) {
 	accTest(t,
 		resource.TestStep{
@@ -158,23 +179,16 @@ data "partiteai_model_profile" "test" {
 			),
 		},
 		resource.TestStep{
-			Config: `
-resource "partiteai_model_provider" "test" {
-  name = "profile-provider"
-  anthropic = { api_key = "sk-ant" }
-}
-
-resource "partiteai_model_profile" "test" {
-  name              = "acc-profile"
-  model_provider_id = partiteai_model_provider.test.id
-  configuration = {
-    model                  = "claude-opus-5"
-    max_tokens             = 4096
-    temperature            = 0.5
-    thinking_budget_tokens = 1024
-  }
-}
-`,
+			Config: thinkingProfileConfig,
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("partiteai_model_profile.test", "configuration.thinking_type", "ADAPTIVE"),
+				resource.TestCheckResourceAttr("partiteai_model_profile.test", "configuration.thinking_display", "UPDATES"),
+				resource.TestCheckResourceAttr("partiteai_model_profile.test", "configuration.reasoning_effort", "HIGH"),
+				resource.TestCheckNoResourceAttr("partiteai_model_profile.test", "configuration.thinking_budget_tokens"),
+			),
+		},
+		resource.TestStep{
+			Config:            thinkingProfileConfig,
 			ResourceName:      "partiteai_model_profile.test",
 			ImportState:       true,
 			ImportStateVerify: true,

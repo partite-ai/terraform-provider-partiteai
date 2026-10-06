@@ -72,6 +72,14 @@ func (r *ModelProfileResource) Schema(ctx context.Context, req resource.SchemaRe
 						MarkdownDescription: "How hard the model should think: NONE, MINIMAL, LOW, MEDIUM, HIGH, XHIGH or MAX.",
 						Optional:            true,
 					},
+					"thinking_type": schema.StringAttribute{
+						MarkdownDescription: "How the model thinks: ADAPTIVE, ENABLED (needs thinking_budget_tokens), DISABLED or BETWEEN_TOOLS.",
+						Optional:            true,
+					},
+					"thinking_display": schema.StringAttribute{
+						MarkdownDescription: "What the model returns of its thinking: SUMMARIZED (reasoning summaries with progress updates mixed in), UPDATES (only the progress updates it writes between tool calls) or OMITTED.",
+						Optional:            true,
+					},
 				},
 			},
 		}),

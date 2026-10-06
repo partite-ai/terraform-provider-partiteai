@@ -32,6 +32,12 @@ fragment AgentDetails on Agent {
         name
       }
     }
+    skills {
+      skill {
+        id
+        name
+      }
+    }
     memoryInteractionProfiles {
       id
       name
@@ -350,6 +356,8 @@ fragment ModelProfileDetails on ModelProfile {
     topK
     thinkingBudgetTokens
     reasoningEffort
+    thinkingType
+    thinkingDisplay
   }
   createdAt
   updatedAt
@@ -698,6 +706,55 @@ mutation ModifyTaskDefinition(
 
 mutation DeleteTaskDefinition($id: TaskDefinitionID!) {
   deleteTaskDefinitions(taskDefinitionIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "SkillDetails")
+fragment SkillDetails on Skill {
+  id
+  name
+  declaredName
+  description
+  instructions
+  files {
+    path
+    content
+  }
+  createdAt
+  updatedAt
+}
+
+query GetSkill($id: SkillID!) {
+  # @genqlient(flatten: true)
+  skill(id: $id) {
+    ...SkillDetails
+  }
+}
+
+query GetSkillByName($name: String!) {
+  # @genqlient(flatten: true)
+  skillByName(name: $name) {
+    ...SkillDetails
+  }
+}
+
+mutation CreateSkill($input: NewSkill!) {
+  # @genqlient(flatten: true)
+  createSkill(input: $input) {
+    ...SkillDetails
+  }
+}
+
+mutation ModifySkill($id: SkillID!, $input: UpdateSkill!) {
+  # @genqlient(flatten: true)
+  updateSkill(skillID: $id, input: $input) {
+    ...SkillDetails
+  }
+}
+
+mutation DeleteSkill($id: SkillID!) {
+  deleteSkills(skillIDs: [$id]) {
     ids
   }
 }
@@ -1103,51 +1160,13 @@ fragment JudgeInputFieldDetails on JudgeInputField {
   required
 }
 
-# @genqlient(typename: "SystemMetricDetails")
-fragment SystemMetricDetails on SystemMetric {
-  key
-  type
-  name
-  description
-  complexity
-  prompt
-  examples {
-    ...ScoreExampleDetails
-  }
-  inputFields {
-    ...JudgeInputFieldDetails
-  }
-}
-
-query GetSystemMetric($key: String!) {
-  # @genqlient(flatten: true)
-  systemMetric(key: $key) {
-    ...SystemMetricDetails
-  }
-}
-
-query ListSystemMetrics($first: Int!, $after: String) {
-  metrics(source: SYSTEM, first: $first, after: $after) {
-    totalCount
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-    edges {
-      node {
-        ... on SystemMetric {
-          ...SystemMetricDetails
-        }
-      }
-    }
-  }
-}
-
-# @genqlient(typename: "UserMetricDetails")
-fragment UserMetricDetails on UserMetric {
+# @genqlient(typename: "JudgeMetricDetails")
+fragment JudgeMetricDetails on JudgeMetric {
   id
   name
   description
+  category
+  scope
   prompt
   complexity
   examples {
@@ -1160,30 +1179,67 @@ fragment UserMetricDetails on UserMetric {
   updatedAt
 }
 
-query GetUserMetric($id: UserMetricID!) {
+query GetJudgeMetric($id: JudgeMetricID!) {
   # @genqlient(flatten: true)
-  userMetric(id: $id) {
-    ...UserMetricDetails
+  judgeMetric(id: $id) {
+    ...JudgeMetricDetails
   }
 }
 
-mutation CreateUserMetric($input: NewUserMetric!) {
-  # @genqlient(flatten: true)
-  createUserMetric(input: $input) {
-    ...UserMetricDetails
+# The API finds metrics by text, not by name, so a lookup by name searches and
+# keeps the exact match.
+query SearchJudgeMetrics($query: String!, $first: Int!, $after: String) {
+  metrics(type: JUDGED, query: $query, first: $first, after: $after) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ... on JudgeMetric {
+          ...JudgeMetricDetails
+        }
+      }
+    }
   }
 }
 
-mutation ModifyUserMetric($id: UserMetricID!, $input: UpdateUserMetric!) {
+mutation CreateJudgeMetric($input: NewJudgeMetric!) {
   # @genqlient(flatten: true)
-  updateUserMetric(id: $id, input: $input) {
-    ...UserMetricDetails
+  createJudgeMetric(input: $input) {
+    ...JudgeMetricDetails
   }
 }
 
-mutation DeleteUserMetric($id: UserMetricID!) {
-  deleteUserMetric(id: $id) {
-    id
+mutation ModifyJudgeMetric($id: JudgeMetricID!, $input: UpdateJudgeMetric!) {
+  # @genqlient(flatten: true)
+  updateJudgeMetric(id: $id, input: $input) {
+    ...JudgeMetricDetails
+  }
+}
+
+mutation DeleteJudgeMetric($id: JudgeMetricID!) {
+  deleteJudgeMetrics(ids: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "ComputedMetricDetails")
+fragment ComputedMetricDetails on ComputedMetric {
+  key
+  name
+  description
+  category
+  collectionScope
+  summarySource
+  aggregation
+  unit
+}
+
+query GetComputedMetric($key: String!) {
+  # @genqlient(flatten: true)
+  computedMetric(key: $key) {
+    ...ComputedMetricDetails
   }
 }
 
@@ -1196,30 +1252,27 @@ fragment RubricDetails on Rubric {
   updatedAt
   metrics {
     __typename
-    # The two members give their entry id and trial count different types, so
-    # each needs an alias of its own.
-    ... on RubricUserMetric {
-      userEntryID: id
-      userMetric {
+    # The two members give their entry ids different types, so each needs an
+    # alias of its own.
+    ... on RubricJudgeMetric {
+      judgeEntryID: id
+      judgeMetric {
         id
       }
-      userTrialCount: trialCount
+      trialCount
       complexity
       inputValues
-      weight
+      judgeWeight: weight
     }
-    ... on RubricSystemMetric {
-      systemEntryID: id
-      systemMetric {
+    ... on RubricComputedMetric {
+      computedEntryID: id
+      computedMetric {
         key
       }
-      systemTrialCount: trialCount
-      complexity
-      inputValues
       scoreFloor
       scoreCeiling
       lowerIsBetter
-      weight
+      computedWeight: weight
     }
   }
 }
@@ -1246,8 +1299,8 @@ mutation ModifyRubric($id: RubricID!, $input: UpdateRubric!) {
 }
 
 mutation DeleteRubric($id: RubricID!) {
-  deleteRubric(id: $id) {
-    id
+  deleteRubrics(ids: [$id]) {
+    ids
   }
 }
 

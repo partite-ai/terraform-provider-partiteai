@@ -32,6 +32,7 @@ Agent data source
 - `particles` (Attributes Set) List of installed particles exposed to the agent. (see [below for nested schema](#nestedatt--particles))
 - `send_messages_to_user` (Boolean) Whether the agent should send messages to the user
 - `send_thinking_to_user` (Boolean) Whether the agent should send 'thinking' messages to the user
+- `skills` (Attributes Set) Set of skills the agent can load, referenced by skill ID (see [below for nested schema](#nestedatt--skills))
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
 - `task_instructions` (String) Detailed instructions that guide the agent's behavior and decision-making processes.
 - `tasks` (Attributes Set) Set of task definitions associated with the agent, referenced by task definition ID (see [below for nested schema](#nestedatt--tasks))
@@ -60,6 +61,14 @@ Read-Only:
 - `id` (String)
 - `tool_name_pattern` (String)
 - `tool_names` (List of String)
+
+
+<a id="nestedatt--skills"></a>
+### Nested Schema for `skills`
+
+Read-Only:
+
+- `id` (String) Skill identifier
 
 
 <a id="nestedatt--tags"></a>

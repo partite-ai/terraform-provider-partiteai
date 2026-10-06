@@ -55,6 +55,7 @@ type AgentDetailsLatestVersionAgentVersion struct {
 	SendMessagesToUser bool                                                                               `json:"sendMessagesToUser"`
 	McpConnections     []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation `json:"mcpConnections"`
 	Tasks              []AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation                   `json:"tasks"`
+	Skills             []AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociation                 `json:"skills"`
 	// How this agent reads and writes memory. A profile takes effect only where the
 	// agent runs in a mesh that has memory stores attached.
 	MemoryInteractionProfiles []AgentDetailsLatestVersionAgentVersionMemoryInteractionProfilesMemoryInteractionProfile `json:"memoryInteractionProfiles"`
@@ -112,6 +113,11 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetMcpConnections() []AgentDetai
 // GetTasks returns AgentDetailsLatestVersionAgentVersion.Tasks, and is useful for accessing the field via an interface.
 func (v *AgentDetailsLatestVersionAgentVersion) GetTasks() []AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation {
 	return v.Tasks
+}
+
+// GetSkills returns AgentDetailsLatestVersionAgentVersion.Skills, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersion) GetSkills() []AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociation {
+	return v.Skills
 }
 
 // GetMemoryInteractionProfiles returns AgentDetailsLatestVersionAgentVersion.MemoryInteractionProfiles, and is useful for accessing the field via an interface.
@@ -222,6 +228,40 @@ func (v *AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociationI
 	return v.Id
 }
 
+// AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociation includes the requested fields of the GraphQL type SkillAgentAssociation.
+type AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociation struct {
+	Skill AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociationSkill `json:"skill"`
+}
+
+// GetSkill returns AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociation.Skill, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociation) GetSkill() AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociationSkill {
+	return v.Skill
+}
+
+// AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociationSkill includes the requested fields of the GraphQL type Skill.
+// The GraphQL type's documentation follows.
+//
+// A Skill is a set of instructions an agent loads when a task calls for them,
+// with the files those instructions refer to. An agent's prompt lists the
+// declared name and description of each of its skills, and the agent loads the
+// rest with tools.
+type AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociationSkill struct {
+	Id string `json:"id"`
+	// The skill's own name, unique across skills. It lets two skills come from
+	// folders that declare the same name, such as two copies of one skill.
+	Name string `json:"name"`
+}
+
+// GetId returns AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociationSkill.Id, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociationSkill) GetId() string {
+	return v.Id
+}
+
+// GetName returns AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociationSkill.Name, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociationSkill) GetName() string {
+	return v.Name
+}
+
 // AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation includes the requested fields of the GraphQL type TaskAgentAssociation.
 type AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation struct {
 	TaskDefinition AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition `json:"taskDefinition"`
@@ -286,6 +326,102 @@ func (v *ApiKeyDetails) GetCreatedAt() string { return v.CreatedAt }
 
 // GetUpdatedAt returns ApiKeyDetails.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *ApiKeyDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+type ComputedMetricAggregation string
+
+const (
+	ComputedMetricAggregationSum     ComputedMetricAggregation = "SUM"
+	ComputedMetricAggregationAverage ComputedMetricAggregation = "AVERAGE"
+	ComputedMetricAggregationMinimum ComputedMetricAggregation = "MINIMUM"
+	ComputedMetricAggregationMaximum ComputedMetricAggregation = "MAXIMUM"
+	ComputedMetricAggregationCustom  ComputedMetricAggregation = "CUSTOM"
+)
+
+var AllComputedMetricAggregation = []ComputedMetricAggregation{
+	ComputedMetricAggregationSum,
+	ComputedMetricAggregationAverage,
+	ComputedMetricAggregationMinimum,
+	ComputedMetricAggregationMaximum,
+	ComputedMetricAggregationCustom,
+}
+
+type ComputedMetricCollectionScope string
+
+const (
+	ComputedMetricCollectionScopeRootOnly ComputedMetricCollectionScope = "ROOT_ONLY"
+	ComputedMetricCollectionScopeAllHops  ComputedMetricCollectionScope = "ALL_HOPS"
+)
+
+var AllComputedMetricCollectionScope = []ComputedMetricCollectionScope{
+	ComputedMetricCollectionScopeRootOnly,
+	ComputedMetricCollectionScopeAllHops,
+}
+
+// ComputedMetricDetails includes the GraphQL fields of ComputedMetric requested by the fragment ComputedMetricDetails.
+type ComputedMetricDetails struct {
+	Key             string                        `json:"key"`
+	Name            string                        `json:"name"`
+	Description     *string                       `json:"description"`
+	Category        MetricCategory                `json:"category"`
+	CollectionScope ComputedMetricCollectionScope `json:"collectionScope"`
+	SummarySource   ComputedMetricSummarySource   `json:"summarySource"`
+	Aggregation     ComputedMetricAggregation     `json:"aggregation"`
+	Unit            ComputedMetricUnit            `json:"unit"`
+}
+
+// GetKey returns ComputedMetricDetails.Key, and is useful for accessing the field via an interface.
+func (v *ComputedMetricDetails) GetKey() string { return v.Key }
+
+// GetName returns ComputedMetricDetails.Name, and is useful for accessing the field via an interface.
+func (v *ComputedMetricDetails) GetName() string { return v.Name }
+
+// GetDescription returns ComputedMetricDetails.Description, and is useful for accessing the field via an interface.
+func (v *ComputedMetricDetails) GetDescription() *string { return v.Description }
+
+// GetCategory returns ComputedMetricDetails.Category, and is useful for accessing the field via an interface.
+func (v *ComputedMetricDetails) GetCategory() MetricCategory { return v.Category }
+
+// GetCollectionScope returns ComputedMetricDetails.CollectionScope, and is useful for accessing the field via an interface.
+func (v *ComputedMetricDetails) GetCollectionScope() ComputedMetricCollectionScope {
+	return v.CollectionScope
+}
+
+// GetSummarySource returns ComputedMetricDetails.SummarySource, and is useful for accessing the field via an interface.
+func (v *ComputedMetricDetails) GetSummarySource() ComputedMetricSummarySource {
+	return v.SummarySource
+}
+
+// GetAggregation returns ComputedMetricDetails.Aggregation, and is useful for accessing the field via an interface.
+func (v *ComputedMetricDetails) GetAggregation() ComputedMetricAggregation { return v.Aggregation }
+
+// GetUnit returns ComputedMetricDetails.Unit, and is useful for accessing the field via an interface.
+func (v *ComputedMetricDetails) GetUnit() ComputedMetricUnit { return v.Unit }
+
+type ComputedMetricSummarySource string
+
+const (
+	ComputedMetricSummarySourceRootValue ComputedMetricSummarySource = "ROOT_VALUE"
+	ComputedMetricSummarySourceAggregate ComputedMetricSummarySource = "AGGREGATE"
+)
+
+var AllComputedMetricSummarySource = []ComputedMetricSummarySource{
+	ComputedMetricSummarySourceRootValue,
+	ComputedMetricSummarySourceAggregate,
+}
+
+type ComputedMetricUnit string
+
+const (
+	ComputedMetricUnitCount        ComputedMetricUnit = "COUNT"
+	ComputedMetricUnitMilliseconds ComputedMetricUnit = "MILLISECONDS"
+	ComputedMetricUnitRatio        ComputedMetricUnit = "RATIO"
+)
+
+var AllComputedMetricUnit = []ComputedMetricUnit{
+	ComputedMetricUnitCount,
+	ComputedMetricUnitMilliseconds,
+	ComputedMetricUnitRatio,
+}
 
 // CreateAgentCreateAgentAgentVersion includes the requested fields of the GraphQL type AgentVersion.
 type CreateAgentCreateAgentAgentVersion struct {
@@ -364,6 +500,16 @@ type CreateInstalledParticleResponse struct {
 // GetCreateInstalledParticle returns CreateInstalledParticleResponse.CreateInstalledParticle, and is useful for accessing the field via an interface.
 func (v *CreateInstalledParticleResponse) GetCreateInstalledParticle() InstalledParticleDetails {
 	return v.CreateInstalledParticle
+}
+
+// CreateJudgeMetricResponse is returned by CreateJudgeMetric on success.
+type CreateJudgeMetricResponse struct {
+	CreateJudgeMetric JudgeMetricDetails `json:"createJudgeMetric"`
+}
+
+// GetCreateJudgeMetric returns CreateJudgeMetricResponse.CreateJudgeMetric, and is useful for accessing the field via an interface.
+func (v *CreateJudgeMetricResponse) GetCreateJudgeMetric() JudgeMetricDetails {
+	return v.CreateJudgeMetric
 }
 
 // CreateLinkResponse is returned by CreateLink on success.
@@ -500,6 +646,18 @@ type CreateRubricResponse struct {
 // GetCreateRubric returns CreateRubricResponse.CreateRubric, and is useful for accessing the field via an interface.
 func (v *CreateRubricResponse) GetCreateRubric() RubricDetails { return v.CreateRubric }
 
+// CreateSkillResponse is returned by CreateSkill on success.
+type CreateSkillResponse struct {
+	// Create a skill from a skill folder. SKILL.md is at the root of the folder or
+	// in the one folder at its root, and its front matter gives the skill's
+	// declared name and description. Skills with a scripts folder or with files
+	// that are not text are refused.
+	CreateSkill SkillDetails `json:"createSkill"`
+}
+
+// GetCreateSkill returns CreateSkillResponse.CreateSkill, and is useful for accessing the field via an interface.
+func (v *CreateSkillResponse) GetCreateSkill() SkillDetails { return v.CreateSkill }
+
 // CreateTaskDefinitionResponse is returned by CreateTaskDefinition on success.
 type CreateTaskDefinitionResponse struct {
 	// Create a new author-defined TaskDefinition. Name must be unique.
@@ -510,14 +668,6 @@ type CreateTaskDefinitionResponse struct {
 func (v *CreateTaskDefinitionResponse) GetCreateTaskDefinition() TaskDefinitionDetails {
 	return v.CreateTaskDefinition
 }
-
-// CreateUserMetricResponse is returned by CreateUserMetric on success.
-type CreateUserMetricResponse struct {
-	CreateUserMetric UserMetricDetails `json:"createUserMetric"`
-}
-
-// GetCreateUserMetric returns CreateUserMetricResponse.CreateUserMetric, and is useful for accessing the field via an interface.
-func (v *CreateUserMetricResponse) GetCreateUserMetric() UserMetricDetails { return v.CreateUserMetric }
 
 // CreateWebhookDestinationResponse is returned by CreateWebhookDestination on success.
 type CreateWebhookDestinationResponse struct {
@@ -646,6 +796,24 @@ type DeleteInstalledParticleResponse struct {
 // GetDeleteInstalledParticles returns DeleteInstalledParticleResponse.DeleteInstalledParticles, and is useful for accessing the field via an interface.
 func (v *DeleteInstalledParticleResponse) GetDeleteInstalledParticles() DeleteInstalledParticleDeleteInstalledParticlesDeleteResults {
 	return v.DeleteInstalledParticles
+}
+
+// DeleteJudgeMetricDeleteJudgeMetricsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteJudgeMetricDeleteJudgeMetricsDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteJudgeMetricDeleteJudgeMetricsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteJudgeMetricDeleteJudgeMetricsDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteJudgeMetricResponse is returned by DeleteJudgeMetric on success.
+type DeleteJudgeMetricResponse struct {
+	DeleteJudgeMetrics DeleteJudgeMetricDeleteJudgeMetricsDeleteResults `json:"deleteJudgeMetrics"`
+}
+
+// GetDeleteJudgeMetrics returns DeleteJudgeMetricResponse.DeleteJudgeMetrics, and is useful for accessing the field via an interface.
+func (v *DeleteJudgeMetricResponse) GetDeleteJudgeMetrics() DeleteJudgeMetricDeleteJudgeMetricsDeleteResults {
+	return v.DeleteJudgeMetrics
 }
 
 // DeleteLinkRemoveMeshLinkByStableIDDeleteResult includes the requested fields of the GraphQL type DeleteResult.
@@ -815,22 +983,42 @@ func (v *DeleteModelSetResponse) GetDeleteModelSets() DeleteModelSetDeleteModelS
 	return v.DeleteModelSets
 }
 
-// DeleteRubricDeleteRubricDeleteResult includes the requested fields of the GraphQL type DeleteResult.
-type DeleteRubricDeleteRubricDeleteResult struct {
-	Id string `json:"id"`
+// DeleteRubricDeleteRubricsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteRubricDeleteRubricsDeleteResults struct {
+	Ids []string `json:"ids"`
 }
 
-// GetId returns DeleteRubricDeleteRubricDeleteResult.Id, and is useful for accessing the field via an interface.
-func (v *DeleteRubricDeleteRubricDeleteResult) GetId() string { return v.Id }
+// GetIds returns DeleteRubricDeleteRubricsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteRubricDeleteRubricsDeleteResults) GetIds() []string { return v.Ids }
 
 // DeleteRubricResponse is returned by DeleteRubric on success.
 type DeleteRubricResponse struct {
-	DeleteRubric DeleteRubricDeleteRubricDeleteResult `json:"deleteRubric"`
+	DeleteRubrics DeleteRubricDeleteRubricsDeleteResults `json:"deleteRubrics"`
 }
 
-// GetDeleteRubric returns DeleteRubricResponse.DeleteRubric, and is useful for accessing the field via an interface.
-func (v *DeleteRubricResponse) GetDeleteRubric() DeleteRubricDeleteRubricDeleteResult {
-	return v.DeleteRubric
+// GetDeleteRubrics returns DeleteRubricResponse.DeleteRubrics, and is useful for accessing the field via an interface.
+func (v *DeleteRubricResponse) GetDeleteRubrics() DeleteRubricDeleteRubricsDeleteResults {
+	return v.DeleteRubrics
+}
+
+// DeleteSkillDeleteSkillsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteSkillDeleteSkillsDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteSkillDeleteSkillsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteSkillDeleteSkillsDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteSkillResponse is returned by DeleteSkill on success.
+type DeleteSkillResponse struct {
+	// Delete skills. Fails for a skill an agent still uses: remove it from the agent
+	// first.
+	DeleteSkills DeleteSkillDeleteSkillsDeleteResults `json:"deleteSkills"`
+}
+
+// GetDeleteSkills returns DeleteSkillResponse.DeleteSkills, and is useful for accessing the field via an interface.
+func (v *DeleteSkillResponse) GetDeleteSkills() DeleteSkillDeleteSkillsDeleteResults {
+	return v.DeleteSkills
 }
 
 // DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
@@ -851,24 +1039,6 @@ type DeleteTaskDefinitionResponse struct {
 // GetDeleteTaskDefinitions returns DeleteTaskDefinitionResponse.DeleteTaskDefinitions, and is useful for accessing the field via an interface.
 func (v *DeleteTaskDefinitionResponse) GetDeleteTaskDefinitions() DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults {
 	return v.DeleteTaskDefinitions
-}
-
-// DeleteUserMetricDeleteUserMetricDeleteResult includes the requested fields of the GraphQL type DeleteResult.
-type DeleteUserMetricDeleteUserMetricDeleteResult struct {
-	Id string `json:"id"`
-}
-
-// GetId returns DeleteUserMetricDeleteUserMetricDeleteResult.Id, and is useful for accessing the field via an interface.
-func (v *DeleteUserMetricDeleteUserMetricDeleteResult) GetId() string { return v.Id }
-
-// DeleteUserMetricResponse is returned by DeleteUserMetric on success.
-type DeleteUserMetricResponse struct {
-	DeleteUserMetric DeleteUserMetricDeleteUserMetricDeleteResult `json:"deleteUserMetric"`
-}
-
-// GetDeleteUserMetric returns DeleteUserMetricResponse.DeleteUserMetric, and is useful for accessing the field via an interface.
-func (v *DeleteUserMetricResponse) GetDeleteUserMetric() DeleteUserMetricDeleteUserMetricDeleteResult {
-	return v.DeleteUserMetric
 }
 
 // DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
@@ -1069,6 +1239,16 @@ type GetApiKeyResponse struct {
 // GetApiKey returns GetApiKeyResponse.ApiKey, and is useful for accessing the field via an interface.
 func (v *GetApiKeyResponse) GetApiKey() ApiKeyDetails { return v.ApiKey }
 
+// GetComputedMetricResponse is returned by GetComputedMetric on success.
+type GetComputedMetricResponse struct {
+	ComputedMetric ComputedMetricDetails `json:"computedMetric"`
+}
+
+// GetComputedMetric returns GetComputedMetricResponse.ComputedMetric, and is useful for accessing the field via an interface.
+func (v *GetComputedMetricResponse) GetComputedMetric() ComputedMetricDetails {
+	return v.ComputedMetric
+}
+
 // GetEmbeddingProfileByProviderAndNameResponse is returned by GetEmbeddingProfileByProviderAndName on success.
 type GetEmbeddingProfileByProviderAndNameResponse struct {
 	EmbeddingProfileByProviderAndName EmbeddingProfileDetails `json:"embeddingProfileByProviderAndName"`
@@ -1108,6 +1288,14 @@ type GetInstalledParticleResponse struct {
 func (v *GetInstalledParticleResponse) GetInstalledParticle() *InstalledParticleDetails {
 	return v.InstalledParticle
 }
+
+// GetJudgeMetricResponse is returned by GetJudgeMetric on success.
+type GetJudgeMetricResponse struct {
+	JudgeMetric *JudgeMetricDetails `json:"judgeMetric"`
+}
+
+// GetJudgeMetric returns GetJudgeMetricResponse.JudgeMetric, and is useful for accessing the field via an interface.
+func (v *GetJudgeMetricResponse) GetJudgeMetric() *JudgeMetricDetails { return v.JudgeMetric }
 
 // GetMcpConnectionResponse is returned by GetMcpConnection on success.
 type GetMcpConnectionResponse struct {
@@ -1290,14 +1478,21 @@ type GetRubricResponse struct {
 // GetRubric returns GetRubricResponse.Rubric, and is useful for accessing the field via an interface.
 func (v *GetRubricResponse) GetRubric() *RubricDetails { return v.Rubric }
 
-// GetSystemMetricResponse is returned by GetSystemMetric on success.
-type GetSystemMetricResponse struct {
-	// A metric the product ships, by key.
-	SystemMetric SystemMetricDetails `json:"systemMetric"`
+// GetSkillByNameResponse is returned by GetSkillByName on success.
+type GetSkillByNameResponse struct {
+	SkillByName *SkillDetails `json:"skillByName"`
 }
 
-// GetSystemMetric returns GetSystemMetricResponse.SystemMetric, and is useful for accessing the field via an interface.
-func (v *GetSystemMetricResponse) GetSystemMetric() SystemMetricDetails { return v.SystemMetric }
+// GetSkillByName returns GetSkillByNameResponse.SkillByName, and is useful for accessing the field via an interface.
+func (v *GetSkillByNameResponse) GetSkillByName() *SkillDetails { return v.SkillByName }
+
+// GetSkillResponse is returned by GetSkill on success.
+type GetSkillResponse struct {
+	Skill *SkillDetails `json:"skill"`
+}
+
+// GetSkill returns GetSkillResponse.Skill, and is useful for accessing the field via an interface.
+func (v *GetSkillResponse) GetSkill() *SkillDetails { return v.Skill }
 
 // GetTaskDefinitionByNameResponse is returned by GetTaskDefinitionByName on success.
 type GetTaskDefinitionByNameResponse struct {
@@ -1318,14 +1513,6 @@ type GetTaskDefinitionResponse struct {
 func (v *GetTaskDefinitionResponse) GetTaskDefinition() *TaskDefinitionDetails {
 	return v.TaskDefinition
 }
-
-// GetUserMetricResponse is returned by GetUserMetric on success.
-type GetUserMetricResponse struct {
-	UserMetric *UserMetricDetails `json:"userMetric"`
-}
-
-// GetUserMetric returns GetUserMetricResponse.UserMetric, and is useful for accessing the field via an interface.
-func (v *GetUserMetricResponse) GetUserMetric() *UserMetricDetails { return v.UserMetric }
 
 // GetWebhookDestinationResponse is returned by GetWebhookDestination on success.
 type GetWebhookDestinationResponse struct {
@@ -1556,6 +1743,224 @@ var AllJudgeInputFieldType = []JudgeInputFieldType{
 	JudgeInputFieldTypeJsonObject,
 }
 
+// JudgeMetricDetails includes the GraphQL fields of JudgeMetric requested by the fragment JudgeMetricDetails.
+type JudgeMetricDetails struct {
+	Id          string                                         `json:"id"`
+	Name        string                                         `json:"name"`
+	Description *string                                        `json:"description"`
+	Category    MetricCategory                                 `json:"category"`
+	Scope       JudgeScope                                     `json:"scope"`
+	Prompt      string                                         `json:"prompt"`
+	Complexity  ModelComplexity                                `json:"complexity"`
+	Examples    []JudgeMetricDetailsExamplesScoreExample       `json:"examples"`
+	InputFields []JudgeMetricDetailsInputFieldsJudgeInputField `json:"inputFields"`
+	CreatedAt   string                                         `json:"createdAt"`
+	UpdatedAt   string                                         `json:"updatedAt"`
+}
+
+// GetId returns JudgeMetricDetails.Id, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetId() string { return v.Id }
+
+// GetName returns JudgeMetricDetails.Name, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetName() string { return v.Name }
+
+// GetDescription returns JudgeMetricDetails.Description, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetDescription() *string { return v.Description }
+
+// GetCategory returns JudgeMetricDetails.Category, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetCategory() MetricCategory { return v.Category }
+
+// GetScope returns JudgeMetricDetails.Scope, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetScope() JudgeScope { return v.Scope }
+
+// GetPrompt returns JudgeMetricDetails.Prompt, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetPrompt() string { return v.Prompt }
+
+// GetComplexity returns JudgeMetricDetails.Complexity, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetComplexity() ModelComplexity { return v.Complexity }
+
+// GetExamples returns JudgeMetricDetails.Examples, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetExamples() []JudgeMetricDetailsExamplesScoreExample {
+	return v.Examples
+}
+
+// GetInputFields returns JudgeMetricDetails.InputFields, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetInputFields() []JudgeMetricDetailsInputFieldsJudgeInputField {
+	return v.InputFields
+}
+
+// GetCreatedAt returns JudgeMetricDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns JudgeMetricDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// JudgeMetricDetailsExamplesScoreExample includes the requested fields of the GraphQL type ScoreExample.
+type JudgeMetricDetailsExamplesScoreExample struct {
+	ScoreExampleDetails `json:"-"`
+}
+
+// GetRating returns JudgeMetricDetailsExamplesScoreExample.Rating, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetailsExamplesScoreExample) GetRating() int { return v.ScoreExampleDetails.Rating }
+
+// GetScenario returns JudgeMetricDetailsExamplesScoreExample.Scenario, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetailsExamplesScoreExample) GetScenario() string {
+	return v.ScoreExampleDetails.Scenario
+}
+
+// GetJudgment returns JudgeMetricDetailsExamplesScoreExample.Judgment, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetailsExamplesScoreExample) GetJudgment() string {
+	return v.ScoreExampleDetails.Judgment
+}
+
+func (v *JudgeMetricDetailsExamplesScoreExample) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*JudgeMetricDetailsExamplesScoreExample
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.JudgeMetricDetailsExamplesScoreExample = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.ScoreExampleDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalJudgeMetricDetailsExamplesScoreExample struct {
+	Rating int `json:"rating"`
+
+	Scenario string `json:"scenario"`
+
+	Judgment string `json:"judgment"`
+}
+
+func (v *JudgeMetricDetailsExamplesScoreExample) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *JudgeMetricDetailsExamplesScoreExample) __premarshalJSON() (*__premarshalJudgeMetricDetailsExamplesScoreExample, error) {
+	var retval __premarshalJudgeMetricDetailsExamplesScoreExample
+
+	retval.Rating = v.ScoreExampleDetails.Rating
+	retval.Scenario = v.ScoreExampleDetails.Scenario
+	retval.Judgment = v.ScoreExampleDetails.Judgment
+	return &retval, nil
+}
+
+// JudgeMetricDetailsInputFieldsJudgeInputField includes the requested fields of the GraphQL type JudgeInputField.
+type JudgeMetricDetailsInputFieldsJudgeInputField struct {
+	JudgeInputFieldDetails `json:"-"`
+}
+
+// GetName returns JudgeMetricDetailsInputFieldsJudgeInputField.Name, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetailsInputFieldsJudgeInputField) GetName() string {
+	return v.JudgeInputFieldDetails.Name
+}
+
+// GetLabel returns JudgeMetricDetailsInputFieldsJudgeInputField.Label, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetailsInputFieldsJudgeInputField) GetLabel() string {
+	return v.JudgeInputFieldDetails.Label
+}
+
+// GetDescription returns JudgeMetricDetailsInputFieldsJudgeInputField.Description, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetailsInputFieldsJudgeInputField) GetDescription() string {
+	return v.JudgeInputFieldDetails.Description
+}
+
+// GetType returns JudgeMetricDetailsInputFieldsJudgeInputField.Type, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetailsInputFieldsJudgeInputField) GetType() JudgeInputFieldType {
+	return v.JudgeInputFieldDetails.Type
+}
+
+// GetRequired returns JudgeMetricDetailsInputFieldsJudgeInputField.Required, and is useful for accessing the field via an interface.
+func (v *JudgeMetricDetailsInputFieldsJudgeInputField) GetRequired() bool {
+	return v.JudgeInputFieldDetails.Required
+}
+
+func (v *JudgeMetricDetailsInputFieldsJudgeInputField) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*JudgeMetricDetailsInputFieldsJudgeInputField
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.JudgeMetricDetailsInputFieldsJudgeInputField = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(
+		b, &v.JudgeInputFieldDetails)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type __premarshalJudgeMetricDetailsInputFieldsJudgeInputField struct {
+	Name string `json:"name"`
+
+	Label string `json:"label"`
+
+	Description string `json:"description"`
+
+	Type JudgeInputFieldType `json:"type"`
+
+	Required bool `json:"required"`
+}
+
+func (v *JudgeMetricDetailsInputFieldsJudgeInputField) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *JudgeMetricDetailsInputFieldsJudgeInputField) __premarshalJSON() (*__premarshalJudgeMetricDetailsInputFieldsJudgeInputField, error) {
+	var retval __premarshalJudgeMetricDetailsInputFieldsJudgeInputField
+
+	retval.Name = v.JudgeInputFieldDetails.Name
+	retval.Label = v.JudgeInputFieldDetails.Label
+	retval.Description = v.JudgeInputFieldDetails.Description
+	retval.Type = v.JudgeInputFieldDetails.Type
+	retval.Required = v.JudgeInputFieldDetails.Required
+	return &retval, nil
+}
+
+type JudgeScope string
+
+const (
+	JudgeScopeRequest JudgeScope = "REQUEST"
+	JudgeScopeHop     JudgeScope = "HOP"
+)
+
+var AllJudgeScope = []JudgeScope{
+	JudgeScopeRequest,
+	JudgeScopeHop,
+}
+
 // LinkDetails includes the GraphQL fields of Link requested by the fragment LinkDetails.
 type LinkDetails struct {
 	StableID         string                                 `json:"stableID"`
@@ -1653,329 +2058,6 @@ type LinkDetailsToAgentVersionAgent struct {
 
 // GetId returns LinkDetailsToAgentVersionAgent.Id, and is useful for accessing the field via an interface.
 func (v *LinkDetailsToAgentVersionAgent) GetId() string { return v.Id }
-
-// ListSystemMetricsMetricsMetricConnection includes the requested fields of the GraphQL type MetricConnection.
-type ListSystemMetricsMetricsMetricConnection struct {
-	TotalCount int                                                       `json:"totalCount"`
-	PageInfo   ListSystemMetricsMetricsMetricConnectionPageInfo          `json:"pageInfo"`
-	Edges      []ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge `json:"edges"`
-}
-
-// GetTotalCount returns ListSystemMetricsMetricsMetricConnection.TotalCount, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnection) GetTotalCount() int { return v.TotalCount }
-
-// GetPageInfo returns ListSystemMetricsMetricsMetricConnection.PageInfo, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnection) GetPageInfo() ListSystemMetricsMetricsMetricConnectionPageInfo {
-	return v.PageInfo
-}
-
-// GetEdges returns ListSystemMetricsMetricsMetricConnection.Edges, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnection) GetEdges() []ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge {
-	return v.Edges
-}
-
-// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge includes the requested fields of the GraphQL type MetricEdge.
-type ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge struct {
-	Node ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric `json:"-"`
-}
-
-// GetNode returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge.Node, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge) GetNode() ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric {
-	return v.Node
-}
-
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge
-		Node json.RawMessage `json:"node"`
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	{
-		dst := &v.Node
-		src := firstPass.Node
-		if len(src) != 0 && string(src) != "null" {
-			err = __unmarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(
-				src, dst)
-			if err != nil {
-				return fmt.Errorf(
-					"unable to unmarshal ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge.Node: %w", err)
-			}
-		}
-	}
-	return nil
-}
-
-type __premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdge struct {
-	Node json.RawMessage `json:"node"`
-}
-
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge) __premarshalJSON() (*__premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdge, error) {
-	var retval __premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdge
-
-	{
-
-		dst := &retval.Node
-		src := v.Node
-		var err error
-		*dst, err = __marshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(
-			&src)
-		if err != nil {
-			return nil, fmt.Errorf(
-				"unable to marshal ListSystemMetricsMetricsMetricConnectionEdgesMetricEdge.Node: %w", err)
-		}
-	}
-	return &retval, nil
-}
-
-// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric includes the requested fields of the GraphQL interface Metric.
-//
-// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric is implemented by the following types:
-// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric
-// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric
-type ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric interface {
-	implementsGraphQLInterfaceListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric()
-	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
-	GetTypename() *string
-}
-
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) implementsGraphQLInterfaceListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric() {
-}
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric) implementsGraphQLInterfaceListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric() {
-}
-
-func __unmarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(b []byte, v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric) error {
-	if string(b) == "null" {
-		return nil
-	}
-
-	var tn struct {
-		TypeName string `json:"__typename"`
-	}
-	err := json.Unmarshal(b, &tn)
-	if err != nil {
-		return err
-	}
-
-	switch tn.TypeName {
-	case "SystemMetric":
-		*v = new(ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric)
-		return json.Unmarshal(b, *v)
-	case "UserMetric":
-		*v = new(ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric)
-		return json.Unmarshal(b, *v)
-	case "":
-		return fmt.Errorf(
-			"response was missing Metric.__typename")
-	default:
-		return fmt.Errorf(
-			`unexpected concrete type for ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric: "%v"`, tn.TypeName)
-	}
-}
-
-func __marshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric) ([]byte, error) {
-
-	var typename string
-	switch v := (*v).(type) {
-	case *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric:
-		typename = "SystemMetric"
-
-		premarshaled, err := v.__premarshalJSON()
-		if err != nil {
-			return nil, err
-		}
-		result := struct {
-			TypeName string `json:"__typename"`
-			*__premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric
-		}{typename, premarshaled}
-		return json.Marshal(result)
-	case *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric:
-		typename = "UserMetric"
-
-		result := struct {
-			TypeName string `json:"__typename"`
-			*ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric
-		}{typename, v}
-		return json.Marshal(result)
-	case nil:
-		return []byte("null"), nil
-	default:
-		return nil, fmt.Errorf(
-			`unexpected concrete type for ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric: "%T"`, v)
-	}
-}
-
-// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric includes the requested fields of the GraphQL type SystemMetric.
-type ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric struct {
-	Typename            *string `json:"__typename"`
-	SystemMetricDetails `json:"-"`
-}
-
-// GetTypename returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Typename, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetTypename() *string {
-	return v.Typename
-}
-
-// GetKey returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Key, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetKey() string {
-	return v.SystemMetricDetails.Key
-}
-
-// GetType returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Type, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetType() MetricType {
-	return v.SystemMetricDetails.Type
-}
-
-// GetName returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Name, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetName() string {
-	return v.SystemMetricDetails.Name
-}
-
-// GetDescription returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Description, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetDescription() *string {
-	return v.SystemMetricDetails.Description
-}
-
-// GetComplexity returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Complexity, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetComplexity() *ModelComplexity {
-	return v.SystemMetricDetails.Complexity
-}
-
-// GetPrompt returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Prompt, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetPrompt() *string {
-	return v.SystemMetricDetails.Prompt
-}
-
-// GetExamples returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.Examples, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetExamples() []SystemMetricDetailsExamplesScoreExample {
-	return v.SystemMetricDetails.Examples
-}
-
-// GetInputFields returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric.InputFields, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) GetInputFields() []SystemMetricDetailsInputFieldsJudgeInputField {
-	return v.SystemMetricDetails.InputFields
-}
-
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(
-		b, &v.SystemMetricDetails)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type __premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric struct {
-	Typename *string `json:"__typename"`
-
-	Key string `json:"key"`
-
-	Type MetricType `json:"type"`
-
-	Name string `json:"name"`
-
-	Description *string `json:"description"`
-
-	Complexity *ModelComplexity `json:"complexity"`
-
-	Prompt *string `json:"prompt"`
-
-	Examples []SystemMetricDetailsExamplesScoreExample `json:"examples"`
-
-	InputFields []SystemMetricDetailsInputFieldsJudgeInputField `json:"inputFields"`
-}
-
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric) __premarshalJSON() (*__premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric, error) {
-	var retval __premarshalListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeSystemMetric
-
-	retval.Typename = v.Typename
-	retval.Key = v.SystemMetricDetails.Key
-	retval.Type = v.SystemMetricDetails.Type
-	retval.Name = v.SystemMetricDetails.Name
-	retval.Description = v.SystemMetricDetails.Description
-	retval.Complexity = v.SystemMetricDetails.Complexity
-	retval.Prompt = v.SystemMetricDetails.Prompt
-	retval.Examples = v.SystemMetricDetails.Examples
-	retval.InputFields = v.SystemMetricDetails.InputFields
-	return &retval, nil
-}
-
-// ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric includes the requested fields of the GraphQL type UserMetric.
-type ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric struct {
-	Typename *string `json:"__typename"`
-}
-
-// GetTypename returns ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric.Typename, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionEdgesMetricEdgeNodeUserMetric) GetTypename() *string {
-	return v.Typename
-}
-
-// ListSystemMetricsMetricsMetricConnectionPageInfo includes the requested fields of the GraphQL type PageInfo.
-type ListSystemMetricsMetricsMetricConnectionPageInfo struct {
-	HasNextPage bool    `json:"hasNextPage"`
-	EndCursor   *string `json:"endCursor"`
-}
-
-// GetHasNextPage returns ListSystemMetricsMetricsMetricConnectionPageInfo.HasNextPage, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionPageInfo) GetHasNextPage() bool {
-	return v.HasNextPage
-}
-
-// GetEndCursor returns ListSystemMetricsMetricsMetricConnectionPageInfo.EndCursor, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsMetricsMetricConnectionPageInfo) GetEndCursor() *string { return v.EndCursor }
-
-// ListSystemMetricsResponse is returned by ListSystemMetrics on success.
-type ListSystemMetricsResponse struct {
-	Metrics ListSystemMetricsMetricsMetricConnection `json:"metrics"`
-}
-
-// GetMetrics returns ListSystemMetricsResponse.Metrics, and is useful for accessing the field via an interface.
-func (v *ListSystemMetricsResponse) GetMetrics() ListSystemMetricsMetricsMetricConnection {
-	return v.Metrics
-}
 
 type McpAuthFlow string
 
@@ -3559,18 +3641,6 @@ var AllMetricCategory = []MetricCategory{
 	MetricCategoryEfficiency,
 }
 
-type MetricType string
-
-const (
-	MetricTypeComputed MetricType = "COMPUTED"
-	MetricTypeJudged   MetricType = "JUDGED"
-)
-
-var AllMetricType = []MetricType{
-	MetricTypeComputed,
-	MetricTypeJudged,
-}
-
 type ModelComplexity string
 
 const (
@@ -3637,6 +3707,8 @@ type ModelProfileDetailsConfigurationModelProfileConfig struct {
 	TopK                 *int             `json:"topK"`
 	ThinkingBudgetTokens *int             `json:"thinkingBudgetTokens"`
 	ReasoningEffort      *ReasoningEffort `json:"reasoningEffort"`
+	ThinkingType         *ThinkingType    `json:"thinkingType"`
+	ThinkingDisplay      *ThinkingDisplay `json:"thinkingDisplay"`
 }
 
 // GetModel returns ModelProfileDetailsConfigurationModelProfileConfig.Model, and is useful for accessing the field via an interface.
@@ -3664,6 +3736,16 @@ func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetThinkingBudgetTo
 // GetReasoningEffort returns ModelProfileDetailsConfigurationModelProfileConfig.ReasoningEffort, and is useful for accessing the field via an interface.
 func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetReasoningEffort() *ReasoningEffort {
 	return v.ReasoningEffort
+}
+
+// GetThinkingType returns ModelProfileDetailsConfigurationModelProfileConfig.ThinkingType, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetThinkingType() *ThinkingType {
+	return v.ThinkingType
+}
+
+// GetThinkingDisplay returns ModelProfileDetailsConfigurationModelProfileConfig.ThinkingDisplay, and is useful for accessing the field via an interface.
+func (v *ModelProfileDetailsConfigurationModelProfileConfig) GetThinkingDisplay() *ThinkingDisplay {
+	return v.ThinkingDisplay
 }
 
 // ModelProfileDetailsProviderModelProvider includes the requested fields of the GraphQL type ModelProvider.
@@ -4229,6 +4311,16 @@ func (v *ModifyInstalledParticleResponse) GetUpdateInstalledParticle() Installed
 	return v.UpdateInstalledParticle
 }
 
+// ModifyJudgeMetricResponse is returned by ModifyJudgeMetric on success.
+type ModifyJudgeMetricResponse struct {
+	UpdateJudgeMetric JudgeMetricDetails `json:"updateJudgeMetric"`
+}
+
+// GetUpdateJudgeMetric returns ModifyJudgeMetricResponse.UpdateJudgeMetric, and is useful for accessing the field via an interface.
+func (v *ModifyJudgeMetricResponse) GetUpdateJudgeMetric() JudgeMetricDetails {
+	return v.UpdateJudgeMetric
+}
+
 // ModifyLinkResponse is returned by ModifyLink on success.
 type ModifyLinkResponse struct {
 	UpdateLinkByStableID LinkDetails `json:"updateLinkByStableID"`
@@ -4344,6 +4436,20 @@ type ModifyRubricResponse struct {
 // GetUpdateRubric returns ModifyRubricResponse.UpdateRubric, and is useful for accessing the field via an interface.
 func (v *ModifyRubricResponse) GetUpdateRubric() RubricDetails { return v.UpdateRubric }
 
+// ModifySkillResponse is returned by ModifySkill on success.
+type ModifySkillResponse struct {
+	// Rename a skill, replace its content with a new skill folder, or both. A new
+	// folder is read the same way as by createSkill, and files that are not in it
+	// are removed. Every agent that uses the skill gets the new content.
+	//
+	// A new folder can't change the declared name to one that another skill of an
+	// agent using this one already has.
+	UpdateSkill SkillDetails `json:"updateSkill"`
+}
+
+// GetUpdateSkill returns ModifySkillResponse.UpdateSkill, and is useful for accessing the field via an interface.
+func (v *ModifySkillResponse) GetUpdateSkill() SkillDetails { return v.UpdateSkill }
+
 // ModifyTaskDefinitionResponse is returned by ModifyTaskDefinition on success.
 type ModifyTaskDefinitionResponse struct {
 	// Update an author-defined TaskDefinition. Any subset of input fields may be
@@ -4355,14 +4461,6 @@ type ModifyTaskDefinitionResponse struct {
 func (v *ModifyTaskDefinitionResponse) GetUpdateTaskDefinition() TaskDefinitionDetails {
 	return v.UpdateTaskDefinition
 }
-
-// ModifyUserMetricResponse is returned by ModifyUserMetric on success.
-type ModifyUserMetricResponse struct {
-	UpdateUserMetric UserMetricDetails `json:"updateUserMetric"`
-}
-
-// GetUpdateUserMetric returns ModifyUserMetricResponse.UpdateUserMetric, and is useful for accessing the field via an interface.
-func (v *ModifyUserMetricResponse) GetUpdateUserMetric() UserMetricDetails { return v.UpdateUserMetric }
 
 // ModifyWebhookDestinationResponse is returned by ModifyWebhookDestination on success.
 type ModifyWebhookDestinationResponse struct {
@@ -4419,6 +4517,41 @@ func (v *NewJudgeInputField) GetType() JudgeInputFieldType { return v.Type }
 
 // GetRequired returns NewJudgeInputField.Required, and is useful for accessing the field via an interface.
 func (v *NewJudgeInputField) GetRequired() bool { return v.Required }
+
+type NewJudgeMetric struct {
+	Name        string               `json:"name"`
+	Description *string              `json:"description,omitempty"`
+	Category    MetricCategory       `json:"category"`
+	Scope       JudgeScope           `json:"scope"`
+	Prompt      string               `json:"prompt"`
+	Complexity  ModelComplexity      `json:"complexity"`
+	Examples    []NewScoreExample    `json:"examples"`
+	InputFields []NewJudgeInputField `json:"inputFields"`
+}
+
+// GetName returns NewJudgeMetric.Name, and is useful for accessing the field via an interface.
+func (v *NewJudgeMetric) GetName() string { return v.Name }
+
+// GetDescription returns NewJudgeMetric.Description, and is useful for accessing the field via an interface.
+func (v *NewJudgeMetric) GetDescription() *string { return v.Description }
+
+// GetCategory returns NewJudgeMetric.Category, and is useful for accessing the field via an interface.
+func (v *NewJudgeMetric) GetCategory() MetricCategory { return v.Category }
+
+// GetScope returns NewJudgeMetric.Scope, and is useful for accessing the field via an interface.
+func (v *NewJudgeMetric) GetScope() JudgeScope { return v.Scope }
+
+// GetPrompt returns NewJudgeMetric.Prompt, and is useful for accessing the field via an interface.
+func (v *NewJudgeMetric) GetPrompt() string { return v.Prompt }
+
+// GetComplexity returns NewJudgeMetric.Complexity, and is useful for accessing the field via an interface.
+func (v *NewJudgeMetric) GetComplexity() ModelComplexity { return v.Complexity }
+
+// GetExamples returns NewJudgeMetric.Examples, and is useful for accessing the field via an interface.
+func (v *NewJudgeMetric) GetExamples() []NewScoreExample { return v.Examples }
+
+// GetInputFields returns NewJudgeMetric.InputFields, and is useful for accessing the field via an interface.
+func (v *NewJudgeMetric) GetInputFields() []NewJudgeInputField { return v.InputFields }
 
 type NewMcpConnection struct {
 	Name                              string                                          `json:"name"`
@@ -4529,22 +4662,22 @@ func (v *NewRubric) GetDescription() *string { return v.Description }
 func (v *NewRubric) GetMetrics() []NewRubricMetric { return v.Metrics }
 
 type NewRubricMetric struct {
-	SystemMetricKey *string          `json:"systemMetricKey,omitempty"`
-	UserMetricID    *string          `json:"userMetricID,omitempty"`
-	TrialCount      *int             `json:"trialCount,omitempty"`
-	Complexity      *ModelComplexity `json:"complexity,omitempty"`
-	InputValues     *json.RawMessage `json:"inputValues,omitempty"`
-	ScoreFloor      *float64         `json:"scoreFloor,omitempty"`
-	ScoreCeiling    *float64         `json:"scoreCeiling,omitempty"`
-	LowerIsBetter   *bool            `json:"lowerIsBetter,omitempty"`
-	Weight          *float64         `json:"weight,omitempty"`
+	ComputedMetricKey *string          `json:"computedMetricKey,omitempty"`
+	JudgeMetricID     *string          `json:"judgeMetricID,omitempty"`
+	TrialCount        *int             `json:"trialCount,omitempty"`
+	Complexity        *ModelComplexity `json:"complexity,omitempty"`
+	InputValues       *json.RawMessage `json:"inputValues,omitempty"`
+	ScoreFloor        *float64         `json:"scoreFloor,omitempty"`
+	ScoreCeiling      *float64         `json:"scoreCeiling,omitempty"`
+	LowerIsBetter     *bool            `json:"lowerIsBetter,omitempty"`
+	Weight            *float64         `json:"weight,omitempty"`
 }
 
-// GetSystemMetricKey returns NewRubricMetric.SystemMetricKey, and is useful for accessing the field via an interface.
-func (v *NewRubricMetric) GetSystemMetricKey() *string { return v.SystemMetricKey }
+// GetComputedMetricKey returns NewRubricMetric.ComputedMetricKey, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetComputedMetricKey() *string { return v.ComputedMetricKey }
 
-// GetUserMetricID returns NewRubricMetric.UserMetricID, and is useful for accessing the field via an interface.
-func (v *NewRubricMetric) GetUserMetricID() *string { return v.UserMetricID }
+// GetJudgeMetricID returns NewRubricMetric.JudgeMetricID, and is useful for accessing the field via an interface.
+func (v *NewRubricMetric) GetJudgeMetricID() *string { return v.JudgeMetricID }
 
 // GetTrialCount returns NewRubricMetric.TrialCount, and is useful for accessing the field via an interface.
 func (v *NewRubricMetric) GetTrialCount() *int { return v.TrialCount }
@@ -4581,37 +4714,6 @@ func (v *NewScoreExample) GetScenario() string { return v.Scenario }
 
 // GetJudgment returns NewScoreExample.Judgment, and is useful for accessing the field via an interface.
 func (v *NewScoreExample) GetJudgment() string { return v.Judgment }
-
-type NewUserMetric struct {
-	Name        string               `json:"name"`
-	Description *string              `json:"description,omitempty"`
-	Category    MetricCategory       `json:"category"`
-	Prompt      string               `json:"prompt"`
-	Complexity  ModelComplexity      `json:"complexity"`
-	Examples    []NewScoreExample    `json:"examples"`
-	InputFields []NewJudgeInputField `json:"inputFields"`
-}
-
-// GetName returns NewUserMetric.Name, and is useful for accessing the field via an interface.
-func (v *NewUserMetric) GetName() string { return v.Name }
-
-// GetDescription returns NewUserMetric.Description, and is useful for accessing the field via an interface.
-func (v *NewUserMetric) GetDescription() *string { return v.Description }
-
-// GetCategory returns NewUserMetric.Category, and is useful for accessing the field via an interface.
-func (v *NewUserMetric) GetCategory() MetricCategory { return v.Category }
-
-// GetPrompt returns NewUserMetric.Prompt, and is useful for accessing the field via an interface.
-func (v *NewUserMetric) GetPrompt() string { return v.Prompt }
-
-// GetComplexity returns NewUserMetric.Complexity, and is useful for accessing the field via an interface.
-func (v *NewUserMetric) GetComplexity() ModelComplexity { return v.Complexity }
-
-// GetExamples returns NewUserMetric.Examples, and is useful for accessing the field via an interface.
-func (v *NewUserMetric) GetExamples() []NewScoreExample { return v.Examples }
-
-// GetInputFields returns NewUserMetric.InputFields, and is useful for accessing the field via an interface.
-func (v *NewUserMetric) GetInputFields() []NewJudgeInputField { return v.InputFields }
 
 type NewWorkspace struct {
 	Name  string         `json:"name"`
@@ -5064,20 +5166,110 @@ func (v *RubricDetails) __premarshalJSON() (*__premarshalRubricDetails, error) {
 	return &retval, nil
 }
 
+// RubricDetailsMetricsRubricComputedMetric includes the requested fields of the GraphQL type RubricComputedMetric.
+type RubricDetailsMetricsRubricComputedMetric struct {
+	Typename        *string                                                `json:"__typename"`
+	ComputedEntryID string                                                 `json:"computedEntryID"`
+	ComputedMetric  RubricDetailsMetricsRubricComputedMetricComputedMetric `json:"computedMetric"`
+	ScoreFloor      *float64                                               `json:"scoreFloor"`
+	ScoreCeiling    *float64                                               `json:"scoreCeiling"`
+	LowerIsBetter   *bool                                                  `json:"lowerIsBetter"`
+	ComputedWeight  *float64                                               `json:"computedWeight"`
+}
+
+// GetTypename returns RubricDetailsMetricsRubricComputedMetric.Typename, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricComputedMetric) GetTypename() *string { return v.Typename }
+
+// GetComputedEntryID returns RubricDetailsMetricsRubricComputedMetric.ComputedEntryID, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricComputedMetric) GetComputedEntryID() string {
+	return v.ComputedEntryID
+}
+
+// GetComputedMetric returns RubricDetailsMetricsRubricComputedMetric.ComputedMetric, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricComputedMetric) GetComputedMetric() RubricDetailsMetricsRubricComputedMetricComputedMetric {
+	return v.ComputedMetric
+}
+
+// GetScoreFloor returns RubricDetailsMetricsRubricComputedMetric.ScoreFloor, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricComputedMetric) GetScoreFloor() *float64 { return v.ScoreFloor }
+
+// GetScoreCeiling returns RubricDetailsMetricsRubricComputedMetric.ScoreCeiling, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricComputedMetric) GetScoreCeiling() *float64 { return v.ScoreCeiling }
+
+// GetLowerIsBetter returns RubricDetailsMetricsRubricComputedMetric.LowerIsBetter, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricComputedMetric) GetLowerIsBetter() *bool { return v.LowerIsBetter }
+
+// GetComputedWeight returns RubricDetailsMetricsRubricComputedMetric.ComputedWeight, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricComputedMetric) GetComputedWeight() *float64 {
+	return v.ComputedWeight
+}
+
+// RubricDetailsMetricsRubricComputedMetricComputedMetric includes the requested fields of the GraphQL type ComputedMetric.
+type RubricDetailsMetricsRubricComputedMetricComputedMetric struct {
+	Key string `json:"key"`
+}
+
+// GetKey returns RubricDetailsMetricsRubricComputedMetricComputedMetric.Key, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricComputedMetricComputedMetric) GetKey() string { return v.Key }
+
+// RubricDetailsMetricsRubricJudgeMetric includes the requested fields of the GraphQL type RubricJudgeMetric.
+type RubricDetailsMetricsRubricJudgeMetric struct {
+	Typename     *string                                          `json:"__typename"`
+	JudgeEntryID string                                           `json:"judgeEntryID"`
+	JudgeMetric  RubricDetailsMetricsRubricJudgeMetricJudgeMetric `json:"judgeMetric"`
+	TrialCount   int                                              `json:"trialCount"`
+	Complexity   *ModelComplexity                                 `json:"complexity"`
+	InputValues  *json.RawMessage                                 `json:"inputValues"`
+	JudgeWeight  *float64                                         `json:"judgeWeight"`
+}
+
+// GetTypename returns RubricDetailsMetricsRubricJudgeMetric.Typename, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricJudgeMetric) GetTypename() *string { return v.Typename }
+
+// GetJudgeEntryID returns RubricDetailsMetricsRubricJudgeMetric.JudgeEntryID, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricJudgeMetric) GetJudgeEntryID() string { return v.JudgeEntryID }
+
+// GetJudgeMetric returns RubricDetailsMetricsRubricJudgeMetric.JudgeMetric, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricJudgeMetric) GetJudgeMetric() RubricDetailsMetricsRubricJudgeMetricJudgeMetric {
+	return v.JudgeMetric
+}
+
+// GetTrialCount returns RubricDetailsMetricsRubricJudgeMetric.TrialCount, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricJudgeMetric) GetTrialCount() int { return v.TrialCount }
+
+// GetComplexity returns RubricDetailsMetricsRubricJudgeMetric.Complexity, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricJudgeMetric) GetComplexity() *ModelComplexity { return v.Complexity }
+
+// GetInputValues returns RubricDetailsMetricsRubricJudgeMetric.InputValues, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricJudgeMetric) GetInputValues() *json.RawMessage {
+	return v.InputValues
+}
+
+// GetJudgeWeight returns RubricDetailsMetricsRubricJudgeMetric.JudgeWeight, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricJudgeMetric) GetJudgeWeight() *float64 { return v.JudgeWeight }
+
+// RubricDetailsMetricsRubricJudgeMetricJudgeMetric includes the requested fields of the GraphQL type JudgeMetric.
+type RubricDetailsMetricsRubricJudgeMetricJudgeMetric struct {
+	Id string `json:"id"`
+}
+
+// GetId returns RubricDetailsMetricsRubricJudgeMetricJudgeMetric.Id, and is useful for accessing the field via an interface.
+func (v *RubricDetailsMetricsRubricJudgeMetricJudgeMetric) GetId() string { return v.Id }
+
 // RubricDetailsMetricsRubricMetric includes the requested fields of the GraphQL interface RubricMetric.
 //
 // RubricDetailsMetricsRubricMetric is implemented by the following types:
-// RubricDetailsMetricsRubricSystemMetric
-// RubricDetailsMetricsRubricUserMetric
+// RubricDetailsMetricsRubricComputedMetric
+// RubricDetailsMetricsRubricJudgeMetric
 type RubricDetailsMetricsRubricMetric interface {
 	implementsGraphQLInterfaceRubricDetailsMetricsRubricMetric()
 	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
 	GetTypename() *string
 }
 
-func (v *RubricDetailsMetricsRubricSystemMetric) implementsGraphQLInterfaceRubricDetailsMetricsRubricMetric() {
+func (v *RubricDetailsMetricsRubricComputedMetric) implementsGraphQLInterfaceRubricDetailsMetricsRubricMetric() {
 }
-func (v *RubricDetailsMetricsRubricUserMetric) implementsGraphQLInterfaceRubricDetailsMetricsRubricMetric() {
+func (v *RubricDetailsMetricsRubricJudgeMetric) implementsGraphQLInterfaceRubricDetailsMetricsRubricMetric() {
 }
 
 func __unmarshalRubricDetailsMetricsRubricMetric(b []byte, v *RubricDetailsMetricsRubricMetric) error {
@@ -5094,11 +5286,11 @@ func __unmarshalRubricDetailsMetricsRubricMetric(b []byte, v *RubricDetailsMetri
 	}
 
 	switch tn.TypeName {
-	case "RubricSystemMetric":
-		*v = new(RubricDetailsMetricsRubricSystemMetric)
+	case "RubricComputedMetric":
+		*v = new(RubricDetailsMetricsRubricComputedMetric)
 		return json.Unmarshal(b, *v)
-	case "RubricUserMetric":
-		*v = new(RubricDetailsMetricsRubricUserMetric)
+	case "RubricJudgeMetric":
+		*v = new(RubricDetailsMetricsRubricJudgeMetric)
 		return json.Unmarshal(b, *v)
 	case "":
 		return fmt.Errorf(
@@ -5113,20 +5305,20 @@ func __marshalRubricDetailsMetricsRubricMetric(v *RubricDetailsMetricsRubricMetr
 
 	var typename string
 	switch v := (*v).(type) {
-	case *RubricDetailsMetricsRubricSystemMetric:
-		typename = "RubricSystemMetric"
+	case *RubricDetailsMetricsRubricComputedMetric:
+		typename = "RubricComputedMetric"
 
 		result := struct {
 			TypeName string `json:"__typename"`
-			*RubricDetailsMetricsRubricSystemMetric
+			*RubricDetailsMetricsRubricComputedMetric
 		}{typename, v}
 		return json.Marshal(result)
-	case *RubricDetailsMetricsRubricUserMetric:
-		typename = "RubricUserMetric"
+	case *RubricDetailsMetricsRubricJudgeMetric:
+		typename = "RubricJudgeMetric"
 
 		result := struct {
 			TypeName string `json:"__typename"`
-			*RubricDetailsMetricsRubricUserMetric
+			*RubricDetailsMetricsRubricJudgeMetric
 		}{typename, v}
 		return json.Marshal(result)
 	case nil:
@@ -5136,110 +5328,6 @@ func __marshalRubricDetailsMetricsRubricMetric(v *RubricDetailsMetricsRubricMetr
 			`unexpected concrete type for RubricDetailsMetricsRubricMetric: "%T"`, v)
 	}
 }
-
-// RubricDetailsMetricsRubricSystemMetric includes the requested fields of the GraphQL type RubricSystemMetric.
-type RubricDetailsMetricsRubricSystemMetric struct {
-	Typename         *string                                            `json:"__typename"`
-	SystemEntryID    string                                             `json:"systemEntryID"`
-	SystemMetric     RubricDetailsMetricsRubricSystemMetricSystemMetric `json:"systemMetric"`
-	SystemTrialCount *int                                               `json:"systemTrialCount"`
-	Complexity       *ModelComplexity                                   `json:"complexity"`
-	InputValues      *json.RawMessage                                   `json:"inputValues"`
-	ScoreFloor       *float64                                           `json:"scoreFloor"`
-	ScoreCeiling     *float64                                           `json:"scoreCeiling"`
-	LowerIsBetter    *bool                                              `json:"lowerIsBetter"`
-	Weight           *float64                                           `json:"weight"`
-}
-
-// GetTypename returns RubricDetailsMetricsRubricSystemMetric.Typename, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetTypename() *string { return v.Typename }
-
-// GetSystemEntryID returns RubricDetailsMetricsRubricSystemMetric.SystemEntryID, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetSystemEntryID() string { return v.SystemEntryID }
-
-// GetSystemMetric returns RubricDetailsMetricsRubricSystemMetric.SystemMetric, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetSystemMetric() RubricDetailsMetricsRubricSystemMetricSystemMetric {
-	return v.SystemMetric
-}
-
-// GetSystemTrialCount returns RubricDetailsMetricsRubricSystemMetric.SystemTrialCount, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetSystemTrialCount() *int {
-	return v.SystemTrialCount
-}
-
-// GetComplexity returns RubricDetailsMetricsRubricSystemMetric.Complexity, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetComplexity() *ModelComplexity {
-	return v.Complexity
-}
-
-// GetInputValues returns RubricDetailsMetricsRubricSystemMetric.InputValues, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetInputValues() *json.RawMessage {
-	return v.InputValues
-}
-
-// GetScoreFloor returns RubricDetailsMetricsRubricSystemMetric.ScoreFloor, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetScoreFloor() *float64 { return v.ScoreFloor }
-
-// GetScoreCeiling returns RubricDetailsMetricsRubricSystemMetric.ScoreCeiling, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetScoreCeiling() *float64 { return v.ScoreCeiling }
-
-// GetLowerIsBetter returns RubricDetailsMetricsRubricSystemMetric.LowerIsBetter, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetLowerIsBetter() *bool { return v.LowerIsBetter }
-
-// GetWeight returns RubricDetailsMetricsRubricSystemMetric.Weight, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetric) GetWeight() *float64 { return v.Weight }
-
-// RubricDetailsMetricsRubricSystemMetricSystemMetric includes the requested fields of the GraphQL type SystemMetric.
-type RubricDetailsMetricsRubricSystemMetricSystemMetric struct {
-	Key string `json:"key"`
-}
-
-// GetKey returns RubricDetailsMetricsRubricSystemMetricSystemMetric.Key, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricSystemMetricSystemMetric) GetKey() string { return v.Key }
-
-// RubricDetailsMetricsRubricUserMetric includes the requested fields of the GraphQL type RubricUserMetric.
-type RubricDetailsMetricsRubricUserMetric struct {
-	Typename       *string                                        `json:"__typename"`
-	UserEntryID    string                                         `json:"userEntryID"`
-	UserMetric     RubricDetailsMetricsRubricUserMetricUserMetric `json:"userMetric"`
-	UserTrialCount int                                            `json:"userTrialCount"`
-	Complexity     *ModelComplexity                               `json:"complexity"`
-	InputValues    *json.RawMessage                               `json:"inputValues"`
-	Weight         *float64                                       `json:"weight"`
-}
-
-// GetTypename returns RubricDetailsMetricsRubricUserMetric.Typename, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricUserMetric) GetTypename() *string { return v.Typename }
-
-// GetUserEntryID returns RubricDetailsMetricsRubricUserMetric.UserEntryID, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricUserMetric) GetUserEntryID() string { return v.UserEntryID }
-
-// GetUserMetric returns RubricDetailsMetricsRubricUserMetric.UserMetric, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricUserMetric) GetUserMetric() RubricDetailsMetricsRubricUserMetricUserMetric {
-	return v.UserMetric
-}
-
-// GetUserTrialCount returns RubricDetailsMetricsRubricUserMetric.UserTrialCount, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricUserMetric) GetUserTrialCount() int { return v.UserTrialCount }
-
-// GetComplexity returns RubricDetailsMetricsRubricUserMetric.Complexity, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricUserMetric) GetComplexity() *ModelComplexity { return v.Complexity }
-
-// GetInputValues returns RubricDetailsMetricsRubricUserMetric.InputValues, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricUserMetric) GetInputValues() *json.RawMessage {
-	return v.InputValues
-}
-
-// GetWeight returns RubricDetailsMetricsRubricUserMetric.Weight, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricUserMetric) GetWeight() *float64 { return v.Weight }
-
-// RubricDetailsMetricsRubricUserMetricUserMetric includes the requested fields of the GraphQL type UserMetric.
-type RubricDetailsMetricsRubricUserMetricUserMetric struct {
-	Id string `json:"id"`
-}
-
-// GetId returns RubricDetailsMetricsRubricUserMetricUserMetric.Id, and is useful for accessing the field via an interface.
-func (v *RubricDetailsMetricsRubricUserMetricUserMetric) GetId() string { return v.Id }
 
 // ScoreExampleDetails includes the GraphQL fields of ScoreExample requested by the fragment ScoreExampleDetails.
 type ScoreExampleDetails struct {
@@ -5257,100 +5345,70 @@ func (v *ScoreExampleDetails) GetScenario() string { return v.Scenario }
 // GetJudgment returns ScoreExampleDetails.Judgment, and is useful for accessing the field via an interface.
 func (v *ScoreExampleDetails) GetJudgment() string { return v.Judgment }
 
-// SystemMetricDetails includes the GraphQL fields of SystemMetric requested by the fragment SystemMetricDetails.
-type SystemMetricDetails struct {
-	Key         string                                          `json:"key"`
-	Type        MetricType                                      `json:"type"`
-	Name        string                                          `json:"name"`
-	Description *string                                         `json:"description"`
-	Complexity  *ModelComplexity                                `json:"complexity"`
-	Prompt      *string                                         `json:"prompt"`
-	Examples    []SystemMetricDetailsExamplesScoreExample       `json:"examples"`
-	InputFields []SystemMetricDetailsInputFieldsJudgeInputField `json:"inputFields"`
+// SearchJudgeMetricsMetricsMetricConnection includes the requested fields of the GraphQL type MetricConnection.
+type SearchJudgeMetricsMetricsMetricConnection struct {
+	PageInfo SearchJudgeMetricsMetricsMetricConnectionPageInfo          `json:"pageInfo"`
+	Edges    []SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge `json:"edges"`
 }
 
-// GetKey returns SystemMetricDetails.Key, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetails) GetKey() string { return v.Key }
-
-// GetType returns SystemMetricDetails.Type, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetails) GetType() MetricType { return v.Type }
-
-// GetName returns SystemMetricDetails.Name, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetails) GetName() string { return v.Name }
-
-// GetDescription returns SystemMetricDetails.Description, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetails) GetDescription() *string { return v.Description }
-
-// GetComplexity returns SystemMetricDetails.Complexity, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetails) GetComplexity() *ModelComplexity { return v.Complexity }
-
-// GetPrompt returns SystemMetricDetails.Prompt, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetails) GetPrompt() *string { return v.Prompt }
-
-// GetExamples returns SystemMetricDetails.Examples, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetails) GetExamples() []SystemMetricDetailsExamplesScoreExample {
-	return v.Examples
+// GetPageInfo returns SearchJudgeMetricsMetricsMetricConnection.PageInfo, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnection) GetPageInfo() SearchJudgeMetricsMetricsMetricConnectionPageInfo {
+	return v.PageInfo
 }
 
-// GetInputFields returns SystemMetricDetails.InputFields, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetails) GetInputFields() []SystemMetricDetailsInputFieldsJudgeInputField {
-	return v.InputFields
+// GetEdges returns SearchJudgeMetricsMetricsMetricConnection.Edges, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnection) GetEdges() []SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge {
+	return v.Edges
 }
 
-// SystemMetricDetailsExamplesScoreExample includes the requested fields of the GraphQL type ScoreExample.
-type SystemMetricDetailsExamplesScoreExample struct {
-	ScoreExampleDetails `json:"-"`
+// SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge includes the requested fields of the GraphQL type MetricEdge.
+type SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge struct {
+	Node SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric `json:"-"`
 }
 
-// GetRating returns SystemMetricDetailsExamplesScoreExample.Rating, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetailsExamplesScoreExample) GetRating() int {
-	return v.ScoreExampleDetails.Rating
+// GetNode returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge.Node, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge) GetNode() SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric {
+	return v.Node
 }
 
-// GetScenario returns SystemMetricDetailsExamplesScoreExample.Scenario, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetailsExamplesScoreExample) GetScenario() string {
-	return v.ScoreExampleDetails.Scenario
-}
-
-// GetJudgment returns SystemMetricDetailsExamplesScoreExample.Judgment, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetailsExamplesScoreExample) GetJudgment() string {
-	return v.ScoreExampleDetails.Judgment
-}
-
-func (v *SystemMetricDetailsExamplesScoreExample) UnmarshalJSON(b []byte) error {
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge) UnmarshalJSON(b []byte) error {
 
 	if string(b) == "null" {
 		return nil
 	}
 
 	var firstPass struct {
-		*SystemMetricDetailsExamplesScoreExample
+		*SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge
+		Node json.RawMessage `json:"node"`
 		graphql.NoUnmarshalJSON
 	}
-	firstPass.SystemMetricDetailsExamplesScoreExample = v
+	firstPass.SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge = v
 
 	err := json.Unmarshal(b, &firstPass)
 	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal(
-		b, &v.ScoreExampleDetails)
-	if err != nil {
-		return err
+	{
+		dst := &v.Node
+		src := firstPass.Node
+		if len(src) != 0 && string(src) != "null" {
+			err = __unmarshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(
+				src, dst)
+			if err != nil {
+				return fmt.Errorf(
+					"unable to unmarshal SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge.Node: %w", err)
+			}
+		}
 	}
 	return nil
 }
 
-type __premarshalSystemMetricDetailsExamplesScoreExample struct {
-	Rating int `json:"rating"`
-
-	Scenario string `json:"scenario"`
-
-	Judgment string `json:"judgment"`
+type __premarshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge struct {
+	Node json.RawMessage `json:"node"`
 }
 
-func (v *SystemMetricDetailsExamplesScoreExample) MarshalJSON() ([]byte, error) {
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge) MarshalJSON() ([]byte, error) {
 	premarshaled, err := v.__premarshalJSON()
 	if err != nil {
 		return nil, err
@@ -5358,56 +5416,111 @@ func (v *SystemMetricDetailsExamplesScoreExample) MarshalJSON() ([]byte, error) 
 	return json.Marshal(premarshaled)
 }
 
-func (v *SystemMetricDetailsExamplesScoreExample) __premarshalJSON() (*__premarshalSystemMetricDetailsExamplesScoreExample, error) {
-	var retval __premarshalSystemMetricDetailsExamplesScoreExample
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge) __premarshalJSON() (*__premarshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge, error) {
+	var retval __premarshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge
 
-	retval.Rating = v.ScoreExampleDetails.Rating
-	retval.Scenario = v.ScoreExampleDetails.Scenario
-	retval.Judgment = v.ScoreExampleDetails.Judgment
+	{
+
+		dst := &retval.Node
+		src := v.Node
+		var err error
+		*dst, err = __marshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(
+			&src)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"unable to marshal SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdge.Node: %w", err)
+		}
+	}
 	return &retval, nil
 }
 
-// SystemMetricDetailsInputFieldsJudgeInputField includes the requested fields of the GraphQL type JudgeInputField.
-type SystemMetricDetailsInputFieldsJudgeInputField struct {
-	JudgeInputFieldDetails `json:"-"`
+// SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeComputedMetric includes the requested fields of the GraphQL type ComputedMetric.
+type SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeComputedMetric struct {
+	Typename *string `json:"__typename"`
 }
 
-// GetName returns SystemMetricDetailsInputFieldsJudgeInputField.Name, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetName() string {
-	return v.JudgeInputFieldDetails.Name
+// GetTypename returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeComputedMetric.Typename, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeComputedMetric) GetTypename() *string {
+	return v.Typename
 }
 
-// GetLabel returns SystemMetricDetailsInputFieldsJudgeInputField.Label, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetLabel() string {
-	return v.JudgeInputFieldDetails.Label
+// SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric includes the requested fields of the GraphQL type JudgeMetric.
+type SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric struct {
+	Typename           *string `json:"__typename"`
+	JudgeMetricDetails `json:"-"`
 }
 
-// GetDescription returns SystemMetricDetailsInputFieldsJudgeInputField.Description, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetDescription() string {
-	return v.JudgeInputFieldDetails.Description
+// GetTypename returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.Typename, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetTypename() *string {
+	return v.Typename
 }
 
-// GetType returns SystemMetricDetailsInputFieldsJudgeInputField.Type, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetType() JudgeInputFieldType {
-	return v.JudgeInputFieldDetails.Type
+// GetId returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.Id, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetId() string {
+	return v.JudgeMetricDetails.Id
 }
 
-// GetRequired returns SystemMetricDetailsInputFieldsJudgeInputField.Required, and is useful for accessing the field via an interface.
-func (v *SystemMetricDetailsInputFieldsJudgeInputField) GetRequired() bool {
-	return v.JudgeInputFieldDetails.Required
+// GetName returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.Name, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetName() string {
+	return v.JudgeMetricDetails.Name
 }
 
-func (v *SystemMetricDetailsInputFieldsJudgeInputField) UnmarshalJSON(b []byte) error {
+// GetDescription returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.Description, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetDescription() *string {
+	return v.JudgeMetricDetails.Description
+}
+
+// GetCategory returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.Category, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetCategory() MetricCategory {
+	return v.JudgeMetricDetails.Category
+}
+
+// GetScope returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.Scope, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetScope() JudgeScope {
+	return v.JudgeMetricDetails.Scope
+}
+
+// GetPrompt returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.Prompt, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetPrompt() string {
+	return v.JudgeMetricDetails.Prompt
+}
+
+// GetComplexity returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.Complexity, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetComplexity() ModelComplexity {
+	return v.JudgeMetricDetails.Complexity
+}
+
+// GetExamples returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.Examples, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetExamples() []JudgeMetricDetailsExamplesScoreExample {
+	return v.JudgeMetricDetails.Examples
+}
+
+// GetInputFields returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.InputFields, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetInputFields() []JudgeMetricDetailsInputFieldsJudgeInputField {
+	return v.JudgeMetricDetails.InputFields
+}
+
+// GetCreatedAt returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.CreatedAt, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetCreatedAt() string {
+	return v.JudgeMetricDetails.CreatedAt
+}
+
+// GetUpdatedAt returns SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) GetUpdatedAt() string {
+	return v.JudgeMetricDetails.UpdatedAt
+}
+
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) UnmarshalJSON(b []byte) error {
 
 	if string(b) == "null" {
 		return nil
 	}
 
 	var firstPass struct {
-		*SystemMetricDetailsInputFieldsJudgeInputField
+		*SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric
 		graphql.NoUnmarshalJSON
 	}
-	firstPass.SystemMetricDetailsInputFieldsJudgeInputField = v
+	firstPass.SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric = v
 
 	err := json.Unmarshal(b, &firstPass)
 	if err != nil {
@@ -5415,26 +5528,40 @@ func (v *SystemMetricDetailsInputFieldsJudgeInputField) UnmarshalJSON(b []byte) 
 	}
 
 	err = json.Unmarshal(
-		b, &v.JudgeInputFieldDetails)
+		b, &v.JudgeMetricDetails)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-type __premarshalSystemMetricDetailsInputFieldsJudgeInputField struct {
+type __premarshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric struct {
+	Typename *string `json:"__typename"`
+
+	Id string `json:"id"`
+
 	Name string `json:"name"`
 
-	Label string `json:"label"`
+	Description *string `json:"description"`
 
-	Description string `json:"description"`
+	Category MetricCategory `json:"category"`
 
-	Type JudgeInputFieldType `json:"type"`
+	Scope JudgeScope `json:"scope"`
 
-	Required bool `json:"required"`
+	Prompt string `json:"prompt"`
+
+	Complexity ModelComplexity `json:"complexity"`
+
+	Examples []JudgeMetricDetailsExamplesScoreExample `json:"examples"`
+
+	InputFields []JudgeMetricDetailsInputFieldsJudgeInputField `json:"inputFields"`
+
+	CreatedAt string `json:"createdAt"`
+
+	UpdatedAt string `json:"updatedAt"`
 }
 
-func (v *SystemMetricDetailsInputFieldsJudgeInputField) MarshalJSON() ([]byte, error) {
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) MarshalJSON() ([]byte, error) {
 	premarshaled, err := v.__premarshalJSON()
 	if err != nil {
 		return nil, err
@@ -5442,16 +5569,189 @@ func (v *SystemMetricDetailsInputFieldsJudgeInputField) MarshalJSON() ([]byte, e
 	return json.Marshal(premarshaled)
 }
 
-func (v *SystemMetricDetailsInputFieldsJudgeInputField) __premarshalJSON() (*__premarshalSystemMetricDetailsInputFieldsJudgeInputField, error) {
-	var retval __premarshalSystemMetricDetailsInputFieldsJudgeInputField
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) __premarshalJSON() (*__premarshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric, error) {
+	var retval __premarshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric
 
-	retval.Name = v.JudgeInputFieldDetails.Name
-	retval.Label = v.JudgeInputFieldDetails.Label
-	retval.Description = v.JudgeInputFieldDetails.Description
-	retval.Type = v.JudgeInputFieldDetails.Type
-	retval.Required = v.JudgeInputFieldDetails.Required
+	retval.Typename = v.Typename
+	retval.Id = v.JudgeMetricDetails.Id
+	retval.Name = v.JudgeMetricDetails.Name
+	retval.Description = v.JudgeMetricDetails.Description
+	retval.Category = v.JudgeMetricDetails.Category
+	retval.Scope = v.JudgeMetricDetails.Scope
+	retval.Prompt = v.JudgeMetricDetails.Prompt
+	retval.Complexity = v.JudgeMetricDetails.Complexity
+	retval.Examples = v.JudgeMetricDetails.Examples
+	retval.InputFields = v.JudgeMetricDetails.InputFields
+	retval.CreatedAt = v.JudgeMetricDetails.CreatedAt
+	retval.UpdatedAt = v.JudgeMetricDetails.UpdatedAt
 	return &retval, nil
 }
+
+// SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric includes the requested fields of the GraphQL interface Metric.
+//
+// SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric is implemented by the following types:
+// SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeComputedMetric
+// SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric
+type SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric interface {
+	implementsGraphQLInterfaceSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric()
+	// GetTypename returns the receiver's concrete GraphQL type-name (see interface doc for possible values).
+	GetTypename() *string
+}
+
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeComputedMetric) implementsGraphQLInterfaceSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric() {
+}
+func (v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric) implementsGraphQLInterfaceSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric() {
+}
+
+func __unmarshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(b []byte, v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric) error {
+	if string(b) == "null" {
+		return nil
+	}
+
+	var tn struct {
+		TypeName string `json:"__typename"`
+	}
+	err := json.Unmarshal(b, &tn)
+	if err != nil {
+		return err
+	}
+
+	switch tn.TypeName {
+	case "ComputedMetric":
+		*v = new(SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeComputedMetric)
+		return json.Unmarshal(b, *v)
+	case "JudgeMetric":
+		*v = new(SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric)
+		return json.Unmarshal(b, *v)
+	case "":
+		return fmt.Errorf(
+			"response was missing Metric.__typename")
+	default:
+		return fmt.Errorf(
+			`unexpected concrete type for SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric: "%v"`, tn.TypeName)
+	}
+}
+
+func __marshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric(v *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric) ([]byte, error) {
+
+	var typename string
+	switch v := (*v).(type) {
+	case *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeComputedMetric:
+		typename = "ComputedMetric"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeComputedMetric
+		}{typename, v}
+		return json.Marshal(result)
+	case *SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric:
+		typename = "JudgeMetric"
+
+		premarshaled, err := v.__premarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		result := struct {
+			TypeName string `json:"__typename"`
+			*__premarshalSearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeJudgeMetric
+		}{typename, premarshaled}
+		return json.Marshal(result)
+	case nil:
+		return []byte("null"), nil
+	default:
+		return nil, fmt.Errorf(
+			`unexpected concrete type for SearchJudgeMetricsMetricsMetricConnectionEdgesMetricEdgeNodeMetric: "%T"`, v)
+	}
+}
+
+// SearchJudgeMetricsMetricsMetricConnectionPageInfo includes the requested fields of the GraphQL type PageInfo.
+type SearchJudgeMetricsMetricsMetricConnectionPageInfo struct {
+	HasNextPage bool    `json:"hasNextPage"`
+	EndCursor   *string `json:"endCursor"`
+}
+
+// GetHasNextPage returns SearchJudgeMetricsMetricsMetricConnectionPageInfo.HasNextPage, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionPageInfo) GetHasNextPage() bool {
+	return v.HasNextPage
+}
+
+// GetEndCursor returns SearchJudgeMetricsMetricsMetricConnectionPageInfo.EndCursor, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsMetricsMetricConnectionPageInfo) GetEndCursor() *string {
+	return v.EndCursor
+}
+
+// SearchJudgeMetricsResponse is returned by SearchJudgeMetrics on success.
+type SearchJudgeMetricsResponse struct {
+	Metrics SearchJudgeMetricsMetricsMetricConnection `json:"metrics"`
+}
+
+// GetMetrics returns SearchJudgeMetricsResponse.Metrics, and is useful for accessing the field via an interface.
+func (v *SearchJudgeMetricsResponse) GetMetrics() SearchJudgeMetricsMetricsMetricConnection {
+	return v.Metrics
+}
+
+// SkillDetails includes the GraphQL fields of Skill requested by the fragment SkillDetails.
+// The GraphQL type's documentation follows.
+//
+// A Skill is a set of instructions an agent loads when a task calls for them,
+// with the files those instructions refer to. An agent's prompt lists the
+// declared name and description of each of its skills, and the agent loads the
+// rest with tools.
+type SkillDetails struct {
+	Id string `json:"id"`
+	// The skill's own name, unique across skills. It lets two skills come from
+	// folders that declare the same name, such as two copies of one skill.
+	Name string `json:"name"`
+	// The name the skill's SKILL.md declares. The agent knows the skill by it, so
+	// an agent can't use two skills with the same declared name.
+	DeclaredName string `json:"declaredName"`
+	// Tells the agent when to use the skill.
+	Description string `json:"description"`
+	// The body of SKILL.md, after its front matter.
+	Instructions string `json:"instructions"`
+	// Every file of the skill as it was written, SKILL.md among them.
+	Files     []SkillDetailsFilesSkillFile `json:"files"`
+	CreatedAt string                       `json:"createdAt"`
+	UpdatedAt string                       `json:"updatedAt"`
+}
+
+// GetId returns SkillDetails.Id, and is useful for accessing the field via an interface.
+func (v *SkillDetails) GetId() string { return v.Id }
+
+// GetName returns SkillDetails.Name, and is useful for accessing the field via an interface.
+func (v *SkillDetails) GetName() string { return v.Name }
+
+// GetDeclaredName returns SkillDetails.DeclaredName, and is useful for accessing the field via an interface.
+func (v *SkillDetails) GetDeclaredName() string { return v.DeclaredName }
+
+// GetDescription returns SkillDetails.Description, and is useful for accessing the field via an interface.
+func (v *SkillDetails) GetDescription() string { return v.Description }
+
+// GetInstructions returns SkillDetails.Instructions, and is useful for accessing the field via an interface.
+func (v *SkillDetails) GetInstructions() string { return v.Instructions }
+
+// GetFiles returns SkillDetails.Files, and is useful for accessing the field via an interface.
+func (v *SkillDetails) GetFiles() []SkillDetailsFilesSkillFile { return v.Files }
+
+// GetCreatedAt returns SkillDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *SkillDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns SkillDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *SkillDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// SkillDetailsFilesSkillFile includes the requested fields of the GraphQL type SkillFile.
+type SkillDetailsFilesSkillFile struct {
+	// The path of the file within the skill folder.
+	Path string `json:"path"`
+	// Read only when asked for, so listing files does not read their content.
+	Content string `json:"content"`
+}
+
+// GetPath returns SkillDetailsFilesSkillFile.Path, and is useful for accessing the field via an interface.
+func (v *SkillDetailsFilesSkillFile) GetPath() string { return v.Path }
+
+// GetContent returns SkillDetailsFilesSkillFile.Content, and is useful for accessing the field via an interface.
+func (v *SkillDetailsFilesSkillFile) GetContent() string { return v.Content }
 
 // TaskDefinitionDetails includes the GraphQL fields of TaskDefinition requested by the fragment TaskDefinitionDetails.
 // The GraphQL type's documentation follows.
@@ -5493,6 +5793,45 @@ func (v *TaskDefinitionDetails) GetCreatedAt() string { return v.CreatedAt }
 
 // GetUpdatedAt returns TaskDefinitionDetails.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *TaskDefinitionDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// What a model returns of its thinking. Each provider accepts its own subset.
+type ThinkingDisplay string
+
+const (
+	// Summaries of the reasoning, with any progress updates mixed in.
+	ThinkingDisplaySummarized ThinkingDisplay = "SUMMARIZED"
+	// Only the progress updates the model writes between tool calls. Reasoning stays hidden.
+	ThinkingDisplayUpdates ThinkingDisplay = "UPDATES"
+	// Nothing. Thinking blocks come back empty.
+	ThinkingDisplayOmitted ThinkingDisplay = "OMITTED"
+)
+
+var AllThinkingDisplay = []ThinkingDisplay{
+	ThinkingDisplaySummarized,
+	ThinkingDisplayUpdates,
+	ThinkingDisplayOmitted,
+}
+
+// How a model thinks. Each provider accepts its own subset.
+type ThinkingType string
+
+const (
+	// The model decides whether and how much to think.
+	ThinkingTypeAdaptive ThinkingType = "ADAPTIVE"
+	// The model thinks within thinkingBudgetTokens.
+	ThinkingTypeEnabled ThinkingType = "ENABLED"
+	// The model does not think.
+	ThinkingTypeDisabled ThinkingType = "DISABLED"
+	// The model does no up-front thinking but writes progress updates between tool calls.
+	ThinkingTypeBetweenTools ThinkingType = "BETWEEN_TOOLS"
+)
+
+var AllThinkingType = []ThinkingType{
+	ThinkingTypeAdaptive,
+	ThinkingTypeEnabled,
+	ThinkingTypeDisabled,
+	ThinkingTypeBetweenTools,
+}
 
 // Tool filter shape shared by all per-agent tool-provider associations
 // (MCP connections, installed particles). NONE = all tools exposed; LIST =
@@ -5572,202 +5911,6 @@ func (v *UpdateMcpConnection) GetBasicCredentials() *McpConnectionBasicCredentia
 // GetHeaderCredentials returns UpdateMcpConnection.HeaderCredentials, and is useful for accessing the field via an interface.
 func (v *UpdateMcpConnection) GetHeaderCredentials() *McpConnectionHeaderCredentials {
 	return v.HeaderCredentials
-}
-
-// UserMetricDetails includes the GraphQL fields of UserMetric requested by the fragment UserMetricDetails.
-type UserMetricDetails struct {
-	Id          string                                        `json:"id"`
-	Name        string                                        `json:"name"`
-	Description *string                                       `json:"description"`
-	Prompt      string                                        `json:"prompt"`
-	Complexity  ModelComplexity                               `json:"complexity"`
-	Examples    []UserMetricDetailsExamplesScoreExample       `json:"examples"`
-	InputFields []UserMetricDetailsInputFieldsJudgeInputField `json:"inputFields"`
-	CreatedAt   string                                        `json:"createdAt"`
-	UpdatedAt   string                                        `json:"updatedAt"`
-}
-
-// GetId returns UserMetricDetails.Id, and is useful for accessing the field via an interface.
-func (v *UserMetricDetails) GetId() string { return v.Id }
-
-// GetName returns UserMetricDetails.Name, and is useful for accessing the field via an interface.
-func (v *UserMetricDetails) GetName() string { return v.Name }
-
-// GetDescription returns UserMetricDetails.Description, and is useful for accessing the field via an interface.
-func (v *UserMetricDetails) GetDescription() *string { return v.Description }
-
-// GetPrompt returns UserMetricDetails.Prompt, and is useful for accessing the field via an interface.
-func (v *UserMetricDetails) GetPrompt() string { return v.Prompt }
-
-// GetComplexity returns UserMetricDetails.Complexity, and is useful for accessing the field via an interface.
-func (v *UserMetricDetails) GetComplexity() ModelComplexity { return v.Complexity }
-
-// GetExamples returns UserMetricDetails.Examples, and is useful for accessing the field via an interface.
-func (v *UserMetricDetails) GetExamples() []UserMetricDetailsExamplesScoreExample { return v.Examples }
-
-// GetInputFields returns UserMetricDetails.InputFields, and is useful for accessing the field via an interface.
-func (v *UserMetricDetails) GetInputFields() []UserMetricDetailsInputFieldsJudgeInputField {
-	return v.InputFields
-}
-
-// GetCreatedAt returns UserMetricDetails.CreatedAt, and is useful for accessing the field via an interface.
-func (v *UserMetricDetails) GetCreatedAt() string { return v.CreatedAt }
-
-// GetUpdatedAt returns UserMetricDetails.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *UserMetricDetails) GetUpdatedAt() string { return v.UpdatedAt }
-
-// UserMetricDetailsExamplesScoreExample includes the requested fields of the GraphQL type ScoreExample.
-type UserMetricDetailsExamplesScoreExample struct {
-	ScoreExampleDetails `json:"-"`
-}
-
-// GetRating returns UserMetricDetailsExamplesScoreExample.Rating, and is useful for accessing the field via an interface.
-func (v *UserMetricDetailsExamplesScoreExample) GetRating() int { return v.ScoreExampleDetails.Rating }
-
-// GetScenario returns UserMetricDetailsExamplesScoreExample.Scenario, and is useful for accessing the field via an interface.
-func (v *UserMetricDetailsExamplesScoreExample) GetScenario() string {
-	return v.ScoreExampleDetails.Scenario
-}
-
-// GetJudgment returns UserMetricDetailsExamplesScoreExample.Judgment, and is useful for accessing the field via an interface.
-func (v *UserMetricDetailsExamplesScoreExample) GetJudgment() string {
-	return v.ScoreExampleDetails.Judgment
-}
-
-func (v *UserMetricDetailsExamplesScoreExample) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*UserMetricDetailsExamplesScoreExample
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.UserMetricDetailsExamplesScoreExample = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(
-		b, &v.ScoreExampleDetails)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type __premarshalUserMetricDetailsExamplesScoreExample struct {
-	Rating int `json:"rating"`
-
-	Scenario string `json:"scenario"`
-
-	Judgment string `json:"judgment"`
-}
-
-func (v *UserMetricDetailsExamplesScoreExample) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *UserMetricDetailsExamplesScoreExample) __premarshalJSON() (*__premarshalUserMetricDetailsExamplesScoreExample, error) {
-	var retval __premarshalUserMetricDetailsExamplesScoreExample
-
-	retval.Rating = v.ScoreExampleDetails.Rating
-	retval.Scenario = v.ScoreExampleDetails.Scenario
-	retval.Judgment = v.ScoreExampleDetails.Judgment
-	return &retval, nil
-}
-
-// UserMetricDetailsInputFieldsJudgeInputField includes the requested fields of the GraphQL type JudgeInputField.
-type UserMetricDetailsInputFieldsJudgeInputField struct {
-	JudgeInputFieldDetails `json:"-"`
-}
-
-// GetName returns UserMetricDetailsInputFieldsJudgeInputField.Name, and is useful for accessing the field via an interface.
-func (v *UserMetricDetailsInputFieldsJudgeInputField) GetName() string {
-	return v.JudgeInputFieldDetails.Name
-}
-
-// GetLabel returns UserMetricDetailsInputFieldsJudgeInputField.Label, and is useful for accessing the field via an interface.
-func (v *UserMetricDetailsInputFieldsJudgeInputField) GetLabel() string {
-	return v.JudgeInputFieldDetails.Label
-}
-
-// GetDescription returns UserMetricDetailsInputFieldsJudgeInputField.Description, and is useful for accessing the field via an interface.
-func (v *UserMetricDetailsInputFieldsJudgeInputField) GetDescription() string {
-	return v.JudgeInputFieldDetails.Description
-}
-
-// GetType returns UserMetricDetailsInputFieldsJudgeInputField.Type, and is useful for accessing the field via an interface.
-func (v *UserMetricDetailsInputFieldsJudgeInputField) GetType() JudgeInputFieldType {
-	return v.JudgeInputFieldDetails.Type
-}
-
-// GetRequired returns UserMetricDetailsInputFieldsJudgeInputField.Required, and is useful for accessing the field via an interface.
-func (v *UserMetricDetailsInputFieldsJudgeInputField) GetRequired() bool {
-	return v.JudgeInputFieldDetails.Required
-}
-
-func (v *UserMetricDetailsInputFieldsJudgeInputField) UnmarshalJSON(b []byte) error {
-
-	if string(b) == "null" {
-		return nil
-	}
-
-	var firstPass struct {
-		*UserMetricDetailsInputFieldsJudgeInputField
-		graphql.NoUnmarshalJSON
-	}
-	firstPass.UserMetricDetailsInputFieldsJudgeInputField = v
-
-	err := json.Unmarshal(b, &firstPass)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(
-		b, &v.JudgeInputFieldDetails)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type __premarshalUserMetricDetailsInputFieldsJudgeInputField struct {
-	Name string `json:"name"`
-
-	Label string `json:"label"`
-
-	Description string `json:"description"`
-
-	Type JudgeInputFieldType `json:"type"`
-
-	Required bool `json:"required"`
-}
-
-func (v *UserMetricDetailsInputFieldsJudgeInputField) MarshalJSON() ([]byte, error) {
-	premarshaled, err := v.__premarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(premarshaled)
-}
-
-func (v *UserMetricDetailsInputFieldsJudgeInputField) __premarshalJSON() (*__premarshalUserMetricDetailsInputFieldsJudgeInputField, error) {
-	var retval __premarshalUserMetricDetailsInputFieldsJudgeInputField
-
-	retval.Name = v.JudgeInputFieldDetails.Name
-	retval.Label = v.JudgeInputFieldDetails.Label
-	retval.Description = v.JudgeInputFieldDetails.Description
-	retval.Type = v.JudgeInputFieldDetails.Type
-	retval.Required = v.JudgeInputFieldDetails.Required
-	return &retval, nil
 }
 
 // WebhookDestinationDetails includes the GraphQL fields of WebhookDestination requested by the fragment WebhookDestinationDetails.
@@ -5922,6 +6065,14 @@ type __CreateInstalledParticleInput struct {
 // GetInput returns __CreateInstalledParticleInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateInstalledParticleInput) GetInput() *CreateInstalledParticleInput { return v.Input }
 
+// __CreateJudgeMetricInput is used internally by genqlient
+type __CreateJudgeMetricInput struct {
+	Input NewJudgeMetric `json:"input"`
+}
+
+// GetInput returns __CreateJudgeMetricInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateJudgeMetricInput) GetInput() NewJudgeMetric { return v.Input }
+
 // __CreateLinkInput is used internally by genqlient
 type __CreateLinkInput struct {
 	MeshId string   `json:"meshId"`
@@ -6022,6 +6173,14 @@ type __CreateRubricInput struct {
 // GetInput returns __CreateRubricInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateRubricInput) GetInput() NewRubric { return v.Input }
 
+// __CreateSkillInput is used internally by genqlient
+type __CreateSkillInput struct {
+	Input *NewSkill `json:"input"`
+}
+
+// GetInput returns __CreateSkillInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateSkillInput) GetInput() *NewSkill { return v.Input }
+
 // __CreateTaskDefinitionInput is used internally by genqlient
 type __CreateTaskDefinitionInput struct {
 	Input *NewTaskDefinition `json:"input"`
@@ -6029,14 +6188,6 @@ type __CreateTaskDefinitionInput struct {
 
 // GetInput returns __CreateTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateTaskDefinitionInput) GetInput() *NewTaskDefinition { return v.Input }
-
-// __CreateUserMetricInput is used internally by genqlient
-type __CreateUserMetricInput struct {
-	Input NewUserMetric `json:"input"`
-}
-
-// GetInput returns __CreateUserMetricInput.Input, and is useful for accessing the field via an interface.
-func (v *__CreateUserMetricInput) GetInput() NewUserMetric { return v.Input }
 
 // __CreateWebhookDestinationInput is used internally by genqlient
 type __CreateWebhookDestinationInput struct {
@@ -6105,6 +6256,14 @@ type __DeleteInstalledParticleInput struct {
 
 // GetId returns __DeleteInstalledParticleInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteInstalledParticleInput) GetId() string { return v.Id }
+
+// __DeleteJudgeMetricInput is used internally by genqlient
+type __DeleteJudgeMetricInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteJudgeMetricInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteJudgeMetricInput) GetId() string { return v.Id }
 
 // __DeleteLinkInput is used internally by genqlient
 type __DeleteLinkInput struct {
@@ -6186,6 +6345,14 @@ type __DeleteRubricInput struct {
 // GetId returns __DeleteRubricInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteRubricInput) GetId() string { return v.Id }
 
+// __DeleteSkillInput is used internally by genqlient
+type __DeleteSkillInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteSkillInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteSkillInput) GetId() string { return v.Id }
+
 // __DeleteTaskDefinitionInput is used internally by genqlient
 type __DeleteTaskDefinitionInput struct {
 	Id string `json:"id"`
@@ -6193,14 +6360,6 @@ type __DeleteTaskDefinitionInput struct {
 
 // GetId returns __DeleteTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteTaskDefinitionInput) GetId() string { return v.Id }
-
-// __DeleteUserMetricInput is used internally by genqlient
-type __DeleteUserMetricInput struct {
-	Id string `json:"id"`
-}
-
-// GetId returns __DeleteUserMetricInput.Id, and is useful for accessing the field via an interface.
-func (v *__DeleteUserMetricInput) GetId() string { return v.Id }
 
 // __DeleteWebhookDestinationInput is used internally by genqlient
 type __DeleteWebhookDestinationInput struct {
@@ -6242,6 +6401,14 @@ type __GetApiKeyInput struct {
 // GetId returns __GetApiKeyInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetApiKeyInput) GetId() string { return v.Id }
 
+// __GetComputedMetricInput is used internally by genqlient
+type __GetComputedMetricInput struct {
+	Key string `json:"key"`
+}
+
+// GetKey returns __GetComputedMetricInput.Key, and is useful for accessing the field via an interface.
+func (v *__GetComputedMetricInput) GetKey() string { return v.Key }
+
 // __GetEmbeddingProfileByProviderAndNameInput is used internally by genqlient
 type __GetEmbeddingProfileByProviderAndNameInput struct {
 	ProviderId string `json:"providerId"`
@@ -6277,6 +6444,14 @@ type __GetInstalledParticleInput struct {
 
 // GetId returns __GetInstalledParticleInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetInstalledParticleInput) GetId() string { return v.Id }
+
+// __GetJudgeMetricInput is used internally by genqlient
+type __GetJudgeMetricInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetJudgeMetricInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetJudgeMetricInput) GetId() string { return v.Id }
 
 // __GetMcpConnectionInput is used internally by genqlient
 type __GetMcpConnectionInput struct {
@@ -6394,13 +6569,21 @@ type __GetRubricInput struct {
 // GetId returns __GetRubricInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetRubricInput) GetId() string { return v.Id }
 
-// __GetSystemMetricInput is used internally by genqlient
-type __GetSystemMetricInput struct {
-	Key string `json:"key"`
+// __GetSkillByNameInput is used internally by genqlient
+type __GetSkillByNameInput struct {
+	Name string `json:"name"`
 }
 
-// GetKey returns __GetSystemMetricInput.Key, and is useful for accessing the field via an interface.
-func (v *__GetSystemMetricInput) GetKey() string { return v.Key }
+// GetName returns __GetSkillByNameInput.Name, and is useful for accessing the field via an interface.
+func (v *__GetSkillByNameInput) GetName() string { return v.Name }
+
+// __GetSkillInput is used internally by genqlient
+type __GetSkillInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetSkillInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetSkillInput) GetId() string { return v.Id }
 
 // __GetTaskDefinitionByNameInput is used internally by genqlient
 type __GetTaskDefinitionByNameInput struct {
@@ -6417,14 +6600,6 @@ type __GetTaskDefinitionInput struct {
 
 // GetId returns __GetTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetTaskDefinitionInput) GetId() string { return v.Id }
-
-// __GetUserMetricInput is used internally by genqlient
-type __GetUserMetricInput struct {
-	Id string `json:"id"`
-}
-
-// GetId returns __GetUserMetricInput.Id, and is useful for accessing the field via an interface.
-func (v *__GetUserMetricInput) GetId() string { return v.Id }
 
 // __GetWebhookDestinationInput is used internally by genqlient
 type __GetWebhookDestinationInput struct {
@@ -6449,18 +6624,6 @@ type __GetWorkspaceInput struct {
 
 // GetId returns __GetWorkspaceInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetWorkspaceInput) GetId() string { return v.Id }
-
-// __ListSystemMetricsInput is used internally by genqlient
-type __ListSystemMetricsInput struct {
-	First int     `json:"first"`
-	After *string `json:"after,omitempty"`
-}
-
-// GetFirst returns __ListSystemMetricsInput.First, and is useful for accessing the field via an interface.
-func (v *__ListSystemMetricsInput) GetFirst() int { return v.First }
-
-// GetAfter returns __ListSystemMetricsInput.After, and is useful for accessing the field via an interface.
-func (v *__ListSystemMetricsInput) GetAfter() *string { return v.After }
 
 // __ModifyAgentInput is used internally by genqlient
 type __ModifyAgentInput struct {
@@ -6541,6 +6704,18 @@ type __ModifyInstalledParticleInput struct {
 
 // GetInput returns __ModifyInstalledParticleInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyInstalledParticleInput) GetInput() *UpdateInstalledParticleInput { return v.Input }
+
+// __ModifyJudgeMetricInput is used internally by genqlient
+type __ModifyJudgeMetricInput struct {
+	Id    string             `json:"id"`
+	Input *UpdateJudgeMetric `json:"input"`
+}
+
+// GetId returns __ModifyJudgeMetricInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyJudgeMetricInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyJudgeMetricInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyJudgeMetricInput) GetInput() *UpdateJudgeMetric { return v.Input }
 
 // __ModifyLinkInput is used internally by genqlient
 type __ModifyLinkInput struct {
@@ -6666,6 +6841,18 @@ func (v *__ModifyRubricInput) GetId() string { return v.Id }
 // GetInput returns __ModifyRubricInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyRubricInput) GetInput() *UpdateRubric { return v.Input }
 
+// __ModifySkillInput is used internally by genqlient
+type __ModifySkillInput struct {
+	Id    string       `json:"id"`
+	Input *UpdateSkill `json:"input"`
+}
+
+// GetId returns __ModifySkillInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifySkillInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifySkillInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifySkillInput) GetInput() *UpdateSkill { return v.Input }
+
 // __ModifyTaskDefinitionInput is used internally by genqlient
 type __ModifyTaskDefinitionInput struct {
 	Id    string                `json:"id"`
@@ -6677,18 +6864,6 @@ func (v *__ModifyTaskDefinitionInput) GetId() string { return v.Id }
 
 // GetInput returns __ModifyTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyTaskDefinitionInput) GetInput() *UpdateTaskDefinition { return v.Input }
-
-// __ModifyUserMetricInput is used internally by genqlient
-type __ModifyUserMetricInput struct {
-	Id    string            `json:"id"`
-	Input *UpdateUserMetric `json:"input"`
-}
-
-// GetId returns __ModifyUserMetricInput.Id, and is useful for accessing the field via an interface.
-func (v *__ModifyUserMetricInput) GetId() string { return v.Id }
-
-// GetInput returns __ModifyUserMetricInput.Input, and is useful for accessing the field via an interface.
-func (v *__ModifyUserMetricInput) GetInput() *UpdateUserMetric { return v.Input }
 
 // __ModifyWebhookDestinationInput is used internally by genqlient
 type __ModifyWebhookDestinationInput struct {
@@ -6721,6 +6896,22 @@ type __RevokeMcpConnectionTunnelKeyInput struct {
 
 // GetId returns __RevokeMcpConnectionTunnelKeyInput.Id, and is useful for accessing the field via an interface.
 func (v *__RevokeMcpConnectionTunnelKeyInput) GetId() string { return v.Id }
+
+// __SearchJudgeMetricsInput is used internally by genqlient
+type __SearchJudgeMetricsInput struct {
+	Query string  `json:"query"`
+	First int     `json:"first"`
+	After *string `json:"after,omitempty"`
+}
+
+// GetQuery returns __SearchJudgeMetricsInput.Query, and is useful for accessing the field via an interface.
+func (v *__SearchJudgeMetricsInput) GetQuery() string { return v.Query }
+
+// GetFirst returns __SearchJudgeMetricsInput.First, and is useful for accessing the field via an interface.
+func (v *__SearchJudgeMetricsInput) GetFirst() int { return v.First }
+
+// GetAfter returns __SearchJudgeMetricsInput.After, and is useful for accessing the field via an interface.
+func (v *__SearchJudgeMetricsInput) GetAfter() *string { return v.After }
 
 // The mutation executed by CreateAgent.
 const CreateAgent_Operation = `
@@ -6760,6 +6951,12 @@ fragment AgentDetails on Agent {
 		}
 		tasks {
 			taskDefinition {
+				id
+				name
+			}
+		}
+		skills {
+			skill {
 				id
 				name
 			}
@@ -7047,6 +7244,69 @@ func CreateInstalledParticle(
 	}
 
 	data_ = &CreateInstalledParticleResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateJudgeMetric.
+const CreateJudgeMetric_Operation = `
+mutation CreateJudgeMetric ($input: NewJudgeMetric!) {
+	createJudgeMetric(input: $input) {
+		... JudgeMetricDetails
+	}
+}
+fragment JudgeMetricDetails on JudgeMetric {
+	id
+	name
+	description
+	category
+	scope
+	prompt
+	complexity
+	examples {
+		... ScoreExampleDetails
+	}
+	inputFields {
+		... JudgeInputFieldDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment ScoreExampleDetails on ScoreExample {
+	rating
+	scenario
+	judgment
+}
+fragment JudgeInputFieldDetails on JudgeInputField {
+	name
+	label
+	description
+	type
+	required
+}
+`
+
+func CreateJudgeMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input NewJudgeMetric,
+) (data_ *CreateJudgeMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateJudgeMetric",
+		Query:  CreateJudgeMetric_Operation,
+		Variables: &__CreateJudgeMetricInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateJudgeMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -7504,6 +7764,8 @@ fragment ModelProfileDetails on ModelProfile {
 		topK
 		thinkingBudgetTokens
 		reasoningEffort
+		thinkingType
+		thinkingDisplay
 	}
 	createdAt
 	updatedAt
@@ -7674,28 +7936,25 @@ fragment RubricDetails on Rubric {
 	updatedAt
 	metrics {
 		__typename
-		... on RubricUserMetric {
-			userEntryID: id
-			userMetric {
+		... on RubricJudgeMetric {
+			judgeEntryID: id
+			judgeMetric {
 				id
 			}
-			userTrialCount: trialCount
+			trialCount
 			complexity
 			inputValues
-			weight
+			judgeWeight: weight
 		}
-		... on RubricSystemMetric {
-			systemEntryID: id
-			systemMetric {
+		... on RubricComputedMetric {
+			computedEntryID: id
+			computedMetric {
 				key
 			}
-			systemTrialCount: trialCount
-			complexity
-			inputValues
 			scoreFloor
 			scoreCeiling
 			lowerIsBetter
-			weight
+			computedWeight: weight
 		}
 	}
 }
@@ -7715,6 +7974,53 @@ func CreateRubric(
 	}
 
 	data_ = &CreateRubricResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateSkill.
+const CreateSkill_Operation = `
+mutation CreateSkill ($input: NewSkill!) {
+	createSkill(input: $input) {
+		... SkillDetails
+	}
+}
+fragment SkillDetails on Skill {
+	id
+	name
+	declaredName
+	description
+	instructions
+	files {
+		path
+		content
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func CreateSkill(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewSkill,
+) (data_ *CreateSkillResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateSkill",
+		Query:  CreateSkill_Operation,
+		Variables: &__CreateSkillInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateSkillResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -7758,67 +8064,6 @@ func CreateTaskDefinition(
 	}
 
 	data_ = &CreateTaskDefinitionResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
-// The mutation executed by CreateUserMetric.
-const CreateUserMetric_Operation = `
-mutation CreateUserMetric ($input: NewUserMetric!) {
-	createUserMetric(input: $input) {
-		... UserMetricDetails
-	}
-}
-fragment UserMetricDetails on UserMetric {
-	id
-	name
-	description
-	prompt
-	complexity
-	examples {
-		... ScoreExampleDetails
-	}
-	inputFields {
-		... JudgeInputFieldDetails
-	}
-	createdAt
-	updatedAt
-}
-fragment ScoreExampleDetails on ScoreExample {
-	rating
-	scenario
-	judgment
-}
-fragment JudgeInputFieldDetails on JudgeInputField {
-	name
-	label
-	description
-	type
-	required
-}
-`
-
-func CreateUserMetric(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	input NewUserMetric,
-) (data_ *CreateUserMetricResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "CreateUserMetric",
-		Query:  CreateUserMetric_Operation,
-		Variables: &__CreateUserMetricInput{
-			Input: input,
-		},
-	}
-
-	data_ = &CreateUserMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -8113,6 +8358,40 @@ func DeleteInstalledParticle(
 	}
 
 	data_ = &DeleteInstalledParticleResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteJudgeMetric.
+const DeleteJudgeMetric_Operation = `
+mutation DeleteJudgeMetric ($id: JudgeMetricID!) {
+	deleteJudgeMetrics(ids: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteJudgeMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteJudgeMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteJudgeMetric",
+		Query:  DeleteJudgeMetric_Operation,
+		Variables: &__DeleteJudgeMetricInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteJudgeMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -8433,8 +8712,8 @@ func DeleteModelSet(
 // The mutation executed by DeleteRubric.
 const DeleteRubric_Operation = `
 mutation DeleteRubric ($id: RubricID!) {
-	deleteRubric(id: $id) {
-		id
+	deleteRubrics(ids: [$id]) {
+		ids
 	}
 }
 `
@@ -8453,6 +8732,40 @@ func DeleteRubric(
 	}
 
 	data_ = &DeleteRubricResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteSkill.
+const DeleteSkill_Operation = `
+mutation DeleteSkill ($id: SkillID!) {
+	deleteSkills(skillIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteSkill(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteSkillResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteSkill",
+		Query:  DeleteSkill_Operation,
+		Variables: &__DeleteSkillInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteSkillResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -8487,40 +8800,6 @@ func DeleteTaskDefinition(
 	}
 
 	data_ = &DeleteTaskDefinitionResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
-// The mutation executed by DeleteUserMetric.
-const DeleteUserMetric_Operation = `
-mutation DeleteUserMetric ($id: UserMetricID!) {
-	deleteUserMetric(id: $id) {
-		id
-	}
-}
-`
-
-func DeleteUserMetric(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	id string,
-) (data_ *DeleteUserMetricResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "DeleteUserMetric",
-		Query:  DeleteUserMetric_Operation,
-		Variables: &__DeleteUserMetricInput{
-			Id: id,
-		},
-	}
-
-	data_ = &DeleteUserMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -8640,6 +8919,12 @@ fragment AgentDetails on Agent {
 				name
 			}
 		}
+		skills {
+			skill {
+				id
+				name
+			}
+		}
 		memoryInteractionProfiles {
 			id
 			name
@@ -8749,6 +9034,50 @@ func GetApiKey(
 	}
 
 	data_ = &GetApiKeyResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetComputedMetric.
+const GetComputedMetric_Operation = `
+query GetComputedMetric ($key: String!) {
+	computedMetric(key: $key) {
+		... ComputedMetricDetails
+	}
+}
+fragment ComputedMetricDetails on ComputedMetric {
+	key
+	name
+	description
+	category
+	collectionScope
+	summarySource
+	aggregation
+	unit
+}
+`
+
+func GetComputedMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	key string,
+) (data_ *GetComputedMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetComputedMetric",
+		Query:  GetComputedMetric_Operation,
+		Variables: &__GetComputedMetricInput{
+			Key: key,
+		},
+	}
+
+	data_ = &GetComputedMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -8951,6 +9280,69 @@ func GetInstalledParticle(
 	}
 
 	data_ = &GetInstalledParticleResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetJudgeMetric.
+const GetJudgeMetric_Operation = `
+query GetJudgeMetric ($id: JudgeMetricID!) {
+	judgeMetric(id: $id) {
+		... JudgeMetricDetails
+	}
+}
+fragment JudgeMetricDetails on JudgeMetric {
+	id
+	name
+	description
+	category
+	scope
+	prompt
+	complexity
+	examples {
+		... ScoreExampleDetails
+	}
+	inputFields {
+		... JudgeInputFieldDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment ScoreExampleDetails on ScoreExample {
+	rating
+	scenario
+	judgment
+}
+fragment JudgeInputFieldDetails on JudgeInputField {
+	name
+	label
+	description
+	type
+	required
+}
+`
+
+func GetJudgeMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetJudgeMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetJudgeMetric",
+		Query:  GetJudgeMetric_Operation,
+		Variables: &__GetJudgeMetricInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetJudgeMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -9504,6 +9896,8 @@ fragment ModelProfileDetails on ModelProfile {
 		topK
 		thinkingBudgetTokens
 		reasoningEffort
+		thinkingType
+		thinkingDisplay
 	}
 	createdAt
 	updatedAt
@@ -9558,6 +9952,8 @@ fragment ModelProfileDetails on ModelProfile {
 		topK
 		thinkingBudgetTokens
 		reasoningEffort
+		thinkingType
+		thinkingDisplay
 	}
 	createdAt
 	updatedAt
@@ -9804,28 +10200,25 @@ fragment RubricDetails on Rubric {
 	updatedAt
 	metrics {
 		__typename
-		... on RubricUserMetric {
-			userEntryID: id
-			userMetric {
+		... on RubricJudgeMetric {
+			judgeEntryID: id
+			judgeMetric {
 				id
 			}
-			userTrialCount: trialCount
+			trialCount
 			complexity
 			inputValues
-			weight
+			judgeWeight: weight
 		}
-		... on RubricSystemMetric {
-			systemEntryID: id
-			systemMetric {
+		... on RubricComputedMetric {
+			computedEntryID: id
+			computedMetric {
 				key
 			}
-			systemTrialCount: trialCount
-			complexity
-			inputValues
 			scoreFloor
 			scoreCeiling
 			lowerIsBetter
-			weight
+			computedWeight: weight
 		}
 	}
 }
@@ -9856,55 +10249,89 @@ func GetRubric(
 	return data_, err_
 }
 
-// The query executed by GetSystemMetric.
-const GetSystemMetric_Operation = `
-query GetSystemMetric ($key: String!) {
-	systemMetric(key: $key) {
-		... SystemMetricDetails
+// The query executed by GetSkill.
+const GetSkill_Operation = `
+query GetSkill ($id: SkillID!) {
+	skill(id: $id) {
+		... SkillDetails
 	}
 }
-fragment SystemMetricDetails on SystemMetric {
-	key
-	type
+fragment SkillDetails on Skill {
+	id
 	name
+	declaredName
 	description
-	complexity
-	prompt
-	examples {
-		... ScoreExampleDetails
+	instructions
+	files {
+		path
+		content
 	}
-	inputFields {
-		... JudgeInputFieldDetails
-	}
-}
-fragment ScoreExampleDetails on ScoreExample {
-	rating
-	scenario
-	judgment
-}
-fragment JudgeInputFieldDetails on JudgeInputField {
-	name
-	label
-	description
-	type
-	required
+	createdAt
+	updatedAt
 }
 `
 
-func GetSystemMetric(
+func GetSkill(
 	ctx_ context.Context,
 	client_ graphql.Client,
-	key string,
-) (data_ *GetSystemMetricResponse, err_ error) {
+	id string,
+) (data_ *GetSkillResponse, err_ error) {
 	req_ := &graphql.Request{
-		OpName: "GetSystemMetric",
-		Query:  GetSystemMetric_Operation,
-		Variables: &__GetSystemMetricInput{
-			Key: key,
+		OpName: "GetSkill",
+		Query:  GetSkill_Operation,
+		Variables: &__GetSkillInput{
+			Id: id,
 		},
 	}
 
-	data_ = &GetSystemMetricResponse{}
+	data_ = &GetSkillResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetSkillByName.
+const GetSkillByName_Operation = `
+query GetSkillByName ($name: String!) {
+	skillByName(name: $name) {
+		... SkillDetails
+	}
+}
+fragment SkillDetails on Skill {
+	id
+	name
+	declaredName
+	description
+	instructions
+	files {
+		path
+		content
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func GetSkillByName(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	name string,
+) (data_ *GetSkillByNameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetSkillByName",
+		Query:  GetSkillByName_Operation,
+		Variables: &__GetSkillByNameInput{
+			Name: name,
+		},
+	}
+
+	data_ = &GetSkillByNameResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -9991,67 +10418,6 @@ func GetTaskDefinitionByName(
 	}
 
 	data_ = &GetTaskDefinitionByNameResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
-// The query executed by GetUserMetric.
-const GetUserMetric_Operation = `
-query GetUserMetric ($id: UserMetricID!) {
-	userMetric(id: $id) {
-		... UserMetricDetails
-	}
-}
-fragment UserMetricDetails on UserMetric {
-	id
-	name
-	description
-	prompt
-	complexity
-	examples {
-		... ScoreExampleDetails
-	}
-	inputFields {
-		... JudgeInputFieldDetails
-	}
-	createdAt
-	updatedAt
-}
-fragment ScoreExampleDetails on ScoreExample {
-	rating
-	scenario
-	judgment
-}
-fragment JudgeInputFieldDetails on JudgeInputField {
-	name
-	label
-	description
-	type
-	required
-}
-`
-
-func GetUserMetric(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	id string,
-) (data_ *GetUserMetricResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "GetUserMetric",
-		Query:  GetUserMetric_Operation,
-		Variables: &__GetUserMetricInput{
-			Id: id,
-		},
-	}
-
-	data_ = &GetUserMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -10192,80 +10558,6 @@ func GetWorkspaceByName(
 	return data_, err_
 }
 
-// The query executed by ListSystemMetrics.
-const ListSystemMetrics_Operation = `
-query ListSystemMetrics ($first: Int!, $after: String) {
-	metrics(source: SYSTEM, first: $first, after: $after) {
-		totalCount
-		pageInfo {
-			hasNextPage
-			endCursor
-		}
-		edges {
-			node {
-				__typename
-				... on SystemMetric {
-					... SystemMetricDetails
-				}
-			}
-		}
-	}
-}
-fragment SystemMetricDetails on SystemMetric {
-	key
-	type
-	name
-	description
-	complexity
-	prompt
-	examples {
-		... ScoreExampleDetails
-	}
-	inputFields {
-		... JudgeInputFieldDetails
-	}
-}
-fragment ScoreExampleDetails on ScoreExample {
-	rating
-	scenario
-	judgment
-}
-fragment JudgeInputFieldDetails on JudgeInputField {
-	name
-	label
-	description
-	type
-	required
-}
-`
-
-func ListSystemMetrics(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	first int,
-	after *string,
-) (data_ *ListSystemMetricsResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "ListSystemMetrics",
-		Query:  ListSystemMetrics_Operation,
-		Variables: &__ListSystemMetricsInput{
-			First: first,
-			After: after,
-		},
-	}
-
-	data_ = &ListSystemMetricsResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
 // The mutation executed by ModifyAgent.
 const ModifyAgent_Operation = `
 mutation ModifyAgent ($id: AgentID!, $input: UpdateAgent!) {
@@ -10304,6 +10596,12 @@ fragment AgentDetails on Agent {
 		}
 		tasks {
 			taskDefinition {
+				id
+				name
+			}
+		}
+		skills {
+			skill {
 				id
 				name
 			}
@@ -10596,6 +10894,71 @@ func ModifyInstalledParticle(
 	}
 
 	data_ = &ModifyInstalledParticleResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyJudgeMetric.
+const ModifyJudgeMetric_Operation = `
+mutation ModifyJudgeMetric ($id: JudgeMetricID!, $input: UpdateJudgeMetric!) {
+	updateJudgeMetric(id: $id, input: $input) {
+		... JudgeMetricDetails
+	}
+}
+fragment JudgeMetricDetails on JudgeMetric {
+	id
+	name
+	description
+	category
+	scope
+	prompt
+	complexity
+	examples {
+		... ScoreExampleDetails
+	}
+	inputFields {
+		... JudgeInputFieldDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment ScoreExampleDetails on ScoreExample {
+	rating
+	scenario
+	judgment
+}
+fragment JudgeInputFieldDetails on JudgeInputField {
+	name
+	label
+	description
+	type
+	required
+}
+`
+
+func ModifyJudgeMetric(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateJudgeMetric,
+) (data_ *ModifyJudgeMetricResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyJudgeMetric",
+		Query:  ModifyJudgeMetric_Operation,
+		Variables: &__ModifyJudgeMetricInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyJudgeMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -11018,6 +11381,8 @@ fragment ModelProfileDetails on ModelProfile {
 		topK
 		thinkingBudgetTokens
 		reasoningEffort
+		thinkingType
+		thinkingDisplay
 	}
 	createdAt
 	updatedAt
@@ -11192,28 +11557,25 @@ fragment RubricDetails on Rubric {
 	updatedAt
 	metrics {
 		__typename
-		... on RubricUserMetric {
-			userEntryID: id
-			userMetric {
+		... on RubricJudgeMetric {
+			judgeEntryID: id
+			judgeMetric {
 				id
 			}
-			userTrialCount: trialCount
+			trialCount
 			complexity
 			inputValues
-			weight
+			judgeWeight: weight
 		}
-		... on RubricSystemMetric {
-			systemEntryID: id
-			systemMetric {
+		... on RubricComputedMetric {
+			computedEntryID: id
+			computedMetric {
 				key
 			}
-			systemTrialCount: trialCount
-			complexity
-			inputValues
 			scoreFloor
 			scoreCeiling
 			lowerIsBetter
-			weight
+			computedWeight: weight
 		}
 	}
 }
@@ -11235,6 +11597,55 @@ func ModifyRubric(
 	}
 
 	data_ = &ModifyRubricResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifySkill.
+const ModifySkill_Operation = `
+mutation ModifySkill ($id: SkillID!, $input: UpdateSkill!) {
+	updateSkill(skillID: $id, input: $input) {
+		... SkillDetails
+	}
+}
+fragment SkillDetails on Skill {
+	id
+	name
+	declaredName
+	description
+	instructions
+	files {
+		path
+		content
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func ModifySkill(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateSkill,
+) (data_ *ModifySkillResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifySkill",
+		Query:  ModifySkill_Operation,
+		Variables: &__ModifySkillInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifySkillResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -11280,69 +11691,6 @@ func ModifyTaskDefinition(
 	}
 
 	data_ = &ModifyTaskDefinitionResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
-// The mutation executed by ModifyUserMetric.
-const ModifyUserMetric_Operation = `
-mutation ModifyUserMetric ($id: UserMetricID!, $input: UpdateUserMetric!) {
-	updateUserMetric(id: $id, input: $input) {
-		... UserMetricDetails
-	}
-}
-fragment UserMetricDetails on UserMetric {
-	id
-	name
-	description
-	prompt
-	complexity
-	examples {
-		... ScoreExampleDetails
-	}
-	inputFields {
-		... JudgeInputFieldDetails
-	}
-	createdAt
-	updatedAt
-}
-fragment ScoreExampleDetails on ScoreExample {
-	rating
-	scenario
-	judgment
-}
-fragment JudgeInputFieldDetails on JudgeInputField {
-	name
-	label
-	description
-	type
-	required
-}
-`
-
-func ModifyUserMetric(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	id string,
-	input *UpdateUserMetric,
-) (data_ *ModifyUserMetricResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "ModifyUserMetric",
-		Query:  ModifyUserMetric_Operation,
-		Variables: &__ModifyUserMetricInput{
-			Id:    id,
-			Input: input,
-		},
-	}
-
-	data_ = &ModifyUserMetricResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -11477,6 +11825,86 @@ func RevokeMcpConnectionTunnelKey(
 	}
 
 	data_ = &RevokeMcpConnectionTunnelKeyResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by SearchJudgeMetrics.
+const SearchJudgeMetrics_Operation = `
+query SearchJudgeMetrics ($query: String!, $first: Int!, $after: String) {
+	metrics(type: JUDGED, query: $query, first: $first, after: $after) {
+		pageInfo {
+			hasNextPage
+			endCursor
+		}
+		edges {
+			node {
+				__typename
+				... on JudgeMetric {
+					... JudgeMetricDetails
+				}
+			}
+		}
+	}
+}
+fragment JudgeMetricDetails on JudgeMetric {
+	id
+	name
+	description
+	category
+	scope
+	prompt
+	complexity
+	examples {
+		... ScoreExampleDetails
+	}
+	inputFields {
+		... JudgeInputFieldDetails
+	}
+	createdAt
+	updatedAt
+}
+fragment ScoreExampleDetails on ScoreExample {
+	rating
+	scenario
+	judgment
+}
+fragment JudgeInputFieldDetails on JudgeInputField {
+	name
+	label
+	description
+	type
+	required
+}
+`
+
+// The API finds metrics by text, not by name, so a lookup by name searches and
+// keeps the exact match.
+func SearchJudgeMetrics(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	query string,
+	first int,
+	after *string,
+) (data_ *SearchJudgeMetricsResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "SearchJudgeMetrics",
+		Query:  SearchJudgeMetrics_Operation,
+		Variables: &__SearchJudgeMetricsInput{
+			Query: query,
+			First: first,
+			After: after,
+		},
+	}
+
+	data_ = &SearchJudgeMetricsResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

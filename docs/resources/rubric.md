@@ -35,12 +35,12 @@ A set of metrics a conversation is scored against. Attach one to a mesh with `pa
 
 Optional:
 
-- `complexity` (String) Model complexity this metric judges at, overriding the metric's own.
-- `input_values` (String) Values for the metric's input fields, as a JSON object. Only a metric a model judges takes them.
+- `complexity` (String) Model complexity this metric judges at, overriding the metric's own. Only a judge metric takes it.
+- `computed_metric_key` (String) A metric the product computes, such as latency, by key.
+- `input_values` (String) Values for the metric's input fields, as a JSON object. Only a judge metric takes them.
+- `judge_metric_id` (String) A metric a model judges. Give this or `computed_metric_key`, not both.
 - `lower_is_better` (Boolean) Whether a lower score is the better one. Only a computed metric takes it.
 - `score_ceiling` (Number) Highest score a computed metric can report. Only a computed metric takes it.
 - `score_floor` (Number) Lowest score a computed metric can report. Only a computed metric takes it.
-- `system_metric_key` (String) A metric that came with the product, by key.
-- `trial_count` (Number) How many times a judged metric is scored, to even out disagreement. A judged metric requires it.
-- `user_metric_id` (String) A metric of your own. Give this or `system_metric_key`, not both.
+- `trial_count` (Number) How many times a judge metric is scored, to even out disagreement. Only a judge metric takes it; a computed metric reads back 1.
 - `weight` (Number) How much this metric counts towards the rubric's score.

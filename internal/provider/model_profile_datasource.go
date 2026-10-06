@@ -68,6 +68,14 @@ func (d *ModelProfileDataSource) Schema(ctx context.Context, req datasource.Sche
 						MarkdownDescription: "How hard the model should think",
 						Computed:            true,
 					},
+					"thinking_type": schema.StringAttribute{
+						MarkdownDescription: "How the model thinks",
+						Computed:            true,
+					},
+					"thinking_display": schema.StringAttribute{
+						MarkdownDescription: "What the model returns of its thinking",
+						Computed:            true,
+					},
 				},
 			},
 		}),

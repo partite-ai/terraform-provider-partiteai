@@ -33,11 +33,11 @@ One rubric, by id. Requires an enterprise deployment.
 Read-Only:
 
 - `complexity` (String)
+- `computed_metric_key` (String)
 - `input_values` (String)
+- `judge_metric_id` (String)
 - `lower_is_better` (Boolean)
 - `score_ceiling` (Number)
 - `score_floor` (Number)
-- `system_metric_key` (String)
 - `trial_count` (Number)
-- `user_metric_id` (String)
 - `weight` (Number)

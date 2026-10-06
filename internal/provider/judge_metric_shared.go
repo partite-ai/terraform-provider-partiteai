@@ -10,12 +10,14 @@ import (
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-// UserMetricBaseModel contains all the common fields for both resource and
+// JudgeMetricBaseModel contains all the common fields for both resource and
 // data source.
-type UserMetricBaseModel struct {
+type JudgeMetricBaseModel struct {
 	Id          types.String      `tfsdk:"id"`
 	Name        types.String      `tfsdk:"name"`
 	Description types.String      `tfsdk:"description"`
+	Category    types.String      `tfsdk:"category"`
+	Scope       types.String      `tfsdk:"scope"`
 	Prompt      types.String      `tfsdk:"prompt"`
 	Complexity  types.String      `tfsdk:"complexity"`
 	Examples    types.List        `tfsdk:"examples"`
@@ -25,12 +27,14 @@ type UserMetricBaseModel struct {
 }
 
 // MapFromGraphQL maps GraphQL response to the base model.
-func (m *UserMetricBaseModel) MapFromGraphQL(ctx context.Context, src *pgql.UserMetricDetails) diag.Diagnostics {
+func (m *JudgeMetricBaseModel) MapFromGraphQL(ctx context.Context, src *pgql.JudgeMetricDetails) diag.Diagnostics {
 	diags := setFields(
 		ctx,
 		&m.Id, src.Id,
 		&m.Name, src.Name,
 		&m.Description, src.Description,
+		&m.Category, string(src.Category),
+		&m.Scope, string(src.Scope),
 		&m.Prompt, src.Prompt,
 		&m.Complexity, string(src.Complexity),
 		&m.CreatedAt, src.CreatedAt,
@@ -88,3 +92,9 @@ func judgeInputFieldInputs(ctx context.Context, list types.List) ([]pgql.NewJudg
 	}
 	return out, diags
 }
+
+// The values a judge metric's category and scope take.
+var (
+	metricCategories = []string{"QUALITY", "SAFETY", "SECURITY", "RELIABILITY", "EFFICIENCY"}
+	judgeScopes      = []string{"REQUEST", "HOP"}
+)

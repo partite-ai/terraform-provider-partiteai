@@ -50,15 +50,20 @@ func (m *ModelProfileBaseModel) MapFromGraphQL(ctx context.Context, details pgql
 		"top_p":                  types.Float64PointerValue(config.TopP),
 		"top_k":                  types.Int64PointerValue(int64Ptr(config.TopK)),
 		"thinking_budget_tokens": types.Int64PointerValue(int64Ptr(config.ThinkingBudgetTokens)),
-		"reasoning_effort": func() types.String {
-			if config.ReasoningEffort != nil {
-				return types.StringValue(string(*config.ReasoningEffort))
-			}
-			return types.StringNull()
-		}(),
+		"reasoning_effort":       enumValue(config.ReasoningEffort),
+		"thinking_type":          enumValue(config.ThinkingType),
+		"thinking_display":       enumValue(config.ThinkingDisplay),
 	})
 
 	return diags
+}
+
+// enumValue is a GraphQL enum as a Terraform string, null when unset.
+func enumValue[E ~string](v *E) types.String {
+	if v == nil {
+		return types.StringNull()
+	}
+	return types.StringValue(string(*v))
 }
 
 // modelProfileConfigAttributes is the shape of the configuration block.
@@ -70,6 +75,8 @@ var modelProfileConfigAttributes = map[string]attr.Type{
 	"top_k":                  types.Int64Type,
 	"thinking_budget_tokens": types.Int64Type,
 	"reasoning_effort":       types.StringType,
+	"thinking_type":          types.StringType,
+	"thinking_display":       types.StringType,
 }
 
 // modelProfileConfigBlock is what a configuration writes.
@@ -81,6 +88,8 @@ type modelProfileConfigBlock struct {
 	TopK                 types.Int64   `tfsdk:"top_k"`
 	ThinkingBudgetTokens types.Int64   `tfsdk:"thinking_budget_tokens"`
 	ReasoningEffort      types.String  `tfsdk:"reasoning_effort"`
+	ThinkingType         types.String  `tfsdk:"thinking_type"`
+	ThinkingDisplay      types.String  `tfsdk:"thinking_display"`
 }
 
 // modelProfileConfig reads the configuration block into the API's input.
@@ -99,5 +108,7 @@ func modelProfileConfig(ctx context.Context, configuration types.Object, diags *
 		TopK:                 pgql.OptPtr(block.TopK.ValueInt64Pointer()),
 		ThinkingBudgetTokens: pgql.OptPtr(block.ThinkingBudgetTokens.ValueInt64Pointer()),
 		ReasoningEffort:      pgql.OptPtr(block.ReasoningEffort.ValueStringPointer()),
+		ThinkingType:         pgql.OptPtr(block.ThinkingType.ValueStringPointer()),
+		ThinkingDisplay:      pgql.OptPtr(block.ThinkingDisplay.ValueStringPointer()),
 	}, true
 }

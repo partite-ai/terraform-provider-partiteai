@@ -42,10 +42,10 @@ func (d *RubricDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 				MarkdownDescription: "The metrics this rubric scores against.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"user_metric_id":    schema.StringAttribute{Computed: true},
-						"system_metric_key": schema.StringAttribute{Computed: true},
-						"trial_count":       schema.Int64Attribute{Computed: true},
-						"complexity":        schema.StringAttribute{Computed: true},
+						"judge_metric_id":     schema.StringAttribute{Computed: true},
+						"computed_metric_key": schema.StringAttribute{Computed: true},
+						"trial_count":         schema.Int64Attribute{Computed: true},
+						"complexity":          schema.StringAttribute{Computed: true},
 						"input_values": schema.StringAttribute{
 							CustomType: jsontypes.NormalizedType{},
 							Computed:   true,

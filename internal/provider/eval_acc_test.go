@@ -11,9 +11,11 @@ import (
 // run against that backend alone. TestAccEval_needsEnterprise covers what
 // happens anywhere else.
 
-const userMetricHCL = `
-resource "partiteai_user_metric" "test" {
-  name        = "acc-user-metric"
+const judgeMetricHCL = `
+resource "partiteai_judge_metric" "test" {
+  name        = "acc-judge-metric"
+  category    = "QUALITY"
+  scope       = "HOP"
   description = "Whether the answer cited a source."
   prompt      = "Did the assistant cite a source for its answer?"
   complexity  = "LOW"
@@ -43,32 +45,34 @@ resource "partiteai_user_metric" "test" {
 }
 `
 
-func TestAccUserMetric_basic(t *testing.T) {
+func TestAccJudgeMetric_basic(t *testing.T) {
 	accTestEnterprise(t,
 		resource.TestStep{
-			Config: userMetricHCL + `
-data "partiteai_user_metric" "test" {
-  id = partiteai_user_metric.test.id
+			Config: judgeMetricHCL + `
+data "partiteai_judge_metric" "test" {
+  id = partiteai_judge_metric.test.id
 }
 `,
 			Check: resource.ComposeAggregateTestCheckFunc(
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "name", "acc-user-metric"),
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "complexity", "LOW"),
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "examples.#", "2"),
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "examples.0.rating", "1"),
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "input_fields.#", "1"),
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "input_fields.0.type", "STRING"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "name", "acc-judge-metric"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "complexity", "LOW"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "examples.#", "2"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "examples.0.rating", "1"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "input_fields.#", "1"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "input_fields.0.type", "STRING"),
 				resource.TestCheckResourceAttrPair(
-					"data.partiteai_user_metric.test", "prompt",
-					"partiteai_user_metric.test", "prompt"),
+					"data.partiteai_judge_metric.test", "prompt",
+					"partiteai_judge_metric.test", "prompt"),
 			),
 		},
 		// The two lists are replaced wholesale, so dropping an example must
 		// leave one behind rather than merging.
 		resource.TestStep{
 			Config: `
-resource "partiteai_user_metric" "test" {
-  name        = "acc-user-metric-renamed"
+resource "partiteai_judge_metric" "test" {
+  name        = "acc-judge-metric-renamed"
+  category    = "QUALITY"
+  scope       = "HOP"
   description = "Whether the answer cited a source."
   prompt      = "Did the assistant cite a source it was given?"
   complexity  = "MEDIUM"
@@ -93,10 +97,10 @@ resource "partiteai_user_metric" "test" {
 }
 `,
 			Check: resource.ComposeAggregateTestCheckFunc(
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "name", "acc-user-metric-renamed"),
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "complexity", "MEDIUM"),
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "examples.#", "1"),
-				resource.TestCheckResourceAttr("partiteai_user_metric.test", "examples.0.rating", "5"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "name", "acc-judge-metric-renamed"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "complexity", "MEDIUM"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "examples.#", "1"),
+				resource.TestCheckResourceAttr("partiteai_judge_metric.test", "examples.0.rating", "5"),
 			),
 		},
 		// Dropping the description has to remove it. The API leaves alone what
@@ -104,8 +108,10 @@ resource "partiteai_user_metric" "test" {
 		// the field as an explicit null.
 		resource.TestStep{
 			Config: `
-resource "partiteai_user_metric" "test" {
-  name       = "acc-user-metric-renamed"
+resource "partiteai_judge_metric" "test" {
+  name       = "acc-judge-metric-renamed"
+  category    = "QUALITY"
+  scope       = "HOP"
   prompt     = "Did the assistant cite a source it was given?"
   complexity = "MEDIUM"
 
@@ -128,70 +134,93 @@ resource "partiteai_user_metric" "test" {
   ]
 }
 `,
-			Check: resource.TestCheckNoResourceAttr("partiteai_user_metric.test", "description"),
+			Check: resource.TestCheckNoResourceAttr("partiteai_judge_metric.test", "description"),
 		},
 		resource.TestStep{
-			Config:            userMetricHCL,
-			ResourceName:      "partiteai_user_metric.test",
+			Config:            judgeMetricHCL,
+			ResourceName:      "partiteai_judge_metric.test",
 			ImportState:       true,
 			ImportStateVerify: true,
 		},
 	)
 }
 
-// TestAccSystemMetric_dataSource reads two metrics the product ships: one a
-// model judges, one worked out from the trace.
-func TestAccSystemMetric_dataSource(t *testing.T) {
+// TestAccJudgeMetric_findsABuiltInByName reads one of the judge metrics every
+// organization starts with, by its name.
+func TestAccJudgeMetric_findsABuiltInByName(t *testing.T) {
 	accTestEnterprise(t, resource.TestStep{
 		Config: `
-data "partiteai_system_metric" "judged" {
-  key = "instruction_following"
-}
-
-data "partiteai_system_metric" "computed" {
-  key = "latency"
+data "partiteai_judge_metric" "instruction_following" {
+  name = "Instruction Following"
 }
 `,
 		Check: resource.ComposeAggregateTestCheckFunc(
-			resource.TestCheckResourceAttr("data.partiteai_system_metric.judged", "type", "JUDGED"),
-			resource.TestCheckResourceAttrSet("data.partiteai_system_metric.judged", "name"),
-			resource.TestCheckResourceAttrSet("data.partiteai_system_metric.judged", "prompt"),
-			resource.TestCheckResourceAttr("data.partiteai_system_metric.computed", "type", "COMPUTED"),
-			resource.TestCheckResourceAttrSet("data.partiteai_system_metric.computed", "name"),
+			resource.TestCheckResourceAttrSet("data.partiteai_judge_metric.instruction_following", "id"),
+			resource.TestCheckResourceAttr("data.partiteai_judge_metric.instruction_following", "category", "QUALITY"),
+			resource.TestCheckResourceAttr("data.partiteai_judge_metric.instruction_following", "scope", "HOP"),
+			resource.TestCheckResourceAttrSet("data.partiteai_judge_metric.instruction_following", "prompt"),
 		),
 	})
 }
 
-// TestAccSystemMetric_missingKey pins what a key that matches nothing does:
-// the field is non-null, so the API says it found none and the provider passes
-// that through.
-func TestAccSystemMetric_missingKey(t *testing.T) {
+// TestAccJudgeMetric_missingName pins that a name only part of another metric's
+// name matches nothing: the search finds by text, and the data source keeps an
+// exact match only.
+func TestAccJudgeMetric_missingName(t *testing.T) {
 	accTestEnterprise(t, resource.TestStep{
 		Config: `
-data "partiteai_system_metric" "missing" {
-  key = "no_such_metric"
+data "partiteai_judge_metric" "partial" {
+  name = "Instruction"
 }
 `,
-		ExpectError: regexp.MustCompile(`(?s)No system metric has the key`),
+		ExpectError: regexp.MustCompile(`(?s)no judge metric named "Instruction"`),
 	})
 }
 
-// rubricHCL scores against one metric of its own and one that came with the
-// product, which is the pair of branches the union mapping has to get right.
-const rubricHCL = userMetricHCL + `
+func TestAccComputedMetric_dataSource(t *testing.T) {
+	accTestEnterprise(t, resource.TestStep{
+		Config: `
+data "partiteai_computed_metric" "latency" {
+  key = "latency"
+}
+`,
+		Check: resource.ComposeAggregateTestCheckFunc(
+			resource.TestCheckResourceAttrSet("data.partiteai_computed_metric.latency", "name"),
+			resource.TestCheckResourceAttrSet("data.partiteai_computed_metric.latency", "unit"),
+			resource.TestCheckResourceAttrSet("data.partiteai_computed_metric.latency", "aggregation"),
+		),
+	})
+}
+
+// TestAccComputedMetric_missingKey pins what a key that matches nothing does:
+// the API says it found none and the provider passes that through.
+func TestAccComputedMetric_missingKey(t *testing.T) {
+	accTestEnterprise(t, resource.TestStep{
+		Config: `
+data "partiteai_computed_metric" "missing" {
+  key = "no_such_metric"
+}
+`,
+		ExpectError: regexp.MustCompile(`(?s)No computed metric has the key`),
+	})
+}
+
+// rubricHCL scores against one judge metric and one computed metric, which is
+// the pair of branches the union mapping has to get right.
+const rubricHCL = judgeMetricHCL + `
 resource "partiteai_rubric" "test" {
   name        = "acc-rubric"
   description = "How well the assistant answered."
 
   metrics = [
     {
-      user_metric_id = partiteai_user_metric.test.id
+      judge_metric_id = partiteai_judge_metric.test.id
       trial_count    = 2
       weight         = 1
       input_values   = jsonencode({ required_source = "the handbook" })
     },
     {
-      system_metric_key = "latency"
+      computed_metric_key = "latency"
       score_floor       = 0
       score_ceiling     = 5000
       lower_is_better   = true
@@ -215,9 +244,9 @@ data "partiteai_rubric" "test" {
 				// The metrics are a set, so each is checked by value rather
 				// than by where it sits.
 				resource.TestCheckTypeSetElemNestedAttrs("partiteai_rubric.test", "metrics.*", map[string]string{
-					"system_metric_key": "latency",
-					"lower_is_better":   "true",
-					"score_ceiling":     "5000",
+					"computed_metric_key": "latency",
+					"lower_is_better":     "true",
+					"score_ceiling":       "5000",
 					// A computed metric takes no input values, so the API does
 					// not report any for one.
 					"input_values": "",
@@ -232,21 +261,21 @@ data "partiteai_rubric" "test" {
 		// An update is a difference rather than a whole list: this changes one
 		// metric's settings, drops the other and adds a third.
 		resource.TestStep{
-			Config: userMetricHCL + `
+			Config: judgeMetricHCL + `
 resource "partiteai_rubric" "test" {
   name        = "acc-rubric"
   description = "How well the assistant answered."
 
   metrics = [
     {
-      user_metric_id = partiteai_user_metric.test.id
+      judge_metric_id = partiteai_judge_metric.test.id
       trial_count    = 3
       weight         = 2
       input_values   = jsonencode({ required_source = "the handbook" })
     },
     {
       # A weighted computed metric has to say what range it scores over.
-      system_metric_key = "llm_call_count"
+      computed_metric_key = "llm_call_count"
       score_floor       = 0
       score_ceiling     = 50
       lower_is_better   = true
@@ -262,7 +291,7 @@ resource "partiteai_rubric" "test" {
 					"weight":      "2",
 				}),
 				resource.TestCheckTypeSetElemNestedAttrs("partiteai_rubric.test", "metrics.*", map[string]string{
-					"system_metric_key": "llm_call_count",
+					"computed_metric_key": "llm_call_count",
 				}),
 			),
 		},
@@ -275,18 +304,18 @@ resource "partiteai_rubric" "test" {
 	)
 }
 
-// TestAccRubric_metricNamesOneSource pins that a rubric entry names a metric of
-// yours or one of the product's, never both and never neither.
+// TestAccRubric_metricNamesOneSource pins that a rubric entry names a judge
+// metric or a computed one, never both and never neither.
 func TestAccRubric_metricNamesOneSource(t *testing.T) {
 	accTestEnterprise(t,
 		resource.TestStep{
-			Config: userMetricHCL + `
+			Config: judgeMetricHCL + `
 resource "partiteai_rubric" "test" {
   name = "acc-rubric-both"
   metrics = [
     {
-      user_metric_id    = partiteai_user_metric.test.id
-      system_metric_key = "latency"
+      judge_metric_id    = partiteai_judge_metric.test.id
+      computed_metric_key = "latency"
     },
   ]
 }
@@ -302,8 +331,68 @@ resource "partiteai_rubric" "test" {
 `,
 			ExpectError: regexp.MustCompile(`(?s)Invalid Attribute Combination`),
 		},
-		resource.TestStep{Config: userMetricHCL},
+		resource.TestStep{Config: judgeMetricHCL},
 	)
+}
+
+// A rubric entry takes the settings of its kind of metric only, and the
+// provider refuses the others before anything is sent.
+func TestAccRubric_settingsFitTheKindOfMetric(t *testing.T) {
+	accTestEnterprise(t,
+		resource.TestStep{
+			Config: `
+resource "partiteai_rubric" "test" {
+  name    = "acc-rubric-computed-trials"
+  metrics = [{ computed_metric_key = "latency", trial_count = 2 }]
+}
+`,
+			ExpectError: regexp.MustCompile(`(?s)Invalid Attribute Combination`),
+		},
+		resource.TestStep{
+			Config: judgeMetricHCL + `
+resource "partiteai_rubric" "test" {
+  name    = "acc-rubric-empty-inputs"
+  metrics = [{ judge_metric_id = partiteai_judge_metric.test.id, input_values = jsonencode({}) }]
+}
+`,
+			ExpectError: regexp.MustCompile(`(?s)Empty input values`),
+		},
+		resource.TestStep{
+			Config: judgeMetricHCL + `
+resource "partiteai_rubric" "test" {
+  name    = "acc-rubric-judge-bounds"
+  metrics = [{ judge_metric_id = partiteai_judge_metric.test.id, score_floor = 0 }]
+}
+`,
+			ExpectError: regexp.MustCompile(`(?s)Invalid Attribute Combination`),
+		},
+		resource.TestStep{Config: judgeMetricHCL},
+	)
+}
+
+// A rubric can score against a built-in judge metric found by name.
+func TestAccRubric_withABuiltInJudge(t *testing.T) {
+	accTestEnterprise(t, resource.TestStep{
+		Config: `
+data "partiteai_judge_metric" "instruction_following" {
+  name = "Instruction Following"
+}
+
+resource "partiteai_rubric" "test" {
+  name = "acc-rubric-built-in"
+  metrics = [
+    { judge_metric_id = data.partiteai_judge_metric.instruction_following.id },
+  ]
+}
+`,
+		Check: resource.ComposeAggregateTestCheckFunc(
+			resource.TestCheckResourceAttr("partiteai_rubric.test", "metrics.#", "1"),
+			resource.TestCheckResourceAttrPair(
+				"partiteai_rubric.test", "metrics.0.judge_metric_id",
+				"data.partiteai_judge_metric.instruction_following", "id"),
+			resource.TestCheckResourceAttr("partiteai_rubric.test", "metrics.0.trial_count", "1"),
+		),
+	})
 }
 
 const evalMeshMonitorHCL = rubricHCL + baseMesh + `

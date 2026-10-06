@@ -25,6 +25,7 @@ type AgentBaseModel struct {
 	VersionCreatedAt            timetypes.RFC3339    `tfsdk:"version_created_at"`
 	McpConnections              types.Set            `tfsdk:"mcp_connections"`
 	Tasks                       types.Set            `tfsdk:"tasks"`
+	Skills                      types.Set            `tfsdk:"skills"`
 	Particles                   types.Set            `tfsdk:"particles"`
 	MemoryInteractionProfileIds types.Set            `tfsdk:"memory_interaction_profile_ids"`
 	Identity                    types.String         `tfsdk:"identity"`
@@ -60,6 +61,7 @@ func (m *AgentBaseModel) MapFromGraphQL(ctx context.Context, agentDetails pgql.A
 		&m.MemoryInteractionProfileIds, memoryInteractionProfileIDs(agentDetails.LatestVersion.MemoryInteractionProfiles),
 		&m.McpConnections, newStructSliceMappable(agentDetails.LatestVersion.McpConnections, mcpConnectionInfo{}),
 		&m.Tasks, newStructSliceMappable(agentDetails.LatestVersion.Tasks, taskInfo{}),
+		&m.Skills, newStructSliceMappable(agentDetails.LatestVersion.Skills, skillAssociationInfo{}),
 		&m.Particles, newStructSliceMappable(agentDetails.LatestVersion.Particles, particleAssociationInfo{}),
 	)...)
 
@@ -103,6 +105,29 @@ type taskInfo struct {
 func (t *taskInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation) diag.Diagnostics {
 	t.Id = src.TaskDefinition.Id
 	return nil
+}
+
+type skillAssociationInfo struct {
+	Id string `tfsdk:"id"`
+}
+
+func (s *skillAssociationInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociation) diag.Diagnostics {
+	s.Id = src.Skill.Id
+	return nil
+}
+
+// skillAssociations are the skills a configuration gives an agent.
+func skillAssociations(ctx context.Context, skills types.Set) ([]pgql.NewSkillAgentAssociation, diag.Diagnostics) {
+	out := []pgql.NewSkillAgentAssociation{}
+	if skills.IsNull() || skills.IsUnknown() {
+		return out, nil
+	}
+	var infos []skillAssociationInfo
+	diags := skills.ElementsAs(ctx, &infos, false)
+	for _, info := range infos {
+		out = append(out, pgql.NewSkillAgentAssociation{SkillID: info.Id})
+	}
+	return out, diags
 }
 
 // memoryInteractionProfileIDs are the profiles one agent version holds, as the

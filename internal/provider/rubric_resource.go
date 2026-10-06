@@ -4,6 +4,9 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/boolvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -36,17 +39,17 @@ type RubricResourceModel struct {
 
 var rubricMetricResourceObject = schema.NestedAttributeObject{
 	Attributes: map[string]schema.Attribute{
-		"user_metric_id": schema.StringAttribute{
-			MarkdownDescription: "A metric of your own. Give this or `system_metric_key`, not both.",
+		"judge_metric_id": schema.StringAttribute{
+			MarkdownDescription: "A metric a model judges. Give this or `computed_metric_key`, not both.",
 			Optional:            true,
 			Validators: []validator.String{
 				stringvalidator.ExactlyOneOf(
-					path.MatchRelative().AtParent().AtName("system_metric_key"),
+					path.MatchRelative().AtParent().AtName("computed_metric_key"),
 				),
 			},
 		},
-		"system_metric_key": schema.StringAttribute{
-			MarkdownDescription: "A metric that came with the product, by key.",
+		"computed_metric_key": schema.StringAttribute{
+			MarkdownDescription: "A metric the product computes, such as latency, by key.",
 			Optional:            true,
 		},
 		// The API fills trial_count in whether or not the configuration names
@@ -55,36 +58,55 @@ var rubricMetricResourceObject = schema.NestedAttributeObject{
 		// whose value is not yet known cannot be matched against the one
 		// already there. Everything else comes back null when it is not given.
 		"trial_count": schema.Int64Attribute{
-			MarkdownDescription: "How many times a judged metric is scored, to even out disagreement. " +
-				"A judged metric requires it.",
+			MarkdownDescription: "How many times a judge metric is scored, to even out disagreement. " +
+				"Only a judge metric takes it; a computed metric reads back 1.",
 			Optional: true,
 			Computed: true,
 			Default:  int64default.StaticInt64(1),
+			Validators: []validator.Int64{
+				int64validator.AtLeast(1),
+				int64validator.ConflictsWith(path.MatchRelative().AtParent().AtName("computed_metric_key")),
+			},
 		},
 		"input_values": schema.StringAttribute{
 			CustomType: jsontypes.NormalizedType{},
 			MarkdownDescription: "Values for the metric's input fields, as a JSON object. " +
-				"Only a metric a model judges takes them.",
+				"Only a judge metric takes them.",
 			Optional: true,
+			Validators: []validator.String{
+				stringvalidator.ConflictsWith(path.MatchRelative().AtParent().AtName("computed_metric_key")),
+				inputValuesNotEmpty{},
+			},
 		},
 		"complexity": schema.StringAttribute{
-			MarkdownDescription: "Model complexity this metric judges at, overriding the metric's own.",
-			Optional:            true,
+			MarkdownDescription: "Model complexity this metric judges at, overriding the metric's own. " +
+				"Only a judge metric takes it.",
+			Optional: true,
 			Validators: []validator.String{
 				stringvalidator.OneOf("LOW", "MEDIUM", "HIGH"),
+				stringvalidator.ConflictsWith(path.MatchRelative().AtParent().AtName("computed_metric_key")),
 			},
 		},
 		"score_floor": schema.Float64Attribute{
 			MarkdownDescription: "Lowest score a computed metric can report. Only a computed metric takes it.",
 			Optional:            true,
+			Validators: []validator.Float64{
+				float64validator.ConflictsWith(path.MatchRelative().AtParent().AtName("judge_metric_id")),
+			},
 		},
 		"score_ceiling": schema.Float64Attribute{
 			MarkdownDescription: "Highest score a computed metric can report. Only a computed metric takes it.",
 			Optional:            true,
+			Validators: []validator.Float64{
+				float64validator.ConflictsWith(path.MatchRelative().AtParent().AtName("judge_metric_id")),
+			},
 		},
 		"lower_is_better": schema.BoolAttribute{
 			MarkdownDescription: "Whether a lower score is the better one. Only a computed metric takes it.",
 			Optional:            true,
+			Validators: []validator.Bool{
+				boolvalidator.ConflictsWith(path.MatchRelative().AtParent().AtName("judge_metric_id")),
+			},
 		},
 		"weight": schema.Float64Attribute{
 			MarkdownDescription: "How much this metric counts towards the rubric's score.",

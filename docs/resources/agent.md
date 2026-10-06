@@ -31,6 +31,7 @@ Agent resource
 - `particles` (Attributes Set) List of installed particles exposed to the agent. (see [below for nested schema](#nestedatt--particles))
 - `send_messages_to_user` (Boolean) Whether the agent should send messages to the user
 - `send_thinking_to_user` (Boolean) Whether the agent should send 'thinking' messages to the user
+- `skills` (Attributes Set) Set of skills the agent can load, referenced by skill ID. No two of them can declare the same name. (see [below for nested schema](#nestedatt--skills))
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
 - `tasks` (Attributes Set) Set of task definitions associated with the agent, referenced by task definition ID (see [below for nested schema](#nestedatt--tasks))
 
@@ -69,6 +70,14 @@ Optional:
 
 - `tool_name_pattern` (String) Regex matched against tool names. Required when filter_type is PATTERN.
 - `tool_names` (List of String) Tool names to expose. Required (and non-empty) when filter_type is LIST.
+
+
+<a id="nestedatt--skills"></a>
+### Nested Schema for `skills`
+
+Required:
+
+- `id` (String) Skill identifier
 
 
 <a id="nestedatt--tags"></a>

@@ -45,6 +45,8 @@ Optional:
 - `reasoning_effort` (String) How hard the model should think: NONE, MINIMAL, LOW, MEDIUM, HIGH, XHIGH or MAX.
 - `temperature` (Number) How much the model is allowed to vary its output.
 - `thinking_budget_tokens` (Number) Tokens the model may spend reasoning before it answers.
+- `thinking_display` (String) What the model returns of its thinking: SUMMARIZED (reasoning summaries with progress updates mixed in), UPDATES (only the progress updates it writes between tool calls) or OMITTED.
+- `thinking_type` (String) How the model thinks: ADAPTIVE, ENABLED (needs thinking_budget_tokens), DISABLED or BETWEEN_TOOLS.
 - `top_k` (Number) How many candidate tokens the model considers.
 - `top_p` (Number) Nucleus sampling cutoff.
 

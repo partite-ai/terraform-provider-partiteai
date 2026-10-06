@@ -58,6 +58,11 @@ func (d *AgentDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Computed:            true,
 				NestedObject:        taskAssociationDataSourceType,
 			},
+			"skills": schema.SetNestedAttribute{
+				MarkdownDescription: "Set of skills the agent can load, referenced by skill ID",
+				Computed:            true,
+				NestedObject:        skillAssociationDataSourceType,
+			},
 			"particles": schema.SetNestedAttribute{
 				MarkdownDescription: "List of installed particles exposed to the agent.",
 				Computed:            true,

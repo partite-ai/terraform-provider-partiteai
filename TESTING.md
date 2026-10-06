@@ -155,8 +155,8 @@ two tenants at once has to go over the API directly, which is why
 
 - MCP connections using `OAUTH2_CLIENT_CREDENTIALS` are not covered, because
   creating one fetches the authorization server's metadata over the network.
-- Evaluation resources (`partiteai_rubric`, `partiteai_user_metric`,
-  `partiteai_eval_mesh_monitor`) and the `partiteai_system_metric` data source
+- Evaluation resources (`partiteai_rubric`, `partiteai_judge_metric`,
+  `partiteai_eval_mesh_monitor`) and the `partiteai_computed_metric` data source
   exist only on an enterprise deployment, so their acceptance tests run against
   that backend alone, through `accTestEnterprise`. `TestAccEval_needsEnterprise`
   covers what the provider says anywhere else.

@@ -77,6 +77,15 @@ var taskAssociationType = schema.NestedAttributeObject{
 	},
 }
 
+var skillAssociationType = schema.NestedAttributeObject{
+	Attributes: map[string]schema.Attribute{
+		"id": schema.StringAttribute{
+			MarkdownDescription: "Skill identifier",
+			Required:            true,
+		},
+	},
+}
+
 var particleAssociationType = schema.NestedAttributeObject{
 	Attributes: map[string]schema.Attribute{
 		"id": schema.StringAttribute{
@@ -137,6 +146,14 @@ func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Computed:            true,
 				NestedObject:        taskAssociationType,
 				Default:             setdefault.StaticValue(types.SetValueMust(taskAssociationType.Type(), nil)),
+			},
+			"skills": schema.SetNestedAttribute{
+				MarkdownDescription: "Set of skills the agent can load, referenced by skill ID. No two of them can " +
+					"declare the same name.",
+				Optional:     true,
+				Computed:     true,
+				NestedObject: skillAssociationType,
+				Default:      setdefault.StaticValue(types.SetValueMust(skillAssociationType.Type(), nil)),
 			},
 			"particles": schema.SetNestedAttribute{
 				MarkdownDescription: "List of installed particles exposed to the agent.",
@@ -250,6 +267,12 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		}
 	}
 
+	skills, diags := skillAssociations(ctx, data.Skills)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	var particles []pgql.NewParticleAgentAssociation
 	if !data.Particles.IsNull() {
 		var particleStructs []particleAssociationInfo
@@ -293,6 +316,7 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		Particles:                 particles,
 		MemoryInteractionProfiles: memoryProfiles,
 		Tasks:                     tasks,
+		Skills:                    skills,
 	})
 
 	if err != nil {
@@ -431,6 +455,15 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 			}
 		}
 		update.Tasks = pgql.Opt(tasks)
+	}
+
+	if !planData.Skills.Equal(stateData.Skills) {
+		skills, diags := skillAssociations(ctx, planData.Skills)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		update.Skills = pgql.Opt(skills)
 	}
 
 	if !planData.Particles.Equal(stateData.Particles) {

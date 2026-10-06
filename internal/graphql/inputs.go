@@ -16,6 +16,7 @@ type NewAgent struct {
 	Particles                 []NewParticleAgentAssociation                 `json:"particles"`
 	MemoryInteractionProfiles []NewMemoryInteractionProfileAgentAssociation `json:"memoryInteractionProfiles"`
 	Tasks                     []NewTaskAgentAssociation                     `json:"tasks"`
+	Skills                    []NewSkillAgentAssociation                    `json:"skills"`
 }
 
 type UpdateAgent struct {
@@ -32,6 +33,7 @@ type UpdateAgent struct {
 	Particles                 Optional[[]NewParticleAgentAssociation]                 `json:"particles,omitzero"`
 	MemoryInteractionProfiles Optional[[]NewMemoryInteractionProfileAgentAssociation] `json:"memoryInteractionProfiles,omitzero"`
 	Tasks                     Optional[[]NewTaskAgentAssociation]                     `json:"tasks,omitzero"`
+	Skills                    Optional[[]NewSkillAgentAssociation]                    `json:"skills,omitzero"`
 }
 
 type NewMcpConnectionAgentAssociation struct {
@@ -52,6 +54,11 @@ type NewMcpConnectionAgentAssociation struct {
 type NewTaskAgentAssociation struct {
 	// The ID of the task definition to expose to this agent version as a tool.
 	TaskDefinitionID string `json:"taskDefinitionID"`
+}
+
+// NewSkillAgentAssociation gives one agent version a skill to load.
+type NewSkillAgentAssociation struct {
+	SkillID string `json:"skillID"`
 }
 
 // NewMemoryInteractionProfileAgentAssociation gives one agent version a memory
@@ -138,6 +145,8 @@ type ModelProfileConfigInput struct {
 	TopK                 Optional[int64]   `json:"topK,omitzero"`
 	ThinkingBudgetTokens Optional[int64]   `json:"thinkingBudgetTokens,omitzero"`
 	ReasoningEffort      Optional[string]  `json:"reasoningEffort,omitzero"`
+	ThinkingType         Optional[string]  `json:"thinkingType,omitzero"`
+	ThinkingDisplay      Optional[string]  `json:"thinkingDisplay,omitzero"`
 }
 
 type ModelSetRuleInput struct {
@@ -251,6 +260,31 @@ type UpdateTaskDefinition struct {
 	Description       Optional[string] `json:"description,omitzero"`
 	InputMessageType  Optional[string] `json:"inputMessageType,omitzero"`
 	OutputMessageType Optional[string] `json:"outputMessageType,omitzero"`
+}
+
+// NewSkill creates a skill from the files of a skill folder.
+type NewSkill struct {
+	// Name is the skill's own name, unique across skills.
+	Name   string      `json:"name"`
+	Source SkillSource `json:"source"`
+}
+
+// UpdateSkill renames a skill, replaces its files, or both.
+type UpdateSkill struct {
+	Name   Optional[string]      `json:"name,omitzero"`
+	Source Optional[SkillSource] `json:"source,omitzero"`
+}
+
+// SkillSource is a skill folder given as its files. The provider never sends
+// a zip, so the archive form of the API is left out.
+type SkillSource struct {
+	Files []SkillSourceFile `json:"files"`
+}
+
+// SkillSourceFile is one file of a skill folder, given as text.
+type SkillSourceFile struct {
+	Path string `json:"path"`
+	Text string `json:"text"`
 }
 
 type NewParticleAgentAssociation struct {
@@ -503,9 +537,11 @@ type UpdateMemoryInteractionProfile struct {
 // to: a description removed from the configuration has to be removed from the
 // resource.
 
-type UpdateUserMetric struct {
+type UpdateJudgeMetric struct {
 	Name        *string              `json:"name"`
 	Description *string              `json:"description"`
+	Category    *MetricCategory      `json:"category"`
+	Scope       *JudgeScope          `json:"scope"`
 	Prompt      *string              `json:"prompt"`
 	Complexity  *ModelComplexity     `json:"complexity"`
 	Examples    []NewScoreExample    `json:"examples"`
