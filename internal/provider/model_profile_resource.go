@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -28,6 +29,7 @@ type ModelProfileResource struct {
 
 type ModelProfileResourceModel struct {
 	ModelProfileBaseModel
+	Probe types.Bool `tfsdk:"probe"`
 }
 
 func (r *ModelProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -82,6 +84,7 @@ func (r *ModelProfileResource) Schema(ctx context.Context, req resource.SchemaRe
 					},
 				},
 			},
+			"probe": probeAttribute,
 		}),
 	}
 }
@@ -115,6 +118,10 @@ func (r *ModelProfileResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 	createReq.Configuration = *config
+	createReq.Probe = configProbe(ctx, req.Config, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	createResp, err := pgql.CreateModelProfile(ctx, r.GetClient(), data.ModelProviderId.ValueString(), &createReq)
 	if err != nil {
@@ -171,6 +178,11 @@ func (r *ModelProfileResource) Update(ctx context.Context, req resource.UpdateRe
 			return
 		}
 		update.Configuration = config
+	}
+
+	update.Probe = configProbe(ctx, req.Config, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
 	updateResp, err := pgql.ModifyModelProfile(ctx, r.GetClient(), planData.Id.ValueString(), &update)

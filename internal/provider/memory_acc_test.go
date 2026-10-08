@@ -8,11 +8,13 @@ import (
 
 const embeddingProfileHCL = `
 resource "partiteai_model_provider" "embed" {
+  probe = false
   name = "embed-provider"
-  openai = { api_key = "sk-test" }
+  openai = { api_key_wo = "sk-test" }
 }
 
 resource "partiteai_embedding_profile" "test" {
+  probe = false
   name              = "acc-embedding"
   model_provider_id = partiteai_model_provider.embed.id
   configuration = {

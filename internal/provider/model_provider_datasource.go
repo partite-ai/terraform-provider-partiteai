@@ -36,8 +36,8 @@ func (d *ModelProviderDataSource) Schema(ctx context.Context, req datasource.Sch
 				MarkdownDescription: "Anthropic provider config",
 				Computed:            true,
 				Attributes: map[string]schema.Attribute{
-					"api_key": schema.StringAttribute{
-						MarkdownDescription: "API key for Anthropic",
+					"api_key_set": schema.BoolAttribute{
+						MarkdownDescription: "Whether an API key is set for Anthropic. The key itself is never returned.",
 						Computed:            true,
 					},
 				},
@@ -46,10 +46,9 @@ func (d *ModelProviderDataSource) Schema(ctx context.Context, req datasource.Sch
 				MarkdownDescription: "OpenAI provider config",
 				Computed:            true,
 				Attributes: map[string]schema.Attribute{
-					"api_key": schema.StringAttribute{
-						MarkdownDescription: "API key for OpenAI",
+					"api_key_set": schema.BoolAttribute{
+						MarkdownDescription: "Whether an API key is set for OpenAI. The key itself is never returned.",
 						Computed:            true,
-						Sensitive:           true,
 					},
 				},
 			},
@@ -61,10 +60,9 @@ func (d *ModelProviderDataSource) Schema(ctx context.Context, req datasource.Sch
 						MarkdownDescription: "Gemini API config",
 						Computed:            true,
 						Attributes: map[string]schema.Attribute{
-							"api_key": schema.StringAttribute{
-								MarkdownDescription: "API key for Gemini",
+							"api_key_set": schema.BoolAttribute{
+								MarkdownDescription: "Whether an API key is set for Gemini. The key itself is never returned.",
 								Computed:            true,
-								Sensitive:           true,
 							},
 						},
 					},
@@ -72,10 +70,9 @@ func (d *ModelProviderDataSource) Schema(ctx context.Context, req datasource.Sch
 						MarkdownDescription: "Vertex API config",
 						Computed:            true,
 						Attributes: map[string]schema.Attribute{
-							"service_account_key": schema.StringAttribute{
-								MarkdownDescription: "Service account key for Vertex",
+							"service_account_key_set": schema.BoolAttribute{
+								MarkdownDescription: "Whether a service account key is set for Vertex. The key itself is never returned.",
 								Computed:            true,
-								Sensitive:           true,
 							},
 							"project_id": schema.StringAttribute{
 								MarkdownDescription: "Project ID for Vertex",
@@ -97,10 +94,33 @@ func (d *ModelProviderDataSource) Schema(ctx context.Context, req datasource.Sch
 						MarkdownDescription: "URL for OpenAI-compatible provider",
 						Computed:            true,
 					},
-					"api_token": schema.StringAttribute{
-						MarkdownDescription: "API token for OpenAI-compatible provider",
+					"api_token_set": schema.BoolAttribute{
+						MarkdownDescription: "Whether the OpenAI-compatible provider sends an API token. The token itself is never returned.",
 						Computed:            true,
-						Sensitive:           true,
+					},
+				},
+			},
+			"fireworks": schema.SingleNestedAttribute{
+				MarkdownDescription: "Fireworks provider config",
+				Computed:            true,
+				Attributes: map[string]schema.Attribute{
+					"api_key_set": schema.BoolAttribute{
+						MarkdownDescription: "Whether an API key is set for Fireworks. The key itself is never returned.",
+						Computed:            true,
+					},
+					"account_id": schema.StringAttribute{
+						MarkdownDescription: "Fireworks account id. When set, the model list includes this account's models.",
+						Computed:            true,
+					},
+				},
+			},
+			"cerebras": schema.SingleNestedAttribute{
+				MarkdownDescription: "Cerebras provider config",
+				Computed:            true,
+				Attributes: map[string]schema.Attribute{
+					"api_key_set": schema.BoolAttribute{
+						MarkdownDescription: "Whether an API key is set for Cerebras. The key itself is never returned.",
+						Computed:            true,
 					},
 				},
 			},
@@ -124,7 +144,7 @@ func (d *ModelProviderDataSource) Read(ctx context.Context, req datasource.ReadR
 	}
 
 	// Use the shared mapping from the base model
-	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, modelProviderResp.ModelProvider)...)
+	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, modelProviderResp.ModelProvider, secretIsSet)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}

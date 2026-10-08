@@ -22,8 +22,10 @@ Model Provider data source
 ### Read-Only
 
 - `anthropic` (Attributes) Anthropic provider config (see [below for nested schema](#nestedatt--anthropic))
+- `cerebras` (Attributes) Cerebras provider config (see [below for nested schema](#nestedatt--cerebras))
 - `created_at` (String) Timestamp when the resource was created
 - `description` (String) Resource description
+- `fireworks` (Attributes) Fireworks provider config (see [below for nested schema](#nestedatt--fireworks))
 - `google_genai` (Attributes) Google GenAI provider config (see [below for nested schema](#nestedatt--google_genai))
 - `name` (String) Resource name
 - `openai` (Attributes) OpenAI provider config (see [below for nested schema](#nestedatt--openai))
@@ -36,7 +38,24 @@ Model Provider data source
 
 Read-Only:
 
-- `api_key` (String) API key for Anthropic
+- `api_key_set` (Boolean) Whether an API key is set for Anthropic. The key itself is never returned.
+
+
+<a id="nestedatt--cerebras"></a>
+### Nested Schema for `cerebras`
+
+Read-Only:
+
+- `api_key_set` (Boolean) Whether an API key is set for Cerebras. The key itself is never returned.
+
+
+<a id="nestedatt--fireworks"></a>
+### Nested Schema for `fireworks`
+
+Read-Only:
+
+- `account_id` (String) Fireworks account id. When set, the model list includes this account's models.
+- `api_key_set` (Boolean) Whether an API key is set for Fireworks. The key itself is never returned.
 
 
 <a id="nestedatt--google_genai"></a>
@@ -52,7 +71,7 @@ Read-Only:
 
 Read-Only:
 
-- `api_key` (String, Sensitive) API key for Gemini
+- `api_key_set` (Boolean) Whether an API key is set for Gemini. The key itself is never returned.
 
 
 <a id="nestedatt--google_genai--vertex"></a>
@@ -62,7 +81,7 @@ Read-Only:
 
 - `location` (String) Location for Vertex
 - `project_id` (String) Project ID for Vertex
-- `service_account_key` (String, Sensitive) Service account key for Vertex
+- `service_account_key_set` (Boolean) Whether a service account key is set for Vertex. The key itself is never returned.
 
 
 
@@ -71,7 +90,7 @@ Read-Only:
 
 Read-Only:
 
-- `api_key` (String, Sensitive) API key for OpenAI
+- `api_key_set` (Boolean) Whether an API key is set for OpenAI. The key itself is never returned.
 
 
 <a id="nestedatt--openai_compatible"></a>
@@ -79,7 +98,7 @@ Read-Only:
 
 Read-Only:
 
-- `api_token` (String, Sensitive) API token for OpenAI-compatible provider
+- `api_token_set` (Boolean) Whether the OpenAI-compatible provider sends an API token. The token itself is never returned.
 - `url` (String) URL for OpenAI-compatible provider
 
 

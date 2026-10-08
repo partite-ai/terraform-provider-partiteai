@@ -21,11 +21,17 @@ Model Provider resource
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `anthropic` (Attributes) Anthropic provider config (see [below for nested schema](#nestedatt--anthropic))
+- `cerebras` (Attributes) Cerebras provider config (see [below for nested schema](#nestedatt--cerebras))
+- `credentials_version` (Number) The version of the provider's secret. The secret is write-only, so Terraform cannot see it change; increment this to send a new one.
 - `description` (String) Resource description
+- `fireworks` (Attributes) Fireworks provider config (see [below for nested schema](#nestedatt--fireworks))
 - `google_genai` (Attributes) Google GenAI provider config (see [below for nested schema](#nestedatt--google_genai))
 - `openai` (Attributes) OpenAI provider config (see [below for nested schema](#nestedatt--openai))
 - `openai_compatible` (Attributes) OpenAI-compatible provider config (see [below for nested schema](#nestedatt--openai_compatible))
+- `probe` (Boolean, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Whether the server lists the provider's models with the credentials before a create, or an update that sends new credentials, and refuses credentials the provider rejects. An unreachable provider does not fail the write. Set false to write credentials the provider can't check yet. It does not cover the provider's profiles, which each take their own `probe`. Defaults to true.
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only
@@ -39,7 +45,27 @@ Model Provider resource
 
 Required:
 
-- `api_key` (String, Sensitive) API key for Anthropic
+- `api_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) API key for Anthropic. Write-only: never stored in state. Change `credentials_version` to send a new value.
+
+
+<a id="nestedatt--cerebras"></a>
+### Nested Schema for `cerebras`
+
+Required:
+
+- `api_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) API key for Cerebras. Write-only: never stored in state. Change `credentials_version` to send a new value.
+
+
+<a id="nestedatt--fireworks"></a>
+### Nested Schema for `fireworks`
+
+Required:
+
+- `api_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) API key for Fireworks. Write-only: never stored in state. Change `credentials_version` to send a new value.
+
+Optional:
+
+- `account_id` (String) Fireworks account id. When set, the model list includes this account's models.
 
 
 <a id="nestedatt--google_genai"></a>
@@ -55,7 +81,7 @@ Optional:
 
 Required:
 
-- `api_key` (String, Sensitive) API key for Gemini
+- `api_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) API key for Gemini. Write-only: never stored in state. Change `credentials_version` to send a new value.
 
 
 <a id="nestedatt--google_genai--vertex"></a>
@@ -65,7 +91,7 @@ Required:
 
 - `location` (String) Location for Vertex
 - `project_id` (String) Project ID for Vertex
-- `service_account_key` (String, Sensitive) Service account key for Vertex
+- `service_account_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Service account key for Vertex. Write-only: never stored in state. Change `credentials_version` to send a new value.
 
 
 
@@ -74,7 +100,7 @@ Required:
 
 Required:
 
-- `api_key` (String, Sensitive) API key for OpenAI
+- `api_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) API key for OpenAI. Write-only: never stored in state. Change `credentials_version` to send a new value.
 
 
 <a id="nestedatt--openai_compatible"></a>
@@ -86,7 +112,7 @@ Required:
 
 Optional:
 
-- `api_token` (String, Sensitive) API token for OpenAI-compatible provider
+- `api_token_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) API token for the OpenAI-compatible provider. Leave it out for one that takes no token. Write-only: never stored in state. Change `credentials_version` to send a new value.
 
 
 <a id="nestedatt--tags"></a>

@@ -281,21 +281,28 @@ fragment ModelProviderDetails on ModelProvider {
   providerType
   providerConfig {
     ... on ModelProviderConfigOpenAI {
-      apiKey
+      apiKeySet
     }
     ... on ModelProviderConfigOpenAICompatible {
       url
-      apiToken
+      apiTokenSet
     }
     ... on ModelProviderConfigAnthropic {
-      apiKey
+      apiKeySet
+    }
+    ... on ModelProviderConfigFireworks {
+      apiKeySet
+      accountID
+    }
+    ... on ModelProviderConfigCerebras {
+      apiKeySet
     }
     ... on ModelProviderConfigGoogleGenAI {
       gemini {
-        apiKey
+        apiKeySet
       }
       vertex {
-        serviceAccountKey
+        serviceAccountKeySet
         projectID
         location
       }

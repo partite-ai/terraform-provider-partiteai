@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -28,6 +29,7 @@ type EmbeddingProfileResource struct {
 
 type EmbeddingProfileResourceModel struct {
 	EmbeddingProfileBaseModel
+	Probe types.Bool `tfsdk:"probe"`
 }
 
 func (r *EmbeddingProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -73,6 +75,7 @@ func (r *EmbeddingProfileResource) Schema(ctx context.Context, req resource.Sche
 					},
 				},
 			},
+			"probe": probeAttribute,
 		},
 	}
 }
@@ -90,12 +93,17 @@ func (r *EmbeddingProfileResource) Create(ctx context.Context, req resource.Crea
 	if !ok {
 		return
 	}
+	probe := configProbe(ctx, req.Config, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	createResp, err := pgql.CreateEmbeddingProfile(ctx, r.GetClient(),
 		data.ModelProviderId.ValueString(), &pgql.NewEmbeddingProfile{
 			Name:          data.Name.ValueString(),
 			Description:   pgql.OptPtr(data.Description.ValueStringPointer()),
 			Configuration: *config,
+			Probe:         probe,
 		})
 	if err != nil {
 		handleAPIError(&resp.Diagnostics, err, "create embedding profile")
@@ -151,6 +159,11 @@ func (r *EmbeddingProfileResource) Update(ctx context.Context, req resource.Upda
 			return
 		}
 		update.Configuration = config
+	}
+
+	update.Probe = configProbe(ctx, req.Config, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
 	updateResp, err := pgql.ModifyEmbeddingProfile(ctx, r.GetClient(), planData.Id.ValueString(), &update)
