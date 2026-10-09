@@ -5794,8 +5794,10 @@ type TaskDefinitionDetails struct {
 	InputMessageType json.RawMessage `json:"inputMessageType"`
 	// JSON Schema the user must satisfy when completing the task.
 	OutputMessageType json.RawMessage `json:"outputMessageType"`
-	CreatedAt         string          `json:"createdAt"`
-	UpdatedAt         string          `json:"updatedAt"`
+	// UIs a client can show to complete the task. At most one of each type.
+	UiForms   []TaskDefinitionDetailsUiFormsTaskUIForm `json:"uiForms"`
+	CreatedAt string                                   `json:"createdAt"`
+	UpdatedAt string                                   `json:"updatedAt"`
 }
 
 // GetId returns TaskDefinitionDetails.Id, and is useful for accessing the field via an interface.
@@ -5813,11 +5815,71 @@ func (v *TaskDefinitionDetails) GetInputMessageType() json.RawMessage { return v
 // GetOutputMessageType returns TaskDefinitionDetails.OutputMessageType, and is useful for accessing the field via an interface.
 func (v *TaskDefinitionDetails) GetOutputMessageType() json.RawMessage { return v.OutputMessageType }
 
+// GetUiForms returns TaskDefinitionDetails.UiForms, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetails) GetUiForms() []TaskDefinitionDetailsUiFormsTaskUIForm {
+	return v.UiForms
+}
+
 // GetCreatedAt returns TaskDefinitionDetails.CreatedAt, and is useful for accessing the field via an interface.
 func (v *TaskDefinitionDetails) GetCreatedAt() string { return v.CreatedAt }
 
 // GetUpdatedAt returns TaskDefinitionDetails.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *TaskDefinitionDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// TaskDefinitionDetailsUiFormsTaskUIForm includes the requested fields of the GraphQL type TaskUIForm.
+// The GraphQL type's documentation follows.
+//
+// A UI a client can show to complete a task.
+type TaskDefinitionDetailsUiFormsTaskUIForm struct {
+	Type TaskUIFormType `json:"type"`
+	// The form's source, in the shape its type defines.
+	Definition string `json:"definition"`
+}
+
+// GetType returns TaskDefinitionDetailsUiFormsTaskUIForm.Type, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetailsUiFormsTaskUIForm) GetType() TaskUIFormType { return v.Type }
+
+// GetDefinition returns TaskDefinitionDetailsUiFormsTaskUIForm.Definition, and is useful for accessing the field via an interface.
+func (v *TaskDefinitionDetailsUiFormsTaskUIForm) GetDefinition() string { return v.Definition }
+
+// The kind of a task's UI form.
+type TaskUIFormType string
+
+const (
+	// An A2UI v0.9 surface for each state of the task. The definition is JSON:
+	// {"catalog": {...}, "open": {"components": [...]},
+	// "completed": {"components": [...]}}. The catalog is optional: if set, it is a
+	// full A2UI catalog definition, and its catalogId is the catalog clients render
+	// the surface with. It must stand alone, with every $ref pointing into it.
+	// Without it, the components come from the A2UI basic catalog. Each component
+	// must fit its schema in the catalog as written.
+	//
+	// The open surface shows while the task is open. Its data model starts as the
+	// task input, and every event action completes the task with its context as
+	// the output, so each action's context must match the task's output schema.
+	//
+	// The completed surface is optional. Once the task is completed, it replaces
+	// the open surface, with the task output as its data model. It has no event
+	// actions. Without it, the surface is removed once the task is completed, as is
+	// a cancelled task's surface.
+	//
+	// Each surface can have "overlays" that set values of its components from the
+	// task input when the task starts, so the components stay plain A2UI:
+	// {"overlays": {"choices": {"/options": "input.options.map(o, {'label': o,
+	// 'value': o})"}}}. Overlays are keyed by component ID, then by a JSON pointer
+	// into the component, and each value is a CEL expression that sees the task
+	// input as input. It is checked against the input schema when the form is
+	// saved, and its type against what the catalog allows at its pointer. An
+	// expression whose value is an empty optional, such as input.?subtitle, removes
+	// the value at its pointer, so it cannot set a value the catalog requires. When
+	// the task starts, the components overlays set are checked against the catalog
+	// again, and the task fails with an error to the agent if one does not fit.
+	TaskUIFormTypeA2ui TaskUIFormType = "A2UI"
+)
+
+var AllTaskUIFormType = []TaskUIFormType{
+	TaskUIFormTypeA2ui,
+}
 
 // What a model returns of its thinking. Each provider accepts its own subset.
 type ThinkingDisplay string
@@ -8077,6 +8139,10 @@ fragment TaskDefinitionDetails on TaskDefinition {
 	description
 	inputMessageType
 	outputMessageType
+	uiForms {
+		type
+		definition
+	}
 	createdAt
 	updatedAt
 }
@@ -10395,6 +10461,10 @@ fragment TaskDefinitionDetails on TaskDefinition {
 	description
 	inputMessageType
 	outputMessageType
+	uiForms {
+		type
+		definition
+	}
 	createdAt
 	updatedAt
 }
@@ -10438,6 +10508,10 @@ fragment TaskDefinitionDetails on TaskDefinition {
 	description
 	inputMessageType
 	outputMessageType
+	uiForms {
+		type
+		definition
+	}
 	createdAt
 	updatedAt
 }
@@ -11716,6 +11790,10 @@ fragment TaskDefinitionDetails on TaskDefinition {
 	description
 	inputMessageType
 	outputMessageType
+	uiForms {
+		type
+		definition
+	}
 	createdAt
 	updatedAt
 }

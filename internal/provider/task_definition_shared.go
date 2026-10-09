@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"sort"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
@@ -18,6 +19,7 @@ type TaskDefinitionBaseModel struct {
 	Description       types.String         `tfsdk:"description"`
 	InputMessageType  jsontypes.Normalized `tfsdk:"input_message_type"`
 	OutputMessageType jsontypes.Normalized `tfsdk:"output_message_type"`
+	UIForms           types.Map            `tfsdk:"ui_forms"`
 	CreatedAt         timetypes.RFC3339    `tfsdk:"created_at"`
 	UpdatedAt         timetypes.RFC3339    `tfsdk:"updated_at"`
 }
@@ -36,5 +38,46 @@ func (m *TaskDefinitionBaseModel) MapFromGraphQL(ctx context.Context, td *pgql.T
 		&m.CreatedAt, td.CreatedAt,
 		&m.UpdatedAt, td.UpdatedAt,
 	)...)
+
+	forms := make(map[string]string, len(td.UiForms))
+	for _, f := range td.UiForms {
+		forms[string(f.Type)] = f.Definition
+	}
+	formsValue, d := types.MapValueFrom(ctx, types.StringType, forms)
+	diags.Append(d...)
+	m.UIForms = formsValue
+
 	return diags
+}
+
+// taskUIFormInputs turns the ui_forms map of a configuration into UI form
+// inputs, in type order so a request is the same each time.
+func taskUIFormInputs(ctx context.Context, forms types.Map) ([]pgql.TaskUIFormInput, diag.Diagnostics) {
+	out := []pgql.TaskUIFormInput{}
+	if forms.IsNull() || forms.IsUnknown() {
+		return out, nil
+	}
+	var byType map[string]string
+	diags := forms.ElementsAs(ctx, &byType, false)
+	if diags.HasError() {
+		return nil, diags
+	}
+	formTypes := make([]string, 0, len(byType))
+	for t := range byType {
+		formTypes = append(formTypes, t)
+	}
+	sort.Strings(formTypes)
+	for _, t := range formTypes {
+		out = append(out, pgql.TaskUIFormInput{Type: pgql.TaskUIFormType(t), Definition: byType[t]})
+	}
+	return out, diags
+}
+
+// taskUIFormTypes are the keys a ui_forms map can have.
+func taskUIFormTypes() []string {
+	out := make([]string, 0, len(pgql.AllTaskUIFormType))
+	for _, t := range pgql.AllTaskUIFormType {
+		out = append(out, string(t))
+	}
+	return out
 }

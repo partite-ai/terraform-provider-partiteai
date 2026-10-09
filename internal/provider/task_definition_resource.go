@@ -4,10 +4,15 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
@@ -56,9 +61,22 @@ func (r *TaskDefinitionResource) Schema(ctx context.Context, req resource.Schema
 				MarkdownDescription: "JSON schema the user must satisfy when completing the task",
 				Required:            true,
 			},
+			"ui_forms": schema.MapAttribute{
+				MarkdownDescription: "UIs a client can show to complete the task, keyed by form type, with the form's " +
+					"definition as the value. The only type is `A2UI`, whose definition is JSON: an A2UI v0.9 surface " +
+					"for each state of the task, such as `jsonencode({ open = { components = [...] } })`. " +
+					"The API checks each form against the input and output schemas. A change replaces all of the task's forms.",
+				ElementType: types.StringType,
+				Optional:    true,
+				Computed:    true,
+				Default:     mapdefault.StaticValue(types.MapValueMust(types.StringType, map[string]attr.Value{})),
+				Validators: []validator.Map{
+					mapvalidator.KeysAre(stringvalidator.OneOf(taskUIFormTypes()...)),
+				},
+			},
 			"overwrite_existing": schema.BoolAttribute{
 				MarkdownDescription: "When true and a task definition with this `name` already exists, create takes it over " +
-					"and overwrites its description and schemas instead of failing on the duplicate name. " +
+					"and overwrites its description, schemas and UI forms instead of failing on the duplicate name. " +
 					"Use it to apply a configuration to an organization that already has the definition, " +
 					"such as one of the task definitions every organization starts with. " +
 					"Only read when the resource is created, and never stored in state, so changing it later does nothing. " +
@@ -88,11 +106,18 @@ func (r *TaskDefinitionResource) Create(ctx context.Context, req resource.Create
 
 	logResourceOperation(ctx, "creating", "task_definition", "")
 
+	uiForms, diags := taskUIFormInputs(ctx, data.UIForms)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	input := &pgql.NewTaskDefinition{
 		Name:              data.Name.ValueString(),
 		Description:       data.Description.ValueString(),
 		InputMessageType:  data.InputMessageType.ValueString(),
 		OutputMessageType: data.OutputMessageType.ValueString(),
+		UIForms:           uiForms,
 	}
 	if overwriteExisting.ValueBool() {
 		input.OverwriteExisting = overwriteExisting.ValueBoolPointer()
@@ -156,6 +181,14 @@ func (r *TaskDefinitionResource) Update(ctx context.Context, req resource.Update
 	}
 	if !planData.OutputMessageType.Equal(stateData.OutputMessageType) {
 		update.OutputMessageType = pgql.Opt(planData.OutputMessageType.ValueString())
+	}
+	if !planData.UIForms.Equal(stateData.UIForms) {
+		uiForms, diags := taskUIFormInputs(ctx, planData.UIForms)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		update.UIForms = pgql.Opt(uiForms)
 	}
 
 	updateResp, err := pgql.ModifyTaskDefinition(ctx, r.GetClient(), planData.Id.ValueString(), &update)

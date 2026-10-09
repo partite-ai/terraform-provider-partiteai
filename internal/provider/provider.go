@@ -304,6 +304,8 @@ func (p *PartiteAIProvider) DataSources(ctx context.Context) []func() datasource
 		NewRubricDataSource,
 		NewEvalMeshMonitorDataSource,
 		NewComputedMetricDataSource,
+		NewA2UIFormDataSource,
+		NewA2UIBasicFormDataSource,
 	}
 }
 

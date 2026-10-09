@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -60,6 +61,11 @@ func (d *TaskDefinitionDataSource) Schema(ctx context.Context, req datasource.Sc
 				CustomType:          jsontypes.NormalizedType{},
 				Computed:            true,
 				MarkdownDescription: "JSON schema the user must satisfy when completing the task",
+			},
+			"ui_forms": schema.MapAttribute{
+				ElementType:         types.StringType,
+				Computed:            true,
+				MarkdownDescription: "UIs a client can show to complete the task, keyed by form type, with the form's definition as the value",
 			},
 			"created_at": commonDataSourceSchemas.createdAt,
 			"updated_at": commonDataSourceSchemas.updatedAt,

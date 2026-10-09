@@ -26,4 +26,5 @@ Task Definition data source. Look up an author-defined task definition by `id` o
 - `description` (String) Description of the task
 - `input_message_type` (String) JSON schema the agent must satisfy when invoking the task
 - `output_message_type` (String) JSON schema the user must satisfy when completing the task
+- `ui_forms` (Map of String) UIs a client can show to complete the task, keyed by form type, with the form's definition as the value
 - `updated_at` (String) Timestamp when the resource was last updated

@@ -278,6 +278,8 @@ type NewTaskDefinition struct {
 	InputMessageType string `json:"inputMessageType"`
 	// A JSON schema the user must satisfy when completing the task.
 	OutputMessageType string `json:"outputMessageType"`
+	// UIs a client can show to complete the task. At most one of each type.
+	UIForms []TaskUIFormInput `json:"uiForms,omitempty"`
 	// Overwrite a definition that already has the name instead of failing.
 	OverwriteExisting *bool `json:"overwriteExisting,omitempty"`
 }
@@ -287,6 +289,14 @@ type UpdateTaskDefinition struct {
 	Description       Optional[string] `json:"description,omitzero"`
 	InputMessageType  Optional[string] `json:"inputMessageType,omitzero"`
 	OutputMessageType Optional[string] `json:"outputMessageType,omitzero"`
+	// Replaces all of the task's UI forms when set.
+	UIForms Optional[[]TaskUIFormInput] `json:"uiForms,omitzero"`
+}
+
+// TaskUIFormInput is one UI a client can show to complete a task.
+type TaskUIFormInput struct {
+	Type       TaskUIFormType `json:"type"`
+	Definition string         `json:"definition"`
 }
 
 // NewSkill creates a skill from the files of a skill folder.

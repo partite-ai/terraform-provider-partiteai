@@ -676,6 +676,10 @@ fragment TaskDefinitionDetails on TaskDefinition {
   description
   inputMessageType
   outputMessageType
+  uiForms {
+    type
+    definition
+  }
   createdAt
   updatedAt
 }

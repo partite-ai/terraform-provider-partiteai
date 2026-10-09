@@ -47,6 +47,18 @@ FEATURES:
 * resource/partiteai_agent: `skills` gives an agent skills to load. No two of an
   agent's skills can declare the same name.
 * data-source/partiteai_agent: `skills`.
+* resource/partiteai_task_definition: `ui_forms` gives a task UIs a client can
+  show to complete it, keyed by form type. The only type is `A2UI`, whose
+  definition is JSON. A change replaces all of the task's forms.
+* data-source/partiteai_task_definition: `ui_forms`.
+* **New Data Source:** `partiteai_a2ui_basic_form` builds an A2UI form for a
+  task definition's `ui_forms` from the basic catalog's components, with a
+  block for each component type. A property that can be bound or computed has
+  `_path` and `_call` forms beside it, such as `text_path`.
+* **New Data Source:** `partiteai_a2ui_form` builds an A2UI form from
+  components given as a type and a JSON object of properties, from the basic
+  catalog or a `catalog` of your own.
+  Both check the form against its catalog at plan time.
 * resource/partiteai_model_provider: `fireworks` (`api_key_wo`, optional
   `account_id`) and `cerebras` (`api_key_wo`) provider types.
 * data-source/partiteai_model_provider: `fireworks` (`api_key_set`,

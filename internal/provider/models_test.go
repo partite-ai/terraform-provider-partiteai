@@ -54,4 +54,6 @@ var dataSourceModels = map[string]any{
 	"partiteai_rubric":                      RubricDataSourceModel{},
 	"partiteai_eval_mesh_monitor":           EvalMeshMonitorDataSourceModel{},
 	"partiteai_computed_metric":             ComputedMetricDataSourceModel{},
+	"partiteai_a2ui_form":                   A2UIFormDataSourceModel{},
+	"partiteai_a2ui_basic_form":             A2UIBasicFormDataSourceModel{},
 }
