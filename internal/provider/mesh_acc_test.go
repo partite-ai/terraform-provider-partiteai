@@ -75,11 +75,13 @@ data "partiteai_model_set" "base" {
 		resource.TestStep{
 			Config: `
 resource "partiteai_model_provider" "base" {
+  probe = false
   name = "base-provider"
-  openai = { api_key = "sk-test" }
+  openai = { api_key_wo = "sk-test" }
 }
 
 resource "partiteai_model_profile" "base" {
+  probe = false
   name              = "base-profile"
   model_provider_id = partiteai_model_provider.base.id
   configuration = {
@@ -89,6 +91,7 @@ resource "partiteai_model_profile" "base" {
 }
 
 resource "partiteai_model_profile" "second" {
+  probe = false
   name              = "second-profile"
   model_provider_id = partiteai_model_provider.base.id
   configuration = {
@@ -128,11 +131,13 @@ resource "partiteai_model_set" "base" {
 // only progress updates.
 const thinkingProfileConfig = `
 resource "partiteai_model_provider" "test" {
+  probe = false
   name = "profile-provider"
-  anthropic = { api_key = "sk-ant" }
+  anthropic = { api_key_wo = "sk-ant" }
 }
 
 resource "partiteai_model_profile" "test" {
+  probe = false
   name              = "acc-profile"
   model_provider_id = partiteai_model_provider.test.id
   configuration = {
@@ -145,16 +150,46 @@ resource "partiteai_model_profile" "test" {
 }
 `
 
+// probe = false writes the profile without asking the provider, and being
+// write-only it is never stored.
+func TestAccModelProfile_probeOff(t *testing.T) {
+	accTest(t, resource.TestStep{
+		Config: `
+resource "partiteai_model_provider" "test" {
+  probe = false
+  name = "probe-provider"
+  anthropic = { api_key_wo = "sk-ant" }
+}
+
+resource "partiteai_model_profile" "test" {
+  name              = "acc-probe-off"
+  model_provider_id = partiteai_model_provider.test.id
+  probe             = false
+  configuration = {
+    model      = "a-model-the-provider-does-not-serve-yet"
+    max_tokens = 1024
+  }
+}
+`,
+		Check: resource.ComposeAggregateTestCheckFunc(
+			resource.TestCheckResourceAttr("partiteai_model_profile.test", "configuration.model", "a-model-the-provider-does-not-serve-yet"),
+			resource.TestCheckNoResourceAttr("partiteai_model_profile.test", "probe"),
+		),
+	})
+}
+
 func TestAccModelProfile_basic(t *testing.T) {
 	accTest(t,
 		resource.TestStep{
 			Config: `
 resource "partiteai_model_provider" "test" {
+  probe = false
   name = "profile-provider"
-  anthropic = { api_key = "sk-ant" }
+  anthropic = { api_key_wo = "sk-ant" }
 }
 
 resource "partiteai_model_profile" "test" {
+  probe = false
   name              = "acc-profile"
   model_provider_id = partiteai_model_provider.test.id
   configuration = {

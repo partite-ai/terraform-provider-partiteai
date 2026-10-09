@@ -23,10 +23,27 @@ type ModelProviderBaseModel struct {
 	OpenAI       types.Object      `tfsdk:"openai"`
 	GoogleGenAI  types.Object      `tfsdk:"google_genai"`
 	OpenAICompat types.Object      `tfsdk:"openai_compatible"`
+	Fireworks    types.Object      `tfsdk:"fireworks"`
+	Cerebras     types.Object      `tfsdk:"cerebras"`
+}
+
+// secretMapper gives the attribute name and value for a secret of the provider
+// config. The server never returns a secret, only whether it is set.
+type secretMapper func(name string, set bool) (string, attr.Value)
+
+// writeOnlySecret is the resource's secretMapper: the <name>_wo attribute is
+// write-only, so state holds null for it.
+func writeOnlySecret(name string, _ bool) (string, attr.Value) {
+	return name + "_wo", types.StringNull()
+}
+
+// secretIsSet is the data source's secretMapper: a <name>_set boolean.
+func secretIsSet(name string, set bool) (string, attr.Value) {
+	return name + "_set", types.BoolValue(set)
 }
 
 // MapFromGraphQL maps a GraphQL ModelProviderDetails response to the ModelProviderBaseModel.
-func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgql.ModelProviderDetails) diag.Diagnostics {
+func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgql.ModelProviderDetails, secret secretMapper) diag.Diagnostics {
 	// Use setFields for standard fields
 	diags := setFields(
 		ctx,
@@ -43,6 +60,8 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 	m.OpenAI = types.ObjectNull(m.OpenAI.AttributeTypes(ctx))
 	m.GoogleGenAI = types.ObjectNull(m.GoogleGenAI.AttributeTypes(ctx))
 	m.OpenAICompat = types.ObjectNull(m.OpenAICompat.AttributeTypes(ctx))
+	m.Fireworks = types.ObjectNull(m.Fireworks.AttributeTypes(ctx))
+	m.Cerebras = types.ObjectNull(m.Cerebras.AttributeTypes(ctx))
 
 	// Set the correct block based on provider type
 	switch details.ProviderType {
@@ -53,9 +72,9 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 			return diags
 		}
 		anthropicAttrs := m.Anthropic.AttributeTypes(ctx)
-		var block = map[string]attr.Value{
-			"api_key": types.StringValue(c.ApiKey),
-		}
+		block := map[string]attr.Value{}
+		name, v := secret("api_key", c.ApiKeySet)
+		block[name] = v
 		m.Anthropic = types.ObjectValueMust(anthropicAttrs, block)
 	case pgql.ModelProviderTypeOpenAi:
 		c, ok := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigOpenAI)
@@ -64,9 +83,9 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 			return diags
 		}
 		openaiAttrs := m.OpenAI.AttributeTypes(ctx)
-		var block = map[string]attr.Value{
-			"api_key": types.StringValue(c.ApiKey),
-		}
+		block := map[string]attr.Value{}
+		name, v := secret("api_key", c.ApiKeySet)
+		block[name] = v
 		m.OpenAI = types.ObjectValueMust(openaiAttrs, block)
 	case pgql.ModelProviderTypeGoogleGenAi:
 		c, ok := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI)
@@ -89,17 +108,18 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 		block := map[string]attr.Value{}
 		// Set only one of gemini or vertex
 		if c.Gemini != nil {
-			geminiBlock := map[string]attr.Value{
-				"api_key": types.StringValue(c.Gemini.ApiKey),
-			}
+			geminiBlock := map[string]attr.Value{}
+			name, v := secret("api_key", c.Gemini.ApiKeySet)
+			geminiBlock[name] = v
 			block["gemini"] = types.ObjectValueMust(geminiType.AttributeTypes(), geminiBlock)
 			block["vertex"] = types.ObjectNull(vertexType.AttributeTypes())
 		} else if c.Vertex != nil {
 			vertexBlock := map[string]attr.Value{
-				"service_account_key": types.StringValue(c.Vertex.ServiceAccountKey),
-				"project_id":          types.StringValue(c.Vertex.ProjectID),
-				"location":            types.StringValue(c.Vertex.Location),
+				"project_id": types.StringValue(c.Vertex.ProjectID),
+				"location":   types.StringValue(c.Vertex.Location),
 			}
+			name, v := secret("service_account_key", c.Vertex.ServiceAccountKeySet)
+			vertexBlock[name] = v
 			block["vertex"] = types.ObjectValueMust(vertexType.AttributeTypes(), vertexBlock)
 			block["gemini"] = types.ObjectNull(geminiType.AttributeTypes())
 		} else {
@@ -117,12 +137,31 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 		block := map[string]attr.Value{
 			"url": types.StringValue(c.Url),
 		}
-		if c.ApiToken != nil {
-			block["api_token"] = types.StringValue(*c.ApiToken)
-		} else {
-			block["api_token"] = types.StringNull()
-		}
+		name, v := secret("api_token", c.ApiTokenSet)
+		block[name] = v
 		m.OpenAICompat = types.ObjectValueMust(openAICompatAttrs, block)
+	case pgql.ModelProviderTypeFireworks:
+		c, ok := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigFireworks)
+		if !ok {
+			diags.AddError("Internal Error", "Expected Fireworks provider config type")
+			return diags
+		}
+		block := map[string]attr.Value{
+			"account_id": types.StringPointerValue(c.AccountID),
+		}
+		name, v := secret("api_key", c.ApiKeySet)
+		block[name] = v
+		m.Fireworks = types.ObjectValueMust(m.Fireworks.AttributeTypes(ctx), block)
+	case pgql.ModelProviderTypeCerebras:
+		c, ok := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigCerebras)
+		if !ok {
+			diags.AddError("Internal Error", "Expected Cerebras provider config type")
+			return diags
+		}
+		block := map[string]attr.Value{}
+		name, v := secret("api_key", c.ApiKeySet)
+		block[name] = v
+		m.Cerebras = types.ObjectValueMust(m.Cerebras.AttributeTypes(ctx), block)
 	}
 
 	return diags

@@ -22,6 +22,12 @@ An author-defined task definition describing a task an agent can send to the use
 - `name` (String) Resource name
 - `output_message_type` (String) JSON schema the user must satisfy when completing the task
 
+### Optional
+
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
+- `overwrite_existing` (Boolean, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) When true and a task definition with this `name` already exists, create takes it over and overwrites its description and schemas instead of failing on the duplicate name. Use it to apply a configuration to an organization that already has the definition, such as one of the task definitions every organization starts with. Only read when the resource is created, and never stored in state, so changing it later does nothing. Defaults to false.
+
 ### Read-Only
 
 - `created_at` (String) Timestamp when the resource was created

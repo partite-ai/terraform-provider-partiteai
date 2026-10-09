@@ -1,6 +1,12 @@
 package provider
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/json"
+	"encoding/pem"
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -11,9 +17,10 @@ func TestAccModelProvider_openai(t *testing.T) {
 		resource.TestStep{
 			Config: `
 resource "partiteai_model_provider" "test" {
+  probe = false
   name = "acc-openai"
   openai = {
-    api_key = "sk-test-1"
+    api_key_wo = "sk-test-1"
   }
 }
 
@@ -28,15 +35,21 @@ data "partiteai_model_provider" "test" {
 				resource.TestCheckResourceAttrPair(
 					"data.partiteai_model_provider.test", "name",
 					"partiteai_model_provider.test", "name"),
+				// The key is write-only, so state never holds it, and the data
+				// source only says that one is set.
+				resource.TestCheckNoResourceAttr("partiteai_model_provider.test", "openai.api_key_wo"),
+				resource.TestCheckResourceAttr("data.partiteai_model_provider.test", "openai.api_key_set", "true"),
+				resource.TestCheckNoResourceAttr("partiteai_model_provider.test", "probe"),
 			),
 		},
 		resource.TestStep{
 			Config: `
 resource "partiteai_model_provider" "test" {
+  probe = false
   name        = "acc-openai-renamed"
   description = "now with a description"
   openai = {
-    api_key = "sk-test-1"
+    api_key_wo = "sk-test-1"
   }
 }
 `,
@@ -48,18 +61,37 @@ resource "partiteai_model_provider" "test" {
 		resource.TestStep{
 			Config: `
 resource "partiteai_model_provider" "test" {
+  probe = false
   name        = "acc-openai-renamed"
   description = "now with a description"
   openai = {
-    api_key = "sk-test-1"
+    api_key_wo = "sk-test-1"
   }
 }
 `,
 			ResourceName:      "partiteai_model_provider.test",
 			ImportState:       true,
 			ImportStateVerify: true,
-			// The API never returns the key it was given.
-			ImportStateVerifyIgnore: []string{"openai"},
+			// Nothing to ignore: the key is write-only, so neither side holds
+			// it, and an import starts at credentials_version 1.
+		},
+		resource.TestStep{
+			// A new key is sent by changing credentials_version with it.
+			Config: `
+resource "partiteai_model_provider" "test" {
+  probe = false
+  name                = "acc-openai-renamed"
+  description         = "now with a description"
+  credentials_version = 2
+  openai = {
+    api_key_wo = "sk-test-2"
+  }
+}
+`,
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("partiteai_model_provider.test", "credentials_version", "2"),
+				resource.TestCheckNoResourceAttr("partiteai_model_provider.test", "openai.api_key_wo"),
+			),
 		},
 	)
 }
@@ -69,23 +101,26 @@ resource "partiteai_model_provider" "test" {
 // them shows up as a non-empty plan after apply.
 func TestAccModelProvider_variants(t *testing.T) {
 	accTest(t, resource.TestStep{
-		Config: `
+		Config: fmt.Sprintf(`
 resource "partiteai_model_provider" "anthropic" {
+  probe = false
   name = "acc-anthropic"
   anthropic = {
-    api_key = "sk-ant-test"
+    api_key_wo = "sk-ant-test"
   }
 }
 
 resource "partiteai_model_provider" "compatible_with_token" {
+  probe = false
   name = "acc-compatible-token"
   openai_compatible = {
     url       = "https://example.invalid/v1"
-    api_token = "tok"
+    api_token_wo = "tok"
   }
 }
 
 resource "partiteai_model_provider" "compatible_without_token" {
+  probe = false
   name = "acc-compatible-no-token"
   openai_compatible = {
     url = "https://example.invalid/v1"
@@ -93,31 +128,52 @@ resource "partiteai_model_provider" "compatible_without_token" {
 }
 
 resource "partiteai_model_provider" "gemini" {
+  probe = false
   name = "acc-gemini"
   google_genai = {
     gemini = {
-      api_key = "goog-test"
+      api_key_wo = "goog-test"
     }
   }
 }
 
+resource "partiteai_model_provider" "fireworks" {
+  probe = false
+  name = "acc-fireworks"
+  fireworks = {
+    api_key_wo = "fw-test"
+    account_id = "acct"
+  }
+}
+
+resource "partiteai_model_provider" "cerebras" {
+  probe = false
+  name = "acc-cerebras"
+  cerebras = {
+    api_key_wo = "csk-test"
+  }
+}
+
 resource "partiteai_model_provider" "vertex" {
+  probe = false
   name = "acc-vertex"
   google_genai = {
     vertex = {
       project_id          = "proj"
       location            = "us-central1"
-      service_account_key = "{}"
+      service_account_key_wo = %q
     }
   }
 }
-`,
+`, serviceAccountKey(t)),
 		Check: resource.ComposeAggregateTestCheckFunc(
 			resource.TestCheckResourceAttrSet("partiteai_model_provider.anthropic", "id"),
 			resource.TestCheckResourceAttr("partiteai_model_provider.compatible_with_token", "openai_compatible.url", "https://example.invalid/v1"),
 			resource.TestCheckResourceAttrSet("partiteai_model_provider.compatible_without_token", "id"),
-			resource.TestCheckResourceAttr("partiteai_model_provider.gemini", "google_genai.gemini.api_key", "goog-test"),
+			resource.TestCheckNoResourceAttr("partiteai_model_provider.gemini", "google_genai.gemini.api_key_wo"),
 			resource.TestCheckResourceAttr("partiteai_model_provider.vertex", "google_genai.vertex.location", "us-central1"),
+			resource.TestCheckResourceAttr("partiteai_model_provider.fireworks", "fireworks.account_id", "acct"),
+			resource.TestCheckNoResourceAttr("partiteai_model_provider.fireworks", "fireworks.api_key_wo"),
 		),
 	})
 }
@@ -128,9 +184,10 @@ resource "partiteai_model_provider" "vertex" {
 func TestAccModelProvider_tags(t *testing.T) {
 	const withTags = `
 resource "partiteai_model_provider" "test" {
+  probe = false
   name = "acc-tags"
   openai = {
-    api_key = "sk-test"
+    api_key_wo = "sk-test"
   }
   tags = [
     { name = "environment", value = "test" },
@@ -140,9 +197,10 @@ resource "partiteai_model_provider" "test" {
 `
 	const withoutTags = `
 resource "partiteai_model_provider" "test" {
+  probe = false
   name = "acc-tags"
   openai = {
-    api_key = "sk-test"
+    api_key_wo = "sk-test"
   }
 }
 `
@@ -161,4 +219,28 @@ resource "partiteai_model_provider" "test" {
 			Check:  resource.TestCheckResourceAttr("partiteai_model_provider.test", "tags.#", "0"),
 		},
 	)
+}
+
+// serviceAccountKey is a well-formed service account document with a key made
+// for the test. The server parses the key when it validates a vertex config,
+// so the key must be a real RSA key.
+func serviceAccountKey(t *testing.T) string {
+	t.Helper()
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc, err := json.Marshal(map[string]string{
+		"type":           "service_account",
+		"project_id":     "proj",
+		"private_key_id": "k1",
+		"private_key":    string(pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})),
+		"client_email":   "sa@proj.iam.gserviceaccount.com",
+		"client_id":      "1",
+		"token_uri":      "https://oauth2.googleapis.com/token",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(doc)
 }

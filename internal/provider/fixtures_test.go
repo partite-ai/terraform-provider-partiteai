@@ -8,13 +8,15 @@ package provider
 // partiteai_model_set.base.id.
 const baseChain = `
 resource "partiteai_model_provider" "base" {
+  probe = false
   name = "base-provider"
   openai = {
-    api_key = "sk-test"
+    api_key_wo = "sk-test"
   }
 }
 
 resource "partiteai_model_profile" "base" {
+  probe = false
   name              = "base-profile"
   model_provider_id = partiteai_model_provider.base.id
   configuration = {

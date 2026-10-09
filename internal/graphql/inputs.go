@@ -73,13 +73,18 @@ type NewModelProvider struct {
 	ProviderType   ModelProviderType        `json:"providerType"`
 	ProviderConfig ModelProviderConfigInput `json:"providerConfig"`
 	Tags           []*Tag                   `json:"tags"`
+	// Left out, the server probes the credentials.
+	Probe *bool `json:"probe,omitempty"`
 }
 
 type UpdateModelProvider struct {
-	Name           Optional[string]         `json:"name,omitzero"`
-	Description    Optional[string]         `json:"description,omitzero"`
-	ProviderConfig ModelProviderConfigInput `json:"providerConfig"`
-	Tags           Optional[[]*Tag]         `json:"tags,omitzero"`
+	Name        Optional[string] `json:"name,omitzero"`
+	Description Optional[string] `json:"description,omitzero"`
+	// Left out, the server keeps the stored config and its secret.
+	ProviderConfig *ModelProviderConfigInput `json:"providerConfig,omitempty"`
+	Tags           Optional[[]*Tag]          `json:"tags,omitzero"`
+	// Left out, the server probes new credentials.
+	Probe *bool `json:"probe,omitempty"`
 }
 
 type ModelProviderConfigInput struct {
@@ -87,6 +92,8 @@ type ModelProviderConfigInput struct {
 	OpenAI           *ModelProviderConfigInputOpenAI           `json:"openAI,omitempty"`
 	GoogleGenAI      *ModelProviderConfigInputGoogleGenAI      `json:"googleGenAI,omitempty"`
 	OpenAICompatible *ModelProviderConfigInputOpenAICompatible `json:"openAICompatible,omitempty"`
+	Fireworks        *ModelProviderConfigInputFireworks        `json:"fireworks,omitempty"`
+	Cerebras         *ModelProviderConfigInputCerebras         `json:"cerebras,omitempty"`
 }
 
 type ModelProviderConfigInputAnthropic struct {
@@ -117,11 +124,25 @@ type ModelProviderConfigInputOpenAICompatible struct {
 	ApiToken Optional[string] `json:"apiToken,omitzero"`
 }
 
+type ModelProviderConfigInputFireworks struct {
+	ApiKey string `json:"apiKey"`
+	// When set, the model list includes this Fireworks account's models.
+	AccountID Optional[string] `json:"accountID,omitzero"`
+}
+
+type ModelProviderConfigInputCerebras struct {
+	ApiKey string `json:"apiKey"`
+}
+
 type NewModelProfile struct {
 	Name          string                  `json:"name"`
 	Description   Optional[string]        `json:"description,omitzero"`
 	Configuration ModelProfileConfigInput `json:"configuration"`
 	Tags          []*Tag                  `json:"tags"`
+	// Probe asks the server to send one request to the provider before the
+	// write and refuse a profile the provider rejects. Omitted, the server
+	// probes.
+	Probe *bool `json:"probe,omitempty"`
 }
 
 type UpdateModelProfile struct {
@@ -129,6 +150,10 @@ type UpdateModelProfile struct {
 	Description   Optional[string]         `json:"description,omitzero"`
 	Configuration *ModelProfileConfigInput `json:"configuration,omitempty"`
 	Tags          Optional[[]*Tag]         `json:"tags,omitzero"`
+	// Probe asks the server to send one request to the provider before the
+	// write and refuse a profile the provider rejects. Omitted, the server
+	// probes.
+	Probe *bool `json:"probe,omitempty"`
 }
 
 // ModelProfileConfigInput is one set of settings for whatever model the profile
@@ -253,6 +278,8 @@ type NewTaskDefinition struct {
 	InputMessageType string `json:"inputMessageType"`
 	// A JSON schema the user must satisfy when completing the task.
 	OutputMessageType string `json:"outputMessageType"`
+	// Overwrite a definition that already has the name instead of failing.
+	OverwriteExisting *bool `json:"overwriteExisting,omitempty"`
 }
 
 type UpdateTaskDefinition struct {
@@ -377,12 +404,20 @@ type NewEmbeddingProfile struct {
 	Name          string                      `json:"name"`
 	Description   Optional[string]            `json:"description,omitzero"`
 	Configuration EmbeddingProfileConfigInput `json:"configuration"`
+	// Probe asks the server to send one request to the provider before the
+	// write and refuse a profile the provider rejects. Omitted, the server
+	// probes.
+	Probe *bool `json:"probe,omitempty"`
 }
 
 type UpdateEmbeddingProfile struct {
 	Name          Optional[string]             `json:"name,omitzero"`
 	Description   Optional[string]             `json:"description,omitzero"`
 	Configuration *EmbeddingProfileConfigInput `json:"configuration,omitempty"`
+	// Probe asks the server to send one request to the provider before the
+	// write and refuse a profile the provider rejects. Omitted, the server
+	// probes.
+	Probe *bool `json:"probe,omitempty"`
 }
 
 // NewMemoryStoreScope is one scope written with its store, or added to one.

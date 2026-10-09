@@ -858,6 +858,20 @@
             "DeprecationMessage": ""
           },
           {
+            "Name": "probe",
+            "Type": "bool",
+            "NestedType": null,
+            "Description": "Whether the server sends one request to the provider before each create or update, and refuses a profile the provider rejects. An unreachable provider does not fail the write. Set false to write a profile for a model the provider does not serve yet. Defaults to true.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": true,
+            "DeprecationMessage": ""
+          },
+          {
             "Name": "updated_at",
             "Type": "string",
             "NestedType": null,
@@ -4209,6 +4223,20 @@
             "DeprecationMessage": ""
           },
           {
+            "Name": "probe",
+            "Type": "bool",
+            "NestedType": null,
+            "Description": "Whether the server sends one request to the provider before each create or update, and refuses a profile the provider rejects. An unreachable provider does not fail the write. Set false to write a profile for a model the provider does not serve yet. Defaults to true.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": true,
+            "DeprecationMessage": ""
+          },
+          {
             "Name": "tags",
             "Type": null,
             "NestedType": {
@@ -4287,23 +4315,55 @@
             "NestedType": {
               "Attributes": [
                 {
-                  "Name": "api_key",
+                  "Name": "api_key_wo",
                   "Type": "string",
                   "NestedType": null,
-                  "Description": "API key for Anthropic",
+                  "Description": "API key for Anthropic. Write-only: never stored in state. Change `credentials_version` to send a new value.",
                   "Required": true,
                   "Optional": false,
                   "Computed": false,
                   "Sensitive": true,
                   "DescriptionKind": 1,
                   "Deprecated": false,
-                  "WriteOnly": false,
+                  "WriteOnly": true,
                   "DeprecationMessage": ""
                 }
               ],
               "Nesting": 1
             },
             "Description": "Anthropic provider config",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "cerebras",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "api_key_wo",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "API key for Cerebras. Write-only: never stored in state. Change `credentials_version` to send a new value.",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": true,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": true,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 1
+            },
+            "Description": "Cerebras provider config",
             "Required": false,
             "Optional": true,
             "Computed": false,
@@ -4328,10 +4388,70 @@
             "DeprecationMessage": ""
           },
           {
+            "Name": "credentials_version",
+            "Type": "number",
+            "NestedType": null,
+            "Description": "The version of the provider's secret. The secret is write-only, so Terraform cannot see it change; increment this to send a new one.",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
             "Name": "description",
             "Type": "string",
             "NestedType": null,
             "Description": "Resource description",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "fireworks",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "account_id",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Fireworks account id. When set, the model list includes this account's models.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "api_key_wo",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "API key for Fireworks. Write-only: never stored in state. Change `credentials_version` to send a new value.",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": true,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": true,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 1
+            },
+            "Description": "Fireworks provider config",
             "Required": false,
             "Optional": true,
             "Computed": false,
@@ -4352,17 +4472,17 @@
                   "NestedType": {
                     "Attributes": [
                       {
-                        "Name": "api_key",
+                        "Name": "api_key_wo",
                         "Type": "string",
                         "NestedType": null,
-                        "Description": "API key for Gemini",
+                        "Description": "API key for Gemini. Write-only: never stored in state. Change `credentials_version` to send a new value.",
                         "Required": true,
                         "Optional": false,
                         "Computed": false,
                         "Sensitive": true,
                         "DescriptionKind": 1,
                         "Deprecated": false,
-                        "WriteOnly": false,
+                        "WriteOnly": true,
                         "DeprecationMessage": ""
                       }
                     ],
@@ -4412,17 +4532,17 @@
                         "DeprecationMessage": ""
                       },
                       {
-                        "Name": "service_account_key",
+                        "Name": "service_account_key_wo",
                         "Type": "string",
                         "NestedType": null,
-                        "Description": "Service account key for Vertex",
+                        "Description": "Service account key for Vertex. Write-only: never stored in state. Change `credentials_version` to send a new value.",
                         "Required": true,
                         "Optional": false,
                         "Computed": false,
                         "Sensitive": true,
                         "DescriptionKind": 1,
                         "Deprecated": false,
-                        "WriteOnly": false,
+                        "WriteOnly": true,
                         "DeprecationMessage": ""
                       }
                     ],
@@ -4485,17 +4605,17 @@
             "NestedType": {
               "Attributes": [
                 {
-                  "Name": "api_key",
+                  "Name": "api_key_wo",
                   "Type": "string",
                   "NestedType": null,
-                  "Description": "API key for OpenAI",
+                  "Description": "API key for OpenAI. Write-only: never stored in state. Change `credentials_version` to send a new value.",
                   "Required": true,
                   "Optional": false,
                   "Computed": false,
                   "Sensitive": true,
                   "DescriptionKind": 1,
                   "Deprecated": false,
-                  "WriteOnly": false,
+                  "WriteOnly": true,
                   "DeprecationMessage": ""
                 }
               ],
@@ -4517,17 +4637,17 @@
             "NestedType": {
               "Attributes": [
                 {
-                  "Name": "api_token",
+                  "Name": "api_token_wo",
                   "Type": "string",
                   "NestedType": null,
-                  "Description": "API token for OpenAI-compatible provider",
+                  "Description": "API token for the OpenAI-compatible provider. Leave it out for one that takes no token. Write-only: never stored in state. Change `credentials_version` to send a new value.",
                   "Required": false,
                   "Optional": true,
                   "Computed": false,
                   "Sensitive": true,
                   "DescriptionKind": 1,
                   "Deprecated": false,
-                  "WriteOnly": false,
+                  "WriteOnly": true,
                   "DeprecationMessage": ""
                 },
                 {
@@ -4555,6 +4675,20 @@
             "DescriptionKind": 1,
             "Deprecated": false,
             "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "probe",
+            "Type": "bool",
+            "NestedType": null,
+            "Description": "Whether the server lists the provider's models with the credentials before a create, or an update that sends new credentials, and refuses credentials the provider rejects. An unreachable provider does not fail the write. Set false to write credentials the provider can't check yet. It does not cover the provider's profiles, which each take their own `probe`. Defaults to true.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": true,
             "DeprecationMessage": ""
           },
           {
@@ -5927,6 +6061,20 @@
             "DescriptionKind": 1,
             "Deprecated": false,
             "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "overwrite_existing",
+            "Type": "bool",
+            "NestedType": null,
+            "Description": "When true and a task definition with this `name` already exists, create takes it over and overwrites its description and schemas instead of failing on the duplicate name. Use it to apply a configuration to an organization that already has the definition, such as one of the task definitions every organization starts with. Only read when the resource is created, and never stored in state, so changing it later does nothing. Defaults to false.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": true,
             "DeprecationMessage": ""
           },
           {
@@ -10057,10 +10205,10 @@
             "NestedType": {
               "Attributes": [
                 {
-                  "Name": "api_key",
-                  "Type": "string",
+                  "Name": "api_key_set",
+                  "Type": "bool",
                   "NestedType": null,
-                  "Description": "API key for Anthropic",
+                  "Description": "Whether an API key is set for Anthropic. The key itself is never returned.",
                   "Required": false,
                   "Optional": false,
                   "Computed": true,
@@ -10074,6 +10222,38 @@
               "Nesting": 1
             },
             "Description": "Anthropic provider config",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "cerebras",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "api_key_set",
+                  "Type": "bool",
+                  "NestedType": null,
+                  "Description": "Whether an API key is set for Cerebras. The key itself is never returned.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 1
+            },
+            "Description": "Cerebras provider config",
             "Required": false,
             "Optional": false,
             "Computed": true,
@@ -10112,6 +10292,52 @@
             "DeprecationMessage": ""
           },
           {
+            "Name": "fireworks",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "account_id",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Fireworks account id. When set, the model list includes this account's models.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "api_key_set",
+                  "Type": "bool",
+                  "NestedType": null,
+                  "Description": "Whether an API key is set for Fireworks. The key itself is never returned.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 1
+            },
+            "Description": "Fireworks provider config",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
             "Name": "google_genai",
             "Type": null,
             "NestedType": {
@@ -10122,14 +10348,14 @@
                   "NestedType": {
                     "Attributes": [
                       {
-                        "Name": "api_key",
-                        "Type": "string",
+                        "Name": "api_key_set",
+                        "Type": "bool",
                         "NestedType": null,
-                        "Description": "API key for Gemini",
+                        "Description": "Whether an API key is set for Gemini. The key itself is never returned.",
                         "Required": false,
                         "Optional": false,
                         "Computed": true,
-                        "Sensitive": true,
+                        "Sensitive": false,
                         "DescriptionKind": 1,
                         "Deprecated": false,
                         "WriteOnly": false,
@@ -10182,14 +10408,14 @@
                         "DeprecationMessage": ""
                       },
                       {
-                        "Name": "service_account_key",
-                        "Type": "string",
+                        "Name": "service_account_key_set",
+                        "Type": "bool",
                         "NestedType": null,
-                        "Description": "Service account key for Vertex",
+                        "Description": "Whether a service account key is set for Vertex. The key itself is never returned.",
                         "Required": false,
                         "Optional": false,
                         "Computed": true,
-                        "Sensitive": true,
+                        "Sensitive": false,
                         "DescriptionKind": 1,
                         "Deprecated": false,
                         "WriteOnly": false,
@@ -10255,14 +10481,14 @@
             "NestedType": {
               "Attributes": [
                 {
-                  "Name": "api_key",
-                  "Type": "string",
+                  "Name": "api_key_set",
+                  "Type": "bool",
                   "NestedType": null,
-                  "Description": "API key for OpenAI",
+                  "Description": "Whether an API key is set for OpenAI. The key itself is never returned.",
                   "Required": false,
                   "Optional": false,
                   "Computed": true,
-                  "Sensitive": true,
+                  "Sensitive": false,
                   "DescriptionKind": 1,
                   "Deprecated": false,
                   "WriteOnly": false,
@@ -10287,14 +10513,14 @@
             "NestedType": {
               "Attributes": [
                 {
-                  "Name": "api_token",
-                  "Type": "string",
+                  "Name": "api_token_set",
+                  "Type": "bool",
                   "NestedType": null,
-                  "Description": "API token for OpenAI-compatible provider",
+                  "Description": "Whether the OpenAI-compatible provider sends an API token. The token itself is never returned.",
                   "Required": false,
                   "Optional": false,
                   "Computed": true,
-                  "Sensitive": true,
+                  "Sensitive": false,
                   "DescriptionKind": 1,
                   "Deprecated": false,
                   "WriteOnly": false,

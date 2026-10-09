@@ -5,8 +5,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -29,6 +31,7 @@ type TaskDefinitionResource struct {
 // TaskDefinitionResourceModel extends the base model with resource-specific fields.
 type TaskDefinitionResourceModel struct {
 	TaskDefinitionBaseModel
+	OverwriteExisting types.Bool `tfsdk:"overwrite_existing"`
 }
 
 func (r *TaskDefinitionResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -53,6 +56,16 @@ func (r *TaskDefinitionResource) Schema(ctx context.Context, req resource.Schema
 				MarkdownDescription: "JSON schema the user must satisfy when completing the task",
 				Required:            true,
 			},
+			"overwrite_existing": schema.BoolAttribute{
+				MarkdownDescription: "When true and a task definition with this `name` already exists, create takes it over " +
+					"and overwrites its description and schemas instead of failing on the duplicate name. " +
+					"Use it to apply a configuration to an organization that already has the definition, " +
+					"such as one of the task definitions every organization starts with. " +
+					"Only read when the resource is created, and never stored in state, so changing it later does nothing. " +
+					"Defaults to false.",
+				Optional:  true,
+				WriteOnly: true,
+			},
 			"created_at": commonSchemas.createdAt,
 			"updated_at": commonSchemas.updatedAt,
 		},
@@ -66,14 +79,25 @@ func (r *TaskDefinitionResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
+	// Write-only, so the plan holds null and only the config has the value.
+	var overwriteExisting types.Bool
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("overwrite_existing"), &overwriteExisting)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	logResourceOperation(ctx, "creating", "task_definition", "")
 
-	createResp, err := pgql.CreateTaskDefinition(ctx, r.GetClient(), &pgql.NewTaskDefinition{
+	input := &pgql.NewTaskDefinition{
 		Name:              data.Name.ValueString(),
 		Description:       data.Description.ValueString(),
 		InputMessageType:  data.InputMessageType.ValueString(),
 		OutputMessageType: data.OutputMessageType.ValueString(),
-	})
+	}
+	if overwriteExisting.ValueBool() {
+		input.OverwriteExisting = overwriteExisting.ValueBoolPointer()
+	}
+	createResp, err := pgql.CreateTaskDefinition(ctx, r.GetClient(), input)
 	if err != nil {
 		handleAPIError(&resp.Diagnostics, err, "create task_definition")
 		return

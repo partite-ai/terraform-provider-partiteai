@@ -660,7 +660,9 @@ func (v *CreateSkillResponse) GetCreateSkill() SkillDetails { return v.CreateSki
 
 // CreateTaskDefinitionResponse is returned by CreateTaskDefinition on success.
 type CreateTaskDefinitionResponse struct {
-	// Create a new author-defined TaskDefinition. Name must be unique.
+	// Create a new author-defined TaskDefinition. Name must be unique unless
+	// overwriteExisting is set, in which case an existing definition with the same
+	// name is updated instead.
 	CreateTaskDefinition TaskDefinitionDetails `json:"createTaskDefinition"`
 }
 
@@ -4008,9 +4010,12 @@ func __marshalModelProviderDetailsProviderConfigModelProviderConfig(v *ModelProv
 }
 
 // ModelProviderDetailsProviderConfigModelProviderConfigAnthropic includes the requested fields of the GraphQL type ModelProviderConfigAnthropic.
+// The GraphQL type's documentation follows.
+//
+// A provider's stored configuration. Secret fields are not returned; each has a boolean that says whether it is set.
 type ModelProviderDetailsProviderConfigModelProviderConfigAnthropic struct {
-	Typename *string `json:"__typename"`
-	ApiKey   string  `json:"apiKey"`
+	Typename  *string `json:"__typename"`
+	ApiKeySet bool    `json:"apiKeySet"`
 }
 
 // GetTypename returns ModelProviderDetailsProviderConfigModelProviderConfigAnthropic.Typename, and is useful for accessing the field via an interface.
@@ -4018,14 +4023,15 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigAnthropic) GetType
 	return v.Typename
 }
 
-// GetApiKey returns ModelProviderDetailsProviderConfigModelProviderConfigAnthropic.ApiKey, and is useful for accessing the field via an interface.
-func (v *ModelProviderDetailsProviderConfigModelProviderConfigAnthropic) GetApiKey() string {
-	return v.ApiKey
+// GetApiKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigAnthropic.ApiKeySet, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigAnthropic) GetApiKeySet() bool {
+	return v.ApiKeySet
 }
 
 // ModelProviderDetailsProviderConfigModelProviderConfigCerebras includes the requested fields of the GraphQL type ModelProviderConfigCerebras.
 type ModelProviderDetailsProviderConfigModelProviderConfigCerebras struct {
-	Typename *string `json:"__typename"`
+	Typename  *string `json:"__typename"`
+	ApiKeySet bool    `json:"apiKeySet"`
 }
 
 // GetTypename returns ModelProviderDetailsProviderConfigModelProviderConfigCerebras.Typename, and is useful for accessing the field via an interface.
@@ -4033,14 +4039,32 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigCerebras) GetTypen
 	return v.Typename
 }
 
+// GetApiKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigCerebras.ApiKeySet, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigCerebras) GetApiKeySet() bool {
+	return v.ApiKeySet
+}
+
 // ModelProviderDetailsProviderConfigModelProviderConfigFireworks includes the requested fields of the GraphQL type ModelProviderConfigFireworks.
 type ModelProviderDetailsProviderConfigModelProviderConfigFireworks struct {
-	Typename *string `json:"__typename"`
+	Typename  *string `json:"__typename"`
+	ApiKeySet bool    `json:"apiKeySet"`
+	// Fireworks account id. When set, the model list includes this account's models.
+	AccountID *string `json:"accountID"`
 }
 
 // GetTypename returns ModelProviderDetailsProviderConfigModelProviderConfigFireworks.Typename, and is useful for accessing the field via an interface.
 func (v *ModelProviderDetailsProviderConfigModelProviderConfigFireworks) GetTypename() *string {
 	return v.Typename
+}
+
+// GetApiKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigFireworks.ApiKeySet, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigFireworks) GetApiKeySet() bool {
+	return v.ApiKeySet
+}
+
+// GetAccountID returns ModelProviderDetailsProviderConfigModelProviderConfigFireworks.AccountID, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigFireworks) GetAccountID() *string {
+	return v.AccountID
 }
 
 // ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI includes the requested fields of the GraphQL type ModelProviderConfigGoogleGenAI.
@@ -4067,24 +4091,24 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI) GetVe
 
 // ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi includes the requested fields of the GraphQL type ModelProviderConfigGoogleGenAIGeminiApi.
 type ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi struct {
-	ApiKey string `json:"apiKey"`
+	ApiKeySet bool `json:"apiKeySet"`
 }
 
-// GetApiKey returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi.ApiKey, and is useful for accessing the field via an interface.
-func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi) GetApiKey() string {
-	return v.ApiKey
+// GetApiKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi.ApiKeySet, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi) GetApiKeySet() bool {
+	return v.ApiKeySet
 }
 
 // ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex includes the requested fields of the GraphQL type ModelProviderConfigGoogleGenAIVertex.
 type ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex struct {
-	ServiceAccountKey string `json:"serviceAccountKey"`
-	ProjectID         string `json:"projectID"`
-	Location          string `json:"location"`
+	ServiceAccountKeySet bool   `json:"serviceAccountKeySet"`
+	ProjectID            string `json:"projectID"`
+	Location             string `json:"location"`
 }
 
-// GetServiceAccountKey returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex.ServiceAccountKey, and is useful for accessing the field via an interface.
-func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex) GetServiceAccountKey() string {
-	return v.ServiceAccountKey
+// GetServiceAccountKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex.ServiceAccountKeySet, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex) GetServiceAccountKeySet() bool {
+	return v.ServiceAccountKeySet
 }
 
 // GetProjectID returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex.ProjectID, and is useful for accessing the field via an interface.
@@ -4099,8 +4123,8 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex)
 
 // ModelProviderDetailsProviderConfigModelProviderConfigOpenAI includes the requested fields of the GraphQL type ModelProviderConfigOpenAI.
 type ModelProviderDetailsProviderConfigModelProviderConfigOpenAI struct {
-	Typename *string `json:"__typename"`
-	ApiKey   string  `json:"apiKey"`
+	Typename  *string `json:"__typename"`
+	ApiKeySet bool    `json:"apiKeySet"`
 }
 
 // GetTypename returns ModelProviderDetailsProviderConfigModelProviderConfigOpenAI.Typename, and is useful for accessing the field via an interface.
@@ -4108,16 +4132,17 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigOpenAI) GetTypenam
 	return v.Typename
 }
 
-// GetApiKey returns ModelProviderDetailsProviderConfigModelProviderConfigOpenAI.ApiKey, and is useful for accessing the field via an interface.
-func (v *ModelProviderDetailsProviderConfigModelProviderConfigOpenAI) GetApiKey() string {
-	return v.ApiKey
+// GetApiKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigOpenAI.ApiKeySet, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigOpenAI) GetApiKeySet() bool {
+	return v.ApiKeySet
 }
 
 // ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible includes the requested fields of the GraphQL type ModelProviderConfigOpenAICompatible.
 type ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible struct {
 	Typename *string `json:"__typename"`
 	Url      string  `json:"url"`
-	ApiToken *string `json:"apiToken"`
+	// False when the provider sends no token.
+	ApiTokenSet bool `json:"apiTokenSet"`
 }
 
 // GetTypename returns ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible.Typename, and is useful for accessing the field via an interface.
@@ -4130,9 +4155,9 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible) 
 	return v.Url
 }
 
-// GetApiToken returns ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible.ApiToken, and is useful for accessing the field via an interface.
-func (v *ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible) GetApiToken() *string {
-	return v.ApiToken
+// GetApiTokenSet returns ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible.ApiTokenSet, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigOpenAICompatible) GetApiTokenSet() bool {
+	return v.ApiTokenSet
 }
 
 type ModelProviderType string
@@ -7814,21 +7839,28 @@ fragment ModelProviderDetails on ModelProvider {
 	providerConfig {
 		__typename
 		... on ModelProviderConfigOpenAI {
-			apiKey
+			apiKeySet
 		}
 		... on ModelProviderConfigOpenAICompatible {
 			url
-			apiToken
+			apiTokenSet
 		}
 		... on ModelProviderConfigAnthropic {
-			apiKey
+			apiKeySet
+		}
+		... on ModelProviderConfigFireworks {
+			apiKeySet
+			accountID
+		}
+		... on ModelProviderConfigCerebras {
+			apiKeySet
 		}
 		... on ModelProviderConfigGoogleGenAI {
 			gemini {
-				apiKey
+				apiKeySet
 			}
 			vertex {
-				serviceAccountKey
+				serviceAccountKeySet
 				projectID
 				location
 			}
@@ -10002,21 +10034,28 @@ fragment ModelProviderDetails on ModelProvider {
 	providerConfig {
 		__typename
 		... on ModelProviderConfigOpenAI {
-			apiKey
+			apiKeySet
 		}
 		... on ModelProviderConfigOpenAICompatible {
 			url
-			apiToken
+			apiTokenSet
 		}
 		... on ModelProviderConfigAnthropic {
-			apiKey
+			apiKeySet
+		}
+		... on ModelProviderConfigFireworks {
+			apiKeySet
+			accountID
+		}
+		... on ModelProviderConfigCerebras {
+			apiKeySet
 		}
 		... on ModelProviderConfigGoogleGenAI {
 			gemini {
-				apiKey
+				apiKeySet
 			}
 			vertex {
-				serviceAccountKey
+				serviceAccountKeySet
 				projectID
 				location
 			}
@@ -11431,21 +11470,28 @@ fragment ModelProviderDetails on ModelProvider {
 	providerConfig {
 		__typename
 		... on ModelProviderConfigOpenAI {
-			apiKey
+			apiKeySet
 		}
 		... on ModelProviderConfigOpenAICompatible {
 			url
-			apiToken
+			apiTokenSet
 		}
 		... on ModelProviderConfigAnthropic {
-			apiKey
+			apiKeySet
+		}
+		... on ModelProviderConfigFireworks {
+			apiKeySet
+			accountID
+		}
+		... on ModelProviderConfigCerebras {
+			apiKeySet
 		}
 		... on ModelProviderConfigGoogleGenAI {
 			gemini {
-				apiKey
+				apiKeySet
 			}
 			vertex {
-				serviceAccountKey
+				serviceAccountKeySet
 				projectID
 				location
 			}

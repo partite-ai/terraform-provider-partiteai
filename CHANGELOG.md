@@ -25,6 +25,18 @@ BREAKING CHANGES:
   score bounds for computed ones. `input_values` can't be an empty object; leave
   it out instead.
 * data-source/partiteai_rubric: the same renames in `metrics`.
+* data-source/partiteai_model_provider: the server no longer returns provider
+  secrets, so `api_key`, `api_token` and `service_account_key` are removed.
+  Each is replaced by a boolean saying whether it is set: `api_key_set`,
+  `api_token_set` and `service_account_key_set`.
+* resource/partiteai_model_provider: secrets are write-only and never stored in
+  state. `api_key` is now `api_key_wo`, `api_token` is `api_token_wo` and
+  `service_account_key` is `service_account_key_wo`. Terraform can't see a
+  write-only value change, so to send a new secret change the new
+  `credentials_version` attribute (default 1) along with it. An update that
+  changes neither it nor the provider's other settings leaves the stored
+  secret alone. This also makes the resource work against servers that no
+  longer return provider secrets.
 
 FEATURES:
 
@@ -35,5 +47,27 @@ FEATURES:
 * resource/partiteai_agent: `skills` gives an agent skills to load. No two of an
   agent's skills can declare the same name.
 * data-source/partiteai_agent: `skills`.
+* resource/partiteai_model_provider: `fireworks` (`api_key_wo`, optional
+  `account_id`) and `cerebras` (`api_key_wo`) provider types.
+* data-source/partiteai_model_provider: `fireworks` (`api_key_set`,
+  `account_id`) and `cerebras` (`api_key_set`). Before this, a provider of
+  either type read back with every block empty.
+* resource/partiteai_model_profile, resource/partiteai_embedding_profile:
+  `probe`, a write-only flag. The server sends one request to the provider
+  before each create or update and refuses a profile the provider rejects;
+  set `probe = false` to write a profile for a model the provider does not
+  serve yet. Defaults to true, as before.
+* resource/partiteai_model_provider: `probe`, a write-only flag. The server
+  lists the provider's models with the credentials before a create, or an
+  update that sends new credentials, and refuses credentials the provider
+  rejects; set `probe = false` to write credentials it can't check yet. It
+  does not cover the provider's profiles. Defaults to true, as before. Needs a
+  server with `probe` on `createModelProvider` and `updateModelProvider`.
+* resource/partiteai_task_definition: `overwrite_existing`, a write-only flag.
+  When it is true and a task definition with the `name` already exists, create
+  overwrites that one instead of failing, so a configuration can be applied to
+  an organization that already has it, such as the task definitions every
+  organization starts with. Needs a server with `overwriteExisting` on
+  `createTaskDefinition`.
 * **New Data Source:** `partiteai_judge_metric`, found by `id` or exact `name`.
 * **New Data Source:** `partiteai_computed_metric`, found by `key`.
