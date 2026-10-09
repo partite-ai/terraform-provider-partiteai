@@ -24,6 +24,7 @@ Mesh data source
 - `created_at` (String) Timestamp when the resource was created
 - `description` (String) Resource description
 - `draft_version_id` (String) The ID of the draft version
+- `memory_store_id` (String) ID of the memory store the mesh reads and writes, if it has one
 - `model_set_id` (String) The ID of the model set
 - `name` (String) Resource name
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))

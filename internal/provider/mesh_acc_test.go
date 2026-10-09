@@ -230,3 +230,63 @@ data "partiteai_model_profile" "test" {
 		},
 	)
 }
+
+// meshMemoryStoreConfig is a mesh holding the given memory_store_id line, with
+// two stores it can point at.
+func meshMemoryStoreConfig(memoryStoreLine string) string {
+	return baseChain + `
+resource "partiteai_memory_store" "first" {
+  name = "acc-mesh-memory-first"
+}
+
+resource "partiteai_memory_store" "second" {
+  name = "acc-mesh-memory-second"
+}
+
+resource "partiteai_mesh" "test" {
+  name         = "acc-mesh-memory"
+  model_set_id = partiteai_model_set.base.id
+  ` + memoryStoreLine + `
+}
+
+data "partiteai_mesh" "test" {
+  id = partiteai_mesh.test.id
+}
+`
+}
+
+func TestAccMesh_memoryStore(t *testing.T) {
+	accTest(t,
+		resource.TestStep{
+			Config: meshMemoryStoreConfig(`memory_store_id = partiteai_memory_store.first.id`),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttrPair(
+					"partiteai_mesh.test", "memory_store_id",
+					"partiteai_memory_store.first", "id"),
+				resource.TestCheckResourceAttrPair(
+					"data.partiteai_mesh.test", "memory_store_id",
+					"partiteai_memory_store.first", "id"),
+			),
+		},
+		resource.TestStep{
+			Config: meshMemoryStoreConfig(`memory_store_id = partiteai_memory_store.second.id`),
+			Check: resource.TestCheckResourceAttrPair(
+				"partiteai_mesh.test", "memory_store_id",
+				"partiteai_memory_store.second", "id"),
+		},
+		resource.TestStep{
+			Config:            meshMemoryStoreConfig(`memory_store_id = partiteai_memory_store.second.id`),
+			ResourceName:      "partiteai_mesh.test",
+			ImportState:       true,
+			ImportStateVerify: true,
+		},
+		// Removing the attribute detaches the store.
+		resource.TestStep{
+			Config: meshMemoryStoreConfig(``),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckNoResourceAttr("partiteai_mesh.test", "memory_store_id"),
+				resource.TestCheckNoResourceAttr("data.partiteai_mesh.test", "memory_store_id"),
+			),
+		},
+	)
+}

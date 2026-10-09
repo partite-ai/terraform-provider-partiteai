@@ -83,3 +83,7 @@ FEATURES:
   `createTaskDefinition`.
 * **New Data Source:** `partiteai_judge_metric`, found by `id` or exact `name`.
 * **New Data Source:** `partiteai_computed_metric`, found by `key`.
+* resource/partiteai_mesh: `memory_store_id` attaches a memory store to the
+  mesh. Every version of the mesh uses the same store. Removing it detaches
+  the store and keeps its records.
+* data-source/partiteai_mesh: `memory_store_id`.

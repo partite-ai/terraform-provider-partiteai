@@ -197,10 +197,11 @@ type UpdateModelSet struct {
 }
 
 type NewMesh struct {
-	Name        string           `json:"name"`
-	Description Optional[string] `json:"description,omitzero"`
-	Tags        []*Tag           `json:"tags"`
-	ModelSetID  string           `json:"modelSetID"`
+	Name          string           `json:"name"`
+	Description   Optional[string] `json:"description,omitzero"`
+	Tags          []*Tag           `json:"tags"`
+	ModelSetID    string           `json:"modelSetID"`
+	MemoryStoreID Optional[string] `json:"memoryStoreID,omitzero"`
 }
 
 type UpdateMesh struct {
@@ -208,6 +209,8 @@ type UpdateMesh struct {
 	Description Optional[string] `json:"description,omitzero"`
 	Tags        Optional[[]*Tag] `json:"tags,omitzero"`
 	ModelSetID  Optional[string] `json:"modelSetID,omitzero"`
+	// A null detaches the mesh's memory store. Left out, the mesh keeps it.
+	MemoryStoreID Optional[string] `json:"memoryStoreID,omitzero"`
 }
 
 type NewLink struct {

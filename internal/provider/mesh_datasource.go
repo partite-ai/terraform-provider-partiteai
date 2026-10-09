@@ -40,6 +40,10 @@ func (d *MeshDataSource) Schema(ctx context.Context, req datasource.SchemaReques
 				MarkdownDescription: "The ID of the draft version",
 				Computed:            true,
 			},
+			"memory_store_id": schema.StringAttribute{
+				MarkdownDescription: "ID of the memory store the mesh reads and writes, if it has one",
+				Computed:            true,
+			},
 		}),
 	}
 }

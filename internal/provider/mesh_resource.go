@@ -48,6 +48,10 @@ func (r *MeshResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 					MarkdownDescription: "Draft version ID of the mesh",
 					Computed:            true,
 				},
+				"memory_store_id": schema.StringAttribute{
+					MarkdownDescription: "ID of the memory store the mesh reads and writes. Every version of the mesh uses the same store. Removing it detaches the store and keeps its records.",
+					Optional:            true,
+				},
 			},
 		),
 	}
@@ -69,10 +73,11 @@ func (r *MeshResource) Create(ctx context.Context, req resource.CreateRequest, r
 	}
 
 	createResp, err := pgql.CreateMesh(ctx, r.GetClient(), &pgql.NewMesh{
-		Name:        data.Name.ValueString(),
-		Description: pgql.OptPtr(data.Description.ValueStringPointer()),
-		Tags:        tags,
-		ModelSetID:  data.ModelSetId.ValueString(),
+		Name:          data.Name.ValueString(),
+		Description:   pgql.OptPtr(data.Description.ValueStringPointer()),
+		Tags:          tags,
+		ModelSetID:    data.ModelSetId.ValueString(),
+		MemoryStoreID: pgql.OptPtr(data.MemoryStoreId.ValueStringPointer()),
 	})
 	if err != nil {
 		handleAPIError(&resp.Diagnostics, err, "create mesh")
@@ -123,6 +128,9 @@ func (r *MeshResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	}
 	if !planData.ModelSetId.Equal(stateData.ModelSetId) {
 		update.ModelSetID = pgql.Opt(planData.ModelSetId.ValueString())
+	}
+	if !planData.MemoryStoreId.Equal(stateData.MemoryStoreId) {
+		update.MemoryStoreID = pgql.OptNil(planData.MemoryStoreId.ValueStringPointer())
 	}
 	if !planData.Tags.Equal(stateData.Tags) {
 		var tags []*pgql.Tag

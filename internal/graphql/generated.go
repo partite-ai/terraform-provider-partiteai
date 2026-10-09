@@ -3576,6 +3576,9 @@ type MeshDetails struct {
 	CreatedAt    string                             `json:"createdAt"`
 	UpdatedAt    string                             `json:"updatedAt"`
 	DraftVersion MeshDetailsDraftVersionMeshVersion `json:"draftVersion"`
+	// The memory this mesh reads and writes, or null where it holds none. The
+	// attachment is not versioned: every version of the mesh reads the same memory.
+	MemoryStore *MeshDetailsMemoryStore `json:"memoryStore"`
 }
 
 // GetId returns MeshDetails.Id, and is useful for accessing the field via an interface.
@@ -3598,6 +3601,9 @@ func (v *MeshDetails) GetUpdatedAt() string { return v.UpdatedAt }
 
 // GetDraftVersion returns MeshDetails.DraftVersion, and is useful for accessing the field via an interface.
 func (v *MeshDetails) GetDraftVersion() MeshDetailsDraftVersionMeshVersion { return v.DraftVersion }
+
+// GetMemoryStore returns MeshDetails.MemoryStore, and is useful for accessing the field via an interface.
+func (v *MeshDetails) GetMemoryStore() *MeshDetailsMemoryStore { return v.MemoryStore }
 
 // MeshDetailsDraftVersionMeshVersion includes the requested fields of the GraphQL type MeshVersion.
 type MeshDetailsDraftVersionMeshVersion struct {
@@ -3624,6 +3630,14 @@ func (v *MeshDetailsDraftVersionMeshVersionModelSet) GetId() string { return v.I
 
 // GetName returns MeshDetailsDraftVersionMeshVersionModelSet.Name, and is useful for accessing the field via an interface.
 func (v *MeshDetailsDraftVersionMeshVersionModelSet) GetName() string { return v.Name }
+
+// MeshDetailsMemoryStore includes the requested fields of the GraphQL type MemoryStore.
+type MeshDetailsMemoryStore struct {
+	Id string `json:"id"`
+}
+
+// GetId returns MeshDetailsMemoryStore.Id, and is useful for accessing the field via an interface.
+func (v *MeshDetailsMemoryStore) GetId() string { return v.Id }
 
 type MetricCategory string
 
@@ -7800,6 +7814,9 @@ fragment MeshDetails on Mesh {
 			name
 		}
 	}
+	memoryStore {
+		id
+	}
 }
 `
 
@@ -9826,6 +9843,9 @@ fragment MeshDetails on Mesh {
 			name
 		}
 	}
+	memoryStore {
+		id
+	}
 }
 `
 
@@ -11440,6 +11460,9 @@ fragment MeshDetails on Mesh {
 			id
 			name
 		}
+	}
+	memoryStore {
+		id
 	}
 }
 `

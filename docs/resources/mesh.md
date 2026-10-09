@@ -23,6 +23,7 @@ Mesh resource
 ### Optional
 
 - `description` (String) Resource description
+- `memory_store_id` (String) ID of the memory store the mesh reads and writes. Every version of the mesh uses the same store. Removing it detaches the store and keeps its records.
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only

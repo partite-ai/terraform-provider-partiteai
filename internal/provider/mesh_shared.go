@@ -20,10 +20,15 @@ type MeshBaseModel struct {
 	UpdatedAt      timetypes.RFC3339 `tfsdk:"updated_at"`
 	ModelSetId     types.String      `tfsdk:"model_set_id"`
 	DraftVersionId types.String      `tfsdk:"draft_version_id"`
+	MemoryStoreId  types.String      `tfsdk:"memory_store_id"`
 }
 
 // MapFromGraphQL maps a GraphQL MeshDetails response to the MeshBaseModel.
 func (m *MeshBaseModel) MapFromGraphQL(ctx context.Context, meshDetails pgql.MeshDetails) diag.Diagnostics {
+	m.MemoryStoreId = types.StringNull()
+	if meshDetails.MemoryStore != nil {
+		m.MemoryStoreId = types.StringValue(meshDetails.MemoryStore.Id)
+	}
 	return setFields(
 		ctx,
 		&m.Id, meshDetails.Id,

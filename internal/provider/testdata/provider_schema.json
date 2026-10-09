@@ -3524,6 +3524,20 @@
             "DeprecationMessage": ""
           },
           {
+            "Name": "memory_store_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "ID of the memory store the mesh reads and writes. Every version of the mesh uses the same store. Removing it detaches the store and keeps its records.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
             "Name": "model_set_id",
             "Type": "string",
             "NestedType": null,
@@ -14692,6 +14706,20 @@
             "Required": true,
             "Optional": false,
             "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "memory_store_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "ID of the memory store the mesh reads and writes, if it has one",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
             "Sensitive": false,
             "DescriptionKind": 1,
             "Deprecated": false,

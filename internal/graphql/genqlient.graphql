@@ -475,6 +475,9 @@ fragment MeshDetails on Mesh {
       name
     }
   }
+  memoryStore {
+    id
+  }
 }
 
 query GetMesh($id: MeshID!) {
