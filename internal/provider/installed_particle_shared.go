@@ -268,9 +268,15 @@ func configuredCredentials(src []pgql.InstalledParticleDetailsCredentialsInstall
 			"version": types.Int64Value(1),
 		}
 		for name, typ := range credentialEntryAttrTypes() {
-			if _, ok := values[name]; !ok {
-				values[name] = types.ObjectNull(typ.(types.ObjectType).AttrTypes)
+			if _, ok := values[name]; ok {
+				continue
 			}
+			objectType, ok := typ.(types.ObjectType)
+			if !ok {
+				diags.AddError("Internal Error", "Expected "+name+" to be ObjectType")
+				return types.ListNull(entryType), diags
+			}
+			values[name] = types.ObjectNull(objectType.AttrTypes)
 		}
 		entry, d := types.ObjectValue(entryType.AttrTypes, values)
 		diags.Append(d...)
