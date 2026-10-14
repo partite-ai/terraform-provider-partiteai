@@ -1,6 +1,6 @@
-# Prints the ASCII-armored public half of the release signing key, e.g. for
-# registering it with a registry. The public key isn't secret, so it goes
-# straight into the log and the job summary.
+# Exports the ASCII-armored public half of the release signing key, e.g. for
+# registering it with a registry, as the gpg-public-key artifact. It can't go in
+# the log: the private key secret contains the same lines, so GitHub masks them.
 name: Export GPG public key
 
 on:
@@ -28,13 +28,15 @@ jobs:
             echo "::error::No public key exported for fingerprint '$GPG_FINGERPRINT'"
             exit 1
           fi
-          cat gpg.pub
           {
             echo "Key ID: \`$GPG_KEYID\`"
             echo
             echo "Fingerprint: \`$GPG_FINGERPRINT\`"
             echo
-            echo '```'
-            cat gpg.pub
-            echo '```'
+            echo "The key is in the gpg-public-key artifact."
           } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: gpg-public-key
+          path: gpg.pub
+          if-no-files-found: error
