@@ -1,0 +1,40 @@
+# Prints the ASCII-armored public half of the release signing key, e.g. for
+# registering it with a registry. The public key isn't secret, so it goes
+# straight into the log and the job summary.
+name: Export GPG public key
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
+        id: import_gpg
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+      - name: Export public key
+        env:
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+          GPG_KEYID: ${{ steps.import_gpg.outputs.keyid }}
+        run: |
+          gpg --armor --export "$GPG_FINGERPRINT" > gpg.pub
+          if [ ! -s gpg.pub ]; then
+            echo "::error::No public key exported for fingerprint '$GPG_FINGERPRINT'"
+            exit 1
+          fi
+          cat gpg.pub
+          {
+            echo "Key ID: \`$GPG_KEYID\`"
+            echo
+            echo "Fingerprint: \`$GPG_FINGERPRINT\`"
+            echo
+            echo '```'
+            cat gpg.pub
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
