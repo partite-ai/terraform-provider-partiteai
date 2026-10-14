@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 )
 
 // The artifact resource uploads a bundle over multipart, which is the only
@@ -32,15 +33,37 @@ data "partiteai_particle_artifact" "test" {
 					"partiteai_particle_artifact.test", "name"),
 			),
 		},
+		// source_path is not kept in state, and source_hash is the server's, so
+		// an import reads back everything.
 		resource.TestStep{
 			Config:            particleArtifactHCL,
 			ResourceName:      "partiteai_particle_artifact.test",
 			ImportState:       true,
 			ImportStateVerify: true,
-			// source_path is a local path the API never returns, and an imported
-			// artifact records source_hash as the sentinel "imported" because the
-			// bundle it was built from is not on this machine.
-			ImportStateVerifyIgnore: []string{"source_path", "source_hash"},
+		},
+		// The same file by another path is the same artifact.
+		resource.TestStep{
+			Config: `
+resource "partiteai_particle_artifact" "test" {
+  source_path = "./testdata/../testdata/hello.particle"
+}
+`,
+			ConfigPlanChecks: resource.ConfigPlanChecks{
+				PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+			},
+		},
+		// Other content is a new artifact.
+		resource.TestStep{
+			Config: `
+resource "partiteai_particle_artifact" "test" {
+  source_path = "testdata/capable.particle"
+}
+`,
+			ConfigPlanChecks: resource.ConfigPlanChecks{
+				PreApply: []plancheck.PlanCheck{
+					plancheck.ExpectResourceAction("partiteai_particle_artifact.test", plancheck.ResourceActionReplace),
+				},
+			},
 		},
 	)
 }
@@ -86,29 +109,19 @@ data "partiteai_installed_particle" "test" {
 func TestAccInstalledParticle_credentials(t *testing.T) {
 	accTest(t,
 		resource.TestStep{
-			Config: capableArtifactHCL + `
-resource "partiteai_installed_particle" "test" {
-  name            = "acc-install-creds"
-  artifact_id     = partiteai_particle_artifact.capable.id
-  kv_workspace_id = partiteai_workspace.kv.id
-
-  credentials = [
-    {
-      name   = "service"
-      method = "login"
-      basic_wo = {
-        username = "user"
-        password = "pass"
-      }
-    },
-  ]
-}
-`,
+			Config: capableArtifactHCL + installedParticleCredentialsHCL,
 			Check: resource.ComposeAggregateTestCheckFunc(
 				resource.TestCheckResourceAttr("partiteai_installed_particle.test", "credentials.#", "1"),
 				resource.TestCheckResourceAttr("partiteai_installed_particle.test", "credentials.0.name", "service"),
 				resource.TestCheckResourceAttr("partiteai_installed_particle.test", "credentials.0.method", "login"),
 			),
+		},
+		// An import reads each credential's name and method back, at version 1.
+		resource.TestStep{
+			Config:            capableArtifactHCL + installedParticleCredentialsHCL,
+			ResourceName:      "partiteai_installed_particle.test",
+			ImportState:       true,
+			ImportStateVerify: true,
 		},
 		// Rotating the secret is an update, and the values never enter state,
 		// so the only thing to check is that it settles.
@@ -136,6 +149,25 @@ resource "partiteai_installed_particle" "test" {
 		},
 	)
 }
+
+const installedParticleCredentialsHCL = `
+resource "partiteai_installed_particle" "test" {
+  name            = "acc-install-creds"
+  artifact_id     = partiteai_particle_artifact.capable.id
+  kv_workspace_id = partiteai_workspace.kv.id
+
+  credentials = [
+    {
+      name   = "service"
+      method = "login"
+      basic_wo = {
+        username = "user"
+        password = "pass"
+      }
+    },
+  ]
+}
+`
 
 // capableArtifactHCL is a fixture artifact whose manifest grants the KV
 // capability and declares one filesystem mount, which is what lets an install

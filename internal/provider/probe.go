@@ -15,7 +15,7 @@ import (
 var probeAttribute = schema.BoolAttribute{
 	MarkdownDescription: "Whether the server sends one request to the provider before each create or update, " +
 		"and refuses a profile the provider rejects. An unreachable provider does not fail the write. " +
-		"Set false to write a profile for a model the provider does not serve yet. Defaults to true.",
+		"Defaults to false.",
 	Optional:  true,
 	WriteOnly: true,
 }
@@ -24,8 +24,8 @@ var probeAttribute = schema.BoolAttribute{
 var providerProbeAttribute = schema.BoolAttribute{
 	MarkdownDescription: "Whether the server lists the provider's models with the credentials before a create, " +
 		"or an update that sends new credentials, and refuses credentials the provider rejects. An unreachable " +
-		"provider does not fail the write. Set false to write credentials the provider can't check yet. " +
-		"It does not cover the provider's profiles, which each take their own `probe`. Defaults to true.",
+		"provider does not fail the write. It does not cover the provider's profiles, which each take their " +
+		"own `probe`. Defaults to false.",
 	Optional:  true,
 	WriteOnly: true,
 }

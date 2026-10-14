@@ -26,7 +26,7 @@ An embedding profile: the model a memory store writes its vectors with.
 > **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
 
 - `description` (String) Resource description
-- `probe` (Boolean, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Whether the server sends one request to the provider before each create or update, and refuses a profile the provider rejects. An unreachable provider does not fail the write. Set false to write a profile for a model the provider does not serve yet. Defaults to true.
+- `probe` (Boolean, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Whether the server sends one request to the provider before each create or update, and refuses a profile the provider rejects. An unreachable provider does not fail the write. Defaults to false.
 
 ### Read-Only
 

@@ -17,7 +17,9 @@ A particle artifact (.particle tarball) uploaded to the Partite AI mesh.
 
 ### Required
 
-- `source_path` (String) Path to the local `.particle` tarball.
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
+- `source_path` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Path to the local `.particle` tarball. It is not kept in state: the artifact is the file's content, which `source_hash` tracks, so moving the file changes nothing.
 
 ### Read-Only
 
@@ -27,7 +29,7 @@ A particle artifact (.particle tarball) uploaded to the Partite AI mesh.
 - `description` (String) Manifest description.
 - `id` (String) Resource identifier
 - `name` (String) Manifest name.
-- `source_hash` (String) SHA-256 hex digest of the file's content. A change forces replacement.
+- `source_hash` (String) SHA-256 hex digest of the uploaded file, as the server reports it. A file at `source_path` with other content forces replacement.
 - `tools` (Attributes List) Tools declared in the manifest. (see [below for nested schema](#nestedatt--tools))
 - `version` (String) Manifest version.
 

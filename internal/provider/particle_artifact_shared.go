@@ -27,13 +27,14 @@ type ParticleArtifactBaseModel struct {
 	Tools        types.List        `tfsdk:"tools"`
 }
 
-// MapFromGraphQL maps the artifact response onto the base model. SourcePath and
-// SourceHash are not touched here — they're set by the resource Create after
-// upload and unused by the data source.
+// MapFromGraphQL maps the artifact response onto the base model. SourceHash is
+// the server's digest of the uploaded file. SourcePath is not touched: the
+// resource never keeps it in state, and the data source has none.
 func (m *ParticleArtifactBaseModel) MapFromGraphQL(ctx context.Context, src pgql.ParticleArtifactDetails) diag.Diagnostics {
 	diags := setFields(
 		ctx,
 		&m.Id, src.Id,
+		&m.SourceHash, src.Sha256,
 		&m.Name, src.Name,
 		&m.Version, src.Version,
 		&m.Description, src.Description,

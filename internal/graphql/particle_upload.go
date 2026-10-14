@@ -21,6 +21,7 @@ const uploadParticleQuery = `mutation UploadParticleArtifact($bytes: Upload!) {
     id
     name
     version
+    sha256
     description
     capabilities {
       http {

@@ -791,7 +791,7 @@ func (v *DeleteInstalledParticleDeleteInstalledParticlesDeleteResults) GetIds() 
 
 // DeleteInstalledParticleResponse is returned by DeleteInstalledParticle on success.
 type DeleteInstalledParticleResponse struct {
-	// Delete installed particles. Cascades credentials, secrets, and agent associations for each. Artifacts remain and are GC'd later if no other install references them.
+	// Delete installed particles, with their credentials and secrets. An installed particle that an agent uses is refused, like any record in use. Artifacts remain and are GC'd later if no other install references them.
 	DeleteInstalledParticles DeleteInstalledParticleDeleteInstalledParticlesDeleteResults `json:"deleteInstalledParticles"`
 }
 
@@ -1613,6 +1613,8 @@ type InstalledParticleDetails struct {
 	// User-chosen identifier. Unique across installs.
 	Name           string                                                 `json:"name"`
 	ActiveArtifact InstalledParticleDetailsActiveArtifactParticleArtifact `json:"activeArtifact"`
+	// The credentials configured on this install, by name and method. The secrets are never returned.
+	Credentials []InstalledParticleDetailsCredentialsInstalledParticleCredential `json:"credentials"`
 	// Workspace backing this install's KV state.
 	// Null when the manifest doesn't grant the KV capability; in that
 	// case the install has no KV binding (and writing one is rejected).
@@ -1633,6 +1635,11 @@ func (v *InstalledParticleDetails) GetName() string { return v.Name }
 // GetActiveArtifact returns InstalledParticleDetails.ActiveArtifact, and is useful for accessing the field via an interface.
 func (v *InstalledParticleDetails) GetActiveArtifact() InstalledParticleDetailsActiveArtifactParticleArtifact {
 	return v.ActiveArtifact
+}
+
+// GetCredentials returns InstalledParticleDetails.Credentials, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetails) GetCredentials() []InstalledParticleDetailsCredentialsInstalledParticleCredential {
+	return v.Credentials
 }
 
 // GetKvWorkspace returns InstalledParticleDetails.KvWorkspace, and is useful for accessing the field via an interface.
@@ -1669,6 +1676,27 @@ func (v *InstalledParticleDetailsActiveArtifactParticleArtifact) GetName() strin
 // GetVersion returns InstalledParticleDetailsActiveArtifactParticleArtifact.Version, and is useful for accessing the field via an interface.
 func (v *InstalledParticleDetailsActiveArtifactParticleArtifact) GetVersion() string {
 	return v.Version
+}
+
+// InstalledParticleDetailsCredentialsInstalledParticleCredential includes the requested fields of the GraphQL type InstalledParticleCredential.
+// The GraphQL type's documentation follows.
+//
+// One credential configured on an installed particle.
+type InstalledParticleDetailsCredentialsInstalledParticleCredential struct {
+	// The credential's name, a key in the manifest's top-level `credentials` map.
+	Name string `json:"name"`
+	// The method it was provisioned with.
+	Method string `json:"method"`
+}
+
+// GetName returns InstalledParticleDetailsCredentialsInstalledParticleCredential.Name, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetailsCredentialsInstalledParticleCredential) GetName() string {
+	return v.Name
+}
+
+// GetMethod returns InstalledParticleDetailsCredentialsInstalledParticleCredential.Method, and is useful for accessing the field via an interface.
+func (v *InstalledParticleDetailsCredentialsInstalledParticleCredential) GetMethod() string {
+	return v.Method
 }
 
 // InstalledParticleDetailsKvWorkspace includes the requested fields of the GraphQL type Workspace.
@@ -4785,7 +4813,9 @@ type ParticleArtifactDetails struct {
 	// Manifest's name field — the publisher's identity for this artifact.
 	Name string `json:"name"`
 	// Manifest's version field — publisher-supplied, NOT used by mesh for compatibility decisions.
-	Version      string                                                  `json:"version"`
+	Version string `json:"version"`
+	// SHA-256 hex digest of the uploaded .particle file.
+	Sha256       string                                                  `json:"sha256"`
 	Description  *string                                                 `json:"description"`
 	Capabilities ParticleArtifactDetailsCapabilitiesParticleCapabilities `json:"capabilities"`
 	// Credentials this artifact declares (manifest top-level `credentials`).
@@ -4804,6 +4834,9 @@ func (v *ParticleArtifactDetails) GetName() string { return v.Name }
 
 // GetVersion returns ParticleArtifactDetails.Version, and is useful for accessing the field via an interface.
 func (v *ParticleArtifactDetails) GetVersion() string { return v.Version }
+
+// GetSha256 returns ParticleArtifactDetails.Sha256, and is useful for accessing the field via an interface.
+func (v *ParticleArtifactDetails) GetSha256() string { return v.Sha256 }
 
 // GetDescription returns ParticleArtifactDetails.Description, and is useful for accessing the field via an interface.
 func (v *ParticleArtifactDetails) GetDescription() *string { return v.Description }
@@ -7317,6 +7350,10 @@ fragment InstalledParticleDetails on InstalledParticle {
 		name
 		version
 	}
+	credentials {
+		name
+		method
+	}
 	kvWorkspace {
 		id
 	}
@@ -9367,6 +9404,10 @@ fragment InstalledParticleDetails on InstalledParticle {
 		name
 		version
 	}
+	credentials {
+		name
+		method
+	}
 	kvWorkspace {
 		id
 	}
@@ -10245,6 +10286,7 @@ fragment ParticleArtifactDetails on ParticleArtifact {
 	id
 	name
 	version
+	sha256
 	description
 	capabilities {
 		http {
@@ -10998,6 +11040,10 @@ fragment InstalledParticleDetails on InstalledParticle {
 		id
 		name
 		version
+	}
+	credentials {
+		name
+		method
 	}
 	kvWorkspace {
 		id

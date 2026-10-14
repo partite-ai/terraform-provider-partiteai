@@ -66,15 +66,13 @@ FEATURES:
   either type read back with every block empty.
 * resource/partiteai_model_profile, resource/partiteai_embedding_profile:
   `probe`, a write-only flag. The server sends one request to the provider
-  before each create or update and refuses a profile the provider rejects;
-  set `probe = false` to write a profile for a model the provider does not
-  serve yet. Defaults to true, as before.
+  before each create or update and refuses a profile the provider rejects.
+  Defaults to false.
 * resource/partiteai_model_provider: `probe`, a write-only flag. The server
   lists the provider's models with the credentials before a create, or an
   update that sends new credentials, and refuses credentials the provider
-  rejects; set `probe = false` to write credentials it can't check yet. It
-  does not cover the provider's profiles. Defaults to true, as before. Needs a
-  server with `probe` on `createModelProvider` and `updateModelProvider`.
+  rejects. It does not cover the provider's profiles. Defaults to false. Needs
+  a server with `probe` on `createModelProvider` and `updateModelProvider`.
 * resource/partiteai_task_definition: `overwrite_existing`, a write-only flag.
   When it is true and a task definition with the `name` already exists, create
   overwrites that one instead of failing, so a configuration can be applied to

@@ -251,4 +251,32 @@ func credentialEntryAttrTypes() map[string]attr.Type {
 	}
 }
 
-var _ = credentialEntryAttrTypes // kept for symmetry; consumer in installed_particle_resource.go may reference
+// configuredCredentials is the credentials list for an install whose state
+// has none, as it is just after an import: each configured credential by name
+// and method, at version 1. The secrets are never read back.
+func configuredCredentials(src []pgql.InstalledParticleDetailsCredentialsInstalledParticleCredential) (types.List, diag.Diagnostics) {
+	entryType := types.ObjectType{AttrTypes: credentialEntryAttrTypes()}
+	if len(src) == 0 {
+		return types.ListNull(entryType), nil
+	}
+	var diags diag.Diagnostics
+	entries := make([]attr.Value, 0, len(src))
+	for _, c := range src {
+		values := map[string]attr.Value{
+			"name":    types.StringValue(c.Name),
+			"method":  types.StringValue(c.Method),
+			"version": types.Int64Value(1),
+		}
+		for name, typ := range credentialEntryAttrTypes() {
+			if _, ok := values[name]; !ok {
+				values[name] = types.ObjectNull(typ.(types.ObjectType).AttrTypes)
+			}
+		}
+		entry, d := types.ObjectValue(entryType.AttrTypes, values)
+		diags.Append(d...)
+		entries = append(entries, entry)
+	}
+	list, d := types.ListValue(entryType, entries)
+	diags.Append(d...)
+	return list, diags
+}

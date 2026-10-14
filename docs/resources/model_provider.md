@@ -31,7 +31,7 @@ Model Provider resource
 - `google_genai` (Attributes) Google GenAI provider config (see [below for nested schema](#nestedatt--google_genai))
 - `openai` (Attributes) OpenAI provider config (see [below for nested schema](#nestedatt--openai))
 - `openai_compatible` (Attributes) OpenAI-compatible provider config (see [below for nested schema](#nestedatt--openai_compatible))
-- `probe` (Boolean, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Whether the server lists the provider's models with the credentials before a create, or an update that sends new credentials, and refuses credentials the provider rejects. An unreachable provider does not fail the write. Set false to write credentials the provider can't check yet. It does not cover the provider's profiles, which each take their own `probe`. Defaults to true.
+- `probe` (Boolean, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Whether the server lists the provider's models with the credentials before a create, or an update that sends new credentials, and refuses credentials the provider rejects. An unreachable provider does not fail the write. It does not cover the provider's profiles, which each take their own `probe`. Defaults to false.
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only

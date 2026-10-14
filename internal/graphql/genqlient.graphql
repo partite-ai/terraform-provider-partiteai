@@ -778,6 +778,7 @@ fragment ParticleArtifactDetails on ParticleArtifact {
   id
   name
   version
+  sha256
   description
   capabilities {
     http {
@@ -875,6 +876,10 @@ fragment InstalledParticleDetails on InstalledParticle {
     id
     name
     version
+  }
+  credentials {
+    name
+    method
   }
   kvWorkspace {
     id

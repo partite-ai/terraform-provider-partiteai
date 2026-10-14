@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -12,8 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
@@ -21,6 +20,7 @@ import (
 
 var _ resource.Resource = &ParticleArtifactResource{}
 var _ resource.ResourceWithImportState = &ParticleArtifactResource{}
+var _ resource.ResourceWithModifyPlan = &ParticleArtifactResource{}
 
 func NewParticleArtifactResource() resource.Resource {
 	return &ParticleArtifactResource{
@@ -43,18 +43,15 @@ func (r *ParticleArtifactResource) Schema(ctx context.Context, req resource.Sche
 			"id":         commonSchemas.id,
 			"created_at": commonSchemas.createdAt,
 			"source_path": schema.StringAttribute{
-				MarkdownDescription: "Path to the local `.particle` tarball.",
-				Required:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
+				MarkdownDescription: "Path to the local `.particle` tarball. It is not kept in state: the " +
+					"artifact is the file's content, which `source_hash` tracks, so moving the file changes nothing.",
+				Required:  true,
+				WriteOnly: true,
 			},
 			"source_hash": schema.StringAttribute{
-				MarkdownDescription: "SHA-256 hex digest of the file's content. A change forces replacement.",
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
+				MarkdownDescription: "SHA-256 hex digest of the uploaded file, as the server reports it. A file " +
+					"at `source_path` with other content forces replacement.",
+				Computed: true,
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Manifest name.",
@@ -163,7 +160,11 @@ func (r *ParticleArtifactResource) Create(ctx context.Context, req resource.Crea
 
 	logResourceOperation(ctx, "creating", "particle_artifact", "")
 
-	srcPath := data.SourcePath.ValueString()
+	var srcPath string
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("source_path"), &srcPath)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 	f, err := os.Open(srcPath)
 	if err != nil {
 		resp.Diagnostics.AddError("Cannot open source_path", err.Error())
@@ -190,7 +191,12 @@ func (r *ParticleArtifactResource) Create(ctx context.Context, req resource.Crea
 	}
 
 	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, details)...)
-	data.SourceHash = types.StringValue(hashHex)
+	if data.SourceHash.ValueString() != hashHex {
+		resp.Diagnostics.AddError("Upload changed the file",
+			fmt.Sprintf("The server's digest %s of the uploaded file is not the file's digest %s.", data.SourceHash.ValueString(), hashHex))
+		return
+	}
+	data.SourcePath = types.StringNull()
 
 	logResourceOperation(ctx, "created", "particle_artifact", data.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -216,6 +222,8 @@ func (r *ParticleArtifactResource) Read(ctx context.Context, req resource.ReadRe
 	}
 
 	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, *getResp.ParticleArtifact)...)
+	// State from before source_path was write-only still holds it.
+	data.SourcePath = types.StringNull()
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -232,6 +240,45 @@ func (r *ParticleArtifactResource) Delete(ctx context.Context, req resource.Dele
 
 func (r *ParticleArtifactResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("source_path"), "imported")...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("source_hash"), "imported")...)
+}
+
+// ModifyPlan replaces the artifact when the file at source_path no longer has
+// the content that was uploaded. An artifact never changes, so new content is a
+// new artifact.
+func (r *ParticleArtifactResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	if req.Plan.Raw.IsNull() || req.State.Raw.IsNull() {
+		return
+	}
+	var srcPath types.String
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("source_path"), &srcPath)...)
+	var stateHash types.String
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("source_hash"), &stateHash)...)
+	if resp.Diagnostics.HasError() || srcPath.IsUnknown() || srcPath.IsNull() {
+		return
+	}
+
+	hashHex, err := hashFile(srcPath.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Cannot hash source_path", err.Error())
+		return
+	}
+	if hashHex == stateHash.ValueString() {
+		return
+	}
+	resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root("source_hash"), hashHex)...)
+	resp.RequiresReplace = append(resp.RequiresReplace, path.Root("source_hash"))
+}
+
+// hashFile is the SHA-256 hex digest of the file at path.
+func hashFile(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	hasher := sha256.New()
+	if _, err := io.Copy(hasher, f); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(hasher.Sum(nil)), nil
 }

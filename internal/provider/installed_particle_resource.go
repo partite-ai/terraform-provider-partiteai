@@ -256,6 +256,11 @@ func (r *InstalledParticleResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, *getResp.InstalledParticle)...)
+	if data.Credentials.IsNull() {
+		credentials, diags := configuredCredentials(getResp.InstalledParticle.Credentials)
+		resp.Diagnostics.Append(diags...)
+		data.Credentials = credentials
+	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 

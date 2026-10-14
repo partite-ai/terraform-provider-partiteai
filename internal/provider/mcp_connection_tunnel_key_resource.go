@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -16,6 +17,7 @@ import (
 )
 
 var _ resource.Resource = &McpConnectionTunnelKeyResource{}
+var _ resource.ResourceWithImportState = &McpConnectionTunnelKeyResource{}
 
 func NewMcpConnectionTunnelKeyResource() resource.Resource {
 	return &McpConnectionTunnelKeyResource{
@@ -144,7 +146,7 @@ func (r *McpConnectionTunnelKeyResource) Read(ctx context.Context, req resource.
 
 	logResourceOperation(ctx, "reading", "mcp_connection_tunnel_key", data.Label.ValueString())
 
-	found, diags := readMcpConnectionTunnelKey(ctx, r.GetClient(),
+	found, subscriptionID, diags := readMcpConnectionTunnelKey(ctx, r.GetClient(),
 		data.McpConnectionId.ValueString(),
 		data.McpConnectionSubscriptionId.ValueString(),
 		data.Id.ValueString())
@@ -156,6 +158,7 @@ func (r *McpConnectionTunnelKeyResource) Read(ctx context.Context, req resource.
 		resp.State.RemoveResource(ctx)
 		return
 	}
+	data.McpConnectionSubscriptionId = types.StringValue(subscriptionID)
 
 	resp.Diagnostics.Append(r.mapResponse(ctx, &data, *found)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -204,4 +207,21 @@ func (r *McpConnectionTunnelKeyResource) mapResponse(ctx context.Context, data *
 
 func (r *McpConnectionTunnelKeyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = fmt.Sprintf("%s_mcp_connection_tunnel_key", req.ProviderTypeName)
+}
+
+func (r *McpConnectionTunnelKeyResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// A key is reached through its connection, so importing needs both. Read
+	// finds the subscription it belongs to.
+	connectionID, keyID, ok := cutImportID(req.ID)
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Invalid Import Identifier",
+			"The import identifier must be in the format '<mcp_connection_id>:<tunnel_key_id>'.\n\n"+
+				"Example: 'cmco_1234567890abcdef:ptk_1234567890abcdef'",
+		)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("mcp_connection_id"), connectionID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), keyID)...)
 }

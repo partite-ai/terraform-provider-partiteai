@@ -113,35 +113,35 @@ func optionalRFC3339(value *string) timetypes.RFC3339 {
 	return parsed
 }
 
-// readMcpConnectionTunnelKey finds one key of a subscription. A nil result means
-// the key is gone.
+// readMcpConnectionTunnelKey finds one key of a connection, and the
+// subscription it belongs to. With subscriptionID empty, as on import, every
+// subscription is searched. A nil result means the key is gone.
 //
 // Keys hang off subscriptions, which hang off connections, and neither has a query
 // of its own, so the connection has to be named rather than discovered.
-func readMcpConnectionTunnelKey(ctx context.Context, client graphql.Client, connectionID, subscriptionID, keyID string) (*pgql.McpConnectionTunnelKeyDetails, diag.Diagnostics) {
+func readMcpConnectionTunnelKey(ctx context.Context, client graphql.Client, connectionID, subscriptionID, keyID string) (*pgql.McpConnectionTunnelKeyDetails, string, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	resp, err := pgql.GetMcpConnectionSubscriptions(ctx, client, connectionID)
 	if err != nil {
 		handleAPIErrorWithDetails(&diags, err, "read", "mcp_connection_tunnel_key", keyID)
-		return nil, diags
+		return nil, "", diags
 	}
 	if resp.McpConnection.TunnelTransport == nil {
-		return nil, diags
+		return nil, "", diags
 	}
 
 	for _, sub := range resp.McpConnection.TunnelTransport.Subscriptions {
-		if sub.Id != subscriptionID {
+		if subscriptionID != "" && sub.Id != subscriptionID {
 			continue
 		}
 		for _, key := range sub.TunnelKeys {
 			if key.Id == keyID {
-				return &key, diags
+				return &key, sub.Id, diags
 			}
 		}
-		return nil, diags
 	}
-	return nil, diags
+	return nil, "", diags
 }
 
 // mcpConnectionTunnelKeyType is one entry of a subscription's tunnel_keys. The

@@ -73,7 +73,7 @@ type NewModelProvider struct {
 	ProviderType   ModelProviderType        `json:"providerType"`
 	ProviderConfig ModelProviderConfigInput `json:"providerConfig"`
 	Tags           []*Tag                   `json:"tags"`
-	// Left out, the server probes the credentials.
+	// Left out, the server doesn't probe the credentials.
 	Probe *bool `json:"probe,omitempty"`
 }
 
@@ -83,7 +83,7 @@ type UpdateModelProvider struct {
 	// Left out, the server keeps the stored config and its secret.
 	ProviderConfig *ModelProviderConfigInput `json:"providerConfig,omitempty"`
 	Tags           Optional[[]*Tag]          `json:"tags,omitzero"`
-	// Left out, the server probes new credentials.
+	// Left out, the server doesn't probe new credentials.
 	Probe *bool `json:"probe,omitempty"`
 }
 
@@ -141,7 +141,7 @@ type NewModelProfile struct {
 	Tags          []*Tag                  `json:"tags"`
 	// Probe asks the server to send one request to the provider before the
 	// write and refuse a profile the provider rejects. Omitted, the server
-	// probes.
+	// doesn't probe.
 	Probe *bool `json:"probe,omitempty"`
 }
 
@@ -152,7 +152,7 @@ type UpdateModelProfile struct {
 	Tags          Optional[[]*Tag]         `json:"tags,omitzero"`
 	// Probe asks the server to send one request to the provider before the
 	// write and refuse a profile the provider rejects. Omitted, the server
-	// probes.
+	// doesn't probe.
 	Probe *bool `json:"probe,omitempty"`
 }
 
@@ -419,7 +419,7 @@ type NewEmbeddingProfile struct {
 	Configuration EmbeddingProfileConfigInput `json:"configuration"`
 	// Probe asks the server to send one request to the provider before the
 	// write and refuse a profile the provider rejects. Omitted, the server
-	// probes.
+	// doesn't probe.
 	Probe *bool `json:"probe,omitempty"`
 }
 
@@ -429,7 +429,7 @@ type UpdateEmbeddingProfile struct {
 	Configuration *EmbeddingProfileConfigInput `json:"configuration,omitempty"`
 	// Probe asks the server to send one request to the provider before the
 	// write and refuse a profile the provider rejects. Omitted, the server
-	// probes.
+	// doesn't probe.
 	Probe *bool `json:"probe,omitempty"`
 }
 
