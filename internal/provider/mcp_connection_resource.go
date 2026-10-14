@@ -156,6 +156,11 @@ func (r *McpConnectionResource) ImportState(ctx context.Context, req resource.Im
 		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "mcp_connection", req.ID)
 		return
 	}
+	// A connection that isn't there is left for Read to drop, and Terraform
+	// then reports that the object to import doesn't exist.
+	if mcpConnectionResp.McpConnection == nil {
+		return
+	}
 
 	if mcpConnectionResp.McpConnection.Transport == pgql.McpTransportHttp {
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("http_transport").AtName("credentials_version"), 1)...)
