@@ -36,9 +36,8 @@ type Enterprise struct {
 	BaseURL  string
 
 	// TenantID identifies the tenant in test output. It is opaque.
-	TenantID  string
-	APIKey    string
-	APISecret string
+	TenantID string
+	APIToken string
 }
 
 func (e *Enterprise) Name() string { return "enterprise" }
@@ -49,11 +48,10 @@ func (e *Enterprise) ProviderConfig() string {
 	return fmt.Sprintf(`
 provider "partiteai" {
   endpoint   = %q
-  api_key    = %q
-  api_secret = %q
+  api_token  = %q
   enterprise = true
 }
-`, e.Endpoint, e.APIKey, e.APISecret)
+`, e.Endpoint, e.APIToken)
 }
 
 // harness is the running harness process. Starting it is the expensive part,
@@ -234,11 +232,11 @@ func (h *harness) tenant() (*Enterprise, error) {
 	}
 
 	return &Enterprise{
-		Endpoint:  h.endpoint,
-		BaseURL:   h.baseURL,
-		TenantID:  resp.Tenant.ID,
-		APIKey:    resp.Tenant.APIKey,
-		APISecret: resp.Tenant.APISecret,
+		Endpoint: h.endpoint,
+		BaseURL:  h.baseURL,
+		TenantID: resp.Tenant.ID,
+		// The harness hands out the key ID and secret, which make up the token.
+		APIToken: "prt_ak_" + resp.Tenant.APIKey + "_" + resp.Tenant.APISecret,
 	}, nil
 }
 

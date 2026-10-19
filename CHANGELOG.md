@@ -85,3 +85,21 @@ FEATURES:
   mesh. Every version of the mesh uses the same store. Removing it detaches
   the store and keeps its records.
 * data-source/partiteai_mesh: `memory_store_id`.
+* provider: `api_token`, or the `PARTITE_AI_API_TOKEN` environment variable.
+  The provider sends it as `Authorization: Bearer <token>`.
+* resource/partiteai_api_key: `token`, the `prt_ak_` token for the key. State
+  from before this has it filled in from `kid` and `secret` on the next
+  refresh.
+
+DEPRECATIONS:
+
+* provider: `api_key` and `api_secret`, and the `PARTITE_AI_API_KEY` and
+  `PARTITE_AI_API_SECRET` environment variables. Set `api_token` or
+  `PARTITE_AI_API_TOKEN` instead. The old pair still works: the provider makes
+  the token `prt_ak_<api_key>_<api_secret>` from it when no token is set. The
+  configuration wins over the environment, and within each a token wins over
+  the key and secret. Setting
+  `api_token` together with `api_key` or `api_secret` in the configuration is
+  an error.
+* resource/partiteai_api_key, data-source/partiteai_api_key: `secret`. Use
+  `token`.

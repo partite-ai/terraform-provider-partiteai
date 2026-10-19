@@ -33,8 +33,8 @@ func TestAccEnterprise_tenantsAreIsolated(t *testing.T) {
 	if first.TenantID == second.TenantID {
 		t.Fatalf("both tenants landed in %s", first.TenantID)
 	}
-	if first.APIKey == second.APIKey {
-		t.Fatalf("both tenants share API key %s", first.APIKey)
+	if first.APIToken == second.APIToken {
+		t.Fatal("both tenants share an API token")
 	}
 	if first.Endpoint != second.Endpoint {
 		t.Fatalf("tenants are on different servers: %s and %s", first.Endpoint, second.Endpoint)
@@ -169,7 +169,7 @@ func graphQL(t *testing.T, tenant *meshtest.Enterprise, query string, out any) {
 		t.Fatal(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(tenant.APIKey, tenant.APISecret)
+	req.Header.Set("Authorization", "Bearer "+tenant.APIToken)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

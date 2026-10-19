@@ -38,3 +38,9 @@ func (m *ApiKeyBaseModel) MapFromGraphQL(ctx context.Context, apiKeyDetails *pgq
 
 	return diags
 }
+
+// apiKeyToken builds the bearer token for an API key from its key ID and
+// secret.
+func apiKeyToken(kid, secret string) string {
+	return "prt_ak_" + kid + "_" + secret
+}

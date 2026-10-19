@@ -6,6 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
@@ -29,6 +31,7 @@ type ApiKeyResource struct {
 type ApiKeyResourceModel struct {
 	ApiKeyBaseModel
 	Secret types.String `tfsdk:"secret"` // Only available in resource after creation
+	Token  types.String `tfsdk:"token"`  // Only available in resource after creation
 }
 
 func (r *ApiKeyResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -54,6 +57,18 @@ func (r *ApiKeyResource) Schema(ctx context.Context, req resource.SchemaRequest,
 				Computed:            true,
 				Sensitive:           true,
 				MarkdownDescription: "API key secret",
+				DeprecationMessage:  "Use token instead. Sending the key ID and secret as basic auth is deprecated.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"token": schema.StringAttribute{
+				Computed:            true,
+				Sensitive:           true,
+				MarkdownDescription: "The token to send as `Authorization: Bearer <token>`. Use it as the provider's `api_token`.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
@@ -82,7 +97,11 @@ func (r *ApiKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	apiKey := createResp.CreateApiKey.ApiKey
 	resp.Diagnostics.Append(r.mapResponse(ctx, &data, &apiKey)...)
-	resp.Diagnostics.Append(setFields(ctx, &data.Secret, createResp.CreateApiKey.Secret)...)
+	resp.Diagnostics.Append(setFields(
+		ctx,
+		&data.Secret, createResp.CreateApiKey.Secret,
+		&data.Token, createResp.CreateApiKey.Token,
+	)...)
 
 	logResourceOperation(ctx, "created", "api_key", data.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -106,6 +125,7 @@ func (r *ApiKeyResource) Read(ctx context.Context, req resource.ReadRequest, res
 	apiKey := getResp.ApiKey
 
 	resp.Diagnostics.Append(r.mapResponse(ctx, &data, &apiKey)...)
+	data.fillTokenFromSecret()
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -133,6 +153,9 @@ func (r *ApiKeyResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 	apiKey := updateResp.UpdateApiKey
 	resp.Diagnostics.Append(r.mapResponse(ctx, &planData, &apiKey)...)
+	planData.Secret = stateData.Secret
+	planData.Token = stateData.Token
+	planData.fillTokenFromSecret()
 
 	logResourceOperation(ctx, "updated", "api_key", planData.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
@@ -158,4 +181,17 @@ func (r *ApiKeyResource) Delete(ctx context.Context, req resource.DeleteRequest,
 
 func (r *ApiKeyResource) mapResponse(ctx context.Context, data *ApiKeyResourceModel, apiKey *pgql.ApiKeyDetails) diag.Diagnostics {
 	return data.MapFromGraphQL(ctx, apiKey)
+}
+
+// fillTokenFromSecret gives state written before the token attribute existed a
+// token built from the key ID and secret it already holds.
+func (m *ApiKeyResourceModel) fillTokenFromSecret() {
+	if !m.Token.IsNull() && !m.Token.IsUnknown() {
+		return
+	}
+	if m.Secret.IsNull() || m.Secret.IsUnknown() || m.Secret.ValueString() == "" {
+		m.Token = types.StringNull()
+		return
+	}
+	m.Token = types.StringValue(apiKeyToken(m.Kid.ValueString(), m.Secret.ValueString()))
 }

@@ -29,5 +29,6 @@ API Key resource
 - `created_at` (String) Timestamp when the resource was created
 - `id` (String) Resource identifier
 - `kid` (String) Key ID
-- `secret` (String, Sensitive) API key secret
+- `secret` (String, Sensitive, Deprecated) API key secret
+- `token` (String, Sensitive) The token to send as `Authorization: Bearer <token>`. Use it as the provider's `api_token`.
 - `updated_at` (String) Timestamp when the resource was last updated

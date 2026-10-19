@@ -415,12 +415,14 @@ const (
 	ComputedMetricUnitCount        ComputedMetricUnit = "COUNT"
 	ComputedMetricUnitMilliseconds ComputedMetricUnit = "MILLISECONDS"
 	ComputedMetricUnitRatio        ComputedMetricUnit = "RATIO"
+	ComputedMetricUnitUsd          ComputedMetricUnit = "USD"
 )
 
 var AllComputedMetricUnit = []ComputedMetricUnit{
 	ComputedMetricUnitCount,
 	ComputedMetricUnitMilliseconds,
 	ComputedMetricUnitRatio,
+	ComputedMetricUnitUsd,
 }
 
 // CreateAgentCreateAgentAgentVersion includes the requested fields of the GraphQL type AgentVersion.
@@ -445,6 +447,8 @@ func (v *CreateAgentResponse) GetCreateAgent() CreateAgentCreateAgentAgentVersio
 type CreateApiKeyCreateApiKeyCreateApiKeyResult struct {
 	ApiKey ApiKeyDetails `json:"apiKey"`
 	Secret string        `json:"secret"`
+	// The token to send as `Authorization: Bearer <token>`. It is returned only here, when the key is created.
+	Token string `json:"token"`
 }
 
 // GetApiKey returns CreateApiKeyCreateApiKeyCreateApiKeyResult.ApiKey, and is useful for accessing the field via an interface.
@@ -452,6 +456,9 @@ func (v *CreateApiKeyCreateApiKeyCreateApiKeyResult) GetApiKey() ApiKeyDetails {
 
 // GetSecret returns CreateApiKeyCreateApiKeyCreateApiKeyResult.Secret, and is useful for accessing the field via an interface.
 func (v *CreateApiKeyCreateApiKeyCreateApiKeyResult) GetSecret() string { return v.Secret }
+
+// GetToken returns CreateApiKeyCreateApiKeyCreateApiKeyResult.Token, and is useful for accessing the field via an interface.
+func (v *CreateApiKeyCreateApiKeyCreateApiKeyResult) GetToken() string { return v.Token }
 
 // CreateApiKeyResponse is returned by CreateApiKey on success.
 type CreateApiKeyResponse struct {
@@ -3675,6 +3682,7 @@ const (
 	MetricCategorySecurity    MetricCategory = "SECURITY"
 	MetricCategoryReliability MetricCategory = "RELIABILITY"
 	MetricCategoryEfficiency  MetricCategory = "EFFICIENCY"
+	MetricCategoryCost        MetricCategory = "COST"
 )
 
 var AllMetricCategory = []MetricCategory{
@@ -3683,6 +3691,7 @@ var AllMetricCategory = []MetricCategory{
 	MetricCategorySecurity,
 	MetricCategoryReliability,
 	MetricCategoryEfficiency,
+	MetricCategoryCost,
 }
 
 type ModelComplexity string
@@ -7144,6 +7153,7 @@ mutation CreateApiKey ($name: String!, $description: String, $scopes: [String!]!
 			... ApiKeyDetails
 		}
 		secret
+		token
 	}
 }
 fragment ApiKeyDetails on ApiKey {

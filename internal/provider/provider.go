@@ -32,6 +32,7 @@ type PartiteAIProvider struct {
 // PartiteAIProviderModel describes the provider data model.
 type PartiteAIProviderModel struct {
 	Endpoint   types.String `tfsdk:"endpoint"`
+	APIToken   types.String `tfsdk:"api_token"`
 	APIKey     types.String `tfsdk:"api_key"`
 	APISecret  types.String `tfsdk:"api_secret"`
 	Enterprise types.Bool   `tfsdk:"enterprise"`
@@ -49,15 +50,23 @@ func (p *PartiteAIProvider) Schema(ctx context.Context, req provider.SchemaReque
 				MarkdownDescription: "The base URL for the Partite AI API. For example, `https://api.partite.ai/graphql`",
 				Optional:            true,
 			},
+			"api_token": schema.StringAttribute{
+				MarkdownDescription: "The API token used to authenticate with the Partite AI API. It starts with `prt_ak_`. " +
+					"Can also be set with the `PARTITE_AI_API_TOKEN` environment variable.",
+				Optional:  true,
+				Sensitive: true,
+			},
 			"api_key": schema.StringAttribute{
-				MarkdownDescription: "The API key used to authenticate with the Partite AI API.",
+				MarkdownDescription: "The API key ID used to authenticate with the Partite AI API.",
 				Optional:            true,
 				Sensitive:           false,
+				DeprecationMessage:  "Use api_token instead.",
 			},
 			"api_secret": schema.StringAttribute{
 				MarkdownDescription: "The API secret used to authenticate with the Partite AI API.",
 				Optional:            true,
 				Sensitive:           true,
+				DeprecationMessage:  "Use api_token instead.",
 			},
 			"enterprise": schema.BoolAttribute{
 				MarkdownDescription: "Whether the endpoint is an enterprise deployment. Some resources, " +
@@ -90,12 +99,21 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 		)
 	}
 
+	if config.APIToken.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("api_token"),
+			"Unknown API Token",
+			"The provider cannot create the Partite.ai API client as there is an unknown configuration value for the API token. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the PARTITE_AI_API_TOKEN environment variable.",
+		)
+	}
+
 	if config.APIKey.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("api_key"),
 			"Unknown API Key",
 			"The provider cannot create the Partite.ai API client as there is an unknown configuration value for the API key. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the PARTITE_AI_API_KEY environment variable.",
+				"Either target apply the source of the value first, or set api_token or the PARTITE_AI_API_TOKEN environment variable instead of the deprecated API key and secret.",
 		)
 	}
 
@@ -113,7 +131,7 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 			path.Root("api_secret"),
 			"Unknown API Secret",
 			"The provider cannot create the Partite.ai API client as there is an unknown configuration value for the API secret. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the PARTITE_AI_API_SECRET environment variable.",
+				"Either target apply the source of the value first, or set api_token or the PARTITE_AI_API_TOKEN environment variable instead of the deprecated API key and secret.",
 		)
 	}
 
@@ -127,11 +145,16 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 	if env := os.Getenv("PARTITE_AI_ENDPOINT"); env != "" {
 		endpoint = env
 	}
+	apiToken := os.Getenv("PARTITE_AI_API_TOKEN")
 	apiKey := os.Getenv("PARTITE_AI_API_KEY")
 	apiSecret := os.Getenv("PARTITE_AI_API_SECRET")
 
 	if !config.Endpoint.IsNull() {
 		endpoint = config.Endpoint.ValueString()
+	}
+
+	if !config.APIToken.IsNull() {
+		apiToken = config.APIToken.ValueString()
 	}
 
 	if !config.APIKey.IsNull() {
@@ -152,22 +175,45 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 		)
 	}
 
-	if apiKey == "" {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("api_key"),
-			"Missing API Key",
-			"The provider cannot create the Partite.ai API client as there is a missing or empty value for the API key. "+
-				"Set the API key value in the configuration or use the PARTITE_AI_API_KEY environment variable. "+
-				"If you are using the environment variable, ensure it is not empty.",
-		)
+	configSetsOldPair := (!config.APIKey.IsNull() && config.APIKey.ValueString() != "") ||
+		(!config.APISecret.IsNull() && config.APISecret.ValueString() != "")
+	configSetsToken := !config.APIToken.IsNull() && config.APIToken.ValueString() != ""
+	if configSetsOldPair && !configSetsToken {
+		// Configuration wins over the environment, so the old pair in the
+		// configuration beats a token from PARTITE_AI_API_TOKEN.
+		apiToken = ""
 	}
-
-	if apiSecret == "" {
+	switch {
+	case !config.APIToken.IsNull() && config.APIToken.ValueString() != "" && configSetsOldPair:
+		resp.Diagnostics.AddAttributeError(
+			path.Root("api_token"),
+			"Conflicting API credentials",
+			"The provider cannot create the Partite.ai API client as the configuration sets both api_token and api_key or api_secret. "+
+				"Set only api_token. The api_key and api_secret values are deprecated.",
+		)
+	case apiToken != "":
+	case apiKey != "" && apiSecret != "":
+		apiToken = apiKeyToken(apiKey, apiSecret)
+	case apiKey != "":
 		resp.Diagnostics.AddAttributeError(
 			path.Root("api_secret"),
 			"Missing API Secret",
-			"The provider cannot create the Partite.ai API client as there is a missing or empty value for the API secret. "+
-				"Set the API secret value in the configuration or use the PARTITE_AI_API_SECRET environment variable. "+
+			"The provider cannot create the Partite.ai API client as the API key is set but the API secret is missing or empty. "+
+				"Set api_token or the PARTITE_AI_API_TOKEN environment variable instead of the deprecated API key and secret.",
+		)
+	case apiSecret != "":
+		resp.Diagnostics.AddAttributeError(
+			path.Root("api_key"),
+			"Missing API Key",
+			"The provider cannot create the Partite.ai API client as the API secret is set but the API key is missing or empty. "+
+				"Set api_token or the PARTITE_AI_API_TOKEN environment variable instead of the deprecated API key and secret.",
+		)
+	default:
+		resp.Diagnostics.AddAttributeError(
+			path.Root("api_token"),
+			"Missing API Token",
+			"The provider cannot create the Partite.ai API client as there is a missing or empty value for the API token. "+
+				"Set the api_token value in the configuration or use the PARTITE_AI_API_TOKEN environment variable. "+
 				"If you are using the environment variable, ensure it is not empty.",
 		)
 	}
@@ -210,8 +256,7 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 
 	httpClient := &http.Client{
 		Transport: &authTransport{
-			apiKey:    apiKey,
-			apiSecret: apiSecret,
+			apiToken: apiToken,
 		},
 	}
 
@@ -331,12 +376,11 @@ func NewWithClient(version string, client graphql.Client) func() provider.Provid
 }
 
 type authTransport struct {
-	apiKey    string
-	apiSecret string
+	apiToken string
 }
 
 func (t *authTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.SetBasicAuth(t.apiKey, t.apiSecret)
+	req.Header.Set("Authorization", "Bearer "+t.apiToken)
 	return http.DefaultTransport.RoundTrip(req)
 }
 

@@ -195,26 +195,58 @@ func TestAccWebhookDestination_basic(t *testing.T) {
 }
 
 func TestAccApiKey_basic(t *testing.T) {
-	accTest(t, resource.TestStep{
-		Config: `
+	config := func(name string) string {
+		return fmt.Sprintf(`
 resource "partiteai_api_key" "test" {
-  name   = "acc-key"
+  name   = %q
   scopes = ["configuration:read", "configuration:write"]
 }
 
 data "partiteai_api_key" "test" {
   id = partiteai_api_key.test.id
 }
-`,
-		Check: resource.ComposeAggregateTestCheckFunc(
-			resource.TestCheckResourceAttr("partiteai_api_key.test", "scopes.#", "2"),
-			resource.TestCheckResourceAttrSet("partiteai_api_key.test", "kid"),
-			resource.TestCheckResourceAttrSet("partiteai_api_key.test", "secret"),
-			resource.TestCheckResourceAttrPair(
-				"data.partiteai_api_key.test", "kid",
-				"partiteai_api_key.test", "kid"),
-		),
-	})
+`, name)
+	}
+	accTest(t,
+		resource.TestStep{
+			Config: config("acc-key"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("partiteai_api_key.test", "scopes.#", "2"),
+				resource.TestCheckResourceAttrSet("partiteai_api_key.test", "kid"),
+				resource.TestCheckResourceAttrSet("partiteai_api_key.test", "secret"),
+				apiKeyTokenMatchesKidAndSecret("partiteai_api_key.test"),
+				resource.TestCheckResourceAttrPair(
+					"data.partiteai_api_key.test", "kid",
+					"partiteai_api_key.test", "kid"),
+			),
+		},
+		// The secret and token come back only on create, so an update keeps
+		// what state has.
+		resource.TestStep{
+			Config: config("acc-key-renamed"),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("partiteai_api_key.test", "name", "acc-key-renamed"),
+				apiKeyTokenMatchesKidAndSecret("partiteai_api_key.test"),
+			),
+		},
+	)
+}
+
+// apiKeyTokenMatchesKidAndSecret checks that the token in state is the one
+// made from the key ID and secret.
+func apiKeyTokenMatchesKidAndSecret(name string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[name]
+		if !ok {
+			return fmt.Errorf("%s is not in state", name)
+		}
+		attrs := rs.Primary.Attributes
+		want := "prt_ak_" + attrs["kid"] + "_" + attrs["secret"]
+		if attrs["kid"] == "" || attrs["secret"] == "" || attrs["token"] != want {
+			return fmt.Errorf("%s: token does not match prt_ak_<kid>_<secret>", name)
+		}
+		return nil
+	}
 }
 
 // resourceAbsent asserts a resource is gone from state, which is what a

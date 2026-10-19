@@ -26,5 +26,6 @@ API Key data source
 - `kid` (String) Key ID
 - `name` (String) Resource name
 - `scopes` (Set of String) List of scopes for the API key
-- `secret` (String, Sensitive) API key secret (only available after creation)
+- `secret` (String, Sensitive, Deprecated) API key secret (only available after creation)
+- `token` (String, Sensitive) Always null here. The API returns the token only when the key is created; read it from the `partiteai_api_key` resource.
 - `updated_at` (String) Timestamp when the resource was last updated

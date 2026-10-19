@@ -28,6 +28,7 @@ type ApiKeyDataSource struct {
 type ApiKeyDataSourceModel struct {
 	ApiKeyBaseModel
 	Secret types.String `tfsdk:"secret"` // Read-only, may be empty for existing keys
+	Token  types.String `tfsdk:"token"`  // Read-only, may be empty for existing keys
 }
 
 func (d *ApiKeyDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
@@ -52,6 +53,12 @@ func (d *ApiKeyDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 				Computed:            true,
 				Sensitive:           true,
 				MarkdownDescription: "API key secret (only available after creation)",
+				DeprecationMessage:  "Use token instead. Sending the key ID and secret as basic auth is deprecated.",
+			},
+			"token": schema.StringAttribute{
+				Computed:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Always null here. The API returns the token only when the key is created; read it from the `partiteai_api_key` resource.",
 			},
 		},
 	}

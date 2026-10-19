@@ -34,10 +34,9 @@ type Server struct {
 	Endpoint string // GraphQL endpoint, e.g. http://127.0.0.1:53211/graphql
 	BaseURL  string
 
-	// APIKey and APISecret are a real key minted on this instance, so tests
-	// go through the same authentication path as a real deployment.
-	APIKey    string
-	APISecret string
+	// APIToken is a real key minted on this instance, so tests go through
+	// the same authentication path as a real deployment.
+	APIToken string
 
 	cmd     *exec.Cmd
 	logPath string
@@ -136,15 +135,12 @@ func Start(t *testing.T) *Server {
 // itself carries no credentials, which the API allows, and which is the only
 // way to bootstrap a fresh local instance.
 func (s *Server) mintAPIKey() error {
-	const query = `mutation { createApiKey(name: "terraform-acceptance-tests", scopes: ["configuration:read", "configuration:write", "mesh:converse"]) { apiKey { kid } secret } }`
+	const query = `mutation { createApiKey(name: "terraform-acceptance-tests", scopes: ["configuration:read", "configuration:write", "mesh:converse"]) { token } }`
 
 	var out struct {
 		Data struct {
 			CreateApiKey struct {
-				ApiKey struct {
-					Kid string `json:"kid"`
-				} `json:"apiKey"`
-				Secret string `json:"secret"`
+				Token string `json:"token"`
 			} `json:"createApiKey"`
 		} `json:"data"`
 		Errors []struct {
@@ -186,9 +182,8 @@ func (s *Server) mintAPIKey() error {
 		return fmt.Errorf("graphql: %s", out.Errors[0].Message)
 	}
 
-	s.APIKey = out.Data.CreateApiKey.ApiKey.Kid
-	s.APISecret = out.Data.CreateApiKey.Secret
-	if s.APIKey == "" || s.APISecret == "" {
+	s.APIToken = out.Data.CreateApiKey.Token
+	if s.APIToken == "" {
 		return fmt.Errorf("empty key in response: %s", raw)
 	}
 	return nil
@@ -201,11 +196,10 @@ func (s *Server) Name() string { return "mesh" }
 func (s *Server) ProviderConfig() string {
 	return fmt.Sprintf(`
 provider "partiteai" {
-  endpoint   = %q
-  api_key    = %q
-  api_secret = %q
+  endpoint  = %q
+  api_token = %q
 }
-`, s.Endpoint, s.APIKey, s.APISecret)
+`, s.Endpoint, s.APIToken)
 }
 
 func (s *Server) waitReady(timeout time.Duration) error {
@@ -264,9 +258,8 @@ func (s *Server) ProviderConfigEnterprise() string {
 	return fmt.Sprintf(`
 provider "partiteai" {
   endpoint   = %q
-  api_key    = %q
-  api_secret = %q
+  api_token  = %q
   enterprise = true
 }
-`, s.Endpoint, s.APIKey, s.APISecret)
+`, s.Endpoint, s.APIToken)
 }

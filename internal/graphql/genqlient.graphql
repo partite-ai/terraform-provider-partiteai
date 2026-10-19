@@ -248,6 +248,7 @@ mutation CreateApiKey(
       ...ApiKeyDetails
     }
     secret
+    token
   }
 }
 
