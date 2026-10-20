@@ -239,3 +239,52 @@ func checkClientSignsIn(secretResource string) resource.TestCheckFunc {
 		return nil
 	}
 }
+
+func TestAccAccessPointClient_redirectURIs(t *testing.T) {
+	clientHCL := func(redirectURIs string) string {
+		return `
+resource "partiteai_access_point" "test" {
+  name = "acc-redirect-portal"
+}
+
+resource "partiteai_access_point_client" "test" {
+  access_point_id = partiteai_access_point.test.id
+  name            = "inspector"
+` + redirectURIs + `
+}
+
+data "partiteai_access_point_client" "test" {
+  id = partiteai_access_point_client.test.id
+}
+`
+	}
+	accTest(t,
+		resource.TestStep{
+			Config: clientHCL(`  redirect_uris = ["http://localhost/oauth/callback", "https://app.example/callback"]`),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("partiteai_access_point_client.test", "redirect_uris.#", "2"),
+				resource.TestCheckTypeSetElemAttr("partiteai_access_point_client.test", "redirect_uris.*", "http://localhost/oauth/callback"),
+				resource.TestCheckTypeSetElemAttr("partiteai_access_point_client.test", "redirect_uris.*", "https://app.example/callback"),
+				resource.TestCheckResourceAttr("data.partiteai_access_point_client.test", "redirect_uris.#", "2"),
+			),
+		},
+		resource.TestStep{
+			Config: clientHCL(`  redirect_uris = ["https://claude.ai/api/mcp/auth_callback"]`),
+			Check: resource.ComposeAggregateTestCheckFunc(
+				resource.TestCheckResourceAttr("partiteai_access_point_client.test", "redirect_uris.#", "1"),
+				resource.TestCheckTypeSetElemAttr("partiteai_access_point_client.test", "redirect_uris.*", "https://claude.ai/api/mcp/auth_callback"),
+			),
+		},
+		resource.TestStep{
+			Config:            clientHCL(`  redirect_uris = ["https://claude.ai/api/mcp/auth_callback"]`),
+			ResourceName:      "partiteai_access_point_client.test",
+			ImportState:       true,
+			ImportStateVerify: true,
+		},
+		// Leaving them out removes them.
+		resource.TestStep{
+			Config: clientHCL(""),
+			Check:  resource.TestCheckResourceAttr("partiteai_access_point_client.test", "redirect_uris.#", "0"),
+		},
+	)
+}

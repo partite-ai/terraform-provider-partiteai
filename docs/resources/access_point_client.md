@@ -23,6 +23,7 @@ A client of an access point. It signs in with its `client_id` and a secret, made
 ### Optional
 
 - `claims` (String) A JSON object copied into every token the client gets. It may not set `iss`, `sub`, `aud`, `exp`, `nbf`, `iat` or `jti`.
+- `redirect_uris` (Set of String) Where the access point's authorization endpoint may send the client back to with a code, for an MCP client that only knows the authorization code flow. Each is an https URL, or an http URL to `localhost` or a loopback address, which matches on any port. A client with none can't use the authorization code flow.
 
 ### Read-Only
 

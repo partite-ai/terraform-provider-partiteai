@@ -702,10 +702,13 @@ type NewAccessPointClient struct {
 	AccessPointID string          `json:"accessPointID"`
 	Name          string          `json:"name"`
 	Claims        json.RawMessage `json:"claims,omitempty"`
+	RedirectUris  []string        `json:"redirectUris,omitempty"`
 }
 
 type UpdateAccessPointClient struct {
 	Name Optional[string] `json:"name,omitzero"`
 	// A null leaves the client no claims.
 	Claims Optional[json.RawMessage] `json:"claims,omitzero"`
+	// Replaces the client's redirect URIs.
+	RedirectUris Optional[[]string] `json:"redirectUris,omitzero"`
 }

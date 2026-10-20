@@ -26,4 +26,5 @@ Access point client data source
 - `client_id` (String) What the client signs in as
 - `created_at` (String) Timestamp when the resource was created
 - `name` (String) Resource name
+- `redirect_uris` (Set of String) Where the access point's authorization endpoint may send the client back to with a code
 - `updated_at` (String) Timestamp when the resource was last updated

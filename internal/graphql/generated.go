@@ -20,9 +20,12 @@ type AccessPointClientDetails struct {
 	ClientId      string `json:"clientId"`
 	Name          string `json:"name"`
 	// Copied into every token the client gets.
-	Claims    json.RawMessage `json:"claims"`
-	CreatedAt string          `json:"createdAt"`
-	UpdatedAt string          `json:"updatedAt"`
+	Claims json.RawMessage `json:"claims"`
+	// Where the access point's authorization endpoint may send the client back to
+	// with a code. A client with none can't use the authorization code flow.
+	RedirectUris []string `json:"redirectUris"`
+	CreatedAt    string   `json:"createdAt"`
+	UpdatedAt    string   `json:"updatedAt"`
 }
 
 // GetId returns AccessPointClientDetails.Id, and is useful for accessing the field via an interface.
@@ -39,6 +42,9 @@ func (v *AccessPointClientDetails) GetName() string { return v.Name }
 
 // GetClaims returns AccessPointClientDetails.Claims, and is useful for accessing the field via an interface.
 func (v *AccessPointClientDetails) GetClaims() json.RawMessage { return v.Claims }
+
+// GetRedirectUris returns AccessPointClientDetails.RedirectUris, and is useful for accessing the field via an interface.
+func (v *AccessPointClientDetails) GetRedirectUris() []string { return v.RedirectUris }
 
 // GetCreatedAt returns AccessPointClientDetails.CreatedAt, and is useful for accessing the field via an interface.
 func (v *AccessPointClientDetails) GetCreatedAt() string { return v.CreatedAt }
@@ -7885,6 +7891,7 @@ fragment AccessPointClientDetails on AccessPointClient {
 	clientId
 	name
 	claims
+	redirectUris
 	createdAt
 	updatedAt
 }
@@ -10217,6 +10224,7 @@ fragment AccessPointClientDetails on AccessPointClient {
 	clientId
 	name
 	claims
+	redirectUris
 	createdAt
 	updatedAt
 }
@@ -12127,6 +12135,7 @@ fragment AccessPointClientDetails on AccessPointClient {
 	clientId
 	name
 	claims
+	redirectUris
 	createdAt
 	updatedAt
 }

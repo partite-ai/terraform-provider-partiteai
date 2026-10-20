@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -46,6 +47,11 @@ func (d *AccessPointClientDataSource) Schema(ctx context.Context, req datasource
 			"claims": schema.StringAttribute{
 				MarkdownDescription: "A JSON object copied into every token the client gets",
 				CustomType:          jsontypes.NormalizedType{},
+				Computed:            true,
+			},
+			"redirect_uris": schema.SetAttribute{
+				MarkdownDescription: "Where the access point's authorization endpoint may send the client back to with a code",
+				ElementType:         types.StringType,
 				Computed:            true,
 			},
 			"created_at": commonDataSourceSchemas.createdAt,

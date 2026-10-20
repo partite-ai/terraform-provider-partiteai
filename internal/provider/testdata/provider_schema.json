@@ -456,6 +456,23 @@
             "DeprecationMessage": ""
           },
           {
+            "Name": "redirect_uris",
+            "Type": [
+              "set",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "Where the access point's authorization endpoint may send the client back to with a code, for an MCP client that only knows the authorization code flow. Each is an https URL, or an http URL to `localhost` or a loopback address, which matches on any port. A client with none can't use the authorization code flow.",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
             "Name": "updated_at",
             "Type": "string",
             "NestedType": null,
@@ -12831,6 +12848,23 @@
             "Type": "string",
             "NestedType": null,
             "Description": "Resource name",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "redirect_uris",
+            "Type": [
+              "set",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "Where the access point's authorization endpoint may send the client back to with a code",
             "Required": false,
             "Optional": false,
             "Computed": true,

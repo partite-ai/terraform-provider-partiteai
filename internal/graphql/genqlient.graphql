@@ -1482,6 +1482,7 @@ fragment AccessPointClientDetails on AccessPointClient {
   clientId
   name
   claims
+  redirectUris
   createdAt
   updatedAt
 }

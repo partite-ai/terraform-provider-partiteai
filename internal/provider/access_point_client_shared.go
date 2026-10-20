@@ -19,6 +19,7 @@ type AccessPointClientBaseModel struct {
 	ClientId      types.String         `tfsdk:"client_id"`
 	Name          types.String         `tfsdk:"name"`
 	Claims        jsontypes.Normalized `tfsdk:"claims"`
+	RedirectUris  types.Set            `tfsdk:"redirect_uris"`
 	CreatedAt     timetypes.RFC3339    `tfsdk:"created_at"`
 	UpdatedAt     timetypes.RFC3339    `tfsdk:"updated_at"`
 }
@@ -39,6 +40,7 @@ func (m *AccessPointClientBaseModel) MapFromGraphQL(ctx context.Context, clientD
 		&m.AccessPointId, clientDetails.AccessPointID,
 		&m.ClientId, clientDetails.ClientId,
 		&m.Name, clientDetails.Name,
+		&m.RedirectUris, clientDetails.RedirectUris,
 		&m.CreatedAt, clientDetails.CreatedAt,
 		&m.UpdatedAt, clientDetails.UpdatedAt,
 	)
