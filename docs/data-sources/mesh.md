@@ -21,6 +21,7 @@ Mesh data source
 
 ### Read-Only
 
+- `boundary_ids` (Set of String) IDs of the boundaries every conversation on the mesh is checked against
 - `created_at` (String) Timestamp when the resource was created
 - `description` (String) Resource description
 - `draft_version_id` (String) The ID of the draft version

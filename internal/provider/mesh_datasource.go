@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -42,6 +43,11 @@ func (d *MeshDataSource) Schema(ctx context.Context, req datasource.SchemaReques
 			},
 			"memory_store_id": schema.StringAttribute{
 				MarkdownDescription: "ID of the memory store the mesh reads and writes, if it has one",
+				Computed:            true,
+			},
+			"boundary_ids": schema.SetAttribute{
+				MarkdownDescription: "IDs of the boundaries every conversation on the mesh is checked against",
+				ElementType:         types.StringType,
 				Computed:            true,
 			},
 		}),

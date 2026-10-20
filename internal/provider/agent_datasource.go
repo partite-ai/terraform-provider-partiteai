@@ -53,10 +53,10 @@ func (d *AgentDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Computed:            true,
 				NestedObject:        mcpConnectionDataSourceType,
 			},
-			"tasks": schema.SetNestedAttribute{
-				MarkdownDescription: "Set of task definitions associated with the agent, referenced by task definition ID",
+			"client_tasks": schema.SetNestedAttribute{
+				MarkdownDescription: "Set of client task definitions associated with the agent, referenced by client task definition ID",
 				Computed:            true,
-				NestedObject:        taskAssociationDataSourceType,
+				NestedObject:        clientTaskAssociationDataSourceType,
 			},
 			"skills": schema.SetNestedAttribute{
 				MarkdownDescription: "Set of skills the agent can load, referenced by skill ID",

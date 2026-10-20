@@ -119,6 +119,9 @@ func TestEveryResourceHasADataSource(t *testing.T) {
 		// created. A data source could return nothing a subscription does not
 		// already expose.
 		"partiteai_mcp_connection_tunnel_key": true,
+		// A client secret is readable only when it is made, and the client's
+		// data source already names the client.
+		"partiteai_access_point_client_secret": true,
 	}
 
 	for name := range schemas.ResourceSchemas {

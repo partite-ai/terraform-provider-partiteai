@@ -90,11 +90,527 @@
   },
   "ProviderMeta": null,
   "ResourceSchemas": {
+    "partiteai_access_point": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "authorization_server_url",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Advertised to MCP clients as where to log in",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "boundary_ids",
+            "Type": [
+              "set",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "IDs of the boundaries conversations created through the access point are checked against",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "client_token_lifetime_seconds",
+            "Type": "number",
+            "NestedType": null,
+            "Description": "How long a token issued to a client lasts, from 300 to 86400 seconds",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "created_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was created",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "description",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource description",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource identifier",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "issuers",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "audience",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Must be in a token's `aud`. Left out, it is the access point's URL.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "check_audience",
+                  "Type": "bool",
+                  "NestedType": null,
+                  "Description": "Whether a token's `aud` is checked. Turning it off accepts tokens the issuer made for other services and ID tokens, and skips the audience check MCP clients expect.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "issuer",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The `iss` a token from this issuer carries",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "jwks",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "A key set, as JSON, for an issuer that publishes none",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "jwks_url",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Where the issuer publishes its key set. Set exactly one of `jwks_url` and `jwks`.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 2
+            },
+            "Description": "The issuers whose tokens the access point accepts",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource name",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "tags",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Tag name",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "value",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Tag value",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 2
+            },
+            "Description": "Tags for the resource",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "updated_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was last updated",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "url",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Where callers reach the access point. Tokens it issues to its clients carry it as their `iss` and `aud`.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "An access point: a way into meshes for callers who sign in with a token from a trusted issuer rather than an API key.",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_access_point_client": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "access_point_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "ID of the access point the client signs in to. Changing it replaces the client.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "claims",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "A JSON object copied into every token the client gets. It may not set `iss`, `sub`, `aud`, `exp`, `nbf`, `iat` or `jti`.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "client_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "What the client signs in as",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "created_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was created",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource identifier",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource name",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "updated_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was last updated",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "A client of an access point. It signs in with its `client_id` and a secret, made with `partiteai_access_point_client_secret`, and gets a token from the access point.",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_access_point_client_secret": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "access_point_client_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "ID of the client the secret signs in as. Changing it replaces the secret.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "created_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was created",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "expires_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "When the secret stops working. Left out, it doesn't expire. Changing it replaces the secret.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource identifier",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "last_used_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "When the secret last signed in. A secret that stopped being used is safe to remove.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "secret",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The secret. It is readable only when it is made, so an imported secret has none.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": true,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "A secret an access point client signs in with. A client can have several, so a secret can be replaced without changing the client ID: add the new one, move callers to it, then remove the old one. `create_before_destroy` does this in one apply.",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
     "partiteai_agent": {
       "Version": 0,
       "Block": {
         "Version": 0,
         "Attributes": [
+          {
+            "Name": "client_tasks",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "id",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Client task definition identifier",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 3
+            },
+            "Description": "Set of client task definitions associated with the agent, referenced by client task definition ID",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
           {
             "Name": "created_at",
             "Type": "string",
@@ -485,38 +1001,6 @@
             "DeprecationMessage": ""
           },
           {
-            "Name": "tasks",
-            "Type": null,
-            "NestedType": {
-              "Attributes": [
-                {
-                  "Name": "id",
-                  "Type": "string",
-                  "NestedType": null,
-                  "Description": "Task definition identifier",
-                  "Required": true,
-                  "Optional": false,
-                  "Computed": false,
-                  "Sensitive": false,
-                  "DescriptionKind": 1,
-                  "Deprecated": false,
-                  "WriteOnly": false,
-                  "DeprecationMessage": ""
-                }
-              ],
-              "Nesting": 3
-            },
-            "Description": "Set of task definitions associated with the agent, referenced by task definition ID",
-            "Required": false,
-            "Optional": true,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
             "Name": "updated_at",
             "Type": "string",
             "NestedType": null,
@@ -717,6 +1201,472 @@
         ],
         "BlockTypes": null,
         "Description": "API Key resource",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_boundary": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "created_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was created",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "description",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource description",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource identifier",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "modifications",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "action",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The action the modification sets things on: `CONVERSATION_CREATE`, `REQUEST_CREATE` or `TOOL_CALL`",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Name of the modification, unique in the boundary",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "set_arguments",
+                  "Type": [
+                    "map",
+                    "string"
+                  ],
+                  "NestedType": null,
+                  "Description": "For `TOOL_CALL`: arguments to set on the call, each name with a CEL expression that gives its value. The model doesn't see an argument a boundary sets.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "set_tags",
+                  "Type": [
+                    "map",
+                    "string"
+                  ],
+                  "NestedType": null,
+                  "Description": "For `CONVERSATION_CREATE` and `REQUEST_CREATE`: tags to set on what the action creates, each name with a CEL expression that gives its values. A string sets one value, a list several, and an empty list removes the tag.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "set_tracing",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "For `CONVERSATION_CREATE`: a CEL expression that gives whether the conversation is traced",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "when",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "CEL expression that decides whether the modification applies. It can't read a tool call's arguments. Left out, the modification applies to every action of its kind.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 2
+            },
+            "Description": "The modifications, made in order",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource name",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "report_only",
+            "Type": "bool",
+            "NestedType": null,
+            "Description": "Every rule reports what it would refuse rather than refusing it, and no modification is made",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "rules",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "action",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The action the rule checks: `CONVERSATION_CREATE`, `REQUEST_CREATE`, `SKILL_PROVIDE`, `TOOL_PROVIDE`, `MEMORY_SEARCH_PROVIDE`, `CONVERSATION_HISTORY_PROVIDE` or `TOOL_CALL`",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "effect",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "`DENY` refuses the action. `ASK` makes a tool call wait for the user to approve it, and is only for `TOOL_CALL`.",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "message",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Told to whoever the rule refuses, or asks to approve. It can embed CEL expressions as `${...}`, which read what the rule's `when` reads; `$${` writes a literal `${`.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Name of the rule, unique in the boundary",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "report_only",
+                  "Type": "bool",
+                  "NestedType": null,
+                  "Description": "The rule reports what it would refuse rather than refusing it",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "when",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "CEL expression that decides whether the rule applies. Left out, the rule applies to every action of its kind.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 2
+            },
+            "Description": "The rules, checked in order",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "updated_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was last updated",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "warnings",
+            "Type": [
+              "list",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "What is likely wrong with the boundary, such as an expression that reads something that can be missing without checking first",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "A boundary: rules that each refuse something in conversations on the meshes, or created through the access points, it is attached to, and modifications that set things on what those conversations do. Attach it with `boundary_ids` on `partiteai_mesh` or `partiteai_access_point`.",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_client_task_definition": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "created_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was created",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "description",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Description of the task. Shown to the LLM as the tool description.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource identifier",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "input_message_type",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "JSON schema the agent must satisfy when invoking the task",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource name",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "output_message_type",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "JSON schema the user must satisfy when completing the task",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "overwrite_existing",
+            "Type": "bool",
+            "NestedType": null,
+            "Description": "When true and a client task definition with this `name` already exists, create takes it over and overwrites its description, schemas and UI forms instead of failing on the duplicate name. Use it to apply a configuration to an organization that already has the definition, such as one of the client task definitions every organization starts with. Only read when the resource is created, and never stored in state, so changing it later does nothing. Defaults to false.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": true,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "ui_forms",
+            "Type": [
+              "map",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "UIs a client can show to complete the task, keyed by form type, with the form's definition as the value. The only type is `A2UI`, whose definition is JSON: an A2UI v0.9 surface for each state of the task, such as `jsonencode({ open = { components = [...] } })`. The API checks each form against the input and output schemas. A change replaces all of the task's forms.",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "updated_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was last updated",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "An author-defined client task definition describing a task an agent can send to the user as a tool call. Carries an input schema (what the agent supplies) and an output schema (what the user submits when completing it). One client task definition is reusable across agents via the agent resource's `client_tasks` attribute.",
         "DescriptionKind": 1,
         "Deprecated": false,
         "DeprecationMessage": ""
@@ -3496,6 +4446,23 @@
         "Version": 0,
         "Attributes": [
           {
+            "Name": "boundary_ids",
+            "Type": [
+              "set",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "IDs of the boundaries every conversation on the mesh is checked against",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
             "Name": "created_at",
             "Type": "string",
             "NestedType": null,
@@ -6011,148 +6978,6 @@
         ],
         "BlockTypes": null,
         "Description": "A skill: instructions an agent loads when a task calls for them, with the files those instructions refer to. The skill is its folder of files, `SKILL.md` among them; the front matter of `SKILL.md` gives the name the agent knows the skill by and its description. Agents use a skill through the agent resource's `skills` attribute. Skills with a `scripts` folder or with files that are not text are refused.",
-        "DescriptionKind": 1,
-        "Deprecated": false,
-        "DeprecationMessage": ""
-      }
-    },
-    "partiteai_task_definition": {
-      "Version": 0,
-      "Block": {
-        "Version": 0,
-        "Attributes": [
-          {
-            "Name": "created_at",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Timestamp when the resource was created",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "description",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Description of the task. Shown to the LLM as the tool description.",
-            "Required": true,
-            "Optional": false,
-            "Computed": false,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "id",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Resource identifier",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "input_message_type",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "JSON schema the agent must satisfy when invoking the task",
-            "Required": true,
-            "Optional": false,
-            "Computed": false,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "name",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Resource name",
-            "Required": true,
-            "Optional": false,
-            "Computed": false,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "output_message_type",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "JSON schema the user must satisfy when completing the task",
-            "Required": true,
-            "Optional": false,
-            "Computed": false,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "overwrite_existing",
-            "Type": "bool",
-            "NestedType": null,
-            "Description": "When true and a task definition with this `name` already exists, create takes it over and overwrites its description, schemas and UI forms instead of failing on the duplicate name. Use it to apply a configuration to an organization that already has the definition, such as one of the task definitions every organization starts with. Only read when the resource is created, and never stored in state, so changing it later does nothing. Defaults to false.",
-            "Required": false,
-            "Optional": true,
-            "Computed": false,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": true,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "ui_forms",
-            "Type": [
-              "map",
-              "string"
-            ],
-            "NestedType": null,
-            "Description": "UIs a client can show to complete the task, keyed by form type, with the form's definition as the value. The only type is `A2UI`, whose definition is JSON: an A2UI v0.9 surface for each state of the task, such as `jsonencode({ open = { components = [...] } })`. The API checks each form against the input and output schemas. A change replaces all of the task's forms.",
-            "Required": false,
-            "Optional": true,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "updated_at",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Timestamp when the resource was last updated",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          }
-        ],
-        "BlockTypes": null,
-        "Description": "An author-defined task definition describing a task an agent can send to the user as a tool call. Carries an input schema (what the agent supplies) and an output schema (what the user submits when completing it). One task definition is reusable across agents via the agent resource's `tasks` attribute.",
         "DescriptionKind": 1,
         "Deprecated": false,
         "DeprecationMessage": ""
@@ -11650,11 +12475,430 @@
         "DeprecationMessage": ""
       }
     },
+    "partiteai_access_point": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "authorization_server_url",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Advertised to MCP clients as where to log in",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "boundary_ids",
+            "Type": [
+              "set",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "IDs of the boundaries conversations created through the access point are checked against",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "client_token_lifetime_seconds",
+            "Type": "number",
+            "NestedType": null,
+            "Description": "How long a token issued to a client lasts, in seconds",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "created_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was created",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "description",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource description",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource identifier",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "issuers",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "audience",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Must be in a token's `aud`",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "check_audience",
+                  "Type": "bool",
+                  "NestedType": null,
+                  "Description": "Whether a token's `aud` is checked",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "issuer",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The `iss` a token from this issuer carries",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "jwks",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "A key set uploaded for an issuer that publishes none",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "jwks_url",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Where the issuer publishes its key set",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 2
+            },
+            "Description": "The issuers whose tokens the access point accepts",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource name",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "tags",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Tag name",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "value",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Tag value",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 2
+            },
+            "Description": "Tags for the resource",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "updated_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was last updated",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "url",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Where callers reach the access point",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Access point data source",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_access_point_client": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "access_point_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "ID of the access point the client signs in to",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "claims",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "A JSON object copied into every token the client gets",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "client_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "What the client signs in as",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "created_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was created",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource identifier",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource name",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "updated_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was last updated",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Access point client data source",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
     "partiteai_agent": {
       "Version": 0,
       "Block": {
         "Version": 0,
         "Attributes": [
+          {
+            "Name": "client_tasks",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "id",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Client task definition identifier",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 3
+            },
+            "Description": "Set of client task definitions associated with the agent, referenced by client task definition ID",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
           {
             "Name": "created_at",
             "Type": "string",
@@ -12045,38 +13289,6 @@
             "DeprecationMessage": ""
           },
           {
-            "Name": "tasks",
-            "Type": null,
-            "NestedType": {
-              "Attributes": [
-                {
-                  "Name": "id",
-                  "Type": "string",
-                  "NestedType": null,
-                  "Description": "Task definition identifier",
-                  "Required": false,
-                  "Optional": false,
-                  "Computed": true,
-                  "Sensitive": false,
-                  "DescriptionKind": 1,
-                  "Deprecated": false,
-                  "WriteOnly": false,
-                  "DeprecationMessage": ""
-                }
-              ],
-              "Nesting": 3
-            },
-            "Description": "Set of task definitions associated with the agent, referenced by task definition ID",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
             "Name": "updated_at",
             "Type": "string",
             "NestedType": null,
@@ -12277,6 +13489,458 @@
         ],
         "BlockTypes": null,
         "Description": "API Key data source",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_boundary": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "created_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was created",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "description",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource description",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource identifier",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "modifications",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "action",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The action the modification sets things on",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Name of the modification",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "set_arguments",
+                  "Type": [
+                    "map",
+                    "string"
+                  ],
+                  "NestedType": null,
+                  "Description": "Tool call arguments to set, each name with a CEL expression that gives its value",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "set_tags",
+                  "Type": [
+                    "map",
+                    "string"
+                  ],
+                  "NestedType": null,
+                  "Description": "Tags to set, each name with a CEL expression that gives its values",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "set_tracing",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "A CEL expression that gives whether the conversation is traced",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "when",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "CEL expression that decides whether the modification applies",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 2
+            },
+            "Description": "The modifications, made in order",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource name",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "report_only",
+            "Type": "bool",
+            "NestedType": null,
+            "Description": "Every rule reports what it would refuse rather than refusing it, and no modification is made",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "rules",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "action",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The action the rule checks",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "effect",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "`DENY` or `ASK`",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "message",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Told to whoever the rule refuses, or asks to approve",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Name of the rule",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "report_only",
+                  "Type": "bool",
+                  "NestedType": null,
+                  "Description": "The rule reports what it would refuse rather than refusing it",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "when",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "CEL expression that decides whether the rule applies",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 2
+            },
+            "Description": "The rules, checked in order",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "updated_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was last updated",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "warnings",
+            "Type": [
+              "list",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "What is likely wrong with the boundary",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Boundary data source",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_client_task_definition": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "created_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was created",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "description",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Description of the task",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Client task definition identifier. Exactly one of `id` or `name` must be set.",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "input_message_type",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "JSON schema the agent must satisfy when invoking the task",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Client task definition name (the tool name exposed to the LLM). Exactly one of `id` or `name` must be set.",
+            "Required": false,
+            "Optional": true,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "output_message_type",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "JSON schema the user must satisfy when completing the task",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "ui_forms",
+            "Type": [
+              "map",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "UIs a client can show to complete the task, keyed by form type, with the form's definition as the value",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "updated_at",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Timestamp when the resource was last updated",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Client Task Definition data source. Look up an author-defined client task definition by `id` or by `name` (exactly one must be set).",
         "DescriptionKind": 1,
         "Deprecated": false,
         "DeprecationMessage": ""
@@ -14698,6 +16362,23 @@
       "Block": {
         "Version": 0,
         "Attributes": [
+          {
+            "Name": "boundary_ids",
+            "Type": [
+              "set",
+              "string"
+            ],
+            "NestedType": null,
+            "Description": "IDs of the boundaries every conversation on the mesh is checked against",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
           {
             "Name": "created_at",
             "Type": "string",
@@ -17172,134 +18853,6 @@
         ],
         "BlockTypes": null,
         "Description": "Skill data source. Look up a skill by `id` or by `name` (exactly one must be set).",
-        "DescriptionKind": 1,
-        "Deprecated": false,
-        "DeprecationMessage": ""
-      }
-    },
-    "partiteai_task_definition": {
-      "Version": 0,
-      "Block": {
-        "Version": 0,
-        "Attributes": [
-          {
-            "Name": "created_at",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Timestamp when the resource was created",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "description",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Description of the task",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "id",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Task definition identifier. Exactly one of `id` or `name` must be set.",
-            "Required": false,
-            "Optional": true,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "input_message_type",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "JSON schema the agent must satisfy when invoking the task",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "name",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Task definition name (the tool name exposed to the LLM). Exactly one of `id` or `name` must be set.",
-            "Required": false,
-            "Optional": true,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "output_message_type",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "JSON schema the user must satisfy when completing the task",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "ui_forms",
-            "Type": [
-              "map",
-              "string"
-            ],
-            "NestedType": null,
-            "Description": "UIs a client can show to complete the task, keyed by form type, with the form's definition as the value",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
-            "Name": "updated_at",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "Timestamp when the resource was last updated",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          }
-        ],
-        "BlockTypes": null,
-        "Description": "Task Definition data source. Look up an author-defined task definition by `id` or by `name` (exactly one must be set).",
         "DescriptionKind": 1,
         "Deprecated": false,
         "DeprecationMessage": ""

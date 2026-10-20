@@ -131,7 +131,7 @@ data "partiteai_a2ui_basic_form" "exported" {
 // a2uiFormAccTask is a task whose form comes from the given data source.
 func a2uiFormAccTask(definition string) string {
 	return fmt.Sprintf(`
-resource "partiteai_task_definition" "pick" {
+resource "partiteai_client_task_definition" "pick" {
   name        = "acc_pick"
   description = "Ask the user to pick a color."
   input_message_type = jsonencode({
@@ -337,7 +337,7 @@ func TestAccA2UIForms(t *testing.T) {
 					"data.partiteai_a2ui_basic_form.pick", "definition",
 					"data.partiteai_a2ui_form.pick", "definition"),
 				resource.TestCheckResourceAttrPair(
-					"partiteai_task_definition.pick", "ui_forms.A2UI",
+					"partiteai_client_task_definition.pick", "ui_forms.A2UI",
 					"data.partiteai_a2ui_basic_form.pick", "definition"),
 				resource.TestCheckResourceAttrWith("data.partiteai_a2ui_basic_form.pick", "definition", func(value string) error {
 					var form struct {
@@ -369,7 +369,7 @@ func TestAccA2UIForms(t *testing.T) {
 		resource.TestStep{
 			Config: a2uiBasicFormAccConfig + a2uiGenericFormAccConfig + a2uiFormAccTask("data.partiteai_a2ui_form.pick.definition"),
 			Check: resource.TestCheckResourceAttrPair(
-				"partiteai_task_definition.pick", "ui_forms.A2UI",
+				"partiteai_client_task_definition.pick", "ui_forms.A2UI",
 				"data.partiteai_a2ui_form.pick", "definition"),
 		},
 	)

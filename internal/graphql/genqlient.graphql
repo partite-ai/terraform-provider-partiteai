@@ -26,8 +26,8 @@ fragment AgentDetails on Agent {
       toolNames
       toolNamePattern
     }
-    tasks {
-      taskDefinition {
+    clientTasks {
+      clientTaskDefinition {
         id
         name
       }
@@ -479,6 +479,9 @@ fragment MeshDetails on Mesh {
   memoryStore {
     id
   }
+  boundaries {
+    id
+  }
 }
 
 query GetMesh($id: MeshID!) {
@@ -673,8 +676,8 @@ mutation DeleteWebhookDestination($id: WebhookDestinationID!) {
   }
 }
 
-# @genqlient(typename: "TaskDefinitionDetails")
-fragment TaskDefinitionDetails on TaskDefinition {
+# @genqlient(typename: "ClientTaskDefinitionDetails")
+fragment ClientTaskDefinitionDetails on ClientTaskDefinition {
   id
   name
   description
@@ -688,39 +691,39 @@ fragment TaskDefinitionDetails on TaskDefinition {
   updatedAt
 }
 
-query GetTaskDefinition($id: TaskDefinitionID!) {
+query GetClientTaskDefinition($id: ClientTaskDefinitionID!) {
   # @genqlient(flatten: true)
-  taskDefinition(id: $id) {
-    ...TaskDefinitionDetails
+  clientTaskDefinition(id: $id) {
+    ...ClientTaskDefinitionDetails
   }
 }
 
-query GetTaskDefinitionByName($name: String!) {
+query GetClientTaskDefinitionByName($name: String!) {
   # @genqlient(flatten: true)
-  taskDefinitionByName(name: $name) {
-    ...TaskDefinitionDetails
+  clientTaskDefinitionByName(name: $name) {
+    ...ClientTaskDefinitionDetails
   }
 }
 
-mutation CreateTaskDefinition($input: NewTaskDefinition!) {
+mutation CreateClientTaskDefinition($input: NewClientTaskDefinition!) {
   # @genqlient(flatten: true)
-  createTaskDefinition(input: $input) {
-    ...TaskDefinitionDetails
+  createClientTaskDefinition(input: $input) {
+    ...ClientTaskDefinitionDetails
   }
 }
 
-mutation ModifyTaskDefinition(
-  $id: TaskDefinitionID!
-  $input: UpdateTaskDefinition!
+mutation ModifyClientTaskDefinition(
+  $id: ClientTaskDefinitionID!
+  $input: UpdateClientTaskDefinition!
 ) {
   # @genqlient(flatten: true)
-  updateTaskDefinition(taskDefinitionID: $id, input: $input) {
-    ...TaskDefinitionDetails
+  updateClientTaskDefinition(clientTaskDefinitionID: $id, input: $input) {
+    ...ClientTaskDefinitionDetails
   }
 }
 
-mutation DeleteTaskDefinition($id: TaskDefinitionID!) {
-  deleteTaskDefinitions(taskDefinitionIDs: [$id]) {
+mutation DeleteClientTaskDefinition($id: ClientTaskDefinitionID!) {
+  deleteClientTaskDefinitions(clientTaskDefinitionIDs: [$id]) {
     ids
   }
 }
@@ -1360,5 +1363,193 @@ mutation ModifyEvalMeshMonitor($id: EvalMeshMonitorID!, $input: UpdateEvalMeshMo
 mutation DeleteEvalMeshMonitor($id: EvalMeshMonitorID!) {
   deleteEvalMeshMonitor(id: $id) {
     id
+  }
+}
+
+# @genqlient(typename: "BoundaryDetails")
+fragment BoundaryDetails on Boundary {
+  id
+  name
+  description
+  reportOnly
+  rules {
+    name
+    action
+    when
+    effect
+    message
+    reportOnly
+  }
+  modifications {
+    name
+    action
+    when
+    setTags {
+      name
+      expression
+    }
+    setTracing
+    setArguments {
+      name
+      expression
+    }
+  }
+  warnings
+  createdAt
+  updatedAt
+}
+
+query GetBoundary($id: BoundaryID!) {
+  # @genqlient(flatten: true)
+  boundary(id: $id) {
+    ...BoundaryDetails
+  }
+}
+
+mutation CreateBoundary($input: NewBoundary!) {
+  # @genqlient(flatten: true)
+  createBoundary(input: $input) {
+    ...BoundaryDetails
+  }
+}
+
+mutation ModifyBoundary($id: BoundaryID!, $input: UpdateBoundary!) {
+  # @genqlient(flatten: true)
+  updateBoundary(id: $id, input: $input) {
+    ...BoundaryDetails
+  }
+}
+
+mutation DeleteBoundary($id: BoundaryID!) {
+  deleteBoundaries(boundaryIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "AccessPointDetails")
+fragment AccessPointDetails on AccessPoint {
+  id
+  name
+  description
+  url
+  tags
+  authorizationServerUrl
+  clientTokenLifetimeSeconds
+  issuers {
+    issuer
+    audience
+    jwksUrl
+    jwks
+  }
+  boundaries {
+    id
+  }
+  createdAt
+  updatedAt
+}
+
+query GetAccessPoint($id: AccessPointID!) {
+  # @genqlient(flatten: true)
+  accessPoint(id: $id) {
+    ...AccessPointDetails
+  }
+}
+
+mutation CreateAccessPoint($input: NewAccessPoint!) {
+  # @genqlient(flatten: true)
+  createAccessPoint(input: $input) {
+    ...AccessPointDetails
+  }
+}
+
+mutation ModifyAccessPoint($id: AccessPointID!, $input: UpdateAccessPoint!) {
+  # @genqlient(flatten: true)
+  updateAccessPoint(id: $id, input: $input) {
+    ...AccessPointDetails
+  }
+}
+
+mutation DeleteAccessPoint($id: AccessPointID!) {
+  deleteAccessPoints(accessPointIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "AccessPointClientDetails")
+fragment AccessPointClientDetails on AccessPointClient {
+  id
+  accessPointID
+  clientId
+  name
+  claims
+  createdAt
+  updatedAt
+}
+
+query GetAccessPointClient($id: AccessPointClientID!) {
+  # @genqlient(flatten: true)
+  accessPointClient(id: $id) {
+    ...AccessPointClientDetails
+  }
+}
+
+mutation CreateAccessPointClient($input: NewAccessPointClient!) {
+  # @genqlient(flatten: true)
+  createAccessPointClient(input: $input) {
+    ...AccessPointClientDetails
+  }
+}
+
+mutation ModifyAccessPointClient(
+  $id: AccessPointClientID!
+  $input: UpdateAccessPointClient!
+) {
+  # @genqlient(flatten: true)
+  updateAccessPointClient(id: $id, input: $input) {
+    ...AccessPointClientDetails
+  }
+}
+
+mutation DeleteAccessPointClient($id: AccessPointClientID!) {
+  deleteAccessPointClients(accessPointClientIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "AccessPointClientSecretDetails")
+fragment AccessPointClientSecretDetails on AccessPointClientSecret {
+  id
+  accessPointClientID
+  expiresAt
+  lastUsedAt
+  createdAt
+}
+
+query GetAccessPointClientSecret($id: AccessPointClientSecretID!) {
+  # @genqlient(flatten: true)
+  accessPointClientSecret(id: $id) {
+    ...AccessPointClientSecretDetails
+  }
+}
+
+mutation CreateAccessPointClientSecret(
+  $accessPointClientID: AccessPointClientID!
+  $expiresAt: Time
+) {
+  createAccessPointClientSecret(
+    accessPointClientID: $accessPointClientID
+    expiresAt: $expiresAt
+  ) {
+    # @genqlient(flatten: true)
+    clientSecret {
+      ...AccessPointClientSecretDetails
+    }
+    secret
+  }
+}
+
+mutation DeleteAccessPointClientSecret($id: AccessPointClientSecretID!) {
+  deleteAccessPointClientSecrets(accessPointClientSecretIDs: [$id]) {
+    ids
   }
 }

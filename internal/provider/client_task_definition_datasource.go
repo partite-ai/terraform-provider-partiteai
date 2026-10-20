@@ -15,38 +15,38 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ datasource.DataSource = &TaskDefinitionDataSource{}
-var _ datasource.DataSourceWithConfigValidators = &TaskDefinitionDataSource{}
+var _ datasource.DataSource = &ClientTaskDefinitionDataSource{}
+var _ datasource.DataSourceWithConfigValidators = &ClientTaskDefinitionDataSource{}
 
-func NewTaskDefinitionDataSource() datasource.DataSource {
-	return &TaskDefinitionDataSource{
-		BaseDataSource: NewBaseDataSource("task_definition"),
+func NewClientTaskDefinitionDataSource() datasource.DataSource {
+	return &ClientTaskDefinitionDataSource{
+		BaseDataSource: NewBaseDataSource("client_task_definition"),
 	}
 }
 
-// TaskDefinitionDataSource defines the data source implementation.
-type TaskDefinitionDataSource struct {
+// ClientTaskDefinitionDataSource defines the data source implementation.
+type ClientTaskDefinitionDataSource struct {
 	BaseDataSource
 }
 
-// TaskDefinitionDataSourceModel describes the data source data model.
-type TaskDefinitionDataSourceModel struct {
-	TaskDefinitionBaseModel
+// ClientTaskDefinitionDataSourceModel describes the data source data model.
+type ClientTaskDefinitionDataSourceModel struct {
+	ClientTaskDefinitionBaseModel
 }
 
-func (d *TaskDefinitionDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *ClientTaskDefinitionDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Task Definition data source. Look up an author-defined task definition by `id` or by `name` (exactly one must be set).",
+		MarkdownDescription: "Client Task Definition data source. Look up an author-defined client task definition by `id` or by `name` (exactly one must be set).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				MarkdownDescription: "Task definition identifier. Exactly one of `id` or `name` must be set.",
+				MarkdownDescription: "Client task definition identifier. Exactly one of `id` or `name` must be set.",
 			},
 			"name": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				MarkdownDescription: "Task definition name (the tool name exposed to the LLM). Exactly one of `id` or `name` must be set.",
+				MarkdownDescription: "Client task definition name (the tool name exposed to the LLM). Exactly one of `id` or `name` must be set.",
 			},
 			"description": schema.StringAttribute{
 				Computed:            true,
@@ -73,7 +73,7 @@ func (d *TaskDefinitionDataSource) Schema(ctx context.Context, req datasource.Sc
 	}
 }
 
-func (d *TaskDefinitionDataSource) ConfigValidators(ctx context.Context) []datasource.ConfigValidator {
+func (d *ClientTaskDefinitionDataSource) ConfigValidators(ctx context.Context) []datasource.ConfigValidator {
 	return []datasource.ConfigValidator{
 		datasourcevalidator.ExactlyOneOf(
 			path.MatchRoot("id"),
@@ -82,43 +82,43 @@ func (d *TaskDefinitionDataSource) ConfigValidators(ctx context.Context) []datas
 	}
 }
 
-func (d *TaskDefinitionDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data TaskDefinitionDataSourceModel
+func (d *ClientTaskDefinitionDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var data ClientTaskDefinitionDataSourceModel
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var details *pgql.TaskDefinitionDetails
+	var details *pgql.ClientTaskDefinitionDetails
 	if !data.Id.IsNull() {
-		logDataSourceOperation(ctx, "reading", "task_definition", data.Id.ValueString())
+		logDataSourceOperation(ctx, "reading", "client_task_definition", data.Id.ValueString())
 
-		getResp, err := pgql.GetTaskDefinition(ctx, d.GetClient(), data.Id.ValueString())
+		getResp, err := pgql.GetClientTaskDefinition(ctx, d.GetClient(), data.Id.ValueString())
 		if err != nil {
-			handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "task_definition", data.Id.ValueString())
+			handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "client_task_definition", data.Id.ValueString())
 			return
 		}
-		details = getResp.TaskDefinition
+		details = getResp.ClientTaskDefinition
 		if details == nil {
 			resp.Diagnostics.AddError(
-				"Task Definition Not Found",
-				fmt.Sprintf("no task definition with ID %q", data.Id.ValueString()),
+				"Client Task Definition Not Found",
+				fmt.Sprintf("no client task definition with ID %q", data.Id.ValueString()),
 			)
 			return
 		}
 	} else {
-		logDataSourceOperation(ctx, "reading", "task_definition", data.Name.ValueString())
+		logDataSourceOperation(ctx, "reading", "client_task_definition", data.Name.ValueString())
 
-		getResp, err := pgql.GetTaskDefinitionByName(ctx, d.GetClient(), data.Name.ValueString())
+		getResp, err := pgql.GetClientTaskDefinitionByName(ctx, d.GetClient(), data.Name.ValueString())
 		if err != nil {
-			handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "task_definition", data.Name.ValueString())
+			handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "client_task_definition", data.Name.ValueString())
 			return
 		}
-		details = getResp.TaskDefinitionByName
+		details = getResp.ClientTaskDefinitionByName
 		if details == nil {
 			resp.Diagnostics.AddError(
-				"Task Definition Not Found",
-				fmt.Sprintf("no task definition named %q", data.Name.ValueString()),
+				"Client Task Definition Not Found",
+				fmt.Sprintf("no client task definition named %q", data.Name.ValueString()),
 			)
 			return
 		}

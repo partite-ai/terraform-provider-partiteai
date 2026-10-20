@@ -22,6 +22,7 @@ Mesh resource
 
 ### Optional
 
+- `boundary_ids` (Set of String) IDs of the boundaries every conversation on the mesh is checked against
 - `description` (String) Resource description
 - `memory_store_id` (String) ID of the memory store the mesh reads and writes. Every version of the mesh uses the same store. Removing it detaches the store and keeps its records.
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))

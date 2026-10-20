@@ -15,7 +15,7 @@ type NewAgent struct {
 	McpConnections            []NewMcpConnectionAgentAssociation            `json:"mcpConnections"`
 	Particles                 []NewParticleAgentAssociation                 `json:"particles"`
 	MemoryInteractionProfiles []NewMemoryInteractionProfileAgentAssociation `json:"memoryInteractionProfiles"`
-	Tasks                     []NewTaskAgentAssociation                     `json:"tasks"`
+	ClientTasks               []NewClientTaskAgentAssociation               `json:"clientTasks"`
 	Skills                    []NewSkillAgentAssociation                    `json:"skills"`
 }
 
@@ -32,7 +32,7 @@ type UpdateAgent struct {
 	McpConnections            Optional[[]NewMcpConnectionAgentAssociation]            `json:"mcpConnections,omitzero"`
 	Particles                 Optional[[]NewParticleAgentAssociation]                 `json:"particles,omitzero"`
 	MemoryInteractionProfiles Optional[[]NewMemoryInteractionProfileAgentAssociation] `json:"memoryInteractionProfiles,omitzero"`
-	Tasks                     Optional[[]NewTaskAgentAssociation]                     `json:"tasks,omitzero"`
+	ClientTasks               Optional[[]NewClientTaskAgentAssociation]               `json:"clientTasks,omitzero"`
 	Skills                    Optional[[]NewSkillAgentAssociation]                    `json:"skills,omitzero"`
 }
 
@@ -51,9 +51,9 @@ type NewMcpConnectionAgentAssociation struct {
 	ToolNamePattern *string `json:"toolNamePattern,omitempty"`
 }
 
-type NewTaskAgentAssociation struct {
+type NewClientTaskAgentAssociation struct {
 	// The ID of the task definition to expose to this agent version as a tool.
-	TaskDefinitionID string `json:"taskDefinitionID"`
+	ClientTaskDefinitionID string `json:"clientTaskDefinitionID"`
 }
 
 // NewSkillAgentAssociation gives one agent version a skill to load.
@@ -197,11 +197,12 @@ type UpdateModelSet struct {
 }
 
 type NewMesh struct {
-	Name          string           `json:"name"`
-	Description   Optional[string] `json:"description,omitzero"`
-	Tags          []*Tag           `json:"tags"`
-	ModelSetID    string           `json:"modelSetID"`
-	MemoryStoreID Optional[string] `json:"memoryStoreID,omitzero"`
+	Name          string                `json:"name"`
+	Description   Optional[string]      `json:"description,omitzero"`
+	Tags          []*Tag                `json:"tags"`
+	ModelSetID    string                `json:"modelSetID"`
+	MemoryStoreID Optional[string]      `json:"memoryStoreID,omitzero"`
+	Boundaries    []BoundaryAssociation `json:"boundaries"`
 }
 
 type UpdateMesh struct {
@@ -211,6 +212,8 @@ type UpdateMesh struct {
 	ModelSetID  Optional[string] `json:"modelSetID,omitzero"`
 	// A null detaches the mesh's memory store. Left out, the mesh keeps it.
 	MemoryStoreID Optional[string] `json:"memoryStoreID,omitzero"`
+	// Replaces the mesh's whole set of boundaries.
+	Boundaries Optional[[]BoundaryAssociation] `json:"boundaries,omitzero"`
 }
 
 type NewLink struct {
@@ -273,7 +276,7 @@ type UpdateWebhookDestination struct {
 	InputName        Optional[string] `json:"inputName,omitzero"`
 }
 
-type NewTaskDefinition struct {
+type NewClientTaskDefinition struct {
 	// Tool name exposed to the LLM. Must be unique across task definitions.
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -282,24 +285,24 @@ type NewTaskDefinition struct {
 	// A JSON schema the user must satisfy when completing the task.
 	OutputMessageType string `json:"outputMessageType"`
 	// UIs a client can show to complete the task. At most one of each type.
-	UIForms []TaskUIFormInput `json:"uiForms,omitempty"`
+	UIForms []ClientTaskUIFormInput `json:"uiForms,omitempty"`
 	// Overwrite a definition that already has the name instead of failing.
 	OverwriteExisting *bool `json:"overwriteExisting,omitempty"`
 }
 
-type UpdateTaskDefinition struct {
+type UpdateClientTaskDefinition struct {
 	Name              Optional[string] `json:"name,omitzero"`
 	Description       Optional[string] `json:"description,omitzero"`
 	InputMessageType  Optional[string] `json:"inputMessageType,omitzero"`
 	OutputMessageType Optional[string] `json:"outputMessageType,omitzero"`
 	// Replaces all of the task's UI forms when set.
-	UIForms Optional[[]TaskUIFormInput] `json:"uiForms,omitzero"`
+	UIForms Optional[[]ClientTaskUIFormInput] `json:"uiForms,omitzero"`
 }
 
-// TaskUIFormInput is one UI a client can show to complete a task.
-type TaskUIFormInput struct {
-	Type       TaskUIFormType `json:"type"`
-	Definition string         `json:"definition"`
+// ClientTaskUIFormInput is one UI a client can show to complete a task.
+type ClientTaskUIFormInput struct {
+	Type       ClientTaskUIFormType `json:"type"`
+	Definition string               `json:"definition"`
 }
 
 // NewSkill creates a skill from the files of a skill folder.
@@ -616,4 +619,93 @@ type UpdateRubric struct {
 	DeletedMetricIDs []string             `json:"deletedMetricIDs"`
 	UpdatedMetrics   []UpdateRubricMetric `json:"updatedMetrics"`
 	NewMetrics       []NewRubricMetric    `json:"newMetrics"`
+}
+
+// BoundaryAssociation attaches a boundary to a mesh or an access point.
+type BoundaryAssociation struct {
+	BoundaryID string `json:"boundaryID"`
+}
+
+type NewBoundary struct {
+	Name          string                      `json:"name"`
+	Description   Optional[string]            `json:"description,omitzero"`
+	ReportOnly    bool                        `json:"reportOnly"`
+	Rules         []BoundaryRuleInput         `json:"rules"`
+	Modifications []BoundaryModificationInput `json:"modifications"`
+}
+
+// UpdateBoundary replaces the whole list of rules or modifications when it
+// gives one.
+type UpdateBoundary struct {
+	Name          Optional[string]                      `json:"name,omitzero"`
+	Description   Optional[string]                      `json:"description,omitzero"`
+	ReportOnly    Optional[bool]                        `json:"reportOnly,omitzero"`
+	Rules         Optional[[]BoundaryRuleInput]         `json:"rules,omitzero"`
+	Modifications Optional[[]BoundaryModificationInput] `json:"modifications,omitzero"`
+}
+
+type BoundaryRuleInput struct {
+	Name       string           `json:"name"`
+	Action     BoundaryAction   `json:"action"`
+	When       Optional[string] `json:"when,omitzero"`
+	Effect     BoundaryEffect   `json:"effect"`
+	Message    Optional[string] `json:"message,omitzero"`
+	ReportOnly bool             `json:"reportOnly"`
+}
+
+type BoundaryModificationInput struct {
+	Name         string                         `json:"name"`
+	Action       BoundaryAction                 `json:"action"`
+	When         Optional[string]               `json:"when,omitzero"`
+	SetTags      []BoundaryNamedExpressionInput `json:"setTags"`
+	SetTracing   Optional[string]               `json:"setTracing,omitzero"`
+	SetArguments []BoundaryNamedExpressionInput `json:"setArguments"`
+}
+
+type BoundaryNamedExpressionInput struct {
+	Name       string `json:"name"`
+	Expression string `json:"expression"`
+}
+
+type NewAccessPoint struct {
+	Name                       string                   `json:"name"`
+	Description                Optional[string]         `json:"description,omitzero"`
+	Tags                       []*Tag                   `json:"tags"`
+	AuthorizationServerURL     Optional[string]         `json:"authorizationServerUrl,omitzero"`
+	ClientTokenLifetimeSeconds Optional[int]            `json:"clientTokenLifetimeSeconds,omitzero"`
+	Issuers                    []AccessPointIssuerInput `json:"issuers"`
+	Boundaries                 []BoundaryAssociation    `json:"boundaries"`
+}
+
+// UpdateAccessPoint replaces the whole list of issuers or boundaries when it
+// gives one. It leaves the access point's clients alone.
+type UpdateAccessPoint struct {
+	Name                       Optional[string]                   `json:"name,omitzero"`
+	Description                Optional[string]                   `json:"description,omitzero"`
+	Tags                       Optional[[]*Tag]                   `json:"tags,omitzero"`
+	AuthorizationServerURL     Optional[string]                   `json:"authorizationServerUrl,omitzero"`
+	ClientTokenLifetimeSeconds Optional[int]                      `json:"clientTokenLifetimeSeconds,omitzero"`
+	Issuers                    Optional[[]AccessPointIssuerInput] `json:"issuers,omitzero"`
+	Boundaries                 Optional[[]BoundaryAssociation]    `json:"boundaries,omitzero"`
+}
+
+type AccessPointIssuerInput struct {
+	Issuer string `json:"issuer"`
+	// Left out, the audience is the access point's URL. A null turns the
+	// audience check off.
+	Audience Optional[string] `json:"audience,omitzero"`
+	JwksURL  Optional[string] `json:"jwksUrl,omitzero"`
+	JWKS     json.RawMessage  `json:"jwks,omitempty"`
+}
+
+type NewAccessPointClient struct {
+	AccessPointID string          `json:"accessPointID"`
+	Name          string          `json:"name"`
+	Claims        json.RawMessage `json:"claims,omitempty"`
+}
+
+type UpdateAccessPointClient struct {
+	Name Optional[string] `json:"name,omitzero"`
+	// A null leaves the client no claims.
+	Claims Optional[json.RawMessage] `json:"claims,omitzero"`
 }

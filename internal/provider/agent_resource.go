@@ -68,10 +68,10 @@ var mcpConnectionType = schema.NestedAttributeObject{
 	},
 }
 
-var taskAssociationType = schema.NestedAttributeObject{
+var clientTaskAssociationType = schema.NestedAttributeObject{
 	Attributes: map[string]schema.Attribute{
 		"id": schema.StringAttribute{
-			MarkdownDescription: "Task definition identifier",
+			MarkdownDescription: "Client task definition identifier",
 			Required:            true,
 		},
 	},
@@ -140,12 +140,12 @@ func (r *AgentResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				NestedObject:        mcpConnectionType,
 				Default:             setdefault.StaticValue(types.SetValueMust(mcpConnectionType.Type(), nil)),
 			},
-			"tasks": schema.SetNestedAttribute{
-				MarkdownDescription: "Set of task definitions associated with the agent, referenced by task definition ID",
+			"client_tasks": schema.SetNestedAttribute{
+				MarkdownDescription: "Set of client task definitions associated with the agent, referenced by client task definition ID",
 				Optional:            true,
 				Computed:            true,
-				NestedObject:        taskAssociationType,
-				Default:             setdefault.StaticValue(types.SetValueMust(taskAssociationType.Type(), nil)),
+				NestedObject:        clientTaskAssociationType,
+				Default:             setdefault.StaticValue(types.SetValueMust(clientTaskAssociationType.Type(), nil)),
 			},
 			"skills": schema.SetNestedAttribute{
 				MarkdownDescription: "Set of skills the agent can load, referenced by skill ID. No two of them can " +
@@ -255,15 +255,15 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		}
 	}
 
-	var tasks []pgql.NewTaskAgentAssociation
-	if !data.Tasks.IsNull() {
-		var taskStructs []taskInfo
-		if diag := data.Tasks.ElementsAs(ctx, &taskStructs, false); diag.HasError() {
+	var tasks []pgql.NewClientTaskAgentAssociation
+	if !data.ClientTasks.IsNull() {
+		var taskStructs []clientTaskInfo
+		if diag := data.ClientTasks.ElementsAs(ctx, &taskStructs, false); diag.HasError() {
 			resp.Diagnostics.Append(diag...)
 			return
 		}
 		for _, v := range taskStructs {
-			tasks = append(tasks, pgql.NewTaskAgentAssociation{TaskDefinitionID: v.Id})
+			tasks = append(tasks, pgql.NewClientTaskAgentAssociation{ClientTaskDefinitionID: v.Id})
 		}
 	}
 
@@ -315,7 +315,7 @@ func (r *AgentResource) Create(ctx context.Context, req resource.CreateRequest, 
 		McpConnections:            mcpConnections,
 		Particles:                 particles,
 		MemoryInteractionProfiles: memoryProfiles,
-		Tasks:                     tasks,
+		ClientTasks:               tasks,
 		Skills:                    skills,
 	})
 
@@ -442,19 +442,19 @@ func (r *AgentResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		update.McpConnections = pgql.Opt(mcpConnections)
 	}
 
-	if !planData.Tasks.Equal(stateData.Tasks) {
-		var tasks []pgql.NewTaskAgentAssociation
-		if !planData.Tasks.IsNull() {
-			var taskStructs []taskInfo
-			if diag := planData.Tasks.ElementsAs(ctx, &taskStructs, false); diag.HasError() {
+	if !planData.ClientTasks.Equal(stateData.ClientTasks) {
+		var tasks []pgql.NewClientTaskAgentAssociation
+		if !planData.ClientTasks.IsNull() {
+			var taskStructs []clientTaskInfo
+			if diag := planData.ClientTasks.ElementsAs(ctx, &taskStructs, false); diag.HasError() {
 				resp.Diagnostics.Append(diag...)
 				return
 			}
 			for _, v := range taskStructs {
-				tasks = append(tasks, pgql.NewTaskAgentAssociation{TaskDefinitionID: v.Id})
+				tasks = append(tasks, pgql.NewClientTaskAgentAssociation{ClientTaskDefinitionID: v.Id})
 			}
 		}
-		update.Tasks = pgql.Opt(tasks)
+		update.ClientTasks = pgql.Opt(tasks)
 	}
 
 	if !planData.Skills.Equal(stateData.Skills) {

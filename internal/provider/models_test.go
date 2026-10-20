@@ -5,6 +5,10 @@ package provider
 // here, which is what keeps TestSchemaMatchesModel honest.
 
 var resourceModels = map[string]any{
+	"partiteai_access_point":                AccessPointResourceModel{},
+	"partiteai_access_point_client":         AccessPointClientResourceModel{},
+	"partiteai_access_point_client_secret":  AccessPointClientSecretResourceModel{},
+	"partiteai_boundary":                    BoundaryResourceModel{},
 	"partiteai_agent":                       AgentResourceModel{},
 	"partiteai_api_key":                     ApiKeyResourceModel{},
 	"partiteai_embedding_profile":           EmbeddingProfileResourceModel{},
@@ -21,7 +25,7 @@ var resourceModels = map[string]any{
 	"partiteai_model_provider":              ModelProviderResourceModel{},
 	"partiteai_model_set":                   ModelSetResourceModel{},
 	"partiteai_particle_artifact":           ParticleArtifactResourceModel{},
-	"partiteai_task_definition":             TaskDefinitionResourceModel{},
+	"partiteai_client_task_definition":      ClientTaskDefinitionResourceModel{},
 	"partiteai_skill":                       SkillResourceModel{},
 	"partiteai_webhook_destination":         WebhookDestinationResourceModel{},
 	"partiteai_workspace":                   WorkspaceResourceModel{},
@@ -31,6 +35,9 @@ var resourceModels = map[string]any{
 }
 
 var dataSourceModels = map[string]any{
+	"partiteai_access_point":                AccessPointDataSourceModel{},
+	"partiteai_access_point_client":         AccessPointClientDataSourceModel{},
+	"partiteai_boundary":                    BoundaryDataSourceModel{},
 	"partiteai_agent":                       AgentDataSourceModel{},
 	"partiteai_api_key":                     ApiKeyDataSourceModel{},
 	"partiteai_embedding_profile":           EmbeddingProfileDataSourceModel{},
@@ -46,7 +53,7 @@ var dataSourceModels = map[string]any{
 	"partiteai_model_provider":              ModelProviderDataSourceModel{},
 	"partiteai_model_set":                   ModelSetDataSourceModel{},
 	"partiteai_particle_artifact":           ParticleArtifactDataSourceModel{},
-	"partiteai_task_definition":             TaskDefinitionDataSourceModel{},
+	"partiteai_client_task_definition":      ClientTaskDefinitionDataSourceModel{},
 	"partiteai_skill":                       SkillDataSourceModel{},
 	"partiteai_webhook_destination":         WebhookDestinationDataSourceModel{},
 	"partiteai_workspace":                   WorkspaceDataSourceModel{},

@@ -21,6 +21,7 @@ Agent data source
 
 ### Read-Only
 
+- `client_tasks` (Attributes Set) Set of client task definitions associated with the agent, referenced by client task definition ID (see [below for nested schema](#nestedatt--client_tasks))
 - `created_at` (String) Timestamp when the resource was created
 - `description` (String) Resource description
 - `identity` (String) A brief description of the agent's identity, such as its role or persona.
@@ -35,11 +36,18 @@ Agent data source
 - `skills` (Attributes Set) Set of skills the agent can load, referenced by skill ID (see [below for nested schema](#nestedatt--skills))
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
 - `task_instructions` (String) Detailed instructions that guide the agent's behavior and decision-making processes.
-- `tasks` (Attributes Set) Set of task definitions associated with the agent, referenced by task definition ID (see [below for nested schema](#nestedatt--tasks))
 - `updated_at` (String) Timestamp when the resource was last updated
 - `version_created_at` (String) Timestamp when the current version was created
 - `version_id` (String) Current version identifier of the agent
 - `version_ordinal` (Number) Current version ordinal of the agent
+
+<a id="nestedatt--client_tasks"></a>
+### Nested Schema for `client_tasks`
+
+Read-Only:
+
+- `id` (String) Client task definition identifier
+
 
 <a id="nestedatt--mcp_connections"></a>
 ### Nested Schema for `mcp_connections`
@@ -78,11 +86,3 @@ Read-Only:
 
 - `name` (String) Tag name
 - `value` (String) Tag value
-
-
-<a id="nestedatt--tasks"></a>
-### Nested Schema for `tasks`
-
-Read-Only:
-
-- `id` (String) Task definition identifier

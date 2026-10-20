@@ -24,7 +24,7 @@ type AgentBaseModel struct {
 	VersionOrdinal              types.Int64          `tfsdk:"version_ordinal"`
 	VersionCreatedAt            timetypes.RFC3339    `tfsdk:"version_created_at"`
 	McpConnections              types.Set            `tfsdk:"mcp_connections"`
-	Tasks                       types.Set            `tfsdk:"tasks"`
+	ClientTasks                 types.Set            `tfsdk:"client_tasks"`
 	Skills                      types.Set            `tfsdk:"skills"`
 	Particles                   types.Set            `tfsdk:"particles"`
 	MemoryInteractionProfileIds types.Set            `tfsdk:"memory_interaction_profile_ids"`
@@ -60,7 +60,7 @@ func (m *AgentBaseModel) MapFromGraphQL(ctx context.Context, agentDetails pgql.A
 		&m.Tags, agentDetails.LatestVersion.Tags,
 		&m.MemoryInteractionProfileIds, memoryInteractionProfileIDs(agentDetails.LatestVersion.MemoryInteractionProfiles),
 		&m.McpConnections, newStructSliceMappable(agentDetails.LatestVersion.McpConnections, mcpConnectionInfo{}),
-		&m.Tasks, newStructSliceMappable(agentDetails.LatestVersion.Tasks, taskInfo{}),
+		&m.ClientTasks, newStructSliceMappable(agentDetails.LatestVersion.ClientTasks, clientTaskInfo{}),
 		&m.Skills, newStructSliceMappable(agentDetails.LatestVersion.Skills, skillAssociationInfo{}),
 		&m.Particles, newStructSliceMappable(agentDetails.LatestVersion.Particles, particleAssociationInfo{}),
 	)...)
@@ -98,12 +98,12 @@ func (t *mcpConnectionInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersi
 	return nil
 }
 
-type taskInfo struct {
+type clientTaskInfo struct {
 	Id string `tfsdk:"id"`
 }
 
-func (t *taskInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation) diag.Diagnostics {
-	t.Id = src.TaskDefinition.Id
+func (t *clientTaskInfo) FromGQL(src pgql.AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociation) diag.Diagnostics {
+	t.Id = src.ClientTaskDefinition.Id
 	return nil
 }
 

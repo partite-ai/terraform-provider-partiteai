@@ -21,6 +21,7 @@ type MeshBaseModel struct {
 	ModelSetId     types.String      `tfsdk:"model_set_id"`
 	DraftVersionId types.String      `tfsdk:"draft_version_id"`
 	MemoryStoreId  types.String      `tfsdk:"memory_store_id"`
+	BoundaryIds    types.Set         `tfsdk:"boundary_ids"`
 }
 
 // MapFromGraphQL maps a GraphQL MeshDetails response to the MeshBaseModel.
@@ -39,5 +40,6 @@ func (m *MeshBaseModel) MapFromGraphQL(ctx context.Context, meshDetails pgql.Mes
 		&m.UpdatedAt, meshDetails.UpdatedAt,
 		&m.DraftVersionId, meshDetails.DraftVersion.Id,
 		&m.ModelSetId, meshDetails.DraftVersion.ModelSet.Id,
+		&m.BoundaryIds, boundaryIDs(meshDetails.Boundaries),
 	)
 }

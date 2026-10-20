@@ -10,6 +10,177 @@ import (
 	"github.com/Khan/genqlient/graphql"
 )
 
+// AccessPointClientDetails includes the GraphQL fields of AccessPointClient requested by the fragment AccessPointClientDetails.
+// The GraphQL type's documentation follows.
+//
+// A caller that signs in with a client ID and a secret and gets a token from the access point.
+type AccessPointClientDetails struct {
+	Id            string `json:"id"`
+	AccessPointID string `json:"accessPointID"`
+	ClientId      string `json:"clientId"`
+	Name          string `json:"name"`
+	// Copied into every token the client gets.
+	Claims    json.RawMessage `json:"claims"`
+	CreatedAt string          `json:"createdAt"`
+	UpdatedAt string          `json:"updatedAt"`
+}
+
+// GetId returns AccessPointClientDetails.Id, and is useful for accessing the field via an interface.
+func (v *AccessPointClientDetails) GetId() string { return v.Id }
+
+// GetAccessPointID returns AccessPointClientDetails.AccessPointID, and is useful for accessing the field via an interface.
+func (v *AccessPointClientDetails) GetAccessPointID() string { return v.AccessPointID }
+
+// GetClientId returns AccessPointClientDetails.ClientId, and is useful for accessing the field via an interface.
+func (v *AccessPointClientDetails) GetClientId() string { return v.ClientId }
+
+// GetName returns AccessPointClientDetails.Name, and is useful for accessing the field via an interface.
+func (v *AccessPointClientDetails) GetName() string { return v.Name }
+
+// GetClaims returns AccessPointClientDetails.Claims, and is useful for accessing the field via an interface.
+func (v *AccessPointClientDetails) GetClaims() json.RawMessage { return v.Claims }
+
+// GetCreatedAt returns AccessPointClientDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *AccessPointClientDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns AccessPointClientDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *AccessPointClientDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// AccessPointClientSecretDetails includes the GraphQL fields of AccessPointClientSecret requested by the fragment AccessPointClientSecretDetails.
+// The GraphQL type's documentation follows.
+//
+// One secret of a client. Only its hash is stored.
+type AccessPointClientSecretDetails struct {
+	Id string `json:"id"`
+	// The client that has the secret. Null until a client takes it.
+	AccessPointClientID *string `json:"accessPointClientID"`
+	ExpiresAt           *string `json:"expiresAt"`
+	// When the secret last signed in. A secret that stopped being used is safe to delete.
+	LastUsedAt *string `json:"lastUsedAt"`
+	CreatedAt  string  `json:"createdAt"`
+}
+
+// GetId returns AccessPointClientSecretDetails.Id, and is useful for accessing the field via an interface.
+func (v *AccessPointClientSecretDetails) GetId() string { return v.Id }
+
+// GetAccessPointClientID returns AccessPointClientSecretDetails.AccessPointClientID, and is useful for accessing the field via an interface.
+func (v *AccessPointClientSecretDetails) GetAccessPointClientID() *string {
+	return v.AccessPointClientID
+}
+
+// GetExpiresAt returns AccessPointClientSecretDetails.ExpiresAt, and is useful for accessing the field via an interface.
+func (v *AccessPointClientSecretDetails) GetExpiresAt() *string { return v.ExpiresAt }
+
+// GetLastUsedAt returns AccessPointClientSecretDetails.LastUsedAt, and is useful for accessing the field via an interface.
+func (v *AccessPointClientSecretDetails) GetLastUsedAt() *string { return v.LastUsedAt }
+
+// GetCreatedAt returns AccessPointClientSecretDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *AccessPointClientSecretDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// AccessPointDetails includes the GraphQL fields of AccessPoint requested by the fragment AccessPointDetails.
+// The GraphQL type's documentation follows.
+//
+// A configured way into meshes for callers who sign in with a token rather than
+// an API key. It names the tags its callers carry and the issuers whose tokens it
+// accepts.
+type AccessPointDetails struct {
+	Id          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	// Where callers reach the access point. Tokens it issues to its clients carry
+	// it as their iss and aud.
+	Url string `json:"url"`
+	// Carried by every caller through the access point.
+	Tags []*Tag `json:"tags"`
+	// Advertised to MCP clients as where to log in.
+	AuthorizationServerUrl *string `json:"authorizationServerUrl"`
+	// How long a token issued to a client lasts, from 300 to 86400 seconds.
+	ClientTokenLifetimeSeconds int                                          `json:"clientTokenLifetimeSeconds"`
+	Issuers                    []AccessPointDetailsIssuersAccessPointIssuer `json:"issuers"`
+	// The boundaries conversations created through the access point are checked against, by name.
+	Boundaries []AccessPointDetailsBoundariesBoundary `json:"boundaries"`
+	CreatedAt  string                                 `json:"createdAt"`
+	UpdatedAt  string                                 `json:"updatedAt"`
+}
+
+// GetId returns AccessPointDetails.Id, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetId() string { return v.Id }
+
+// GetName returns AccessPointDetails.Name, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetName() string { return v.Name }
+
+// GetDescription returns AccessPointDetails.Description, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetDescription() *string { return v.Description }
+
+// GetUrl returns AccessPointDetails.Url, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetUrl() string { return v.Url }
+
+// GetTags returns AccessPointDetails.Tags, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetTags() []*Tag { return v.Tags }
+
+// GetAuthorizationServerUrl returns AccessPointDetails.AuthorizationServerUrl, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetAuthorizationServerUrl() *string { return v.AuthorizationServerUrl }
+
+// GetClientTokenLifetimeSeconds returns AccessPointDetails.ClientTokenLifetimeSeconds, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetClientTokenLifetimeSeconds() int { return v.ClientTokenLifetimeSeconds }
+
+// GetIssuers returns AccessPointDetails.Issuers, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetIssuers() []AccessPointDetailsIssuersAccessPointIssuer {
+	return v.Issuers
+}
+
+// GetBoundaries returns AccessPointDetails.Boundaries, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetBoundaries() []AccessPointDetailsBoundariesBoundary {
+	return v.Boundaries
+}
+
+// GetCreatedAt returns AccessPointDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns AccessPointDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *AccessPointDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// AccessPointDetailsBoundariesBoundary includes the requested fields of the GraphQL type Boundary.
+// The GraphQL type's documentation follows.
+//
+// Rules that each refuse something in conversations on the meshes, or created
+// through the access points, it is attached to: creating a conversation or a
+// request, giving an agent a skill, memory profile or tool, or a tool call. Its
+// modifications set things on what those do.
+type AccessPointDetailsBoundariesBoundary struct {
+	Id string `json:"id"`
+}
+
+// GetId returns AccessPointDetailsBoundariesBoundary.Id, and is useful for accessing the field via an interface.
+func (v *AccessPointDetailsBoundariesBoundary) GetId() string { return v.Id }
+
+// AccessPointDetailsIssuersAccessPointIssuer includes the requested fields of the GraphQL type AccessPointIssuer.
+// The GraphQL type's documentation follows.
+//
+// An issuer whose tokens an access point accepts.
+type AccessPointDetailsIssuersAccessPointIssuer struct {
+	// The iss a token from this issuer carries.
+	Issuer string `json:"issuer"`
+	// Must be in a token's aud. When it is unset, aud is not checked.
+	Audience *string `json:"audience"`
+	// Where the issuer publishes its key set. Exactly one of jwksUrl and jwks is set.
+	JwksUrl *string `json:"jwksUrl"`
+	// A key set uploaded for an issuer that publishes none.
+	Jwks *json.RawMessage `json:"jwks"`
+}
+
+// GetIssuer returns AccessPointDetailsIssuersAccessPointIssuer.Issuer, and is useful for accessing the field via an interface.
+func (v *AccessPointDetailsIssuersAccessPointIssuer) GetIssuer() string { return v.Issuer }
+
+// GetAudience returns AccessPointDetailsIssuersAccessPointIssuer.Audience, and is useful for accessing the field via an interface.
+func (v *AccessPointDetailsIssuersAccessPointIssuer) GetAudience() *string { return v.Audience }
+
+// GetJwksUrl returns AccessPointDetailsIssuersAccessPointIssuer.JwksUrl, and is useful for accessing the field via an interface.
+func (v *AccessPointDetailsIssuersAccessPointIssuer) GetJwksUrl() *string { return v.JwksUrl }
+
+// GetJwks returns AccessPointDetailsIssuersAccessPointIssuer.Jwks, and is useful for accessing the field via an interface.
+func (v *AccessPointDetailsIssuersAccessPointIssuer) GetJwks() *json.RawMessage { return v.Jwks }
+
 // AgentDetails includes the GraphQL fields of Agent requested by the fragment AgentDetails.
 type AgentDetails struct {
 	Id            string                                `json:"id"`
@@ -54,7 +225,7 @@ type AgentDetailsLatestVersionAgentVersion struct {
 	SendThinkingToUser bool                                                                               `json:"sendThinkingToUser"`
 	SendMessagesToUser bool                                                                               `json:"sendMessagesToUser"`
 	McpConnections     []AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation `json:"mcpConnections"`
-	Tasks              []AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation                   `json:"tasks"`
+	ClientTasks        []AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociation       `json:"clientTasks"`
 	Skills             []AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociation                 `json:"skills"`
 	// How this agent reads and writes memory. A profile takes effect only where the
 	// agent runs in a mesh that has memory stores attached.
@@ -110,9 +281,9 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetMcpConnections() []AgentDetai
 	return v.McpConnections
 }
 
-// GetTasks returns AgentDetailsLatestVersionAgentVersion.Tasks, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersion) GetTasks() []AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation {
-	return v.Tasks
+// GetClientTasks returns AgentDetailsLatestVersionAgentVersion.ClientTasks, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersion) GetClientTasks() []AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociation {
+	return v.ClientTasks
 }
 
 // GetSkills returns AgentDetailsLatestVersionAgentVersion.Skills, and is useful for accessing the field via an interface.
@@ -128,6 +299,39 @@ func (v *AgentDetailsLatestVersionAgentVersion) GetMemoryInteractionProfiles() [
 // GetParticles returns AgentDetailsLatestVersionAgentVersion.Particles, and is useful for accessing the field via an interface.
 func (v *AgentDetailsLatestVersionAgentVersion) GetParticles() []AgentDetailsLatestVersionAgentVersionParticlesParticleAgentAssociation {
 	return v.Particles
+}
+
+// AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociation includes the requested fields of the GraphQL type ClientTaskAgentAssociation.
+type AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociation struct {
+	ClientTaskDefinition AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociationClientTaskDefinition `json:"clientTaskDefinition"`
+}
+
+// GetClientTaskDefinition returns AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociation.ClientTaskDefinition, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociation) GetClientTaskDefinition() AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociationClientTaskDefinition {
+	return v.ClientTaskDefinition
+}
+
+// AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociationClientTaskDefinition includes the requested fields of the GraphQL type ClientTaskDefinition.
+// The GraphQL type's documentation follows.
+//
+// An author-defined ClientTaskDefinition describing a task an agent can send to the
+// user as a tool call. Carries an input schema (what the agent supplies) and an
+// output schema (what the user submits when completing it). One ClientTaskDefinition
+// is reusable across agents and meshes via ClientTaskAgentAssociation.
+type AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociationClientTaskDefinition struct {
+	Id string `json:"id"`
+	// Tool name exposed to the LLM. Unique across all client task definitions.
+	Name string `json:"name"`
+}
+
+// GetId returns AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociationClientTaskDefinition.Id, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociationClientTaskDefinition) GetId() string {
+	return v.Id
+}
+
+// GetName returns AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociationClientTaskDefinition.Name, and is useful for accessing the field via an interface.
+func (v *AgentDetailsLatestVersionAgentVersionClientTasksClientTaskAgentAssociationClientTaskDefinition) GetName() string {
+	return v.Name
 }
 
 // AgentDetailsLatestVersionAgentVersionMcpConnectionsMcpConnectionAgentAssociation includes the requested fields of the GraphQL type McpConnectionAgentAssociation.
@@ -262,39 +466,6 @@ func (v *AgentDetailsLatestVersionAgentVersionSkillsSkillAgentAssociationSkill) 
 	return v.Name
 }
 
-// AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation includes the requested fields of the GraphQL type TaskAgentAssociation.
-type AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation struct {
-	TaskDefinition AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition `json:"taskDefinition"`
-}
-
-// GetTaskDefinition returns AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation.TaskDefinition, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociation) GetTaskDefinition() AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition {
-	return v.TaskDefinition
-}
-
-// AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition includes the requested fields of the GraphQL type TaskDefinition.
-// The GraphQL type's documentation follows.
-//
-// An author-defined TaskDefinition describing a task an agent can send to the
-// user as a tool call. Carries an input schema (what the agent supplies) and an
-// output schema (what the user submits when completing it). One TaskDefinition
-// is reusable across agents and meshes via TaskAgentAssociation.
-type AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition struct {
-	Id string `json:"id"`
-	// Tool name exposed to the LLM. Unique across all task definitions.
-	Name string `json:"name"`
-}
-
-// GetId returns AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition.Id, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition) GetId() string {
-	return v.Id
-}
-
-// GetName returns AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition.Name, and is useful for accessing the field via an interface.
-func (v *AgentDetailsLatestVersionAgentVersionTasksTaskAgentAssociationTaskDefinition) GetName() string {
-	return v.Name
-}
-
 // ApiKeyDetails includes the GraphQL fields of ApiKey requested by the fragment ApiKeyDetails.
 type ApiKeyDetails struct {
 	Id          string   `json:"id"`
@@ -326,6 +497,329 @@ func (v *ApiKeyDetails) GetCreatedAt() string { return v.CreatedAt }
 
 // GetUpdatedAt returns ApiKeyDetails.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *ApiKeyDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+type BoundaryAction string
+
+const (
+	BoundaryActionConversationCreate BoundaryAction = "CONVERSATION_CREATE"
+	BoundaryActionRequestCreate      BoundaryAction = "REQUEST_CREATE"
+	// Runs for each skill an agent could be provided for a step.
+	BoundaryActionSkillProvide BoundaryAction = "SKILL_PROVIDE"
+	// Runs for each tool an agent could be provided for a step.
+	BoundaryActionToolProvide BoundaryAction = "TOOL_PROVIDE"
+	// Runs for each memory search whose results an agent could be provided for a step.
+	BoundaryActionMemorySearchProvide BoundaryAction = "MEMORY_SEARCH_PROVIDE"
+	// Runs for the conversation's history, when an agent could be provided it for a step.
+	BoundaryActionConversationHistoryProvide BoundaryAction = "CONVERSATION_HISTORY_PROVIDE"
+	BoundaryActionToolCall                   BoundaryAction = "TOOL_CALL"
+)
+
+var AllBoundaryAction = []BoundaryAction{
+	BoundaryActionConversationCreate,
+	BoundaryActionRequestCreate,
+	BoundaryActionSkillProvide,
+	BoundaryActionToolProvide,
+	BoundaryActionMemorySearchProvide,
+	BoundaryActionConversationHistoryProvide,
+	BoundaryActionToolCall,
+}
+
+// BoundaryDetails includes the GraphQL fields of Boundary requested by the fragment BoundaryDetails.
+// The GraphQL type's documentation follows.
+//
+// Rules that each refuse something in conversations on the meshes, or created
+// through the access points, it is attached to: creating a conversation or a
+// request, giving an agent a skill, memory profile or tool, or a tool call. Its
+// modifications set things on what those do.
+type BoundaryDetails struct {
+	Id          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	// Every rule reports what it would refuse rather than refusing it, and no modification is made.
+	ReportOnly bool `json:"reportOnly"`
+	// The rules, in the order they were written.
+	Rules []BoundaryDetailsRulesBoundaryRule `json:"rules"`
+	// The modifications, in the order they are made.
+	Modifications []BoundaryDetailsModificationsBoundaryModification `json:"modifications"`
+	// What is likely wrong with the stored boundary: an expression that no longer
+	// compiles, or one that reads something that can be missing without checking
+	// first, such as a field of a route that is null when a conversation names a
+	// mesh version directly. Reading a field of null, or a claim or argument that
+	// isn't there, fails, and a failing expression refuses the action.
+	Warnings  []string `json:"warnings"`
+	CreatedAt string   `json:"createdAt"`
+	UpdatedAt string   `json:"updatedAt"`
+}
+
+// GetId returns BoundaryDetails.Id, and is useful for accessing the field via an interface.
+func (v *BoundaryDetails) GetId() string { return v.Id }
+
+// GetName returns BoundaryDetails.Name, and is useful for accessing the field via an interface.
+func (v *BoundaryDetails) GetName() string { return v.Name }
+
+// GetDescription returns BoundaryDetails.Description, and is useful for accessing the field via an interface.
+func (v *BoundaryDetails) GetDescription() *string { return v.Description }
+
+// GetReportOnly returns BoundaryDetails.ReportOnly, and is useful for accessing the field via an interface.
+func (v *BoundaryDetails) GetReportOnly() bool { return v.ReportOnly }
+
+// GetRules returns BoundaryDetails.Rules, and is useful for accessing the field via an interface.
+func (v *BoundaryDetails) GetRules() []BoundaryDetailsRulesBoundaryRule { return v.Rules }
+
+// GetModifications returns BoundaryDetails.Modifications, and is useful for accessing the field via an interface.
+func (v *BoundaryDetails) GetModifications() []BoundaryDetailsModificationsBoundaryModification {
+	return v.Modifications
+}
+
+// GetWarnings returns BoundaryDetails.Warnings, and is useful for accessing the field via an interface.
+func (v *BoundaryDetails) GetWarnings() []string { return v.Warnings }
+
+// GetCreatedAt returns BoundaryDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *BoundaryDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns BoundaryDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *BoundaryDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// BoundaryDetailsModificationsBoundaryModification includes the requested fields of the GraphQL type BoundaryModification.
+// The GraphQL type's documentation follows.
+//
+// A modification of a boundary: what the system sets on an action its rules
+// allowed. when is a CEL expression that decides whether the modification
+// applies, and can't read a tool call's arguments; a modification that leaves it
+// out applies to every action of its kind. Each set expression is CEL.
+type BoundaryDetailsModificationsBoundaryModification struct {
+	Name string `json:"name"`
+	// CONVERSATION_CREATE, REQUEST_CREATE or TOOL_CALL.
+	Action BoundaryAction `json:"action"`
+	When   *string        `json:"when"`
+	// Tags set on what CONVERSATION_CREATE or REQUEST_CREATE creates, each with an expression that gives its values.
+	SetTags []BoundaryDetailsModificationsBoundaryModificationSetTagsBoundaryNamedExpression `json:"setTags"`
+	// For CONVERSATION_CREATE: an expression that gives whether the conversation is traced.
+	SetTracing *string `json:"setTracing"`
+	// For TOOL_CALL: arguments set on the call, each with an expression that gives its value.
+	SetArguments []BoundaryDetailsModificationsBoundaryModificationSetArgumentsBoundaryNamedExpression `json:"setArguments"`
+}
+
+// GetName returns BoundaryDetailsModificationsBoundaryModification.Name, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModification) GetName() string { return v.Name }
+
+// GetAction returns BoundaryDetailsModificationsBoundaryModification.Action, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModification) GetAction() BoundaryAction {
+	return v.Action
+}
+
+// GetWhen returns BoundaryDetailsModificationsBoundaryModification.When, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModification) GetWhen() *string { return v.When }
+
+// GetSetTags returns BoundaryDetailsModificationsBoundaryModification.SetTags, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModification) GetSetTags() []BoundaryDetailsModificationsBoundaryModificationSetTagsBoundaryNamedExpression {
+	return v.SetTags
+}
+
+// GetSetTracing returns BoundaryDetailsModificationsBoundaryModification.SetTracing, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModification) GetSetTracing() *string {
+	return v.SetTracing
+}
+
+// GetSetArguments returns BoundaryDetailsModificationsBoundaryModification.SetArguments, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModification) GetSetArguments() []BoundaryDetailsModificationsBoundaryModificationSetArgumentsBoundaryNamedExpression {
+	return v.SetArguments
+}
+
+// BoundaryDetailsModificationsBoundaryModificationSetArgumentsBoundaryNamedExpression includes the requested fields of the GraphQL type BoundaryNamedExpression.
+type BoundaryDetailsModificationsBoundaryModificationSetArgumentsBoundaryNamedExpression struct {
+	Name       string `json:"name"`
+	Expression string `json:"expression"`
+}
+
+// GetName returns BoundaryDetailsModificationsBoundaryModificationSetArgumentsBoundaryNamedExpression.Name, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModificationSetArgumentsBoundaryNamedExpression) GetName() string {
+	return v.Name
+}
+
+// GetExpression returns BoundaryDetailsModificationsBoundaryModificationSetArgumentsBoundaryNamedExpression.Expression, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModificationSetArgumentsBoundaryNamedExpression) GetExpression() string {
+	return v.Expression
+}
+
+// BoundaryDetailsModificationsBoundaryModificationSetTagsBoundaryNamedExpression includes the requested fields of the GraphQL type BoundaryNamedExpression.
+type BoundaryDetailsModificationsBoundaryModificationSetTagsBoundaryNamedExpression struct {
+	Name       string `json:"name"`
+	Expression string `json:"expression"`
+}
+
+// GetName returns BoundaryDetailsModificationsBoundaryModificationSetTagsBoundaryNamedExpression.Name, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModificationSetTagsBoundaryNamedExpression) GetName() string {
+	return v.Name
+}
+
+// GetExpression returns BoundaryDetailsModificationsBoundaryModificationSetTagsBoundaryNamedExpression.Expression, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsModificationsBoundaryModificationSetTagsBoundaryNamedExpression) GetExpression() string {
+	return v.Expression
+}
+
+// BoundaryDetailsRulesBoundaryRule includes the requested fields of the GraphQL type BoundaryRule.
+// The GraphQL type's documentation follows.
+//
+// A rule of a boundary. when is a CEL expression that decides whether the rule
+// applies; a rule that leaves it out applies to every action of its kind.
+type BoundaryDetailsRulesBoundaryRule struct {
+	Name   string         `json:"name"`
+	Action BoundaryAction `json:"action"`
+	When   *string        `json:"when"`
+	Effect BoundaryEffect `json:"effect"`
+	// Told to whoever the rule refuses, or asks to approve. It can embed CEL
+	// expressions as ${...}, which read what the rule's when reads, such as
+	// "Refunds over ${arguments.amount} need approval."; $${ writes a literal ${.
+	// A string value is put in as it is, anything else as JSON, and an expression
+	// that fails as ?.
+	Message *string `json:"message"`
+	// The rule reports what it would refuse rather than refusing it.
+	ReportOnly bool `json:"reportOnly"`
+}
+
+// GetName returns BoundaryDetailsRulesBoundaryRule.Name, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsRulesBoundaryRule) GetName() string { return v.Name }
+
+// GetAction returns BoundaryDetailsRulesBoundaryRule.Action, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsRulesBoundaryRule) GetAction() BoundaryAction { return v.Action }
+
+// GetWhen returns BoundaryDetailsRulesBoundaryRule.When, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsRulesBoundaryRule) GetWhen() *string { return v.When }
+
+// GetEffect returns BoundaryDetailsRulesBoundaryRule.Effect, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsRulesBoundaryRule) GetEffect() BoundaryEffect { return v.Effect }
+
+// GetMessage returns BoundaryDetailsRulesBoundaryRule.Message, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsRulesBoundaryRule) GetMessage() *string { return v.Message }
+
+// GetReportOnly returns BoundaryDetailsRulesBoundaryRule.ReportOnly, and is useful for accessing the field via an interface.
+func (v *BoundaryDetailsRulesBoundaryRule) GetReportOnly() bool { return v.ReportOnly }
+
+type BoundaryEffect string
+
+const (
+	// Refuses the action.
+	BoundaryEffectDeny BoundaryEffect = "DENY"
+	// Makes a tool call wait for the user to approve it. Only for TOOL_CALL.
+	BoundaryEffectAsk BoundaryEffect = "ASK"
+)
+
+var AllBoundaryEffect = []BoundaryEffect{
+	BoundaryEffectDeny,
+	BoundaryEffectAsk,
+}
+
+// ClientTaskDefinitionDetails includes the GraphQL fields of ClientTaskDefinition requested by the fragment ClientTaskDefinitionDetails.
+// The GraphQL type's documentation follows.
+//
+// An author-defined ClientTaskDefinition describing a task an agent can send to the
+// user as a tool call. Carries an input schema (what the agent supplies) and an
+// output schema (what the user submits when completing it). One ClientTaskDefinition
+// is reusable across agents and meshes via ClientTaskAgentAssociation.
+type ClientTaskDefinitionDetails struct {
+	Id string `json:"id"`
+	// Tool name exposed to the LLM. Unique across all client task definitions.
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	// JSON Schema the agent must satisfy when invoking the task.
+	InputMessageType json.RawMessage `json:"inputMessageType"`
+	// JSON Schema the user must satisfy when completing the task.
+	OutputMessageType json.RawMessage `json:"outputMessageType"`
+	// UIs a client can show to complete the task. At most one of each type.
+	UiForms   []ClientTaskDefinitionDetailsUiFormsClientTaskUIForm `json:"uiForms"`
+	CreatedAt string                                               `json:"createdAt"`
+	UpdatedAt string                                               `json:"updatedAt"`
+}
+
+// GetId returns ClientTaskDefinitionDetails.Id, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetails) GetId() string { return v.Id }
+
+// GetName returns ClientTaskDefinitionDetails.Name, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetails) GetName() string { return v.Name }
+
+// GetDescription returns ClientTaskDefinitionDetails.Description, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetails) GetDescription() string { return v.Description }
+
+// GetInputMessageType returns ClientTaskDefinitionDetails.InputMessageType, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetails) GetInputMessageType() json.RawMessage {
+	return v.InputMessageType
+}
+
+// GetOutputMessageType returns ClientTaskDefinitionDetails.OutputMessageType, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetails) GetOutputMessageType() json.RawMessage {
+	return v.OutputMessageType
+}
+
+// GetUiForms returns ClientTaskDefinitionDetails.UiForms, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetails) GetUiForms() []ClientTaskDefinitionDetailsUiFormsClientTaskUIForm {
+	return v.UiForms
+}
+
+// GetCreatedAt returns ClientTaskDefinitionDetails.CreatedAt, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetails) GetCreatedAt() string { return v.CreatedAt }
+
+// GetUpdatedAt returns ClientTaskDefinitionDetails.UpdatedAt, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// ClientTaskDefinitionDetailsUiFormsClientTaskUIForm includes the requested fields of the GraphQL type ClientTaskUIForm.
+// The GraphQL type's documentation follows.
+//
+// A UI a client can show to complete a task.
+type ClientTaskDefinitionDetailsUiFormsClientTaskUIForm struct {
+	Type ClientTaskUIFormType `json:"type"`
+	// The form's source, in the shape its type defines.
+	Definition string `json:"definition"`
+}
+
+// GetType returns ClientTaskDefinitionDetailsUiFormsClientTaskUIForm.Type, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetailsUiFormsClientTaskUIForm) GetType() ClientTaskUIFormType {
+	return v.Type
+}
+
+// GetDefinition returns ClientTaskDefinitionDetailsUiFormsClientTaskUIForm.Definition, and is useful for accessing the field via an interface.
+func (v *ClientTaskDefinitionDetailsUiFormsClientTaskUIForm) GetDefinition() string {
+	return v.Definition
+}
+
+// The kind of a task's UI form.
+type ClientTaskUIFormType string
+
+const (
+	// An A2UI v0.9 surface for each state of the task. The definition is JSON:
+	// {"catalog": {...}, "open": {"components": [...]},
+	// "completed": {"components": [...]}}. The catalog is optional: if set, it is a
+	// full A2UI catalog definition, and its catalogId is the catalog clients render
+	// the surface with. It must stand alone, with every $ref pointing into it.
+	// Without it, the components come from the A2UI basic catalog. Each component
+	// must fit its schema in the catalog as written.
+	//
+	// The open surface shows while the task is open. Its data model starts as the
+	// task input, and every event action completes the task with its context as
+	// the output, so each action's context must match the task's output schema.
+	//
+	// The completed surface is optional. Once the task is completed, it replaces
+	// the open surface, with the task output as its data model. It has no event
+	// actions. Without it, the surface is removed once the task is completed, as is
+	// a cancelled task's surface.
+	//
+	// Each surface can have "overlays" that set values of its components from the
+	// task input when the task starts, so the components stay plain A2UI:
+	// {"overlays": {"choices": {"/options": "input.options.map(o, {'label': o,
+	// 'value': o})"}}}. Overlays are keyed by component ID, then by a JSON pointer
+	// into the component, and each value is a CEL expression that sees the task
+	// input as input. It is checked against the input schema when the form is
+	// saved, and its type against what the catalog allows at its pointer. An
+	// expression whose value is an empty optional, such as input.?subtitle, removes
+	// the value at its pointer, so it cannot set a value the catalog requires. When
+	// the task starts, the components overlays set are checked against the catalog
+	// again, and the task fails with an error to the agent if one does not fit.
+	ClientTaskUIFormTypeA2ui ClientTaskUIFormType = "A2UI"
+)
+
+var AllClientTaskUIFormType = []ClientTaskUIFormType{
+	ClientTaskUIFormTypeA2ui,
+}
 
 type ComputedMetricAggregation string
 
@@ -425,6 +919,64 @@ var AllComputedMetricUnit = []ComputedMetricUnit{
 	ComputedMetricUnitUsd,
 }
 
+// CreateAccessPointClientResponse is returned by CreateAccessPointClient on success.
+type CreateAccessPointClientResponse struct {
+	// Adds a client. It has no secret until createAccessPointClientSecret makes one for it.
+	CreateAccessPointClient AccessPointClientDetails `json:"createAccessPointClient"`
+}
+
+// GetCreateAccessPointClient returns CreateAccessPointClientResponse.CreateAccessPointClient, and is useful for accessing the field via an interface.
+func (v *CreateAccessPointClientResponse) GetCreateAccessPointClient() AccessPointClientDetails {
+	return v.CreateAccessPointClient
+}
+
+// CreateAccessPointClientSecretCreateAccessPointClientSecretCreateAccessPointClientSecretResult includes the requested fields of the GraphQL type CreateAccessPointClientSecretResult.
+type CreateAccessPointClientSecretCreateAccessPointClientSecretCreateAccessPointClientSecretResult struct {
+	ClientSecret AccessPointClientSecretDetails `json:"clientSecret"`
+	// The secret. It is returned only here.
+	Secret string `json:"secret"`
+}
+
+// GetClientSecret returns CreateAccessPointClientSecretCreateAccessPointClientSecretCreateAccessPointClientSecretResult.ClientSecret, and is useful for accessing the field via an interface.
+func (v *CreateAccessPointClientSecretCreateAccessPointClientSecretCreateAccessPointClientSecretResult) GetClientSecret() AccessPointClientSecretDetails {
+	return v.ClientSecret
+}
+
+// GetSecret returns CreateAccessPointClientSecretCreateAccessPointClientSecretCreateAccessPointClientSecretResult.Secret, and is useful for accessing the field via an interface.
+func (v *CreateAccessPointClientSecretCreateAccessPointClientSecretCreateAccessPointClientSecretResult) GetSecret() string {
+	return v.Secret
+}
+
+// CreateAccessPointClientSecretResponse is returned by CreateAccessPointClientSecret on success.
+type CreateAccessPointClientSecretResponse struct {
+	// Makes a client secret. The secret is in the result and is never readable
+	// again.
+	//
+	// Given a client, the secret is added to it, so the client's secret can be
+	// replaced without changing its client ID. Left out, the secret is made
+	// unattached: it signs nothing in until a client takes it with
+	// createAccessPoint or updateAccessPoint. That lets a secret be made before
+	// the client it is for has been saved, so it can be shown when it is asked
+	// for. An unattached secret is discarded if nothing claims it.
+	CreateAccessPointClientSecret CreateAccessPointClientSecretCreateAccessPointClientSecretCreateAccessPointClientSecretResult `json:"createAccessPointClientSecret"`
+}
+
+// GetCreateAccessPointClientSecret returns CreateAccessPointClientSecretResponse.CreateAccessPointClientSecret, and is useful for accessing the field via an interface.
+func (v *CreateAccessPointClientSecretResponse) GetCreateAccessPointClientSecret() CreateAccessPointClientSecretCreateAccessPointClientSecretCreateAccessPointClientSecretResult {
+	return v.CreateAccessPointClientSecret
+}
+
+// CreateAccessPointResponse is returned by CreateAccessPoint on success.
+type CreateAccessPointResponse struct {
+	// Creates an access point, with its clients.
+	CreateAccessPoint AccessPointDetails `json:"createAccessPoint"`
+}
+
+// GetCreateAccessPoint returns CreateAccessPointResponse.CreateAccessPoint, and is useful for accessing the field via an interface.
+func (v *CreateAccessPointResponse) GetCreateAccessPoint() AccessPointDetails {
+	return v.CreateAccessPoint
+}
+
 // CreateAgentCreateAgentAgentVersion includes the requested fields of the GraphQL type AgentVersion.
 type CreateAgentCreateAgentAgentVersion struct {
 	Agent AgentDetails `json:"agent"`
@@ -468,6 +1020,28 @@ type CreateApiKeyResponse struct {
 // GetCreateApiKey returns CreateApiKeyResponse.CreateApiKey, and is useful for accessing the field via an interface.
 func (v *CreateApiKeyResponse) GetCreateApiKey() CreateApiKeyCreateApiKeyCreateApiKeyResult {
 	return v.CreateApiKey
+}
+
+// CreateBoundaryResponse is returned by CreateBoundary on success.
+type CreateBoundaryResponse struct {
+	// Saves a boundary. A boundary that isn't valid is refused with every problem found, such as an expression that doesn't compile.
+	CreateBoundary BoundaryDetails `json:"createBoundary"`
+}
+
+// GetCreateBoundary returns CreateBoundaryResponse.CreateBoundary, and is useful for accessing the field via an interface.
+func (v *CreateBoundaryResponse) GetCreateBoundary() BoundaryDetails { return v.CreateBoundary }
+
+// CreateClientTaskDefinitionResponse is returned by CreateClientTaskDefinition on success.
+type CreateClientTaskDefinitionResponse struct {
+	// Create a new author-defined ClientTaskDefinition. Name must be unique unless
+	// overwriteExisting is set, in which case an existing definition with the same
+	// name is updated instead.
+	CreateClientTaskDefinition ClientTaskDefinitionDetails `json:"createClientTaskDefinition"`
+}
+
+// GetCreateClientTaskDefinition returns CreateClientTaskDefinitionResponse.CreateClientTaskDefinition, and is useful for accessing the field via an interface.
+func (v *CreateClientTaskDefinitionResponse) GetCreateClientTaskDefinition() ClientTaskDefinitionDetails {
+	return v.CreateClientTaskDefinition
 }
 
 // CreateEmbeddingProfileResponse is returned by CreateEmbeddingProfile on success.
@@ -665,19 +1239,6 @@ type CreateSkillResponse struct {
 // GetCreateSkill returns CreateSkillResponse.CreateSkill, and is useful for accessing the field via an interface.
 func (v *CreateSkillResponse) GetCreateSkill() SkillDetails { return v.CreateSkill }
 
-// CreateTaskDefinitionResponse is returned by CreateTaskDefinition on success.
-type CreateTaskDefinitionResponse struct {
-	// Create a new author-defined TaskDefinition. Name must be unique unless
-	// overwriteExisting is set, in which case an existing definition with the same
-	// name is updated instead.
-	CreateTaskDefinition TaskDefinitionDetails `json:"createTaskDefinition"`
-}
-
-// GetCreateTaskDefinition returns CreateTaskDefinitionResponse.CreateTaskDefinition, and is useful for accessing the field via an interface.
-func (v *CreateTaskDefinitionResponse) GetCreateTaskDefinition() TaskDefinitionDetails {
-	return v.CreateTaskDefinition
-}
-
 // CreateWebhookDestinationResponse is returned by CreateWebhookDestination on success.
 type CreateWebhookDestinationResponse struct {
 	CreateWebhookDestination WebhookDestinationDetails `json:"createWebhookDestination"`
@@ -695,6 +1256,65 @@ type CreateWorkspaceResponse struct {
 
 // GetCreateWorkspace returns CreateWorkspaceResponse.CreateWorkspace, and is useful for accessing the field via an interface.
 func (v *CreateWorkspaceResponse) GetCreateWorkspace() WorkspaceDetails { return v.CreateWorkspace }
+
+// DeleteAccessPointClientDeleteAccessPointClientsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteAccessPointClientDeleteAccessPointClientsDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteAccessPointClientDeleteAccessPointClientsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteAccessPointClientDeleteAccessPointClientsDeleteResults) GetIds() []string {
+	return v.Ids
+}
+
+// DeleteAccessPointClientResponse is returned by DeleteAccessPointClient on success.
+type DeleteAccessPointClientResponse struct {
+	DeleteAccessPointClients DeleteAccessPointClientDeleteAccessPointClientsDeleteResults `json:"deleteAccessPointClients"`
+}
+
+// GetDeleteAccessPointClients returns DeleteAccessPointClientResponse.DeleteAccessPointClients, and is useful for accessing the field via an interface.
+func (v *DeleteAccessPointClientResponse) GetDeleteAccessPointClients() DeleteAccessPointClientDeleteAccessPointClientsDeleteResults {
+	return v.DeleteAccessPointClients
+}
+
+// DeleteAccessPointClientSecretDeleteAccessPointClientSecretsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteAccessPointClientSecretDeleteAccessPointClientSecretsDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteAccessPointClientSecretDeleteAccessPointClientSecretsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteAccessPointClientSecretDeleteAccessPointClientSecretsDeleteResults) GetIds() []string {
+	return v.Ids
+}
+
+// DeleteAccessPointClientSecretResponse is returned by DeleteAccessPointClientSecret on success.
+type DeleteAccessPointClientSecretResponse struct {
+	DeleteAccessPointClientSecrets DeleteAccessPointClientSecretDeleteAccessPointClientSecretsDeleteResults `json:"deleteAccessPointClientSecrets"`
+}
+
+// GetDeleteAccessPointClientSecrets returns DeleteAccessPointClientSecretResponse.DeleteAccessPointClientSecrets, and is useful for accessing the field via an interface.
+func (v *DeleteAccessPointClientSecretResponse) GetDeleteAccessPointClientSecrets() DeleteAccessPointClientSecretDeleteAccessPointClientSecretsDeleteResults {
+	return v.DeleteAccessPointClientSecrets
+}
+
+// DeleteAccessPointDeleteAccessPointsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteAccessPointDeleteAccessPointsDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteAccessPointDeleteAccessPointsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteAccessPointDeleteAccessPointsDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteAccessPointResponse is returned by DeleteAccessPoint on success.
+type DeleteAccessPointResponse struct {
+	// Delete access points with their clients, secrets and signing keys.
+	DeleteAccessPoints DeleteAccessPointDeleteAccessPointsDeleteResults `json:"deleteAccessPoints"`
+}
+
+// GetDeleteAccessPoints returns DeleteAccessPointResponse.DeleteAccessPoints, and is useful for accessing the field via an interface.
+func (v *DeleteAccessPointResponse) GetDeleteAccessPoints() DeleteAccessPointDeleteAccessPointsDeleteResults {
+	return v.DeleteAccessPoints
+}
 
 // DeleteAgentDeleteAgentsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
 type DeleteAgentDeleteAgentsDeleteResults struct {
@@ -730,6 +1350,47 @@ type DeleteApiKeyResponse struct {
 // GetDeleteApiKeys returns DeleteApiKeyResponse.DeleteApiKeys, and is useful for accessing the field via an interface.
 func (v *DeleteApiKeyResponse) GetDeleteApiKeys() DeleteApiKeyDeleteApiKeysDeleteResults {
 	return v.DeleteApiKeys
+}
+
+// DeleteBoundaryDeleteBoundariesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteBoundaryDeleteBoundariesDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteBoundaryDeleteBoundariesDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteBoundaryDeleteBoundariesDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteBoundaryResponse is returned by DeleteBoundary on success.
+type DeleteBoundaryResponse struct {
+	// Deletes boundaries, detaching them from their meshes and access points.
+	DeleteBoundaries DeleteBoundaryDeleteBoundariesDeleteResults `json:"deleteBoundaries"`
+}
+
+// GetDeleteBoundaries returns DeleteBoundaryResponse.DeleteBoundaries, and is useful for accessing the field via an interface.
+func (v *DeleteBoundaryResponse) GetDeleteBoundaries() DeleteBoundaryDeleteBoundariesDeleteResults {
+	return v.DeleteBoundaries
+}
+
+// DeleteClientTaskDefinitionDeleteClientTaskDefinitionsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteClientTaskDefinitionDeleteClientTaskDefinitionsDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteClientTaskDefinitionDeleteClientTaskDefinitionsDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteClientTaskDefinitionDeleteClientTaskDefinitionsDeleteResults) GetIds() []string {
+	return v.Ids
+}
+
+// DeleteClientTaskDefinitionResponse is returned by DeleteClientTaskDefinition on success.
+type DeleteClientTaskDefinitionResponse struct {
+	// Delete ClientTaskDefinitions. Fails if any definition is still associated with an
+	// agent — remove the associations first.
+	DeleteClientTaskDefinitions DeleteClientTaskDefinitionDeleteClientTaskDefinitionsDeleteResults `json:"deleteClientTaskDefinitions"`
+}
+
+// GetDeleteClientTaskDefinitions returns DeleteClientTaskDefinitionResponse.DeleteClientTaskDefinitions, and is useful for accessing the field via an interface.
+func (v *DeleteClientTaskDefinitionResponse) GetDeleteClientTaskDefinitions() DeleteClientTaskDefinitionDeleteClientTaskDefinitionsDeleteResults {
+	return v.DeleteClientTaskDefinitions
 }
 
 // DeleteEmbeddingProfileDeleteEmbeddingProfilesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
@@ -1030,26 +1691,6 @@ func (v *DeleteSkillResponse) GetDeleteSkills() DeleteSkillDeleteSkillsDeleteRes
 	return v.DeleteSkills
 }
 
-// DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
-type DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults struct {
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults.Ids, and is useful for accessing the field via an interface.
-func (v *DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults) GetIds() []string { return v.Ids }
-
-// DeleteTaskDefinitionResponse is returned by DeleteTaskDefinition on success.
-type DeleteTaskDefinitionResponse struct {
-	// Delete TaskDefinitions. Fails if any definition is still associated with an
-	// agent — remove the associations first.
-	DeleteTaskDefinitions DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults `json:"deleteTaskDefinitions"`
-}
-
-// GetDeleteTaskDefinitions returns DeleteTaskDefinitionResponse.DeleteTaskDefinitions, and is useful for accessing the field via an interface.
-func (v *DeleteTaskDefinitionResponse) GetDeleteTaskDefinitions() DeleteTaskDefinitionDeleteTaskDefinitionsDeleteResults {
-	return v.DeleteTaskDefinitions
-}
-
 // DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
 type DeleteWebhookDestinationDeleteWebhookDestinationsDeleteResults struct {
 	Ids []string `json:"ids"`
@@ -1204,6 +1845,35 @@ func (v *EvalMeshMonitorDetails) GetCreatedAt() string { return v.CreatedAt }
 // GetUpdatedAt returns EvalMeshMonitorDetails.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *EvalMeshMonitorDetails) GetUpdatedAt() string { return v.UpdatedAt }
 
+// GetAccessPointClientResponse is returned by GetAccessPointClient on success.
+type GetAccessPointClientResponse struct {
+	AccessPointClient *AccessPointClientDetails `json:"accessPointClient"`
+}
+
+// GetAccessPointClient returns GetAccessPointClientResponse.AccessPointClient, and is useful for accessing the field via an interface.
+func (v *GetAccessPointClientResponse) GetAccessPointClient() *AccessPointClientDetails {
+	return v.AccessPointClient
+}
+
+// GetAccessPointClientSecretResponse is returned by GetAccessPointClientSecret on success.
+type GetAccessPointClientSecretResponse struct {
+	// A client secret, without the secret itself, which is only returned when it is made.
+	AccessPointClientSecret *AccessPointClientSecretDetails `json:"accessPointClientSecret"`
+}
+
+// GetAccessPointClientSecret returns GetAccessPointClientSecretResponse.AccessPointClientSecret, and is useful for accessing the field via an interface.
+func (v *GetAccessPointClientSecretResponse) GetAccessPointClientSecret() *AccessPointClientSecretDetails {
+	return v.AccessPointClientSecret
+}
+
+// GetAccessPointResponse is returned by GetAccessPoint on success.
+type GetAccessPointResponse struct {
+	AccessPoint *AccessPointDetails `json:"accessPoint"`
+}
+
+// GetAccessPoint returns GetAccessPointResponse.AccessPoint, and is useful for accessing the field via an interface.
+func (v *GetAccessPointResponse) GetAccessPoint() *AccessPointDetails { return v.AccessPoint }
+
 // GetAgentIDForVersionAgentVersion includes the requested fields of the GraphQL type AgentVersion.
 type GetAgentIDForVersionAgentVersion struct {
 	Agent GetAgentIDForVersionAgentVersionAgent `json:"agent"`
@@ -1247,6 +1917,34 @@ type GetApiKeyResponse struct {
 
 // GetApiKey returns GetApiKeyResponse.ApiKey, and is useful for accessing the field via an interface.
 func (v *GetApiKeyResponse) GetApiKey() ApiKeyDetails { return v.ApiKey }
+
+// GetBoundaryResponse is returned by GetBoundary on success.
+type GetBoundaryResponse struct {
+	Boundary *BoundaryDetails `json:"boundary"`
+}
+
+// GetBoundary returns GetBoundaryResponse.Boundary, and is useful for accessing the field via an interface.
+func (v *GetBoundaryResponse) GetBoundary() *BoundaryDetails { return v.Boundary }
+
+// GetClientTaskDefinitionByNameResponse is returned by GetClientTaskDefinitionByName on success.
+type GetClientTaskDefinitionByNameResponse struct {
+	ClientTaskDefinitionByName *ClientTaskDefinitionDetails `json:"clientTaskDefinitionByName"`
+}
+
+// GetClientTaskDefinitionByName returns GetClientTaskDefinitionByNameResponse.ClientTaskDefinitionByName, and is useful for accessing the field via an interface.
+func (v *GetClientTaskDefinitionByNameResponse) GetClientTaskDefinitionByName() *ClientTaskDefinitionDetails {
+	return v.ClientTaskDefinitionByName
+}
+
+// GetClientTaskDefinitionResponse is returned by GetClientTaskDefinition on success.
+type GetClientTaskDefinitionResponse struct {
+	ClientTaskDefinition *ClientTaskDefinitionDetails `json:"clientTaskDefinition"`
+}
+
+// GetClientTaskDefinition returns GetClientTaskDefinitionResponse.ClientTaskDefinition, and is useful for accessing the field via an interface.
+func (v *GetClientTaskDefinitionResponse) GetClientTaskDefinition() *ClientTaskDefinitionDetails {
+	return v.ClientTaskDefinition
+}
 
 // GetComputedMetricResponse is returned by GetComputedMetric on success.
 type GetComputedMetricResponse struct {
@@ -1502,26 +2200,6 @@ type GetSkillResponse struct {
 
 // GetSkill returns GetSkillResponse.Skill, and is useful for accessing the field via an interface.
 func (v *GetSkillResponse) GetSkill() *SkillDetails { return v.Skill }
-
-// GetTaskDefinitionByNameResponse is returned by GetTaskDefinitionByName on success.
-type GetTaskDefinitionByNameResponse struct {
-	TaskDefinitionByName *TaskDefinitionDetails `json:"taskDefinitionByName"`
-}
-
-// GetTaskDefinitionByName returns GetTaskDefinitionByNameResponse.TaskDefinitionByName, and is useful for accessing the field via an interface.
-func (v *GetTaskDefinitionByNameResponse) GetTaskDefinitionByName() *TaskDefinitionDetails {
-	return v.TaskDefinitionByName
-}
-
-// GetTaskDefinitionResponse is returned by GetTaskDefinition on success.
-type GetTaskDefinitionResponse struct {
-	TaskDefinition *TaskDefinitionDetails `json:"taskDefinition"`
-}
-
-// GetTaskDefinition returns GetTaskDefinitionResponse.TaskDefinition, and is useful for accessing the field via an interface.
-func (v *GetTaskDefinitionResponse) GetTaskDefinition() *TaskDefinitionDetails {
-	return v.TaskDefinition
-}
 
 // GetWebhookDestinationResponse is returned by GetWebhookDestination on success.
 type GetWebhookDestinationResponse struct {
@@ -3614,6 +4292,8 @@ type MeshDetails struct {
 	// The memory this mesh reads and writes, or null where it holds none. The
 	// attachment is not versioned: every version of the mesh reads the same memory.
 	MemoryStore *MeshDetailsMemoryStore `json:"memoryStore"`
+	// The boundaries every conversation on the mesh is checked against, by name.
+	Boundaries []MeshDetailsBoundariesBoundary `json:"boundaries"`
 }
 
 // GetId returns MeshDetails.Id, and is useful for accessing the field via an interface.
@@ -3639,6 +4319,23 @@ func (v *MeshDetails) GetDraftVersion() MeshDetailsDraftVersionMeshVersion { ret
 
 // GetMemoryStore returns MeshDetails.MemoryStore, and is useful for accessing the field via an interface.
 func (v *MeshDetails) GetMemoryStore() *MeshDetailsMemoryStore { return v.MemoryStore }
+
+// GetBoundaries returns MeshDetails.Boundaries, and is useful for accessing the field via an interface.
+func (v *MeshDetails) GetBoundaries() []MeshDetailsBoundariesBoundary { return v.Boundaries }
+
+// MeshDetailsBoundariesBoundary includes the requested fields of the GraphQL type Boundary.
+// The GraphQL type's documentation follows.
+//
+// Rules that each refuse something in conversations on the meshes, or created
+// through the access points, it is attached to: creating a conversation or a
+// request, giving an agent a skill, memory profile or tool, or a tool call. Its
+// modifications set things on what those do.
+type MeshDetailsBoundariesBoundary struct {
+	Id string `json:"id"`
+}
+
+// GetId returns MeshDetailsBoundariesBoundary.Id, and is useful for accessing the field via an interface.
+func (v *MeshDetailsBoundariesBoundary) GetId() string { return v.Id }
 
 // MeshDetailsDraftVersionMeshVersion includes the requested fields of the GraphQL type MeshVersion.
 type MeshDetailsDraftVersionMeshVersion struct {
@@ -4319,6 +5016,27 @@ func (v *ModelSetDetailsRulesModelSetRule) GetComplexity() *ModelComplexity { re
 // GetMatchTags returns ModelSetDetailsRulesModelSetRule.MatchTags, and is useful for accessing the field via an interface.
 func (v *ModelSetDetailsRulesModelSetRule) GetMatchTags() []*Tag { return v.MatchTags }
 
+// ModifyAccessPointClientResponse is returned by ModifyAccessPointClient on success.
+type ModifyAccessPointClientResponse struct {
+	UpdateAccessPointClient AccessPointClientDetails `json:"updateAccessPointClient"`
+}
+
+// GetUpdateAccessPointClient returns ModifyAccessPointClientResponse.UpdateAccessPointClient, and is useful for accessing the field via an interface.
+func (v *ModifyAccessPointClientResponse) GetUpdateAccessPointClient() AccessPointClientDetails {
+	return v.UpdateAccessPointClient
+}
+
+// ModifyAccessPointResponse is returned by ModifyAccessPoint on success.
+type ModifyAccessPointResponse struct {
+	// Changes an access point, and creates, changes and deletes its clients.
+	UpdateAccessPoint AccessPointDetails `json:"updateAccessPoint"`
+}
+
+// GetUpdateAccessPoint returns ModifyAccessPointResponse.UpdateAccessPoint, and is useful for accessing the field via an interface.
+func (v *ModifyAccessPointResponse) GetUpdateAccessPoint() AccessPointDetails {
+	return v.UpdateAccessPoint
+}
+
 // ModifyAgentResponse is returned by ModifyAgent on success.
 type ModifyAgentResponse struct {
 	UpdateAgent ModifyAgentUpdateAgentAgentVersion `json:"updateAgent"`
@@ -4344,6 +5062,27 @@ type ModifyApiKeyResponse struct {
 
 // GetUpdateApiKey returns ModifyApiKeyResponse.UpdateApiKey, and is useful for accessing the field via an interface.
 func (v *ModifyApiKeyResponse) GetUpdateApiKey() ApiKeyDetails { return v.UpdateApiKey }
+
+// ModifyBoundaryResponse is returned by ModifyBoundary on success.
+type ModifyBoundaryResponse struct {
+	// Changes a boundary. Rules and modifications, when given, replace the whole list.
+	UpdateBoundary BoundaryDetails `json:"updateBoundary"`
+}
+
+// GetUpdateBoundary returns ModifyBoundaryResponse.UpdateBoundary, and is useful for accessing the field via an interface.
+func (v *ModifyBoundaryResponse) GetUpdateBoundary() BoundaryDetails { return v.UpdateBoundary }
+
+// ModifyClientTaskDefinitionResponse is returned by ModifyClientTaskDefinition on success.
+type ModifyClientTaskDefinitionResponse struct {
+	// Update an author-defined ClientTaskDefinition. Any subset of input fields may be
+	// supplied; an empty input is a no-op.
+	UpdateClientTaskDefinition ClientTaskDefinitionDetails `json:"updateClientTaskDefinition"`
+}
+
+// GetUpdateClientTaskDefinition returns ModifyClientTaskDefinitionResponse.UpdateClientTaskDefinition, and is useful for accessing the field via an interface.
+func (v *ModifyClientTaskDefinitionResponse) GetUpdateClientTaskDefinition() ClientTaskDefinitionDetails {
+	return v.UpdateClientTaskDefinition
+}
 
 // ModifyEmbeddingProfileResponse is returned by ModifyEmbeddingProfile on success.
 type ModifyEmbeddingProfileResponse struct {
@@ -4525,18 +5264,6 @@ type ModifySkillResponse struct {
 
 // GetUpdateSkill returns ModifySkillResponse.UpdateSkill, and is useful for accessing the field via an interface.
 func (v *ModifySkillResponse) GetUpdateSkill() SkillDetails { return v.UpdateSkill }
-
-// ModifyTaskDefinitionResponse is returned by ModifyTaskDefinition on success.
-type ModifyTaskDefinitionResponse struct {
-	// Update an author-defined TaskDefinition. Any subset of input fields may be
-	// supplied; an empty input is a no-op.
-	UpdateTaskDefinition TaskDefinitionDetails `json:"updateTaskDefinition"`
-}
-
-// GetUpdateTaskDefinition returns ModifyTaskDefinitionResponse.UpdateTaskDefinition, and is useful for accessing the field via an interface.
-func (v *ModifyTaskDefinitionResponse) GetUpdateTaskDefinition() TaskDefinitionDetails {
-	return v.UpdateTaskDefinition
-}
 
 // ModifyWebhookDestinationResponse is returned by ModifyWebhookDestination on success.
 type ModifyWebhookDestinationResponse struct {
@@ -5834,109 +6561,6 @@ func (v *SkillDetailsFilesSkillFile) GetPath() string { return v.Path }
 // GetContent returns SkillDetailsFilesSkillFile.Content, and is useful for accessing the field via an interface.
 func (v *SkillDetailsFilesSkillFile) GetContent() string { return v.Content }
 
-// TaskDefinitionDetails includes the GraphQL fields of TaskDefinition requested by the fragment TaskDefinitionDetails.
-// The GraphQL type's documentation follows.
-//
-// An author-defined TaskDefinition describing a task an agent can send to the
-// user as a tool call. Carries an input schema (what the agent supplies) and an
-// output schema (what the user submits when completing it). One TaskDefinition
-// is reusable across agents and meshes via TaskAgentAssociation.
-type TaskDefinitionDetails struct {
-	Id string `json:"id"`
-	// Tool name exposed to the LLM. Unique across all task definitions.
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	// JSON Schema the agent must satisfy when invoking the task.
-	InputMessageType json.RawMessage `json:"inputMessageType"`
-	// JSON Schema the user must satisfy when completing the task.
-	OutputMessageType json.RawMessage `json:"outputMessageType"`
-	// UIs a client can show to complete the task. At most one of each type.
-	UiForms   []TaskDefinitionDetailsUiFormsTaskUIForm `json:"uiForms"`
-	CreatedAt string                                   `json:"createdAt"`
-	UpdatedAt string                                   `json:"updatedAt"`
-}
-
-// GetId returns TaskDefinitionDetails.Id, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetails) GetId() string { return v.Id }
-
-// GetName returns TaskDefinitionDetails.Name, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetails) GetName() string { return v.Name }
-
-// GetDescription returns TaskDefinitionDetails.Description, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetails) GetDescription() string { return v.Description }
-
-// GetInputMessageType returns TaskDefinitionDetails.InputMessageType, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetails) GetInputMessageType() json.RawMessage { return v.InputMessageType }
-
-// GetOutputMessageType returns TaskDefinitionDetails.OutputMessageType, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetails) GetOutputMessageType() json.RawMessage { return v.OutputMessageType }
-
-// GetUiForms returns TaskDefinitionDetails.UiForms, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetails) GetUiForms() []TaskDefinitionDetailsUiFormsTaskUIForm {
-	return v.UiForms
-}
-
-// GetCreatedAt returns TaskDefinitionDetails.CreatedAt, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetails) GetCreatedAt() string { return v.CreatedAt }
-
-// GetUpdatedAt returns TaskDefinitionDetails.UpdatedAt, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetails) GetUpdatedAt() string { return v.UpdatedAt }
-
-// TaskDefinitionDetailsUiFormsTaskUIForm includes the requested fields of the GraphQL type TaskUIForm.
-// The GraphQL type's documentation follows.
-//
-// A UI a client can show to complete a task.
-type TaskDefinitionDetailsUiFormsTaskUIForm struct {
-	Type TaskUIFormType `json:"type"`
-	// The form's source, in the shape its type defines.
-	Definition string `json:"definition"`
-}
-
-// GetType returns TaskDefinitionDetailsUiFormsTaskUIForm.Type, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetailsUiFormsTaskUIForm) GetType() TaskUIFormType { return v.Type }
-
-// GetDefinition returns TaskDefinitionDetailsUiFormsTaskUIForm.Definition, and is useful for accessing the field via an interface.
-func (v *TaskDefinitionDetailsUiFormsTaskUIForm) GetDefinition() string { return v.Definition }
-
-// The kind of a task's UI form.
-type TaskUIFormType string
-
-const (
-	// An A2UI v0.9 surface for each state of the task. The definition is JSON:
-	// {"catalog": {...}, "open": {"components": [...]},
-	// "completed": {"components": [...]}}. The catalog is optional: if set, it is a
-	// full A2UI catalog definition, and its catalogId is the catalog clients render
-	// the surface with. It must stand alone, with every $ref pointing into it.
-	// Without it, the components come from the A2UI basic catalog. Each component
-	// must fit its schema in the catalog as written.
-	//
-	// The open surface shows while the task is open. Its data model starts as the
-	// task input, and every event action completes the task with its context as
-	// the output, so each action's context must match the task's output schema.
-	//
-	// The completed surface is optional. Once the task is completed, it replaces
-	// the open surface, with the task output as its data model. It has no event
-	// actions. Without it, the surface is removed once the task is completed, as is
-	// a cancelled task's surface.
-	//
-	// Each surface can have "overlays" that set values of its components from the
-	// task input when the task starts, so the components stay plain A2UI:
-	// {"overlays": {"choices": {"/options": "input.options.map(o, {'label': o,
-	// 'value': o})"}}}. Overlays are keyed by component ID, then by a JSON pointer
-	// into the component, and each value is a CEL expression that sees the task
-	// input as input. It is checked against the input schema when the form is
-	// saved, and its type against what the catalog allows at its pointer. An
-	// expression whose value is an empty optional, such as input.?subtitle, removes
-	// the value at its pointer, so it cannot set a value the catalog requires. When
-	// the task starts, the components overlays set are checked against the catalog
-	// again, and the task fails with an error to the agent if one does not fit.
-	TaskUIFormTypeA2ui TaskUIFormType = "A2UI"
-)
-
-var AllTaskUIFormType = []TaskUIFormType{
-	TaskUIFormTypeA2ui,
-}
-
 // What a model returns of its thinking. Each provider accepts its own subset.
 type ThinkingDisplay string
 
@@ -6144,6 +6768,36 @@ var AllWorkspaceScope = []WorkspaceScope{
 	WorkspaceScopeConversation,
 }
 
+// __CreateAccessPointClientInput is used internally by genqlient
+type __CreateAccessPointClientInput struct {
+	Input *NewAccessPointClient `json:"input"`
+}
+
+// GetInput returns __CreateAccessPointClientInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateAccessPointClientInput) GetInput() *NewAccessPointClient { return v.Input }
+
+// __CreateAccessPointClientSecretInput is used internally by genqlient
+type __CreateAccessPointClientSecretInput struct {
+	AccessPointClientID string  `json:"accessPointClientID"`
+	ExpiresAt           *string `json:"expiresAt,omitempty"`
+}
+
+// GetAccessPointClientID returns __CreateAccessPointClientSecretInput.AccessPointClientID, and is useful for accessing the field via an interface.
+func (v *__CreateAccessPointClientSecretInput) GetAccessPointClientID() string {
+	return v.AccessPointClientID
+}
+
+// GetExpiresAt returns __CreateAccessPointClientSecretInput.ExpiresAt, and is useful for accessing the field via an interface.
+func (v *__CreateAccessPointClientSecretInput) GetExpiresAt() *string { return v.ExpiresAt }
+
+// __CreateAccessPointInput is used internally by genqlient
+type __CreateAccessPointInput struct {
+	Input *NewAccessPoint `json:"input"`
+}
+
+// GetInput returns __CreateAccessPointInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateAccessPointInput) GetInput() *NewAccessPoint { return v.Input }
+
 // __CreateAgentInput is used internally by genqlient
 type __CreateAgentInput struct {
 	Input *NewAgent `json:"input"`
@@ -6167,6 +6821,22 @@ func (v *__CreateApiKeyInput) GetDescription() *string { return v.Description }
 
 // GetScopes returns __CreateApiKeyInput.Scopes, and is useful for accessing the field via an interface.
 func (v *__CreateApiKeyInput) GetScopes() []string { return v.Scopes }
+
+// __CreateBoundaryInput is used internally by genqlient
+type __CreateBoundaryInput struct {
+	Input *NewBoundary `json:"input"`
+}
+
+// GetInput returns __CreateBoundaryInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateBoundaryInput) GetInput() *NewBoundary { return v.Input }
+
+// __CreateClientTaskDefinitionInput is used internally by genqlient
+type __CreateClientTaskDefinitionInput struct {
+	Input *NewClientTaskDefinition `json:"input"`
+}
+
+// GetInput returns __CreateClientTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateClientTaskDefinitionInput) GetInput() *NewClientTaskDefinition { return v.Input }
 
 // __CreateEmbeddingProfileInput is used internally by genqlient
 type __CreateEmbeddingProfileInput struct {
@@ -6324,14 +6994,6 @@ type __CreateSkillInput struct {
 // GetInput returns __CreateSkillInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateSkillInput) GetInput() *NewSkill { return v.Input }
 
-// __CreateTaskDefinitionInput is used internally by genqlient
-type __CreateTaskDefinitionInput struct {
-	Input *NewTaskDefinition `json:"input"`
-}
-
-// GetInput returns __CreateTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
-func (v *__CreateTaskDefinitionInput) GetInput() *NewTaskDefinition { return v.Input }
-
 // __CreateWebhookDestinationInput is used internally by genqlient
 type __CreateWebhookDestinationInput struct {
 	Input *NewWebhookDestination `json:"input"`
@@ -6348,6 +7010,30 @@ type __CreateWorkspaceInput struct {
 // GetInput returns __CreateWorkspaceInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateWorkspaceInput) GetInput() NewWorkspace { return v.Input }
 
+// __DeleteAccessPointClientInput is used internally by genqlient
+type __DeleteAccessPointClientInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteAccessPointClientInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteAccessPointClientInput) GetId() string { return v.Id }
+
+// __DeleteAccessPointClientSecretInput is used internally by genqlient
+type __DeleteAccessPointClientSecretInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteAccessPointClientSecretInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteAccessPointClientSecretInput) GetId() string { return v.Id }
+
+// __DeleteAccessPointInput is used internally by genqlient
+type __DeleteAccessPointInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteAccessPointInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteAccessPointInput) GetId() string { return v.Id }
+
 // __DeleteAgentInput is used internally by genqlient
 type __DeleteAgentInput struct {
 	Id string `json:"id"`
@@ -6363,6 +7049,22 @@ type __DeleteApiKeyInput struct {
 
 // GetId returns __DeleteApiKeyInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteApiKeyInput) GetId() string { return v.Id }
+
+// __DeleteBoundaryInput is used internally by genqlient
+type __DeleteBoundaryInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteBoundaryInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteBoundaryInput) GetId() string { return v.Id }
+
+// __DeleteClientTaskDefinitionInput is used internally by genqlient
+type __DeleteClientTaskDefinitionInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteClientTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteClientTaskDefinitionInput) GetId() string { return v.Id }
 
 // __DeleteEmbeddingProfileInput is used internally by genqlient
 type __DeleteEmbeddingProfileInput struct {
@@ -6496,14 +7198,6 @@ type __DeleteSkillInput struct {
 // GetId returns __DeleteSkillInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteSkillInput) GetId() string { return v.Id }
 
-// __DeleteTaskDefinitionInput is used internally by genqlient
-type __DeleteTaskDefinitionInput struct {
-	Id string `json:"id"`
-}
-
-// GetId returns __DeleteTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
-func (v *__DeleteTaskDefinitionInput) GetId() string { return v.Id }
-
 // __DeleteWebhookDestinationInput is used internally by genqlient
 type __DeleteWebhookDestinationInput struct {
 	Id string `json:"id"`
@@ -6519,6 +7213,30 @@ type __DeleteWorkspaceInput struct {
 
 // GetId returns __DeleteWorkspaceInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteWorkspaceInput) GetId() string { return v.Id }
+
+// __GetAccessPointClientInput is used internally by genqlient
+type __GetAccessPointClientInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetAccessPointClientInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetAccessPointClientInput) GetId() string { return v.Id }
+
+// __GetAccessPointClientSecretInput is used internally by genqlient
+type __GetAccessPointClientSecretInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetAccessPointClientSecretInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetAccessPointClientSecretInput) GetId() string { return v.Id }
+
+// __GetAccessPointInput is used internally by genqlient
+type __GetAccessPointInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetAccessPointInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetAccessPointInput) GetId() string { return v.Id }
 
 // __GetAgentIDForVersionInput is used internally by genqlient
 type __GetAgentIDForVersionInput struct {
@@ -6543,6 +7261,30 @@ type __GetApiKeyInput struct {
 
 // GetId returns __GetApiKeyInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetApiKeyInput) GetId() string { return v.Id }
+
+// __GetBoundaryInput is used internally by genqlient
+type __GetBoundaryInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetBoundaryInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetBoundaryInput) GetId() string { return v.Id }
+
+// __GetClientTaskDefinitionByNameInput is used internally by genqlient
+type __GetClientTaskDefinitionByNameInput struct {
+	Name string `json:"name"`
+}
+
+// GetName returns __GetClientTaskDefinitionByNameInput.Name, and is useful for accessing the field via an interface.
+func (v *__GetClientTaskDefinitionByNameInput) GetName() string { return v.Name }
+
+// __GetClientTaskDefinitionInput is used internally by genqlient
+type __GetClientTaskDefinitionInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetClientTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetClientTaskDefinitionInput) GetId() string { return v.Id }
 
 // __GetComputedMetricInput is used internally by genqlient
 type __GetComputedMetricInput struct {
@@ -6728,22 +7470,6 @@ type __GetSkillInput struct {
 // GetId returns __GetSkillInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetSkillInput) GetId() string { return v.Id }
 
-// __GetTaskDefinitionByNameInput is used internally by genqlient
-type __GetTaskDefinitionByNameInput struct {
-	Name string `json:"name"`
-}
-
-// GetName returns __GetTaskDefinitionByNameInput.Name, and is useful for accessing the field via an interface.
-func (v *__GetTaskDefinitionByNameInput) GetName() string { return v.Name }
-
-// __GetTaskDefinitionInput is used internally by genqlient
-type __GetTaskDefinitionInput struct {
-	Id string `json:"id"`
-}
-
-// GetId returns __GetTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
-func (v *__GetTaskDefinitionInput) GetId() string { return v.Id }
-
 // __GetWebhookDestinationInput is used internally by genqlient
 type __GetWebhookDestinationInput struct {
 	Id string `json:"id"`
@@ -6767,6 +7493,30 @@ type __GetWorkspaceInput struct {
 
 // GetId returns __GetWorkspaceInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetWorkspaceInput) GetId() string { return v.Id }
+
+// __ModifyAccessPointClientInput is used internally by genqlient
+type __ModifyAccessPointClientInput struct {
+	Id    string                   `json:"id"`
+	Input *UpdateAccessPointClient `json:"input"`
+}
+
+// GetId returns __ModifyAccessPointClientInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyAccessPointClientInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyAccessPointClientInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyAccessPointClientInput) GetInput() *UpdateAccessPointClient { return v.Input }
+
+// __ModifyAccessPointInput is used internally by genqlient
+type __ModifyAccessPointInput struct {
+	Id    string             `json:"id"`
+	Input *UpdateAccessPoint `json:"input"`
+}
+
+// GetId returns __ModifyAccessPointInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyAccessPointInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyAccessPointInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyAccessPointInput) GetInput() *UpdateAccessPoint { return v.Input }
 
 // __ModifyAgentInput is used internally by genqlient
 type __ModifyAgentInput struct {
@@ -6799,6 +7549,30 @@ func (v *__ModifyApiKeyInput) GetDescription() *string { return v.Description }
 
 // GetScopes returns __ModifyApiKeyInput.Scopes, and is useful for accessing the field via an interface.
 func (v *__ModifyApiKeyInput) GetScopes() []string { return v.Scopes }
+
+// __ModifyBoundaryInput is used internally by genqlient
+type __ModifyBoundaryInput struct {
+	Id    string          `json:"id"`
+	Input *UpdateBoundary `json:"input"`
+}
+
+// GetId returns __ModifyBoundaryInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyBoundaryInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyBoundaryInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyBoundaryInput) GetInput() *UpdateBoundary { return v.Input }
+
+// __ModifyClientTaskDefinitionInput is used internally by genqlient
+type __ModifyClientTaskDefinitionInput struct {
+	Id    string                      `json:"id"`
+	Input *UpdateClientTaskDefinition `json:"input"`
+}
+
+// GetId returns __ModifyClientTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyClientTaskDefinitionInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyClientTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyClientTaskDefinitionInput) GetInput() *UpdateClientTaskDefinition { return v.Input }
 
 // __ModifyEmbeddingProfileInput is used internally by genqlient
 type __ModifyEmbeddingProfileInput struct {
@@ -6996,18 +7770,6 @@ func (v *__ModifySkillInput) GetId() string { return v.Id }
 // GetInput returns __ModifySkillInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifySkillInput) GetInput() *UpdateSkill { return v.Input }
 
-// __ModifyTaskDefinitionInput is used internally by genqlient
-type __ModifyTaskDefinitionInput struct {
-	Id    string                `json:"id"`
-	Input *UpdateTaskDefinition `json:"input"`
-}
-
-// GetId returns __ModifyTaskDefinitionInput.Id, and is useful for accessing the field via an interface.
-func (v *__ModifyTaskDefinitionInput) GetId() string { return v.Id }
-
-// GetInput returns __ModifyTaskDefinitionInput.Input, and is useful for accessing the field via an interface.
-func (v *__ModifyTaskDefinitionInput) GetInput() *UpdateTaskDefinition { return v.Input }
-
 // __ModifyWebhookDestinationInput is used internally by genqlient
 type __ModifyWebhookDestinationInput struct {
 	Id    string                    `json:"id"`
@@ -7056,6 +7818,149 @@ func (v *__SearchJudgeMetricsInput) GetFirst() int { return v.First }
 // GetAfter returns __SearchJudgeMetricsInput.After, and is useful for accessing the field via an interface.
 func (v *__SearchJudgeMetricsInput) GetAfter() *string { return v.After }
 
+// The mutation executed by CreateAccessPoint.
+const CreateAccessPoint_Operation = `
+mutation CreateAccessPoint ($input: NewAccessPoint!) {
+	createAccessPoint(input: $input) {
+		... AccessPointDetails
+	}
+}
+fragment AccessPointDetails on AccessPoint {
+	id
+	name
+	description
+	url
+	tags
+	authorizationServerUrl
+	clientTokenLifetimeSeconds
+	issuers {
+		issuer
+		audience
+		jwksUrl
+		jwks
+	}
+	boundaries {
+		id
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func CreateAccessPoint(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewAccessPoint,
+) (data_ *CreateAccessPointResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateAccessPoint",
+		Query:  CreateAccessPoint_Operation,
+		Variables: &__CreateAccessPointInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateAccessPointResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateAccessPointClient.
+const CreateAccessPointClient_Operation = `
+mutation CreateAccessPointClient ($input: NewAccessPointClient!) {
+	createAccessPointClient(input: $input) {
+		... AccessPointClientDetails
+	}
+}
+fragment AccessPointClientDetails on AccessPointClient {
+	id
+	accessPointID
+	clientId
+	name
+	claims
+	createdAt
+	updatedAt
+}
+`
+
+func CreateAccessPointClient(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewAccessPointClient,
+) (data_ *CreateAccessPointClientResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateAccessPointClient",
+		Query:  CreateAccessPointClient_Operation,
+		Variables: &__CreateAccessPointClientInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateAccessPointClientResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateAccessPointClientSecret.
+const CreateAccessPointClientSecret_Operation = `
+mutation CreateAccessPointClientSecret ($accessPointClientID: AccessPointClientID!, $expiresAt: Time) {
+	createAccessPointClientSecret(accessPointClientID: $accessPointClientID, expiresAt: $expiresAt) {
+		clientSecret {
+			... AccessPointClientSecretDetails
+		}
+		secret
+	}
+}
+fragment AccessPointClientSecretDetails on AccessPointClientSecret {
+	id
+	accessPointClientID
+	expiresAt
+	lastUsedAt
+	createdAt
+}
+`
+
+func CreateAccessPointClientSecret(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	accessPointClientID string,
+	expiresAt *string,
+) (data_ *CreateAccessPointClientSecretResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateAccessPointClientSecret",
+		Query:  CreateAccessPointClientSecret_Operation,
+		Variables: &__CreateAccessPointClientSecretInput{
+			AccessPointClientID: accessPointClientID,
+			ExpiresAt:           expiresAt,
+		},
+	}
+
+	data_ = &CreateAccessPointClientSecretResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by CreateAgent.
 const CreateAgent_Operation = `
 mutation CreateAgent ($input: NewAgent!) {
@@ -7092,8 +7997,8 @@ fragment AgentDetails on Agent {
 			toolNames
 			toolNamePattern
 		}
-		tasks {
-			taskDefinition {
+		clientTasks {
+			clientTaskDefinition {
 				id
 				name
 			}
@@ -7185,6 +8090,118 @@ func CreateApiKey(
 	}
 
 	data_ = &CreateApiKeyResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateBoundary.
+const CreateBoundary_Operation = `
+mutation CreateBoundary ($input: NewBoundary!) {
+	createBoundary(input: $input) {
+		... BoundaryDetails
+	}
+}
+fragment BoundaryDetails on Boundary {
+	id
+	name
+	description
+	reportOnly
+	rules {
+		name
+		action
+		when
+		effect
+		message
+		reportOnly
+	}
+	modifications {
+		name
+		action
+		when
+		setTags {
+			name
+			expression
+		}
+		setTracing
+		setArguments {
+			name
+			expression
+		}
+	}
+	warnings
+	createdAt
+	updatedAt
+}
+`
+
+func CreateBoundary(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewBoundary,
+) (data_ *CreateBoundaryResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateBoundary",
+		Query:  CreateBoundary_Operation,
+		Variables: &__CreateBoundaryInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateBoundaryResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateClientTaskDefinition.
+const CreateClientTaskDefinition_Operation = `
+mutation CreateClientTaskDefinition ($input: NewClientTaskDefinition!) {
+	createClientTaskDefinition(input: $input) {
+		... ClientTaskDefinitionDetails
+	}
+}
+fragment ClientTaskDefinitionDetails on ClientTaskDefinition {
+	id
+	name
+	description
+	inputMessageType
+	outputMessageType
+	uiForms {
+		type
+		definition
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func CreateClientTaskDefinition(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewClientTaskDefinition,
+) (data_ *CreateClientTaskDefinitionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateClientTaskDefinition",
+		Query:  CreateClientTaskDefinition_Operation,
+		Variables: &__CreateClientTaskDefinitionInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateClientTaskDefinitionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -7864,6 +8881,9 @@ fragment MeshDetails on Mesh {
 	memoryStore {
 		id
 	}
+	boundaries {
+		id
+	}
 }
 `
 
@@ -8190,53 +9210,6 @@ func CreateSkill(
 	return data_, err_
 }
 
-// The mutation executed by CreateTaskDefinition.
-const CreateTaskDefinition_Operation = `
-mutation CreateTaskDefinition ($input: NewTaskDefinition!) {
-	createTaskDefinition(input: $input) {
-		... TaskDefinitionDetails
-	}
-}
-fragment TaskDefinitionDetails on TaskDefinition {
-	id
-	name
-	description
-	inputMessageType
-	outputMessageType
-	uiForms {
-		type
-		definition
-	}
-	createdAt
-	updatedAt
-}
-`
-
-func CreateTaskDefinition(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	input *NewTaskDefinition,
-) (data_ *CreateTaskDefinitionResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "CreateTaskDefinition",
-		Query:  CreateTaskDefinition_Operation,
-		Variables: &__CreateTaskDefinitionInput{
-			Input: input,
-		},
-	}
-
-	data_ = &CreateTaskDefinitionResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
 // The mutation executed by CreateWebhookDestination.
 const CreateWebhookDestination_Operation = `
 mutation CreateWebhookDestination ($input: NewWebhookDestination!) {
@@ -8325,6 +9298,108 @@ func CreateWorkspace(
 	return data_, err_
 }
 
+// The mutation executed by DeleteAccessPoint.
+const DeleteAccessPoint_Operation = `
+mutation DeleteAccessPoint ($id: AccessPointID!) {
+	deleteAccessPoints(accessPointIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteAccessPoint(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteAccessPointResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteAccessPoint",
+		Query:  DeleteAccessPoint_Operation,
+		Variables: &__DeleteAccessPointInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteAccessPointResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteAccessPointClient.
+const DeleteAccessPointClient_Operation = `
+mutation DeleteAccessPointClient ($id: AccessPointClientID!) {
+	deleteAccessPointClients(accessPointClientIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteAccessPointClient(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteAccessPointClientResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteAccessPointClient",
+		Query:  DeleteAccessPointClient_Operation,
+		Variables: &__DeleteAccessPointClientInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteAccessPointClientResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteAccessPointClientSecret.
+const DeleteAccessPointClientSecret_Operation = `
+mutation DeleteAccessPointClientSecret ($id: AccessPointClientSecretID!) {
+	deleteAccessPointClientSecrets(accessPointClientSecretIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteAccessPointClientSecret(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteAccessPointClientSecretResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteAccessPointClientSecret",
+		Query:  DeleteAccessPointClientSecret_Operation,
+		Variables: &__DeleteAccessPointClientSecretInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteAccessPointClientSecretResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by DeleteAgent.
 const DeleteAgent_Operation = `
 mutation DeleteAgent ($id: AgentID!) {
@@ -8382,6 +9457,74 @@ func DeleteApiKey(
 	}
 
 	data_ = &DeleteApiKeyResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteBoundary.
+const DeleteBoundary_Operation = `
+mutation DeleteBoundary ($id: BoundaryID!) {
+	deleteBoundaries(boundaryIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteBoundary(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteBoundaryResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteBoundary",
+		Query:  DeleteBoundary_Operation,
+		Variables: &__DeleteBoundaryInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteBoundaryResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteClientTaskDefinition.
+const DeleteClientTaskDefinition_Operation = `
+mutation DeleteClientTaskDefinition ($id: ClientTaskDefinitionID!) {
+	deleteClientTaskDefinitions(clientTaskDefinitionIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteClientTaskDefinition(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteClientTaskDefinitionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteClientTaskDefinition",
+		Query:  DeleteClientTaskDefinition_Operation,
+		Variables: &__DeleteClientTaskDefinitionInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteClientTaskDefinitionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -8939,40 +10082,6 @@ func DeleteSkill(
 	return data_, err_
 }
 
-// The mutation executed by DeleteTaskDefinition.
-const DeleteTaskDefinition_Operation = `
-mutation DeleteTaskDefinition ($id: TaskDefinitionID!) {
-	deleteTaskDefinitions(taskDefinitionIDs: [$id]) {
-		ids
-	}
-}
-`
-
-func DeleteTaskDefinition(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	id string,
-) (data_ *DeleteTaskDefinitionResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "DeleteTaskDefinition",
-		Query:  DeleteTaskDefinition_Operation,
-		Variables: &__DeleteTaskDefinitionInput{
-			Id: id,
-		},
-	}
-
-	data_ = &DeleteTaskDefinitionResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
 // The mutation executed by DeleteWebhookDestination.
 const DeleteWebhookDestination_Operation = `
 mutation DeleteWebhookDestination ($id: WebhookDestinationID!) {
@@ -9041,6 +10150,144 @@ func DeleteWorkspace(
 	return data_, err_
 }
 
+// The query executed by GetAccessPoint.
+const GetAccessPoint_Operation = `
+query GetAccessPoint ($id: AccessPointID!) {
+	accessPoint(id: $id) {
+		... AccessPointDetails
+	}
+}
+fragment AccessPointDetails on AccessPoint {
+	id
+	name
+	description
+	url
+	tags
+	authorizationServerUrl
+	clientTokenLifetimeSeconds
+	issuers {
+		issuer
+		audience
+		jwksUrl
+		jwks
+	}
+	boundaries {
+		id
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func GetAccessPoint(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetAccessPointResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetAccessPoint",
+		Query:  GetAccessPoint_Operation,
+		Variables: &__GetAccessPointInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetAccessPointResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetAccessPointClient.
+const GetAccessPointClient_Operation = `
+query GetAccessPointClient ($id: AccessPointClientID!) {
+	accessPointClient(id: $id) {
+		... AccessPointClientDetails
+	}
+}
+fragment AccessPointClientDetails on AccessPointClient {
+	id
+	accessPointID
+	clientId
+	name
+	claims
+	createdAt
+	updatedAt
+}
+`
+
+func GetAccessPointClient(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetAccessPointClientResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetAccessPointClient",
+		Query:  GetAccessPointClient_Operation,
+		Variables: &__GetAccessPointClientInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetAccessPointClientResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetAccessPointClientSecret.
+const GetAccessPointClientSecret_Operation = `
+query GetAccessPointClientSecret ($id: AccessPointClientSecretID!) {
+	accessPointClientSecret(id: $id) {
+		... AccessPointClientSecretDetails
+	}
+}
+fragment AccessPointClientSecretDetails on AccessPointClientSecret {
+	id
+	accessPointClientID
+	expiresAt
+	lastUsedAt
+	createdAt
+}
+`
+
+func GetAccessPointClientSecret(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetAccessPointClientSecretResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetAccessPointClientSecret",
+		Query:  GetAccessPointClientSecret_Operation,
+		Variables: &__GetAccessPointClientSecretInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetAccessPointClientSecretResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetAgent.
 const GetAgent_Operation = `
 query GetAgent ($id: AgentID!) {
@@ -9075,8 +10322,8 @@ fragment AgentDetails on Agent {
 			toolNames
 			toolNamePattern
 		}
-		tasks {
-			taskDefinition {
+		clientTasks {
+			clientTaskDefinition {
 				id
 				name
 			}
@@ -9196,6 +10443,165 @@ func GetApiKey(
 	}
 
 	data_ = &GetApiKeyResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetBoundary.
+const GetBoundary_Operation = `
+query GetBoundary ($id: BoundaryID!) {
+	boundary(id: $id) {
+		... BoundaryDetails
+	}
+}
+fragment BoundaryDetails on Boundary {
+	id
+	name
+	description
+	reportOnly
+	rules {
+		name
+		action
+		when
+		effect
+		message
+		reportOnly
+	}
+	modifications {
+		name
+		action
+		when
+		setTags {
+			name
+			expression
+		}
+		setTracing
+		setArguments {
+			name
+			expression
+		}
+	}
+	warnings
+	createdAt
+	updatedAt
+}
+`
+
+func GetBoundary(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetBoundaryResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetBoundary",
+		Query:  GetBoundary_Operation,
+		Variables: &__GetBoundaryInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetBoundaryResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetClientTaskDefinition.
+const GetClientTaskDefinition_Operation = `
+query GetClientTaskDefinition ($id: ClientTaskDefinitionID!) {
+	clientTaskDefinition(id: $id) {
+		... ClientTaskDefinitionDetails
+	}
+}
+fragment ClientTaskDefinitionDetails on ClientTaskDefinition {
+	id
+	name
+	description
+	inputMessageType
+	outputMessageType
+	uiForms {
+		type
+		definition
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func GetClientTaskDefinition(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetClientTaskDefinitionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetClientTaskDefinition",
+		Query:  GetClientTaskDefinition_Operation,
+		Variables: &__GetClientTaskDefinitionInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetClientTaskDefinitionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetClientTaskDefinitionByName.
+const GetClientTaskDefinitionByName_Operation = `
+query GetClientTaskDefinitionByName ($name: String!) {
+	clientTaskDefinitionByName(name: $name) {
+		... ClientTaskDefinitionDetails
+	}
+}
+fragment ClientTaskDefinitionDetails on ClientTaskDefinition {
+	id
+	name
+	description
+	inputMessageType
+	outputMessageType
+	uiForms {
+		type
+		definition
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func GetClientTaskDefinitionByName(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	name string,
+) (data_ *GetClientTaskDefinitionByNameResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetClientTaskDefinitionByName",
+		Query:  GetClientTaskDefinitionByName_Operation,
+		Variables: &__GetClientTaskDefinitionByNameInput{
+			Name: name,
+		},
+	}
+
+	data_ = &GetClientTaskDefinitionByNameResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -9897,6 +11303,9 @@ fragment MeshDetails on Mesh {
 	memoryStore {
 		id
 	}
+	boundaries {
+		id
+	}
 }
 `
 
@@ -10520,100 +11929,6 @@ func GetSkillByName(
 	return data_, err_
 }
 
-// The query executed by GetTaskDefinition.
-const GetTaskDefinition_Operation = `
-query GetTaskDefinition ($id: TaskDefinitionID!) {
-	taskDefinition(id: $id) {
-		... TaskDefinitionDetails
-	}
-}
-fragment TaskDefinitionDetails on TaskDefinition {
-	id
-	name
-	description
-	inputMessageType
-	outputMessageType
-	uiForms {
-		type
-		definition
-	}
-	createdAt
-	updatedAt
-}
-`
-
-func GetTaskDefinition(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	id string,
-) (data_ *GetTaskDefinitionResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "GetTaskDefinition",
-		Query:  GetTaskDefinition_Operation,
-		Variables: &__GetTaskDefinitionInput{
-			Id: id,
-		},
-	}
-
-	data_ = &GetTaskDefinitionResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
-// The query executed by GetTaskDefinitionByName.
-const GetTaskDefinitionByName_Operation = `
-query GetTaskDefinitionByName ($name: String!) {
-	taskDefinitionByName(name: $name) {
-		... TaskDefinitionDetails
-	}
-}
-fragment TaskDefinitionDetails on TaskDefinition {
-	id
-	name
-	description
-	inputMessageType
-	outputMessageType
-	uiForms {
-		type
-		definition
-	}
-	createdAt
-	updatedAt
-}
-`
-
-func GetTaskDefinitionByName(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	name string,
-) (data_ *GetTaskDefinitionByNameResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "GetTaskDefinitionByName",
-		Query:  GetTaskDefinitionByName_Operation,
-		Variables: &__GetTaskDefinitionByNameInput{
-			Name: name,
-		},
-	}
-
-	data_ = &GetTaskDefinitionByNameResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
 // The query executed by GetWebhookDestination.
 const GetWebhookDestination_Operation = `
 query GetWebhookDestination ($id: WebhookDestinationID!) {
@@ -10743,6 +12058,107 @@ func GetWorkspaceByName(
 	return data_, err_
 }
 
+// The mutation executed by ModifyAccessPoint.
+const ModifyAccessPoint_Operation = `
+mutation ModifyAccessPoint ($id: AccessPointID!, $input: UpdateAccessPoint!) {
+	updateAccessPoint(id: $id, input: $input) {
+		... AccessPointDetails
+	}
+}
+fragment AccessPointDetails on AccessPoint {
+	id
+	name
+	description
+	url
+	tags
+	authorizationServerUrl
+	clientTokenLifetimeSeconds
+	issuers {
+		issuer
+		audience
+		jwksUrl
+		jwks
+	}
+	boundaries {
+		id
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyAccessPoint(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateAccessPoint,
+) (data_ *ModifyAccessPointResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyAccessPoint",
+		Query:  ModifyAccessPoint_Operation,
+		Variables: &__ModifyAccessPointInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyAccessPointResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyAccessPointClient.
+const ModifyAccessPointClient_Operation = `
+mutation ModifyAccessPointClient ($id: AccessPointClientID!, $input: UpdateAccessPointClient!) {
+	updateAccessPointClient(id: $id, input: $input) {
+		... AccessPointClientDetails
+	}
+}
+fragment AccessPointClientDetails on AccessPointClient {
+	id
+	accessPointID
+	clientId
+	name
+	claims
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyAccessPointClient(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateAccessPointClient,
+) (data_ *ModifyAccessPointClientResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyAccessPointClient",
+		Query:  ModifyAccessPointClient_Operation,
+		Variables: &__ModifyAccessPointClientInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyAccessPointClientResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by ModifyAgent.
 const ModifyAgent_Operation = `
 mutation ModifyAgent ($id: AgentID!, $input: UpdateAgent!) {
@@ -10779,8 +12195,8 @@ fragment AgentDetails on Agent {
 			toolNames
 			toolNamePattern
 		}
-		tasks {
-			taskDefinition {
+		clientTasks {
+			clientTaskDefinition {
 				id
 				name
 			}
@@ -10872,6 +12288,122 @@ func ModifyApiKey(
 	}
 
 	data_ = &ModifyApiKeyResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyBoundary.
+const ModifyBoundary_Operation = `
+mutation ModifyBoundary ($id: BoundaryID!, $input: UpdateBoundary!) {
+	updateBoundary(id: $id, input: $input) {
+		... BoundaryDetails
+	}
+}
+fragment BoundaryDetails on Boundary {
+	id
+	name
+	description
+	reportOnly
+	rules {
+		name
+		action
+		when
+		effect
+		message
+		reportOnly
+	}
+	modifications {
+		name
+		action
+		when
+		setTags {
+			name
+			expression
+		}
+		setTracing
+		setArguments {
+			name
+			expression
+		}
+	}
+	warnings
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyBoundary(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateBoundary,
+) (data_ *ModifyBoundaryResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyBoundary",
+		Query:  ModifyBoundary_Operation,
+		Variables: &__ModifyBoundaryInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyBoundaryResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyClientTaskDefinition.
+const ModifyClientTaskDefinition_Operation = `
+mutation ModifyClientTaskDefinition ($id: ClientTaskDefinitionID!, $input: UpdateClientTaskDefinition!) {
+	updateClientTaskDefinition(clientTaskDefinitionID: $id, input: $input) {
+		... ClientTaskDefinitionDetails
+	}
+}
+fragment ClientTaskDefinitionDetails on ClientTaskDefinition {
+	id
+	name
+	description
+	inputMessageType
+	outputMessageType
+	uiForms {
+		type
+		definition
+	}
+	createdAt
+	updatedAt
+}
+`
+
+func ModifyClientTaskDefinition(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateClientTaskDefinition,
+) (data_ *ModifyClientTaskDefinitionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyClientTaskDefinition",
+		Query:  ModifyClientTaskDefinition_Operation,
+		Variables: &__ModifyClientTaskDefinitionInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyClientTaskDefinitionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -11520,6 +13052,9 @@ fragment MeshDetails on Mesh {
 	memoryStore {
 		id
 	}
+	boundaries {
+		id
+	}
 }
 `
 
@@ -11845,55 +13380,6 @@ func ModifySkill(
 	}
 
 	data_ = &ModifySkillResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
-// The mutation executed by ModifyTaskDefinition.
-const ModifyTaskDefinition_Operation = `
-mutation ModifyTaskDefinition ($id: TaskDefinitionID!, $input: UpdateTaskDefinition!) {
-	updateTaskDefinition(taskDefinitionID: $id, input: $input) {
-		... TaskDefinitionDetails
-	}
-}
-fragment TaskDefinitionDetails on TaskDefinition {
-	id
-	name
-	description
-	inputMessageType
-	outputMessageType
-	uiForms {
-		type
-		definition
-	}
-	createdAt
-	updatedAt
-}
-`
-
-func ModifyTaskDefinition(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	id string,
-	input *UpdateTaskDefinition,
-) (data_ *ModifyTaskDefinitionResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "ModifyTaskDefinition",
-		Query:  ModifyTaskDefinition_Operation,
-		Variables: &__ModifyTaskDefinitionInput{
-			Id:    id,
-			Input: input,
-		},
-	}
-
-	data_ = &ModifyTaskDefinitionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

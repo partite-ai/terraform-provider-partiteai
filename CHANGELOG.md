@@ -2,6 +2,24 @@
 
 BREAKING CHANGES:
 
+* resource/partiteai_task_definition is now `partiteai_client_task_definition`,
+  and data-source/partiteai_task_definition is now
+  `partiteai_client_task_definition`. A client task is one kind of task a
+  request can wait on; tool call approvals are another. To keep a resource
+  under the new name without replacing it, rename its block and add a moved
+  block (Terraform 1.8 or later):
+
+  ```hcl
+  moved {
+    from = partiteai_task_definition.ask_question
+    to   = partiteai_client_task_definition.ask_question
+  }
+  ```
+
+  A data source needs only the rename.
+* resource/partiteai_agent: `tasks` is now `client_tasks`. The same goes for
+  data-source/partiteai_agent. Existing state needs nothing: the next refresh
+  reads `client_tasks` from the server.
 * resource/partiteai_mcp_connection: `stdio_transport` is removed. Mesh no
   longer runs MCP servers as child processes, so there is nothing behind it.
   Replace a stdio connection with `tunnel_transport`, and run the server
@@ -40,6 +58,29 @@ BREAKING CHANGES:
 
 FEATURES:
 
+* **New Resource:** `partiteai_boundary`. A boundary's `rules` each refuse an
+  action, such as creating a conversation or calling a tool, when their CEL
+  `when` holds, or make a tool call wait for approval. Its `modifications` set
+  tags, tracing or tool call arguments on what those actions do. A rule or
+  modification that doesn't compile is refused when the boundary is saved, and
+  `warnings` says what is likely wrong with one that does.
+* **New Data Source:** `partiteai_boundary`, found by `id`.
+* **New Resource:** `partiteai_access_point`. An access point lets callers who
+  sign in with a token from a trusted issuer into meshes. Each of its `issuers`
+  takes a `jwks_url` or a `jwks`. An issuer's `audience` defaults to the access
+  point's `url`; `check_audience = false` stops checking it.
+* **New Data Source:** `partiteai_access_point`, found by `id`.
+* **New Resource:** `partiteai_access_point_client`. A client signs in to its
+  access point with its `client_id` and a secret, and gets a token carrying its
+  `claims`.
+* **New Data Source:** `partiteai_access_point_client`, found by `id`.
+* **New Resource:** `partiteai_access_point_client_secret`. A client has no
+  secret until one is made with this resource, and can have several, so a
+  secret is replaced without changing the client ID. `secret` is readable only
+  when it is made.
+* resource/partiteai_mesh and resource/partiteai_access_point: `boundary_ids`
+  attaches boundaries. The same goes for data-source/partiteai_mesh and
+  data-source/partiteai_access_point.
 * **New Resource:** `partiteai_skill`. A skill is a folder of text files, given
   as `files` by path, `SKILL.md` among them. Its own `name` is unique; the name
   `SKILL.md` declares is what agents see.

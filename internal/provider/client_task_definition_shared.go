@@ -12,8 +12,8 @@ import (
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-// TaskDefinitionBaseModel contains all the common fields for both resource and data source.
-type TaskDefinitionBaseModel struct {
+// ClientTaskDefinitionBaseModel contains all the common fields for both resource and data source.
+type ClientTaskDefinitionBaseModel struct {
 	Id                types.String         `tfsdk:"id"`
 	Name              types.String         `tfsdk:"name"`
 	Description       types.String         `tfsdk:"description"`
@@ -25,7 +25,7 @@ type TaskDefinitionBaseModel struct {
 }
 
 // MapFromGraphQL maps GraphQL response to the base model.
-func (m *TaskDefinitionBaseModel) MapFromGraphQL(ctx context.Context, td *pgql.TaskDefinitionDetails) diag.Diagnostics {
+func (m *ClientTaskDefinitionBaseModel) MapFromGraphQL(ctx context.Context, td *pgql.ClientTaskDefinitionDetails) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	diags.Append(setFields(
@@ -50,10 +50,10 @@ func (m *TaskDefinitionBaseModel) MapFromGraphQL(ctx context.Context, td *pgql.T
 	return diags
 }
 
-// taskUIFormInputs turns the ui_forms map of a configuration into UI form
+// clientTaskUIFormInputs turns the ui_forms map of a configuration into UI form
 // inputs, in type order so a request is the same each time.
-func taskUIFormInputs(ctx context.Context, forms types.Map) ([]pgql.TaskUIFormInput, diag.Diagnostics) {
-	out := []pgql.TaskUIFormInput{}
+func clientTaskUIFormInputs(ctx context.Context, forms types.Map) ([]pgql.ClientTaskUIFormInput, diag.Diagnostics) {
+	out := []pgql.ClientTaskUIFormInput{}
 	if forms.IsNull() || forms.IsUnknown() {
 		return out, nil
 	}
@@ -68,15 +68,15 @@ func taskUIFormInputs(ctx context.Context, forms types.Map) ([]pgql.TaskUIFormIn
 	}
 	sort.Strings(formTypes)
 	for _, t := range formTypes {
-		out = append(out, pgql.TaskUIFormInput{Type: pgql.TaskUIFormType(t), Definition: byType[t]})
+		out = append(out, pgql.ClientTaskUIFormInput{Type: pgql.ClientTaskUIFormType(t), Definition: byType[t]})
 	}
 	return out, diags
 }
 
-// taskUIFormTypes are the keys a ui_forms map can have.
-func taskUIFormTypes() []string {
-	out := make([]string, 0, len(pgql.AllTaskUIFormType))
-	for _, t := range pgql.AllTaskUIFormType {
+// clientTaskUIFormTypes are the keys a ui_forms map can have.
+func clientTaskUIFormTypes() []string {
+	out := make([]string, 0, len(pgql.AllClientTaskUIFormType))
+	for _, t := range pgql.AllClientTaskUIFormType {
 		out = append(out, string(t))
 	}
 	return out

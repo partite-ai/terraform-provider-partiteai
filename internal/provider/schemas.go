@@ -111,10 +111,10 @@ var mcpConnectionDataSourceType = dsschema.NestedAttributeObject{
 	},
 }
 
-var taskAssociationDataSourceType = dsschema.NestedAttributeObject{
+var clientTaskAssociationDataSourceType = dsschema.NestedAttributeObject{
 	Attributes: map[string]dsschema.Attribute{
 		"id": dsschema.StringAttribute{
-			MarkdownDescription: "Task definition identifier",
+			MarkdownDescription: "Client task definition identifier",
 			Computed:            true,
 		},
 	},

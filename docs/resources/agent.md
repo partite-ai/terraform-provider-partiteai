@@ -24,6 +24,7 @@ Agent resource
 
 ### Optional
 
+- `client_tasks` (Attributes Set) Set of client task definitions associated with the agent, referenced by client task definition ID (see [below for nested schema](#nestedatt--client_tasks))
 - `description` (String) Resource description
 - `identity` (String) A brief description of the agent's identity, such as its role or persona.
 - `mcp_connections` (Attributes Set) List of MCP connections associated with the agent (see [below for nested schema](#nestedatt--mcp_connections))
@@ -33,7 +34,6 @@ Agent resource
 - `send_thinking_to_user` (Boolean) Whether the agent should send 'thinking' messages to the user
 - `skills` (Attributes Set) Set of skills the agent can load, referenced by skill ID. No two of them can declare the same name. (see [below for nested schema](#nestedatt--skills))
 - `tags` (Attributes List) Tags for the resource (see [below for nested schema](#nestedatt--tags))
-- `tasks` (Attributes Set) Set of task definitions associated with the agent, referenced by task definition ID (see [below for nested schema](#nestedatt--tasks))
 
 ### Read-Only
 
@@ -43,6 +43,14 @@ Agent resource
 - `version_created_at` (String) Timestamp when the current version was created
 - `version_id` (String) Current version identifier of the agent
 - `version_ordinal` (Number) Current version ordinal of the agent
+
+<a id="nestedatt--client_tasks"></a>
+### Nested Schema for `client_tasks`
+
+Required:
+
+- `id` (String) Client task definition identifier
+
 
 <a id="nestedatt--mcp_connections"></a>
 ### Nested Schema for `mcp_connections`
@@ -87,11 +95,3 @@ Required:
 
 - `name` (String) Tag name
 - `value` (String) Tag value
-
-
-<a id="nestedatt--tasks"></a>
-### Nested Schema for `tasks`
-
-Required:
-
-- `id` (String) Task definition identifier

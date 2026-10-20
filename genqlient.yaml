@@ -65,11 +65,19 @@ bindings:
     type: string
   EvalMeshMonitorID:
     type: string
-  TaskDefinitionID:
+  ClientTaskDefinitionID:
     type: string
-  TaskAgentAssociationID:
+  ClientTaskAgentAssociationID:
     type: string
   SkillID:
+    type: string
+  BoundaryID:
+    type: string
+  AccessPointID:
+    type: string
+  AccessPointClientID:
+    type: string
+  AccessPointClientSecretID:
     type: string
   SkillFileID:
     type: string
@@ -115,10 +123,10 @@ bindings:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewWebhookDestination"
   UpdateWebhookDestination:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateWebhookDestination"
-  NewTaskDefinition:
-    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewTaskDefinition"
-  UpdateTaskDefinition:
-    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateTaskDefinition"
+  NewClientTaskDefinition:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewClientTaskDefinition"
+  UpdateClientTaskDefinition:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateClientTaskDefinition"
   NewSkill:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewSkill"
   UpdateSkill:
@@ -143,3 +151,15 @@ bindings:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateRubric"
   UpdateMemoryInteractionProfile:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateMemoryInteractionProfile"
+  NewBoundary:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewBoundary"
+  UpdateBoundary:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateBoundary"
+  NewAccessPoint:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewAccessPoint"
+  UpdateAccessPoint:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateAccessPoint"
+  NewAccessPointClient:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewAccessPointClient"
+  UpdateAccessPointClient:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateAccessPointClient"

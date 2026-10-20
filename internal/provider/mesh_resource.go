@@ -7,6 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -52,6 +54,13 @@ func (r *MeshResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 					MarkdownDescription: "ID of the memory store the mesh reads and writes. Every version of the mesh uses the same store. Removing it detaches the store and keeps its records.",
 					Optional:            true,
 				},
+				"boundary_ids": schema.SetAttribute{
+					MarkdownDescription: "IDs of the boundaries every conversation on the mesh is checked against",
+					ElementType:         types.StringType,
+					Optional:            true,
+					Computed:            true,
+					Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, nil)),
+				},
 			},
 		),
 	}
@@ -71,6 +80,11 @@ func (r *MeshResource) Create(ctx context.Context, req resource.CreateRequest, r
 		resp.Diagnostics.Append(diag...)
 		return
 	}
+	boundaries, diags := boundaryAssociations(ctx, data.BoundaryIds)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	createResp, err := pgql.CreateMesh(ctx, r.GetClient(), &pgql.NewMesh{
 		Name:          data.Name.ValueString(),
@@ -78,6 +92,7 @@ func (r *MeshResource) Create(ctx context.Context, req resource.CreateRequest, r
 		Tags:          tags,
 		ModelSetID:    data.ModelSetId.ValueString(),
 		MemoryStoreID: pgql.OptPtr(data.MemoryStoreId.ValueStringPointer()),
+		Boundaries:    boundaries,
 	})
 	if err != nil {
 		handleAPIError(&resp.Diagnostics, err, "create mesh")
@@ -139,6 +154,14 @@ func (r *MeshResource) Update(ctx context.Context, req resource.UpdateRequest, r
 			return
 		}
 		update.Tags = pgql.Opt(tags)
+	}
+	if !planData.BoundaryIds.Equal(stateData.BoundaryIds) {
+		boundaries, diags := boundaryAssociations(ctx, planData.BoundaryIds)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		update.Boundaries = pgql.Opt(boundaries)
 	}
 
 	updateResp, err := pgql.ModifyMesh(ctx, r.GetClient(), planData.Id.ValueString(), &update)
