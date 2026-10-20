@@ -133,8 +133,12 @@ resource %q "confirm" {
 // TestAccClientTaskDefinition_movedFromOldName checks that a moved block takes
 // a partiteai_task_definition's state over in place, with nothing replaced.
 func TestAccClientTaskDefinition_movedFromOldName(t *testing.T) {
+	current, ok := New("test")().(*PartiteAIProvider)
+	if !ok {
+		t.Fatalf("New gave a %T, not a *PartiteAIProvider", New("test")())
+	}
 	oldProvider := map[string]func() (tfprotov6.ProviderServer, error){
-		"partiteai": providerserver.NewProtocol6WithError(providerWithOldTaskDefinition{New("test")().(*PartiteAIProvider)}),
+		"partiteai": providerserver.NewProtocol6WithError(providerWithOldTaskDefinition{current}),
 	}
 	for _, name := range enabledBackends() {
 		t.Run(name, func(t *testing.T) {

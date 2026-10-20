@@ -55,7 +55,10 @@ func configureProvider(t *testing.T, attrs map[string]string) *provider.Configur
 	var schemaResp provider.SchemaResponse
 	p.Schema(context.Background(), provider.SchemaRequest{}, &schemaResp)
 
-	objectType := schemaResp.Schema.Type().TerraformType(context.Background()).(tftypes.Object)
+	objectType, ok := schemaResp.Schema.Type().TerraformType(context.Background()).(tftypes.Object)
+	if !ok {
+		t.Fatalf("the provider schema is a %T, not an object", schemaResp.Schema.Type().TerraformType(context.Background()))
+	}
 	values := map[string]tftypes.Value{}
 	for name, attrType := range objectType.AttributeTypes {
 		values[name] = tftypes.NewValue(attrType, nil)
@@ -92,7 +95,10 @@ func sentAuthorization(t *testing.T, attrs map[string]string) string {
 		t.Fatalf("configure: %v", resp.Diagnostics)
 	}
 
-	data := resp.ResourceData.(*providerData)
+	data, ok := resp.ResourceData.(*providerData)
+	if !ok {
+		t.Fatalf("resource data is a %T, not *providerData", resp.ResourceData)
+	}
 	res, err := data.httpClient.Get(srv.URL)
 	if err != nil {
 		t.Fatal(err)
