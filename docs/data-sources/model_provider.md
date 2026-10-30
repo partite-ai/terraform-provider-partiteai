@@ -22,6 +22,7 @@ Model Provider data source
 ### Read-Only
 
 - `anthropic` (Attributes) Anthropic provider config (see [below for nested schema](#nestedatt--anthropic))
+- `bedrock` (Attributes) Amazon Bedrock provider config (see [below for nested schema](#nestedatt--bedrock))
 - `cerebras` (Attributes) Cerebras provider config (see [below for nested schema](#nestedatt--cerebras))
 - `created_at` (String) Timestamp when the resource was created
 - `description` (String) Resource description
@@ -39,6 +40,25 @@ Model Provider data source
 Read-Only:
 
 - `api_key_set` (Boolean) Whether an API key is set for Anthropic. The key itself is never returned.
+
+
+<a id="nestedatt--bedrock"></a>
+### Nested Schema for `bedrock`
+
+Read-Only:
+
+- `api_key_set` (Boolean) Whether an Amazon Bedrock API key is set. The key itself is never returned.
+- `region` (String) The AWS Region that serves the models.
+- `static_keys` (Attributes) IAM access keys. (see [below for nested schema](#nestedatt--bedrock--static_keys))
+
+<a id="nestedatt--bedrock--static_keys"></a>
+### Nested Schema for `bedrock.static_keys`
+
+Read-Only:
+
+- `access_key_id` (String) IAM access key ID.
+- `secret_access_key_set` (Boolean) Whether an IAM secret access key is set. The key itself is never returned.
+
 
 
 <a id="nestedatt--cerebras"></a>

@@ -1745,7 +1745,7 @@
                   "Name": "task_type",
                   "Type": "string",
                   "NestedType": null,
-                  "Description": "What the embedding is for, such as RETRIEVAL_DOCUMENT. Google only.",
+                  "Description": "What the embedding is for, such as RETRIEVAL_DOCUMENT. Google and the Cohere models on Amazon Bedrock accept it.",
                   "Required": false,
                   "Optional": true,
                   "Computed": false,
@@ -5358,6 +5358,98 @@
               "Nesting": 1
             },
             "Description": "Anthropic provider config",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "bedrock",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "api_key_wo",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Amazon Bedrock API key. A short-term key expires in 12 hours or less. Write-only: never stored in state. Change `credentials_version` to send a new value.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": true,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": true,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "region",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The AWS Region that serves the models, for example `us-east-1`.",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "static_keys",
+                  "Type": null,
+                  "NestedType": {
+                    "Attributes": [
+                      {
+                        "Name": "access_key_id",
+                        "Type": "string",
+                        "NestedType": null,
+                        "Description": "IAM access key ID.",
+                        "Required": true,
+                        "Optional": false,
+                        "Computed": false,
+                        "Sensitive": false,
+                        "DescriptionKind": 1,
+                        "Deprecated": false,
+                        "WriteOnly": false,
+                        "DeprecationMessage": ""
+                      },
+                      {
+                        "Name": "secret_access_key_wo",
+                        "Type": "string",
+                        "NestedType": null,
+                        "Description": "IAM secret access key. Write-only: never stored in state. Change `credentials_version` to send a new value.",
+                        "Required": true,
+                        "Optional": false,
+                        "Computed": false,
+                        "Sensitive": true,
+                        "DescriptionKind": 1,
+                        "Deprecated": false,
+                        "WriteOnly": true,
+                        "DeprecationMessage": ""
+                      }
+                    ],
+                    "Nesting": 1
+                  },
+                  "Description": "IAM access keys.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 1
+            },
+            "Description": "Amazon Bedrock provider config. Set exactly one of `api_key_wo` and `static_keys`.",
             "Required": false,
             "Optional": true,
             "Computed": false,
@@ -17278,6 +17370,98 @@
               "Nesting": 1
             },
             "Description": "Anthropic provider config",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "bedrock",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "api_key_set",
+                  "Type": "bool",
+                  "NestedType": null,
+                  "Description": "Whether an Amazon Bedrock API key is set. The key itself is never returned.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "region",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The AWS Region that serves the models.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "static_keys",
+                  "Type": null,
+                  "NestedType": {
+                    "Attributes": [
+                      {
+                        "Name": "access_key_id",
+                        "Type": "string",
+                        "NestedType": null,
+                        "Description": "IAM access key ID.",
+                        "Required": false,
+                        "Optional": false,
+                        "Computed": true,
+                        "Sensitive": false,
+                        "DescriptionKind": 1,
+                        "Deprecated": false,
+                        "WriteOnly": false,
+                        "DeprecationMessage": ""
+                      },
+                      {
+                        "Name": "secret_access_key_set",
+                        "Type": "bool",
+                        "NestedType": null,
+                        "Description": "Whether an IAM secret access key is set. The key itself is never returned.",
+                        "Required": false,
+                        "Optional": false,
+                        "Computed": true,
+                        "Sensitive": false,
+                        "DescriptionKind": 1,
+                        "Deprecated": false,
+                        "WriteOnly": false,
+                        "DeprecationMessage": ""
+                      }
+                    ],
+                    "Nesting": 1
+                  },
+                  "Description": "IAM access keys.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 1
+            },
+            "Description": "Amazon Bedrock provider config",
             "Required": false,
             "Optional": false,
             "Computed": true,

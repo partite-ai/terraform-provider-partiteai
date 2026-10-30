@@ -46,4 +46,4 @@ Required:
 Optional:
 
 - `send_dimensions` (Boolean) Ask the service for that width with each request. Set it only for a model that can be asked for fewer dimensions than it produces by default.
-- `task_type` (String) What the embedding is for, such as RETRIEVAL_DOCUMENT. Google only.
+- `task_type` (String) What the embedding is for, such as RETRIEVAL_DOCUMENT. Google and the Cohere models on Amazon Bedrock accept it.

@@ -70,7 +70,7 @@ func (r *EmbeddingProfileResource) Schema(ctx context.Context, req resource.Sche
 						Default:             booldefault.StaticBool(false),
 					},
 					"task_type": schema.StringAttribute{
-						MarkdownDescription: "What the embedding is for, such as RETRIEVAL_DOCUMENT. Google only.",
+						MarkdownDescription: "What the embedding is for, such as RETRIEVAL_DOCUMENT. Google and the Cohere models on Amazon Bedrock accept it.",
 						Optional:            true,
 					},
 				},

@@ -105,6 +105,11 @@ FEATURES:
 * data-source/partiteai_model_provider: `fireworks` (`api_key_set`,
   `account_id`) and `cerebras` (`api_key_set`). Before this, a provider of
   either type read back with every block empty.
+* resource/partiteai_model_provider: `bedrock` provider type (`region`, and
+  exactly one of `api_key_wo` and `static_keys` with `access_key_id` and
+  `secret_access_key_wo`).
+* data-source/partiteai_model_provider: `bedrock` (`region`, `api_key_set`,
+  and `static_keys` with `access_key_id` and `secret_access_key_set`).
 * resource/partiteai_model_profile, resource/partiteai_embedding_profile:
   `probe`, a write-only flag. The server sends one request to the provider
   before each create or update and refuses a profile the provider rejects.

@@ -25,6 +25,7 @@ type ModelProviderBaseModel struct {
 	OpenAICompat types.Object      `tfsdk:"openai_compatible"`
 	Fireworks    types.Object      `tfsdk:"fireworks"`
 	Cerebras     types.Object      `tfsdk:"cerebras"`
+	Bedrock      types.Object      `tfsdk:"bedrock"`
 }
 
 // secretMapper gives the attribute name and value for a secret of the provider
@@ -62,6 +63,7 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 	m.OpenAICompat = types.ObjectNull(m.OpenAICompat.AttributeTypes(ctx))
 	m.Fireworks = types.ObjectNull(m.Fireworks.AttributeTypes(ctx))
 	m.Cerebras = types.ObjectNull(m.Cerebras.AttributeTypes(ctx))
+	m.Bedrock = types.ObjectNull(m.Bedrock.AttributeTypes(ctx))
 
 	// Set the correct block based on provider type
 	switch details.ProviderType {
@@ -162,6 +164,33 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 		name, v := secret("api_key", c.ApiKeySet)
 		block[name] = v
 		m.Cerebras = types.ObjectValueMust(m.Cerebras.AttributeTypes(ctx), block)
+	case pgql.ModelProviderTypeBedrock:
+		c, ok := details.ProviderConfig.(*pgql.ModelProviderDetailsProviderConfigModelProviderConfigBedrock)
+		if !ok {
+			diags.AddError("Internal Error", "Expected Bedrock provider config type")
+			return diags
+		}
+		bedrockAttrs := m.Bedrock.AttributeTypes(ctx)
+		staticKeysType, ok := bedrockAttrs["static_keys"].(types.ObjectType)
+		if !ok {
+			diags.AddError("Internal Error", "Expected static_keys to be ObjectType")
+			return diags
+		}
+		block := map[string]attr.Value{
+			"region":      types.StringValue(c.Region),
+			"static_keys": types.ObjectNull(staticKeysType.AttributeTypes()),
+		}
+		name, v := secret("api_key", c.ApiKey != nil && c.ApiKey.ApiKeySet)
+		block[name] = v
+		if c.StaticKeys != nil {
+			staticKeysBlock := map[string]attr.Value{
+				"access_key_id": types.StringValue(c.StaticKeys.AccessKeyID),
+			}
+			name, v := secret("secret_access_key", c.StaticKeys.SecretAccessKeySet)
+			staticKeysBlock[name] = v
+			block["static_keys"] = types.ObjectValueMust(staticKeysType.AttributeTypes(), staticKeysBlock)
+		}
+		m.Bedrock = types.ObjectValueMust(bedrockAttrs, block)
 	}
 
 	return diags

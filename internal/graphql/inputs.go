@@ -94,6 +94,22 @@ type ModelProviderConfigInput struct {
 	OpenAICompatible *ModelProviderConfigInputOpenAICompatible `json:"openAICompatible,omitempty"`
 	Fireworks        *ModelProviderConfigInputFireworks        `json:"fireworks,omitempty"`
 	Cerebras         *ModelProviderConfigInputCerebras         `json:"cerebras,omitempty"`
+	Bedrock          *ModelProviderConfigInputBedrock          `json:"bedrock,omitempty"`
+}
+
+type ModelProviderConfigInputBedrock struct {
+	Region     string                                     `json:"region"`
+	ApiKey     *ModelProviderConfigInputBedrockApiKey     `json:"apiKey,omitempty"`
+	StaticKeys *ModelProviderConfigInputBedrockStaticKeys `json:"staticKeys,omitempty"`
+}
+
+type ModelProviderConfigInputBedrockApiKey struct {
+	ApiKey string `json:"apiKey"`
+}
+
+type ModelProviderConfigInputBedrockStaticKeys struct {
+	AccessKeyID     string `json:"accessKeyID"`
+	SecretAccessKey string `json:"secretAccessKey"`
 }
 
 type ModelProviderConfigInputAnthropic struct {

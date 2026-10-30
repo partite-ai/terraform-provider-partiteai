@@ -24,6 +24,7 @@ Model Provider resource
 > **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
 
 - `anthropic` (Attributes) Anthropic provider config (see [below for nested schema](#nestedatt--anthropic))
+- `bedrock` (Attributes) Amazon Bedrock provider config. Set exactly one of `api_key_wo` and `static_keys`. (see [below for nested schema](#nestedatt--bedrock))
 - `cerebras` (Attributes) Cerebras provider config (see [below for nested schema](#nestedatt--cerebras))
 - `credentials_version` (Number) The version of the provider's secret. The secret is write-only, so Terraform cannot see it change; increment this to send a new one.
 - `description` (String) Resource description
@@ -46,6 +47,28 @@ Model Provider resource
 Required:
 
 - `api_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) API key for Anthropic. Write-only: never stored in state. Change `credentials_version` to send a new value.
+
+
+<a id="nestedatt--bedrock"></a>
+### Nested Schema for `bedrock`
+
+Required:
+
+- `region` (String) The AWS Region that serves the models, for example `us-east-1`.
+
+Optional:
+
+- `api_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Amazon Bedrock API key. A short-term key expires in 12 hours or less. Write-only: never stored in state. Change `credentials_version` to send a new value.
+- `static_keys` (Attributes) IAM access keys. (see [below for nested schema](#nestedatt--bedrock--static_keys))
+
+<a id="nestedatt--bedrock--static_keys"></a>
+### Nested Schema for `bedrock.static_keys`
+
+Required:
+
+- `access_key_id` (String) IAM access key ID.
+- `secret_access_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) IAM secret access key. Write-only: never stored in state. Change `credentials_version` to send a new value.
+
 
 
 <a id="nestedatt--cerebras"></a>
