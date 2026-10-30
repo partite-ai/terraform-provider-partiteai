@@ -298,6 +298,16 @@ fragment ModelProviderDetails on ModelProvider {
     ... on ModelProviderConfigCerebras {
       apiKeySet
     }
+    ... on ModelProviderConfigBedrock {
+      region
+      apiKey {
+        apiKeySet
+      }
+      staticKeys {
+        accessKeyID
+        secretAccessKeySet
+      }
+    }
     ... on ModelProviderConfigGoogleGenAI {
       gemini {
         apiKeySet

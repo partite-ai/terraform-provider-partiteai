@@ -1779,7 +1779,7 @@ func (v *EmbeddingProfileDetails) GetUpdatedAt() string { return v.UpdatedAt }
 // EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig includes the requested fields of the GraphQL type EmbeddingProfileConfig.
 // The GraphQL type's documentation follows.
 //
-// What an embedding profile holds. taskType is accepted by Google only.
+// What an embedding profile holds. taskType is accepted by Google and by the Cohere models on Amazon Bedrock.
 type EmbeddingProfileDetailsConfigurationEmbeddingProfileConfig struct {
 	Model          string  `json:"model"`
 	Dimensions     int     `json:"dimensions"`
@@ -4638,6 +4638,7 @@ func (v *ModelProviderDetails) __premarshalJSON() (*__premarshalModelProviderDet
 //
 // ModelProviderDetailsProviderConfigModelProviderConfig is implemented by the following types:
 // ModelProviderDetailsProviderConfigModelProviderConfigAnthropic
+// ModelProviderDetailsProviderConfigModelProviderConfigBedrock
 // ModelProviderDetailsProviderConfigModelProviderConfigCerebras
 // ModelProviderDetailsProviderConfigModelProviderConfigFireworks
 // ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI
@@ -4650,6 +4651,8 @@ type ModelProviderDetailsProviderConfigModelProviderConfig interface {
 }
 
 func (v *ModelProviderDetailsProviderConfigModelProviderConfigAnthropic) implementsGraphQLInterfaceModelProviderDetailsProviderConfigModelProviderConfig() {
+}
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigBedrock) implementsGraphQLInterfaceModelProviderDetailsProviderConfigModelProviderConfig() {
 }
 func (v *ModelProviderDetailsProviderConfigModelProviderConfigCerebras) implementsGraphQLInterfaceModelProviderDetailsProviderConfigModelProviderConfig() {
 }
@@ -4678,6 +4681,9 @@ func __unmarshalModelProviderDetailsProviderConfigModelProviderConfig(b []byte, 
 	switch tn.TypeName {
 	case "ModelProviderConfigAnthropic":
 		*v = new(ModelProviderDetailsProviderConfigModelProviderConfigAnthropic)
+		return json.Unmarshal(b, *v)
+	case "ModelProviderConfigBedrock":
+		*v = new(ModelProviderDetailsProviderConfigModelProviderConfigBedrock)
 		return json.Unmarshal(b, *v)
 	case "ModelProviderConfigCerebras":
 		*v = new(ModelProviderDetailsProviderConfigModelProviderConfigCerebras)
@@ -4713,6 +4719,14 @@ func __marshalModelProviderDetailsProviderConfigModelProviderConfig(v *ModelProv
 		result := struct {
 			TypeName string `json:"__typename"`
 			*ModelProviderDetailsProviderConfigModelProviderConfigAnthropic
+		}{typename, v}
+		return json.Marshal(result)
+	case *ModelProviderDetailsProviderConfigModelProviderConfigBedrock:
+		typename = "ModelProviderConfigBedrock"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*ModelProviderDetailsProviderConfigModelProviderConfigBedrock
 		}{typename, v}
 		return json.Marshal(result)
 	case *ModelProviderDetailsProviderConfigModelProviderConfigCerebras:
@@ -4780,6 +4794,63 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigAnthropic) GetType
 // GetApiKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigAnthropic.ApiKeySet, and is useful for accessing the field via an interface.
 func (v *ModelProviderDetailsProviderConfigModelProviderConfigAnthropic) GetApiKeySet() bool {
 	return v.ApiKeySet
+}
+
+// ModelProviderDetailsProviderConfigModelProviderConfigBedrock includes the requested fields of the GraphQL type ModelProviderConfigBedrock.
+// The GraphQL type's documentation follows.
+//
+// Amazon Bedrock. Exactly one of apiKey and staticKeys is set.
+type ModelProviderDetailsProviderConfigModelProviderConfigBedrock struct {
+	Typename   *string                                                                 `json:"__typename"`
+	Region     string                                                                  `json:"region"`
+	ApiKey     *ModelProviderDetailsProviderConfigModelProviderConfigBedrockApiKey     `json:"apiKey"`
+	StaticKeys *ModelProviderDetailsProviderConfigModelProviderConfigBedrockStaticKeys `json:"staticKeys"`
+}
+
+// GetTypename returns ModelProviderDetailsProviderConfigModelProviderConfigBedrock.Typename, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigBedrock) GetTypename() *string {
+	return v.Typename
+}
+
+// GetRegion returns ModelProviderDetailsProviderConfigModelProviderConfigBedrock.Region, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigBedrock) GetRegion() string {
+	return v.Region
+}
+
+// GetApiKey returns ModelProviderDetailsProviderConfigModelProviderConfigBedrock.ApiKey, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigBedrock) GetApiKey() *ModelProviderDetailsProviderConfigModelProviderConfigBedrockApiKey {
+	return v.ApiKey
+}
+
+// GetStaticKeys returns ModelProviderDetailsProviderConfigModelProviderConfigBedrock.StaticKeys, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigBedrock) GetStaticKeys() *ModelProviderDetailsProviderConfigModelProviderConfigBedrockStaticKeys {
+	return v.StaticKeys
+}
+
+// ModelProviderDetailsProviderConfigModelProviderConfigBedrockApiKey includes the requested fields of the GraphQL type ModelProviderConfigBedrockApiKey.
+type ModelProviderDetailsProviderConfigModelProviderConfigBedrockApiKey struct {
+	ApiKeySet bool `json:"apiKeySet"`
+}
+
+// GetApiKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigBedrockApiKey.ApiKeySet, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigBedrockApiKey) GetApiKeySet() bool {
+	return v.ApiKeySet
+}
+
+// ModelProviderDetailsProviderConfigModelProviderConfigBedrockStaticKeys includes the requested fields of the GraphQL type ModelProviderConfigBedrockStaticKeys.
+type ModelProviderDetailsProviderConfigModelProviderConfigBedrockStaticKeys struct {
+	AccessKeyID        string `json:"accessKeyID"`
+	SecretAccessKeySet bool   `json:"secretAccessKeySet"`
+}
+
+// GetAccessKeyID returns ModelProviderDetailsProviderConfigModelProviderConfigBedrockStaticKeys.AccessKeyID, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigBedrockStaticKeys) GetAccessKeyID() string {
+	return v.AccessKeyID
+}
+
+// GetSecretAccessKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigBedrockStaticKeys.SecretAccessKeySet, and is useful for accessing the field via an interface.
+func (v *ModelProviderDetailsProviderConfigModelProviderConfigBedrockStaticKeys) GetSecretAccessKeySet() bool {
+	return v.SecretAccessKeySet
 }
 
 // ModelProviderDetailsProviderConfigModelProviderConfigCerebras includes the requested fields of the GraphQL type ModelProviderConfigCerebras.
@@ -4923,6 +4994,7 @@ const (
 	ModelProviderTypeOpenAiCompatible ModelProviderType = "OPEN_AI_COMPATIBLE"
 	ModelProviderTypeFireworks        ModelProviderType = "FIREWORKS"
 	ModelProviderTypeCerebras         ModelProviderType = "CEREBRAS"
+	ModelProviderTypeBedrock          ModelProviderType = "BEDROCK"
 )
 
 var AllModelProviderType = []ModelProviderType{
@@ -4932,6 +5004,7 @@ var AllModelProviderType = []ModelProviderType{
 	ModelProviderTypeOpenAiCompatible,
 	ModelProviderTypeFireworks,
 	ModelProviderTypeCerebras,
+	ModelProviderTypeBedrock,
 }
 
 // ModelSetDetails includes the GraphQL fields of ModelSet requested by the fragment ModelSetDetails.
@@ -9008,6 +9081,16 @@ fragment ModelProviderDetails on ModelProvider {
 		... on ModelProviderConfigCerebras {
 			apiKeySet
 		}
+		... on ModelProviderConfigBedrock {
+			region
+			apiKey {
+				apiKeySet
+			}
+			staticKeys {
+				accessKeyID
+				secretAccessKeySet
+			}
+		}
 		... on ModelProviderConfigGoogleGenAI {
 			gemini {
 				apiKeySet
@@ -11604,6 +11687,16 @@ fragment ModelProviderDetails on ModelProvider {
 		... on ModelProviderConfigCerebras {
 			apiKeySet
 		}
+		... on ModelProviderConfigBedrock {
+			region
+			apiKey {
+				apiKeySet
+			}
+			staticKeys {
+				accessKeyID
+				secretAccessKeySet
+			}
+		}
 		... on ModelProviderConfigGoogleGenAI {
 			gemini {
 				apiKeySet
@@ -13182,6 +13275,16 @@ fragment ModelProviderDetails on ModelProvider {
 		}
 		... on ModelProviderConfigCerebras {
 			apiKeySet
+		}
+		... on ModelProviderConfigBedrock {
+			region
+			apiKey {
+				apiKeySet
+			}
+			staticKeys {
+				accessKeyID
+				secretAccessKeySet
+			}
 		}
 		... on ModelProviderConfigGoogleGenAI {
 			gemini {

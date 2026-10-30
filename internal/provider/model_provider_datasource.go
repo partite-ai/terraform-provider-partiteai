@@ -124,6 +124,34 @@ func (d *ModelProviderDataSource) Schema(ctx context.Context, req datasource.Sch
 					},
 				},
 			},
+			"bedrock": schema.SingleNestedAttribute{
+				MarkdownDescription: "Amazon Bedrock provider config",
+				Computed:            true,
+				Attributes: map[string]schema.Attribute{
+					"region": schema.StringAttribute{
+						MarkdownDescription: "The AWS Region that serves the models.",
+						Computed:            true,
+					},
+					"api_key_set": schema.BoolAttribute{
+						MarkdownDescription: "Whether an Amazon Bedrock API key is set. The key itself is never returned.",
+						Computed:            true,
+					},
+					"static_keys": schema.SingleNestedAttribute{
+						MarkdownDescription: "IAM access keys.",
+						Computed:            true,
+						Attributes: map[string]schema.Attribute{
+							"access_key_id": schema.StringAttribute{
+								MarkdownDescription: "IAM access key ID.",
+								Computed:            true,
+							},
+							"secret_access_key_set": schema.BoolAttribute{
+								MarkdownDescription: "Whether an IAM secret access key is set. The key itself is never returned.",
+								Computed:            true,
+							},
+						},
+					},
+				},
+			},
 		}),
 	}
 }

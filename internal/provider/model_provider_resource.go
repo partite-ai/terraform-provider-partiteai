@@ -3,11 +3,13 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/objectvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
@@ -130,6 +132,27 @@ func (r *ModelProviderResource) Schema(ctx context.Context, req resource.SchemaR
 					"api_key_wo": secretAttribute("API key for Cerebras.", true),
 				},
 			},
+			"bedrock": schema.SingleNestedAttribute{
+				MarkdownDescription: "Amazon Bedrock provider config. Set exactly one of `api_key_wo` and `static_keys`.",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"region":     schema.StringAttribute{MarkdownDescription: "The AWS Region that serves the models, for example `us-east-1`.", Required: true},
+					"api_key_wo": secretAttribute("Amazon Bedrock API key. A short-term key expires in 12 hours or less.", false),
+					"static_keys": schema.SingleNestedAttribute{
+						MarkdownDescription: "IAM access keys.",
+						Optional:            true,
+						Attributes: map[string]schema.Attribute{
+							"access_key_id":        schema.StringAttribute{MarkdownDescription: "IAM access key ID.", Required: true},
+							"secret_access_key_wo": secretAttribute("IAM secret access key.", true),
+						},
+						// Exactly one of api_key_wo and static_keys must be set. The attribute
+						// that is set selects the kind of credential.
+						Validators: []validator.Object{
+							objectvalidator.ExactlyOneOf(path.MatchRoot("bedrock").AtName("static_keys"), path.MatchRoot("bedrock").AtName("api_key_wo")),
+						},
+					},
+				},
+			},
 		}),
 	}
 }
@@ -225,6 +248,38 @@ func providerConfigInput(ctx context.Context, data *ModelProviderResourceModel, 
 		return pgql.ModelProviderTypeCerebras, &pgql.ModelProviderConfigInput{
 			Cerebras: &pgql.ModelProviderConfigInputCerebras{ApiKey: block.ApiKey},
 		}
+	case set(data.Bedrock):
+		var block struct {
+			Region     string       `tfsdk:"region"`
+			ApiKey     types.String `tfsdk:"api_key_wo"`
+			StaticKeys types.Object `tfsdk:"static_keys"`
+		}
+		diags.Append(tfsdk.ValueAs(ctx, data.Bedrock, &block)...)
+		apiKeySet, staticKeysSet := !block.ApiKey.IsNull(), set(block.StaticKeys)
+		if apiKeySet && staticKeysSet {
+			diags.AddError("Invalid bedrock config", "Only one of api_key_wo or static_keys should be set, not both.")
+			return "", nil
+		}
+		if !apiKeySet && !staticKeysSet {
+			diags.AddError("Invalid bedrock config", "Either api_key_wo or static_keys must be provided.")
+			return "", nil
+		}
+		cfg := &pgql.ModelProviderConfigInputBedrock{Region: block.Region}
+		if apiKeySet {
+			cfg.ApiKey = &pgql.ModelProviderConfigInputBedrockApiKey{ApiKey: block.ApiKey.ValueString()}
+		}
+		if staticKeysSet {
+			var staticKeys struct {
+				AccessKeyID     string `tfsdk:"access_key_id"`
+				SecretAccessKey string `tfsdk:"secret_access_key_wo"`
+			}
+			diags.Append(tfsdk.ValueAs(ctx, block.StaticKeys, &staticKeys)...)
+			cfg.StaticKeys = &pgql.ModelProviderConfigInputBedrockStaticKeys{
+				AccessKeyID:     staticKeys.AccessKeyID,
+				SecretAccessKey: staticKeys.SecretAccessKey,
+			}
+		}
+		return pgql.ModelProviderTypeBedrock, &pgql.ModelProviderConfigInput{Bedrock: cfg}
 	default:
 		diags.AddError("Missing provider config", "One provider config block must be set")
 		return "", nil
@@ -242,7 +297,8 @@ func providerConfigChanged(plan, state *ModelProviderResourceModel) bool {
 		!plan.GoogleGenAI.Equal(state.GoogleGenAI) ||
 		!plan.OpenAICompat.Equal(state.OpenAICompat) ||
 		!plan.Fireworks.Equal(state.Fireworks) ||
-		!plan.Cerebras.Equal(state.Cerebras)
+		!plan.Cerebras.Equal(state.Cerebras) ||
+		!plan.Bedrock.Equal(state.Bedrock)
 }
 
 func (r *ModelProviderResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
