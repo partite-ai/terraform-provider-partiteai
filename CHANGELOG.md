@@ -127,6 +127,12 @@ FEATURES:
   `createTaskDefinition`.
 * **New Data Source:** `partiteai_judge_metric`, found by `id` or exact `name`.
 * **New Data Source:** `partiteai_computed_metric`, found by `key`.
+* **New Resource:** `partiteai_mesh_version_label`. Creating one freezes the
+  mesh's draft under `label`, and the mesh gets a new draft. A change to `label`
+  renames that version. Destroying the resource removes the label; the version
+  stays frozen.
+* **New Data Source:** `partiteai_mesh_version_label`, found by `mesh_id` and
+  `label`.
 * resource/partiteai_mesh: `memory_store_id` attaches a memory store to the
   mesh. Every version of the mesh uses the same store. Removing it detaches
   the store and keeps its records.
