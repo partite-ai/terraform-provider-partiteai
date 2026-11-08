@@ -101,32 +101,14 @@ func (m *ModelProviderBaseModel) MapFromGraphQL(ctx context.Context, details pgq
 			diags.AddError("Internal Error", "Expected gemini to be ObjectType")
 			return diags
 		}
-		vertexType, ok := googleGenAIAttrs["vertex"].(types.ObjectType)
-		if !ok {
-			diags.AddError("Internal Error", "Expected vertex to be ObjectType")
-			return diags
-		}
-
 		block := map[string]attr.Value{}
-		// Set only one of gemini or vertex
 		if c.Gemini != nil {
 			geminiBlock := map[string]attr.Value{}
 			name, v := secret("api_key", c.Gemini.ApiKeySet)
 			geminiBlock[name] = v
 			block["gemini"] = types.ObjectValueMust(geminiType.AttributeTypes(), geminiBlock)
-			block["vertex"] = types.ObjectNull(vertexType.AttributeTypes())
-		} else if c.Vertex != nil {
-			vertexBlock := map[string]attr.Value{
-				"project_id": types.StringValue(c.Vertex.ProjectID),
-				"location":   types.StringValue(c.Vertex.Location),
-			}
-			name, v := secret("service_account_key", c.Vertex.ServiceAccountKeySet)
-			vertexBlock[name] = v
-			block["vertex"] = types.ObjectValueMust(vertexType.AttributeTypes(), vertexBlock)
-			block["gemini"] = types.ObjectNull(geminiType.AttributeTypes())
 		} else {
 			block["gemini"] = types.ObjectNull(geminiType.AttributeTypes())
-			block["vertex"] = types.ObjectNull(vertexType.AttributeTypes())
 		}
 		m.GoogleGenAI = types.ObjectValueMust(googleGenAIAttrs, block)
 	case pgql.ModelProviderTypeOpenAiCompatible:

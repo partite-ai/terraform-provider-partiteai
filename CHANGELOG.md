@@ -44,17 +44,15 @@ BREAKING CHANGES:
   it out instead.
 * data-source/partiteai_rubric: the same renames in `metrics`.
 * data-source/partiteai_model_provider: the server no longer returns provider
-  secrets, so `api_key`, `api_token` and `service_account_key` are removed.
-  Each is replaced by a boolean saying whether it is set: `api_key_set`,
-  `api_token_set` and `service_account_key_set`.
+  secrets, so `api_key` and `api_token` are removed. Each is replaced by a
+  boolean saying whether it is set: `api_key_set` and `api_token_set`.
 * resource/partiteai_model_provider: secrets are write-only and never stored in
-  state. `api_key` is now `api_key_wo`, `api_token` is `api_token_wo` and
-  `service_account_key` is `service_account_key_wo`. Terraform can't see a
-  write-only value change, so to send a new secret change the new
-  `credentials_version` attribute (default 1) along with it. An update that
-  changes neither it nor the provider's other settings leaves the stored
-  secret alone. This also makes the resource work against servers that no
-  longer return provider secrets.
+  state. `api_key` is now `api_key_wo` and `api_token` is `api_token_wo`.
+  Terraform can't see a write-only value change, so to send a new secret
+  change the new `credentials_version` attribute (default 1) along with it. An
+  update that changes neither it nor the provider's other settings leaves the
+  stored secret alone. This also makes the resource work against servers that
+  no longer return provider secrets.
 * resource/partiteai_mesh_version_label: `id` is now `mesh_version_id`. The
   resource does not create an object of its own. It labels a mesh version, and
   the attribute holds the ID of that version. In route `segments`, change
@@ -64,6 +62,11 @@ BREAKING CHANGES:
   label again. To keep the label on its version, remove the resource from state
   and import it by its mesh version ID.
 * data-source/partiteai_mesh_version_label: `id` is now `mesh_version_id`, for
+  the same reason.
+* resource/partiteai_model_provider: `google_genai.vertex` is removed. Mesh
+  supports Google models only through the Gemini API, so use
+  `google_genai.gemini` with an API key.
+* data-source/partiteai_model_provider: `google_genai.vertex` is removed, for
   the same reason.
 
 FEATURES:

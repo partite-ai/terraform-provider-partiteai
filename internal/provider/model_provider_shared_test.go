@@ -220,25 +220,18 @@ func TestModelProviderDataSourceReportsSecretSet(t *testing.T) {
 	m := nullBlocks(t, dataSourceAttrTypes(t))
 	details := providerDetails(pgql.ModelProviderTypeGoogleGenAi,
 		&pgql.ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI{
-			Vertex: &pgql.ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex{
-				ServiceAccountKeySet: true,
-				ProjectID:            "proj",
-				Location:             "us-central1",
-			},
+			Gemini: &pgql.ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi{ApiKeySet: true},
 		})
 
 	if diags := m.MapFromGraphQL(ctx, details, secretIsSet); diags.HasError() {
 		t.Fatal(diags)
 	}
-	vertex, ok := m.GoogleGenAI.Attributes()["vertex"].(types.Object)
-	if !ok || vertex.IsNull() {
-		t.Fatalf("vertex = %v", m.GoogleGenAI)
+	gemini, ok := m.GoogleGenAI.Attributes()["gemini"].(types.Object)
+	if !ok || gemini.IsNull() {
+		t.Fatalf("gemini = %v", m.GoogleGenAI)
 	}
-	if got := vertex.Attributes()["service_account_key_set"]; !got.Equal(types.BoolValue(true)) {
-		t.Errorf("service_account_key_set = %v, want true", got)
-	}
-	if got := vertex.Attributes()["project_id"]; !got.Equal(types.StringValue("proj")) {
-		t.Errorf("project_id = %v, want proj", got)
+	if got := gemini.Attributes()["api_key_set"]; !got.Equal(types.BoolValue(true)) {
+		t.Errorf("api_key_set = %v, want true", got)
 	}
 }
 

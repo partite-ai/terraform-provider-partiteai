@@ -84,7 +84,6 @@ Read-Only:
 Read-Only:
 
 - `gemini` (Attributes) Gemini API config (see [below for nested schema](#nestedatt--google_genai--gemini))
-- `vertex` (Attributes) Vertex API config (see [below for nested schema](#nestedatt--google_genai--vertex))
 
 <a id="nestedatt--google_genai--gemini"></a>
 ### Nested Schema for `google_genai.gemini`
@@ -92,16 +91,6 @@ Read-Only:
 Read-Only:
 
 - `api_key_set` (Boolean) Whether an API key is set for Gemini. The key itself is never returned.
-
-
-<a id="nestedatt--google_genai--vertex"></a>
-### Nested Schema for `google_genai.vertex`
-
-Read-Only:
-
-- `location` (String) Location for Vertex
-- `project_id` (String) Project ID for Vertex
-- `service_account_key_set` (Boolean) Whether a service account key is set for Vertex. The key itself is never returned.
 
 
 

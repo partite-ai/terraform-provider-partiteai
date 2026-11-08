@@ -5002,7 +5002,6 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigFireworks) GetAcco
 type ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI struct {
 	Typename *string                                                                                                        `json:"__typename"`
 	Gemini   *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi `json:"gemini"`
-	Vertex   *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex                                        `json:"vertex"`
 }
 
 // GetTypename returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI.Typename, and is useful for accessing the field via an interface.
@@ -5015,11 +5014,6 @@ func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI) GetGe
 	return v.Gemini
 }
 
-// GetVertex returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI.Vertex, and is useful for accessing the field via an interface.
-func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAI) GetVertex() *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex {
-	return v.Vertex
-}
-
 // ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi includes the requested fields of the GraphQL type ModelProviderConfigGoogleGenAIGeminiApi.
 type ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi struct {
 	ApiKeySet bool `json:"apiKeySet"`
@@ -5028,28 +5022,6 @@ type ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModel
 // GetApiKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi.ApiKeySet, and is useful for accessing the field via an interface.
 func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIGeminiModelProviderConfigGoogleGenAIGeminiApi) GetApiKeySet() bool {
 	return v.ApiKeySet
-}
-
-// ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex includes the requested fields of the GraphQL type ModelProviderConfigGoogleGenAIVertex.
-type ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex struct {
-	ServiceAccountKeySet bool   `json:"serviceAccountKeySet"`
-	ProjectID            string `json:"projectID"`
-	Location             string `json:"location"`
-}
-
-// GetServiceAccountKeySet returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex.ServiceAccountKeySet, and is useful for accessing the field via an interface.
-func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex) GetServiceAccountKeySet() bool {
-	return v.ServiceAccountKeySet
-}
-
-// GetProjectID returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex.ProjectID, and is useful for accessing the field via an interface.
-func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex) GetProjectID() string {
-	return v.ProjectID
-}
-
-// GetLocation returns ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex.Location, and is useful for accessing the field via an interface.
-func (v *ModelProviderDetailsProviderConfigModelProviderConfigGoogleGenAIVertex) GetLocation() string {
-	return v.Location
 }
 
 // ModelProviderDetailsProviderConfigModelProviderConfigOpenAI includes the requested fields of the GraphQL type ModelProviderConfigOpenAI.
@@ -9350,11 +9322,6 @@ fragment ModelProviderDetails on ModelProvider {
 			gemini {
 				apiKeySet
 			}
-			vertex {
-				serviceAccountKeySet
-				projectID
-				location
-			}
 		}
 	}
 	tags
@@ -12122,11 +12089,6 @@ fragment ModelProviderDetails on ModelProvider {
 			gemini {
 				apiKeySet
 			}
-			vertex {
-				serviceAccountKeySet
-				projectID
-				location
-			}
 		}
 	}
 	tags
@@ -13842,11 +13804,6 @@ fragment ModelProviderDetails on ModelProvider {
 		... on ModelProviderConfigGoogleGenAI {
 			gemini {
 				apiKeySet
-			}
-			vertex {
-				serviceAccountKeySet
-				projectID
-				location
 			}
 		}
 	}

@@ -5684,66 +5684,6 @@
                   "Deprecated": false,
                   "WriteOnly": false,
                   "DeprecationMessage": ""
-                },
-                {
-                  "Name": "vertex",
-                  "Type": null,
-                  "NestedType": {
-                    "Attributes": [
-                      {
-                        "Name": "location",
-                        "Type": "string",
-                        "NestedType": null,
-                        "Description": "Location for Vertex",
-                        "Required": true,
-                        "Optional": false,
-                        "Computed": false,
-                        "Sensitive": false,
-                        "DescriptionKind": 1,
-                        "Deprecated": false,
-                        "WriteOnly": false,
-                        "DeprecationMessage": ""
-                      },
-                      {
-                        "Name": "project_id",
-                        "Type": "string",
-                        "NestedType": null,
-                        "Description": "Project ID for Vertex",
-                        "Required": true,
-                        "Optional": false,
-                        "Computed": false,
-                        "Sensitive": false,
-                        "DescriptionKind": 1,
-                        "Deprecated": false,
-                        "WriteOnly": false,
-                        "DeprecationMessage": ""
-                      },
-                      {
-                        "Name": "service_account_key_wo",
-                        "Type": "string",
-                        "NestedType": null,
-                        "Description": "Service account key for Vertex. Write-only: never stored in state. Change `credentials_version` to send a new value.",
-                        "Required": true,
-                        "Optional": false,
-                        "Computed": false,
-                        "Sensitive": true,
-                        "DescriptionKind": 1,
-                        "Deprecated": false,
-                        "WriteOnly": true,
-                        "DeprecationMessage": ""
-                      }
-                    ],
-                    "Nesting": 1
-                  },
-                  "Description": "Vertex API config",
-                  "Required": false,
-                  "Optional": true,
-                  "Computed": false,
-                  "Sensitive": false,
-                  "DescriptionKind": 1,
-                  "Deprecated": false,
-                  "WriteOnly": false,
-                  "DeprecationMessage": ""
                 }
               ],
               "Nesting": 1
@@ -17858,66 +17798,6 @@
                     "Nesting": 1
                   },
                   "Description": "Gemini API config",
-                  "Required": false,
-                  "Optional": false,
-                  "Computed": true,
-                  "Sensitive": false,
-                  "DescriptionKind": 1,
-                  "Deprecated": false,
-                  "WriteOnly": false,
-                  "DeprecationMessage": ""
-                },
-                {
-                  "Name": "vertex",
-                  "Type": null,
-                  "NestedType": {
-                    "Attributes": [
-                      {
-                        "Name": "location",
-                        "Type": "string",
-                        "NestedType": null,
-                        "Description": "Location for Vertex",
-                        "Required": false,
-                        "Optional": false,
-                        "Computed": true,
-                        "Sensitive": false,
-                        "DescriptionKind": 1,
-                        "Deprecated": false,
-                        "WriteOnly": false,
-                        "DeprecationMessage": ""
-                      },
-                      {
-                        "Name": "project_id",
-                        "Type": "string",
-                        "NestedType": null,
-                        "Description": "Project ID for Vertex",
-                        "Required": false,
-                        "Optional": false,
-                        "Computed": true,
-                        "Sensitive": false,
-                        "DescriptionKind": 1,
-                        "Deprecated": false,
-                        "WriteOnly": false,
-                        "DeprecationMessage": ""
-                      },
-                      {
-                        "Name": "service_account_key_set",
-                        "Type": "bool",
-                        "NestedType": null,
-                        "Description": "Whether a service account key is set for Vertex. The key itself is never returned.",
-                        "Required": false,
-                        "Optional": false,
-                        "Computed": true,
-                        "Sensitive": false,
-                        "DescriptionKind": 1,
-                        "Deprecated": false,
-                        "WriteOnly": false,
-                        "DeprecationMessage": ""
-                      }
-                    ],
-                    "Nesting": 1
-                  },
-                  "Description": "Vertex API config",
                   "Required": false,
                   "Optional": false,
                   "Computed": true,

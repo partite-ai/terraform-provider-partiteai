@@ -1,11 +1,6 @@
 package provider
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/json"
-	"encoding/pem"
 	"fmt"
 	"regexp"
 	"testing"
@@ -154,18 +149,6 @@ resource "partiteai_model_provider" "cerebras" {
   }
 }
 
-resource "partiteai_model_provider" "vertex" {
-  probe = false
-  name = "acc-vertex"
-  google_genai = {
-    vertex = {
-      project_id          = "proj"
-      location            = "us-central1"
-      service_account_key_wo = %q
-    }
-  }
-}
-
 resource "partiteai_model_provider" "bedrock_api_key" {
   probe = false
   name  = "acc-bedrock-api-key"
@@ -194,7 +177,6 @@ resource "partiteai_model_provider" "bedrock_static_keys" {
 			resource.TestCheckResourceAttr("partiteai_model_provider.compatible_with_token", "openai_compatible.url", "https://example.invalid/v1"),
 			resource.TestCheckResourceAttrSet("partiteai_model_provider.compatible_without_token", "id"),
 			resource.TestCheckNoResourceAttr("partiteai_model_provider.gemini", "google_genai.gemini.api_key_wo"),
-			resource.TestCheckResourceAttr("partiteai_model_provider.vertex", "google_genai.vertex.location", "us-central1"),
 			resource.TestCheckResourceAttr("partiteai_model_provider.fireworks", "fireworks.account_id", "acct"),
 			resource.TestCheckNoResourceAttr("partiteai_model_provider.fireworks", "fireworks.api_key_wo"),
 			resource.TestCheckResourceAttr("partiteai_model_provider.bedrock_api_key", "bedrock.region", "us-east-2"),
@@ -307,28 +289,4 @@ resource "partiteai_model_provider" "test" {
 			Check:  resource.TestCheckResourceAttr("partiteai_model_provider.test", "tags.#", "0"),
 		},
 	)
-}
-
-// serviceAccountKey is a well-formed service account document with a key made
-// for the test. The server parses the key when it validates a vertex config,
-// so the key must be a real RSA key.
-func serviceAccountKey(t *testing.T) string {
-	t.Helper()
-	key, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		t.Fatal(err)
-	}
-	doc, err := json.Marshal(map[string]string{
-		"type":           "service_account",
-		"project_id":     "proj",
-		"private_key_id": "k1",
-		"private_key":    string(pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})),
-		"client_email":   "sa@proj.iam.gserviceaccount.com",
-		"client_id":      "1",
-		"token_uri":      "https://oauth2.googleapis.com/token",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	return string(doc)
 }

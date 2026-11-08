@@ -97,7 +97,6 @@ Optional:
 Optional:
 
 - `gemini` (Attributes) Gemini API config (see [below for nested schema](#nestedatt--google_genai--gemini))
-- `vertex` (Attributes) Vertex API config (see [below for nested schema](#nestedatt--google_genai--vertex))
 
 <a id="nestedatt--google_genai--gemini"></a>
 ### Nested Schema for `google_genai.gemini`
@@ -105,16 +104,6 @@ Optional:
 Required:
 
 - `api_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) API key for Gemini. Write-only: never stored in state. Change `credentials_version` to send a new value.
-
-
-<a id="nestedatt--google_genai--vertex"></a>
-### Nested Schema for `google_genai.vertex`
-
-Required:
-
-- `location` (String) Location for Vertex
-- `project_id` (String) Project ID for Vertex
-- `service_account_key_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Service account key for Vertex. Write-only: never stored in state. Change `credentials_version` to send a new value.
 
 
 

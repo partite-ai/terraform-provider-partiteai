@@ -66,24 +66,6 @@ func (d *ModelProviderDataSource) Schema(ctx context.Context, req datasource.Sch
 							},
 						},
 					},
-					"vertex": schema.SingleNestedAttribute{
-						MarkdownDescription: "Vertex API config",
-						Computed:            true,
-						Attributes: map[string]schema.Attribute{
-							"service_account_key_set": schema.BoolAttribute{
-								MarkdownDescription: "Whether a service account key is set for Vertex. The key itself is never returned.",
-								Computed:            true,
-							},
-							"project_id": schema.StringAttribute{
-								MarkdownDescription: "Project ID for Vertex",
-								Computed:            true,
-							},
-							"location": schema.StringAttribute{
-								MarkdownDescription: "Location for Vertex",
-								Computed:            true,
-							},
-						},
-					},
 				},
 			},
 			"openai_compatible": schema.SingleNestedAttribute{

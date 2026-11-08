@@ -86,21 +86,6 @@ func (r *ModelProviderResource) Schema(ctx context.Context, req resource.SchemaR
 							"api_key_wo": secretAttribute("API key for Gemini.", true),
 						},
 					},
-					"vertex": schema.SingleNestedAttribute{
-						MarkdownDescription: "Vertex API config",
-						Optional:            true,
-						Attributes: map[string]schema.Attribute{
-							"service_account_key_wo": secretAttribute("Service account key for Vertex.", true),
-							"project_id": schema.StringAttribute{
-								MarkdownDescription: "Project ID for Vertex",
-								Required:            true,
-							},
-							"location": schema.StringAttribute{
-								MarkdownDescription: "Location for Vertex",
-								Required:            true,
-							},
-						},
-					},
 				},
 			},
 			"openai_compatible": schema.SingleNestedAttribute{
@@ -182,38 +167,18 @@ func providerConfigInput(ctx context.Context, data *ModelProviderResourceModel, 
 	case set(data.GoogleGenAI):
 		var block struct {
 			Gemini types.Object `tfsdk:"gemini"`
-			Vertex types.Object `tfsdk:"vertex"`
 		}
 		diags.Append(tfsdk.ValueAs(ctx, data.GoogleGenAI, &block)...)
-		geminiSet, vertexSet := set(block.Gemini), set(block.Vertex)
-		if geminiSet && vertexSet {
-			diags.AddError("Invalid google_genai config", "Only one of gemini or vertex should be set, not both.")
+		if !set(block.Gemini) {
+			diags.AddError("Invalid google_genai config", "The gemini config must be provided.")
 			return "", nil
 		}
-		if !geminiSet && !vertexSet {
-			diags.AddError("Invalid google_genai config", "Either gemini or vertex config must be provided.")
-			return "", nil
+		var gemini struct {
+			ApiKey string `tfsdk:"api_key_wo"`
 		}
-		cfg := &pgql.ModelProviderConfigInputGoogleGenAI{}
-		if geminiSet {
-			var gemini struct {
-				ApiKey string `tfsdk:"api_key_wo"`
-			}
-			diags.Append(tfsdk.ValueAs(ctx, block.Gemini, &gemini)...)
-			cfg.Gemini = &pgql.ModelProviderConfigInputGoogleGenAIGeminiApi{ApiKey: gemini.ApiKey}
-		}
-		if vertexSet {
-			var vertex struct {
-				ServiceAccountKey string `tfsdk:"service_account_key_wo"`
-				ProjectID         string `tfsdk:"project_id"`
-				Location          string `tfsdk:"location"`
-			}
-			diags.Append(tfsdk.ValueAs(ctx, block.Vertex, &vertex)...)
-			cfg.Vertex = &pgql.ModelProviderConfigInputGoogleGenAIVertex{
-				ServiceAccountKey: vertex.ServiceAccountKey,
-				ProjectID:         vertex.ProjectID,
-				Location:          vertex.Location,
-			}
+		diags.Append(tfsdk.ValueAs(ctx, block.Gemini, &gemini)...)
+		cfg := &pgql.ModelProviderConfigInputGoogleGenAI{
+			Gemini: &pgql.ModelProviderConfigInputGoogleGenAIGeminiApi{ApiKey: gemini.ApiKey},
 		}
 		return pgql.ModelProviderTypeGoogleGenAi, &pgql.ModelProviderConfigInput{GoogleGenAI: cfg}
 	case set(data.OpenAICompat):
