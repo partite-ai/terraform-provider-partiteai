@@ -728,3 +728,24 @@ type UpdateAccessPointClient struct {
 	// Replaces the client's redirect URIs.
 	RedirectUris Optional[[]string] `json:"redirectUris,omitzero"`
 }
+
+type NewRoute struct {
+	MeshID      string            `json:"meshID"`
+	Name        string            `json:"name"`
+	Description Optional[string]  `json:"description,omitzero"`
+	Segments    []NewRouteSegment `json:"segments"`
+}
+
+type UpdateRoute struct {
+	Name Optional[string] `json:"name,omitzero"`
+	// A null clears the description.
+	Description Optional[string] `json:"description,omitzero"`
+	// Replaces the route's segments.
+	Segments Optional[[]NewRouteSegment] `json:"segments,omitzero"`
+}
+
+type NewRouteSegment struct {
+	// Left out, the segment is the mesh's draft.
+	MeshVersionID Optional[string] `json:"meshVersionID,omitzero"`
+	Weight        int              `json:"weight"`
+}

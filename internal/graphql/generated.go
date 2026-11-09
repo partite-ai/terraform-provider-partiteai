@@ -1225,6 +1225,14 @@ type CreateModelSetResponse struct {
 // GetCreateModelSet returns CreateModelSetResponse.CreateModelSet, and is useful for accessing the field via an interface.
 func (v *CreateModelSetResponse) GetCreateModelSet() ModelSetDetails { return v.CreateModelSet }
 
+// CreateRouteResponse is returned by CreateRoute on success.
+type CreateRouteResponse struct {
+	CreateRoute RouteDetails `json:"createRoute"`
+}
+
+// GetCreateRoute returns CreateRouteResponse.CreateRoute, and is useful for accessing the field via an interface.
+func (v *CreateRouteResponse) GetCreateRoute() RouteDetails { return v.CreateRoute }
+
 // CreateRubricResponse is returned by CreateRubric on success.
 type CreateRubricResponse struct {
 	CreateRubric RubricDetails `json:"createRubric"`
@@ -1657,6 +1665,24 @@ type DeleteModelSetResponse struct {
 // GetDeleteModelSets returns DeleteModelSetResponse.DeleteModelSets, and is useful for accessing the field via an interface.
 func (v *DeleteModelSetResponse) GetDeleteModelSets() DeleteModelSetDeleteModelSetsDeleteResults {
 	return v.DeleteModelSets
+}
+
+// DeleteRouteDeleteRoutesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteRouteDeleteRoutesDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteRouteDeleteRoutesDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteRouteDeleteRoutesDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteRouteResponse is returned by DeleteRoute on success.
+type DeleteRouteResponse struct {
+	DeleteRoutes DeleteRouteDeleteRoutesDeleteResults `json:"deleteRoutes"`
+}
+
+// GetDeleteRoutes returns DeleteRouteResponse.DeleteRoutes, and is useful for accessing the field via an interface.
+func (v *DeleteRouteResponse) GetDeleteRoutes() DeleteRouteDeleteRoutesDeleteResults {
+	return v.DeleteRoutes
 }
 
 // DeleteRubricDeleteRubricsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
@@ -2223,6 +2249,14 @@ type GetParticleArtifactResponse struct {
 func (v *GetParticleArtifactResponse) GetParticleArtifact() *ParticleArtifactDetails {
 	return v.ParticleArtifact
 }
+
+// GetRouteResponse is returned by GetRoute on success.
+type GetRouteResponse struct {
+	Route *RouteDetails `json:"route"`
+}
+
+// GetRoute returns GetRouteResponse.Route, and is useful for accessing the field via an interface.
+func (v *GetRouteResponse) GetRoute() *RouteDetails { return v.Route }
 
 // GetRubricResponse is returned by GetRubric on success.
 type GetRubricResponse struct {
@@ -5410,6 +5444,14 @@ type ModifyModelSetResponse struct {
 // GetUpdateModelSet returns ModifyModelSetResponse.UpdateModelSet, and is useful for accessing the field via an interface.
 func (v *ModifyModelSetResponse) GetUpdateModelSet() ModelSetDetails { return v.UpdateModelSet }
 
+// ModifyRouteResponse is returned by ModifyRoute on success.
+type ModifyRouteResponse struct {
+	UpdateRoute RouteDetails `json:"updateRoute"`
+}
+
+// GetUpdateRoute returns ModifyRouteResponse.UpdateRoute, and is useful for accessing the field via an interface.
+func (v *ModifyRouteResponse) GetUpdateRoute() RouteDetails { return v.UpdateRoute }
+
 // ModifyRubricResponse is returned by ModifyRubric on success.
 type ModifyRubricResponse struct {
 	UpdateRubric RubricDetails `json:"updateRubric"`
@@ -6022,6 +6064,48 @@ type RevokeMcpConnectionTunnelKeyResponse struct {
 func (v *RevokeMcpConnectionTunnelKeyResponse) GetRevokeMcpConnectionTunnelKey() McpConnectionTunnelKeyDetails {
 	return v.RevokeMcpConnectionTunnelKey
 }
+
+// RouteDetails includes the GraphQL fields of Route requested by the fragment RouteDetails.
+type RouteDetails struct {
+	Id          string                             `json:"id"`
+	Name        string                             `json:"name"`
+	Description *string                            `json:"description"`
+	MeshID      string                             `json:"meshID"`
+	Segments    []RouteDetailsSegmentsRouteSegment `json:"segments"`
+}
+
+// GetId returns RouteDetails.Id, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetId() string { return v.Id }
+
+// GetName returns RouteDetails.Name, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetName() string { return v.Name }
+
+// GetDescription returns RouteDetails.Description, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetDescription() *string { return v.Description }
+
+// GetMeshID returns RouteDetails.MeshID, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetMeshID() string { return v.MeshID }
+
+// GetSegments returns RouteDetails.Segments, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetSegments() []RouteDetailsSegmentsRouteSegment { return v.Segments }
+
+// RouteDetailsSegmentsRouteSegment includes the requested fields of the GraphQL type RouteSegment.
+type RouteDetailsSegmentsRouteSegment struct {
+	// The version this share of the traffic goes to. Null means the draft.
+	MeshVersionID *string `json:"meshVersionID"`
+	// This segment's share of the traffic, as a percentage. A route's segments add up
+	// to 100.
+	//
+	// Zero is allowed and means the segment takes no traffic. That is how a version is
+	// kept in a route, named and ready, without being served.
+	Weight int `json:"weight"`
+}
+
+// GetMeshVersionID returns RouteDetailsSegmentsRouteSegment.MeshVersionID, and is useful for accessing the field via an interface.
+func (v *RouteDetailsSegmentsRouteSegment) GetMeshVersionID() *string { return v.MeshVersionID }
+
+// GetWeight returns RouteDetailsSegmentsRouteSegment.Weight, and is useful for accessing the field via an interface.
+func (v *RouteDetailsSegmentsRouteSegment) GetWeight() int { return v.Weight }
 
 // RubricDetails includes the GraphQL fields of Rubric requested by the fragment RubricDetails.
 type RubricDetails struct {
@@ -7156,6 +7240,14 @@ type __CreateModelSetInput struct {
 // GetInput returns __CreateModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateModelSetInput) GetInput() *NewModelSet { return v.Input }
 
+// __CreateRouteInput is used internally by genqlient
+type __CreateRouteInput struct {
+	Input *NewRoute `json:"input"`
+}
+
+// GetInput returns __CreateRouteInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateRouteInput) GetInput() *NewRoute { return v.Input }
+
 // __CreateRubricInput is used internally by genqlient
 type __CreateRubricInput struct {
 	Input NewRubric `json:"input"`
@@ -7359,6 +7451,14 @@ type __DeleteModelSetInput struct {
 
 // GetId returns __DeleteModelSetInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteModelSetInput) GetId() string { return v.Id }
+
+// __DeleteRouteInput is used internally by genqlient
+type __DeleteRouteInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteRouteInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteRouteInput) GetId() string { return v.Id }
 
 // __DeleteRubricInput is used internally by genqlient
 type __DeleteRubricInput struct {
@@ -7651,6 +7751,14 @@ type __GetParticleArtifactInput struct {
 
 // GetId returns __GetParticleArtifactInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetParticleArtifactInput) GetId() string { return v.Id }
+
+// __GetRouteInput is used internally by genqlient
+type __GetRouteInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetRouteInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetRouteInput) GetId() string { return v.Id }
 
 // __GetRubricInput is used internally by genqlient
 type __GetRubricInput struct {
@@ -7975,6 +8083,18 @@ func (v *__ModifyModelSetInput) GetId() string { return v.Id }
 
 // GetInput returns __ModifyModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyModelSetInput) GetInput() *UpdateModelSet { return v.Input }
+
+// __ModifyRouteInput is used internally by genqlient
+type __ModifyRouteInput struct {
+	Id    string       `json:"id"`
+	Input *UpdateRoute `json:"input"`
+}
+
+// GetId returns __ModifyRouteInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyRouteInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyRouteInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyRouteInput) GetInput() *UpdateRoute { return v.Input }
 
 // __ModifyRubricInput is used internally by genqlient
 type __ModifyRubricInput struct {
@@ -9348,6 +9468,50 @@ func CreateModelSet(
 	return data_, err_
 }
 
+// The mutation executed by CreateRoute.
+const CreateRoute_Operation = `
+mutation CreateRoute ($input: NewRoute!) {
+	createRoute(input: $input) {
+		... RouteDetails
+	}
+}
+fragment RouteDetails on Route {
+	id
+	name
+	description
+	meshID
+	segments {
+		meshVersionID
+		weight
+	}
+}
+`
+
+func CreateRoute(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewRoute,
+) (data_ *CreateRouteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateRoute",
+		Query:  CreateRoute_Operation,
+		Variables: &__CreateRouteInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateRouteResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by CreateRubric.
 const CreateRubric_Operation = `
 mutation CreateRubric ($input: NewRubric!) {
@@ -10252,6 +10416,40 @@ func DeleteModelSet(
 	}
 
 	data_ = &DeleteModelSetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteRoute.
+const DeleteRoute_Operation = `
+mutation DeleteRoute ($id: RouteID!) {
+	deleteRoutes(routeIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteRoute(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteRouteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteRoute",
+		Query:  DeleteRoute_Operation,
+		Variables: &__DeleteRouteInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteRouteResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -12163,6 +12361,50 @@ func GetParticleArtifact(
 	return data_, err_
 }
 
+// The query executed by GetRoute.
+const GetRoute_Operation = `
+query GetRoute ($id: RouteID!) {
+	route(id: $id) {
+		... RouteDetails
+	}
+}
+fragment RouteDetails on Route {
+	id
+	name
+	description
+	meshID
+	segments {
+		meshVersionID
+		weight
+	}
+}
+`
+
+func GetRoute(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetRouteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetRoute",
+		Query:  GetRoute_Operation,
+		Variables: &__GetRouteInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetRouteResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetRubric.
 const GetRubric_Operation = `
 query GetRubric ($id: RubricID!) {
@@ -13756,6 +13998,52 @@ func ModifyModelSet(
 	}
 
 	data_ = &ModifyModelSetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by ModifyRoute.
+const ModifyRoute_Operation = `
+mutation ModifyRoute ($id: RouteID!, $input: UpdateRoute!) {
+	updateRoute(routeID: $id, input: $input) {
+		... RouteDetails
+	}
+}
+fragment RouteDetails on Route {
+	id
+	name
+	description
+	meshID
+	segments {
+		meshVersionID
+		weight
+	}
+}
+`
+
+func ModifyRoute(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateRoute,
+) (data_ *ModifyRouteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyRoute",
+		Query:  ModifyRoute_Operation,
+		Variables: &__ModifyRouteInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyRouteResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

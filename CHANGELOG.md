@@ -133,6 +133,10 @@ FEATURES:
   stays frozen.
 * **New Data Source:** `partiteai_mesh_version_label`, found by `mesh_id` and
   `label`.
+* **New Resource:** `partiteai_route`. A route splits the traffic of a mesh
+  across its versions by weight, and the weights must add up to 100. A segment
+  without `mesh_version_id` sends its share to the mesh's draft.
+* **New Data Source:** `partiteai_route`, found by `id`.
 * resource/partiteai_mesh: `memory_store_id` attaches a memory store to the
   mesh. Every version of the mesh uses the same store. Removing it detaches
   the store and keeps its records.

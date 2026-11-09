@@ -307,6 +307,7 @@ func (p *PartiteAIProvider) Resources(ctx context.Context) []func() resource.Res
 		NewMeshLinkResource,
 		NewMeshInputResource,
 		NewMeshVersionLabelResource,
+		NewRouteResource,
 		NewClientTaskDefinitionResource,
 		NewSkillResource,
 		NewParticleArtifactResource,
@@ -333,6 +334,7 @@ func (p *PartiteAIProvider) DataSources(ctx context.Context) []func() datasource
 	return []func() datasource.DataSource{
 		NewAgentDataSource,
 		NewMeshVersionLabelDataSource,
+		NewRouteDataSource,
 		NewApiKeyDataSource,
 		NewWebhookDestinationDataSource,
 		NewMcpConnectionDataSource,
