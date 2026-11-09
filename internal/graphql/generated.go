@@ -2079,6 +2079,22 @@ type GetMemoryStoreResponse struct {
 // GetMemoryStore returns GetMemoryStoreResponse.MemoryStore, and is useful for accessing the field via an interface.
 func (v *GetMemoryStoreResponse) GetMemoryStore() *MemoryStoreDetails { return v.MemoryStore }
 
+// GetMeshDraftVersionMesh includes the requested fields of the GraphQL type Mesh.
+type GetMeshDraftVersionMesh struct {
+	DraftVersion MeshVersionDetails `json:"draftVersion"`
+}
+
+// GetDraftVersion returns GetMeshDraftVersionMesh.DraftVersion, and is useful for accessing the field via an interface.
+func (v *GetMeshDraftVersionMesh) GetDraftVersion() MeshVersionDetails { return v.DraftVersion }
+
+// GetMeshDraftVersionResponse is returned by GetMeshDraftVersion on success.
+type GetMeshDraftVersionResponse struct {
+	Mesh *GetMeshDraftVersionMesh `json:"mesh"`
+}
+
+// GetMesh returns GetMeshDraftVersionResponse.Mesh, and is useful for accessing the field via an interface.
+func (v *GetMeshDraftVersionResponse) GetMesh() *GetMeshDraftVersionMesh { return v.Mesh }
+
 // GetMeshInputsMesh includes the requested fields of the GraphQL type Mesh.
 type GetMeshInputsMesh struct {
 	DraftVersion GetMeshInputsMeshDraftVersionMeshVersion `json:"draftVersion"`
@@ -2138,6 +2154,31 @@ type GetMeshResponse struct {
 
 // GetMesh returns GetMeshResponse.Mesh, and is useful for accessing the field via an interface.
 func (v *GetMeshResponse) GetMesh() *MeshDetails { return v.Mesh }
+
+// GetMeshVersionByLabelMesh includes the requested fields of the GraphQL type Mesh.
+type GetMeshVersionByLabelMesh struct {
+	// The version of this mesh with exactly this label, or null if no version has it.
+	VersionByLabel *MeshVersionDetails `json:"versionByLabel"`
+}
+
+// GetVersionByLabel returns GetMeshVersionByLabelMesh.VersionByLabel, and is useful for accessing the field via an interface.
+func (v *GetMeshVersionByLabelMesh) GetVersionByLabel() *MeshVersionDetails { return v.VersionByLabel }
+
+// GetMeshVersionByLabelResponse is returned by GetMeshVersionByLabel on success.
+type GetMeshVersionByLabelResponse struct {
+	Mesh *GetMeshVersionByLabelMesh `json:"mesh"`
+}
+
+// GetMesh returns GetMeshVersionByLabelResponse.Mesh, and is useful for accessing the field via an interface.
+func (v *GetMeshVersionByLabelResponse) GetMesh() *GetMeshVersionByLabelMesh { return v.Mesh }
+
+// GetMeshVersionResponse is returned by GetMeshVersion on success.
+type GetMeshVersionResponse struct {
+	MeshVersion *MeshVersionDetails `json:"meshVersion"`
+}
+
+// GetMeshVersion returns GetMeshVersionResponse.MeshVersion, and is useful for accessing the field via an interface.
+func (v *GetMeshVersionResponse) GetMeshVersion() *MeshVersionDetails { return v.MeshVersion }
 
 // GetModelProfileByProviderAndNameResponse is returned by GetModelProfileByProviderAndName on success.
 type GetModelProfileByProviderAndNameResponse struct {
@@ -2680,6 +2721,25 @@ const (
 var AllJudgeScope = []JudgeScope{
 	JudgeScopeRequest,
 	JudgeScopeHop,
+}
+
+// LabelMeshDraftResponse is returned by LabelMeshDraft on success.
+type LabelMeshDraftResponse struct {
+	// Labels the mesh's draft, which freezes it, and starts a new draft with the same configuration. Returns the frozen version. The draft is found and labeled in one transaction. If another operation replaces the draft at the same time, the mutation fails with a conflict.
+	LabelMeshDraft MeshVersionDetails `json:"labelMeshDraft"`
+}
+
+// GetLabelMeshDraft returns LabelMeshDraftResponse.LabelMeshDraft, and is useful for accessing the field via an interface.
+func (v *LabelMeshDraftResponse) GetLabelMeshDraft() MeshVersionDetails { return v.LabelMeshDraft }
+
+// LabelMeshVersionResponse is returned by LabelMeshVersion on success.
+type LabelMeshVersionResponse struct {
+	LabelMeshVersion MeshVersionDetails `json:"labelMeshVersion"`
+}
+
+// GetLabelMeshVersion returns LabelMeshVersionResponse.LabelMeshVersion, and is useful for accessing the field via an interface.
+func (v *LabelMeshVersionResponse) GetLabelMeshVersion() MeshVersionDetails {
+	return v.LabelMeshVersion
 }
 
 // LinkDetails includes the GraphQL fields of Link requested by the fragment LinkDetails.
@@ -4376,6 +4436,34 @@ type MeshDetailsMemoryStore struct {
 
 // GetId returns MeshDetailsMemoryStore.Id, and is useful for accessing the field via an interface.
 func (v *MeshDetailsMemoryStore) GetId() string { return v.Id }
+
+// MeshVersionDetails includes the GraphQL fields of MeshVersion requested by the fragment MeshVersionDetails.
+type MeshVersionDetails struct {
+	Id      string                 `json:"id"`
+	Ordinal int                    `json:"ordinal"`
+	Label   *string                `json:"label"`
+	Mesh    MeshVersionDetailsMesh `json:"mesh"`
+}
+
+// GetId returns MeshVersionDetails.Id, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetails) GetId() string { return v.Id }
+
+// GetOrdinal returns MeshVersionDetails.Ordinal, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetails) GetOrdinal() int { return v.Ordinal }
+
+// GetLabel returns MeshVersionDetails.Label, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetails) GetLabel() *string { return v.Label }
+
+// GetMesh returns MeshVersionDetails.Mesh, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetails) GetMesh() MeshVersionDetailsMesh { return v.Mesh }
+
+// MeshVersionDetailsMesh includes the requested fields of the GraphQL type Mesh.
+type MeshVersionDetailsMesh struct {
+	Id string `json:"id"`
+}
+
+// GetId returns MeshVersionDetailsMesh.Id, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetailsMesh) GetId() string { return v.Id }
 
 type MetricCategory string
 
@@ -6697,6 +6785,17 @@ var AllToolFilterType = []ToolFilterType{
 	ToolFilterTypePattern,
 }
 
+// UnlabelMeshVersionResponse is returned by UnlabelMeshVersion on success.
+type UnlabelMeshVersionResponse struct {
+	// Removes the label of a mesh version. The version stays frozen. If the version has no label, it is returned unchanged.
+	UnlabelMeshVersion MeshVersionDetails `json:"unlabelMeshVersion"`
+}
+
+// GetUnlabelMeshVersion returns UnlabelMeshVersionResponse.UnlabelMeshVersion, and is useful for accessing the field via an interface.
+func (v *UnlabelMeshVersionResponse) GetUnlabelMeshVersion() MeshVersionDetails {
+	return v.UnlabelMeshVersion
+}
+
 type UpdateEvalMeshMonitor struct {
 	ModelSetID *string  `json:"modelSetID,omitempty"`
 	Enabled    *bool    `json:"enabled,omitempty"`
@@ -7457,6 +7556,14 @@ type __GetMemoryStoreInput struct {
 // GetId returns __GetMemoryStoreInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetMemoryStoreInput) GetId() string { return v.Id }
 
+// __GetMeshDraftVersionInput is used internally by genqlient
+type __GetMeshDraftVersionInput struct {
+	MeshId string `json:"meshId"`
+}
+
+// GetMeshId returns __GetMeshDraftVersionInput.MeshId, and is useful for accessing the field via an interface.
+func (v *__GetMeshDraftVersionInput) GetMeshId() string { return v.MeshId }
+
 // __GetMeshInput is used internally by genqlient
 type __GetMeshInput struct {
 	Id string `json:"id"`
@@ -7480,6 +7587,26 @@ type __GetMeshLinksInput struct {
 
 // GetMeshId returns __GetMeshLinksInput.MeshId, and is useful for accessing the field via an interface.
 func (v *__GetMeshLinksInput) GetMeshId() string { return v.MeshId }
+
+// __GetMeshVersionByLabelInput is used internally by genqlient
+type __GetMeshVersionByLabelInput struct {
+	MeshId string `json:"meshId"`
+	Label  string `json:"label"`
+}
+
+// GetMeshId returns __GetMeshVersionByLabelInput.MeshId, and is useful for accessing the field via an interface.
+func (v *__GetMeshVersionByLabelInput) GetMeshId() string { return v.MeshId }
+
+// GetLabel returns __GetMeshVersionByLabelInput.Label, and is useful for accessing the field via an interface.
+func (v *__GetMeshVersionByLabelInput) GetLabel() string { return v.Label }
+
+// __GetMeshVersionInput is used internally by genqlient
+type __GetMeshVersionInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetMeshVersionInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetMeshVersionInput) GetId() string { return v.Id }
 
 // __GetModelProfileByProviderAndNameInput is used internally by genqlient
 type __GetModelProfileByProviderAndNameInput struct {
@@ -7572,6 +7699,30 @@ type __GetWorkspaceInput struct {
 
 // GetId returns __GetWorkspaceInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetWorkspaceInput) GetId() string { return v.Id }
+
+// __LabelMeshDraftInput is used internally by genqlient
+type __LabelMeshDraftInput struct {
+	MeshId string `json:"meshId"`
+	Label  string `json:"label"`
+}
+
+// GetMeshId returns __LabelMeshDraftInput.MeshId, and is useful for accessing the field via an interface.
+func (v *__LabelMeshDraftInput) GetMeshId() string { return v.MeshId }
+
+// GetLabel returns __LabelMeshDraftInput.Label, and is useful for accessing the field via an interface.
+func (v *__LabelMeshDraftInput) GetLabel() string { return v.Label }
+
+// __LabelMeshVersionInput is used internally by genqlient
+type __LabelMeshVersionInput struct {
+	Id    string `json:"id"`
+	Label string `json:"label"`
+}
+
+// GetId returns __LabelMeshVersionInput.Id, and is useful for accessing the field via an interface.
+func (v *__LabelMeshVersionInput) GetId() string { return v.Id }
+
+// GetLabel returns __LabelMeshVersionInput.Label, and is useful for accessing the field via an interface.
+func (v *__LabelMeshVersionInput) GetLabel() string { return v.Label }
 
 // __ModifyAccessPointClientInput is used internally by genqlient
 type __ModifyAccessPointClientInput struct {
@@ -7896,6 +8047,14 @@ func (v *__SearchJudgeMetricsInput) GetFirst() int { return v.First }
 
 // GetAfter returns __SearchJudgeMetricsInput.After, and is useful for accessing the field via an interface.
 func (v *__SearchJudgeMetricsInput) GetAfter() *string { return v.After }
+
+// __UnlabelMeshVersionInput is used internally by genqlient
+type __UnlabelMeshVersionInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __UnlabelMeshVersionInput.Id, and is useful for accessing the field via an interface.
+func (v *__UnlabelMeshVersionInput) GetId() string { return v.Id }
 
 // The mutation executed by CreateAccessPoint.
 const CreateAccessPoint_Operation = `
@@ -11425,6 +11584,50 @@ func GetMesh(
 	return data_, err_
 }
 
+// The query executed by GetMeshDraftVersion.
+const GetMeshDraftVersion_Operation = `
+query GetMeshDraftVersion ($meshId: MeshID!) {
+	mesh(id: $meshId) {
+		draftVersion {
+			... MeshVersionDetails
+		}
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func GetMeshDraftVersion(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	meshId string,
+) (data_ *GetMeshDraftVersionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetMeshDraftVersion",
+		Query:  GetMeshDraftVersion_Operation,
+		Variables: &__GetMeshDraftVersionInput{
+			MeshId: meshId,
+		},
+	}
+
+	data_ = &GetMeshDraftVersionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetMeshInputs.
 const GetMeshInputs_Operation = `
 query GetMeshInputs ($meshId: MeshID!) {
@@ -11531,6 +11734,94 @@ func GetMeshLinks(
 	}
 
 	data_ = &GetMeshLinksResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetMeshVersion.
+const GetMeshVersion_Operation = `
+query GetMeshVersion ($id: MeshVersionID!) {
+	meshVersion(id: $id) {
+		... MeshVersionDetails
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func GetMeshVersion(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetMeshVersionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetMeshVersion",
+		Query:  GetMeshVersion_Operation,
+		Variables: &__GetMeshVersionInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetMeshVersionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetMeshVersionByLabel.
+const GetMeshVersionByLabel_Operation = `
+query GetMeshVersionByLabel ($meshId: MeshID!, $label: String!) {
+	mesh(id: $meshId) {
+		versionByLabel(label: $label) {
+			... MeshVersionDetails
+		}
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func GetMeshVersionByLabel(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	meshId string,
+	label string,
+) (data_ *GetMeshVersionByLabelResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetMeshVersionByLabel",
+		Query:  GetMeshVersionByLabel_Operation,
+		Variables: &__GetMeshVersionByLabelInput{
+			MeshId: meshId,
+			Label:  label,
+		},
+	}
+
+	data_ = &GetMeshVersionByLabelResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -12148,6 +12439,94 @@ func GetWorkspaceByName(
 	}
 
 	data_ = &GetWorkspaceByNameResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by LabelMeshDraft.
+const LabelMeshDraft_Operation = `
+mutation LabelMeshDraft ($meshId: MeshID!, $label: String!) {
+	labelMeshDraft(meshID: $meshId, label: $label) {
+		... MeshVersionDetails
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func LabelMeshDraft(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	meshId string,
+	label string,
+) (data_ *LabelMeshDraftResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "LabelMeshDraft",
+		Query:  LabelMeshDraft_Operation,
+		Variables: &__LabelMeshDraftInput{
+			MeshId: meshId,
+			Label:  label,
+		},
+	}
+
+	data_ = &LabelMeshDraftResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by LabelMeshVersion.
+const LabelMeshVersion_Operation = `
+mutation LabelMeshVersion ($id: MeshVersionID!, $label: String!) {
+	labelMeshVersion(meshVersionID: $id, label: $label) {
+		... MeshVersionDetails
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func LabelMeshVersion(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	label string,
+) (data_ *LabelMeshVersionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "LabelMeshVersion",
+		Query:  LabelMeshVersion_Operation,
+		Variables: &__LabelMeshVersionInput{
+			Id:    id,
+			Label: label,
+		},
+	}
+
+	data_ = &LabelMeshVersionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -13706,6 +14085,48 @@ func SearchJudgeMetrics(
 	}
 
 	data_ = &SearchJudgeMetricsResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by UnlabelMeshVersion.
+const UnlabelMeshVersion_Operation = `
+mutation UnlabelMeshVersion ($id: MeshVersionID!) {
+	unlabelMeshVersion(meshVersionID: $id) {
+		... MeshVersionDetails
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func UnlabelMeshVersion(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *UnlabelMeshVersionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "UnlabelMeshVersion",
+		Query:  UnlabelMeshVersion_Operation,
+		Variables: &__UnlabelMeshVersionInput{
+			Id: id,
+		},
+	}
+
+	data_ = &UnlabelMeshVersionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

@@ -5029,6 +5029,89 @@
         "DeprecationMessage": ""
       }
     },
+    "partiteai_mesh_version_label": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the labeled mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "label",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The label. A change renames the version.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh. A change replaces the resource.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_version_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the labeled mesh version. This is the same value as `id`.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "ordinal",
+            "Type": "number",
+            "NestedType": null,
+            "Description": "The ordinal of the labeled mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Labels a mesh version. Creating the resource freezes the mesh's current draft under `label`, and the mesh gets a new draft with the same configuration. The resource then follows that version by its ID.\n\n* A change to `label` renames that version. It does not freeze a new version. To freeze a new version, add a resource at a new address.\n* To move a baseline, replace the resource block with a block at a new address in one apply. The apply removes the old label and freezes the draft under the new label. The old version stays frozen.\n* Destroying the resource removes the label. The version stays frozen, with its conversations and evaluation runs. To keep the label, remove the resource with a `removed` block that has `lifecycle { destroy = false }`. If you apply the same configuration again, the resource freezes the current draft. It does not take back the old version.\n* Labeling must happen after the configuration that it freezes. Add `depends_on` for the mesh's `partiteai_mesh_input` and `partiteai_mesh_link` resources, and for anything else that changes the draft.\n* A frozen version keeps references to the agent versions it uses, so an agent cannot be deleted while a frozen version of its mesh exists. Add `depends_on` for the mesh's agents to the `partiteai_mesh` resource, so that a destroy deletes the mesh first.\n* Do not change a label resource and the mesh configuration in the same apply. The label waits for the configuration, so it freezes the changed configuration.\n* If one apply adds two label resources for the same mesh, add `depends_on` from one to the other. Without it, Terraform can create both at the same time, and one of them can fail with a conflict. Both freeze the same configuration.\n* A webhook destination or a schedule that names a removed or renamed label fails on its next use.",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
     "partiteai_model_profile": {
       "Version": 0,
       "Block": {
@@ -17050,6 +17133,89 @@
         ],
         "BlockTypes": null,
         "Description": "Mesh Link data source",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_mesh_version_label": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "label",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The label of the mesh version.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_version_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh version. This is the same value as `id`.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "ordinal",
+            "Type": "number",
+            "NestedType": null,
+            "Description": "The ordinal of the mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Finds a mesh version by its mesh and its exact label.",
         "DescriptionKind": 1,
         "Deprecated": false,
         "DeprecationMessage": ""
