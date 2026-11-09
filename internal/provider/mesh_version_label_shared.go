@@ -1,23 +1,27 @@
 package provider
 
 import (
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-type MeshVersionLabelModel struct {
-	Id            types.String `tfsdk:"id"`
-	MeshId        types.String `tfsdk:"mesh_id"`
-	Label         types.String `tfsdk:"label"`
-	MeshVersionId types.String `tfsdk:"mesh_version_id"`
-	Ordinal       types.Int64  `tfsdk:"ordinal"`
+type MeshVersionLabelBaseModel struct {
+	Id      types.String `tfsdk:"id"`
+	MeshId  types.String `tfsdk:"mesh_id"`
+	Label   types.String `tfsdk:"label"`
+	Ordinal types.Int64  `tfsdk:"ordinal"`
 }
 
-func (m *MeshVersionLabelModel) MapFromGraphQL(v pgql.MeshVersionDetails) {
-	m.Id = types.StringValue(v.Id)
-	m.MeshVersionId = types.StringValue(v.Id)
-	m.MeshId = types.StringValue(v.Mesh.Id)
-	m.Label = types.StringPointerValue(v.Label)
-	m.Ordinal = types.Int64Value(int64(v.Ordinal))
+func (m *MeshVersionLabelBaseModel) MapFromGraphQL(ctx context.Context, v pgql.MeshVersionDetails) diag.Diagnostics {
+	return setFields(
+		ctx,
+		&m.Id, v.Id,
+		&m.MeshId, v.Mesh.Id,
+		&m.Label, v.Label,
+		&m.Ordinal, v.Ordinal,
+	)
 }

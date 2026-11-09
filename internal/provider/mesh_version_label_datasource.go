@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
@@ -22,6 +20,10 @@ func NewMeshVersionLabelDataSource() datasource.DataSource {
 
 type MeshVersionLabelDataSource struct {
 	BaseDataSource
+}
+
+type MeshVersionLabelDataSourceModel struct {
+	MeshVersionLabelBaseModel
 }
 
 func (d *MeshVersionLabelDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
@@ -39,11 +41,6 @@ func (d *MeshVersionLabelDataSource) Schema(ctx context.Context, req datasource.
 			"label": schema.StringAttribute{
 				Required:            true,
 				MarkdownDescription: "The label of the mesh version.",
-				Validators:          []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"mesh_version_id": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "The ID of the mesh version. This is the same value as `id`.",
 			},
 			"ordinal": schema.Int64Attribute{
 				Computed:            true,
@@ -54,7 +51,7 @@ func (d *MeshVersionLabelDataSource) Schema(ctx context.Context, req datasource.
 }
 
 func (d *MeshVersionLabelDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data MeshVersionLabelModel
+	var data MeshVersionLabelDataSourceModel
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -66,22 +63,19 @@ func (d *MeshVersionLabelDataSource) Read(ctx context.Context, req datasource.Re
 
 	lookup, err := pgql.GetMeshVersionByLabel(ctx, d.GetClient(), meshID, label)
 	if err != nil {
-		handleAPIError(&resp.Diagnostics, err, "look up mesh version label")
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "mesh_version_label", label)
 		return
 	}
 	if lookup.Mesh == nil {
-		resp.Diagnostics.AddError("Mesh not found", fmt.Sprintf("No mesh has the ID %s.", meshID))
+		resp.Diagnostics.AddError("Not found", "No mesh has ID "+meshID)
 		return
 	}
 	version := lookup.Mesh.VersionByLabel
 	if version == nil {
-		resp.Diagnostics.AddError(
-			"Mesh version label not found",
-			fmt.Sprintf("Mesh %s has no version with the label \"%s\".", meshID, label),
-		)
+		resp.Diagnostics.AddError("Not found", fmt.Sprintf("Mesh %s has no version with the label %q", meshID, label))
 		return
 	}
 
-	data.MapFromGraphQL(*version)
+	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, *version)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

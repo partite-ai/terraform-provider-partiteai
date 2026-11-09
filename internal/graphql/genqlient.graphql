@@ -660,14 +660,6 @@ query GetMeshVersionByLabel($meshId: MeshID!, $label: String!) {
   }
 }
 
-query GetMeshDraftVersion($meshId: MeshID!) {
-  mesh(id: $meshId) {
-    # @genqlient(flatten: true)
-    draftVersion {
-      ...MeshVersionDetails
-    }
-  }
-}
 
 mutation LabelMeshVersion($id: MeshVersionID!, $label: String!) {
   # @genqlient(flatten: true)

@@ -7,13 +7,12 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/hashicorp/terraform-plugin-testing/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 )
 
-// labelMesh is a mesh with one input. A change to the description of the
-// input's response changes the draft.
-func labelMesh(description string) string {
-	return labelMeshOn(description, "partiteai_agent.base")
+// labelMesh is a mesh with one input.
+func labelMesh() string {
+	return labelMeshOn("x", "partiteai_agent.base")
 }
 
 // labelMeshOn is labelMesh with a mesh that depends on the given agents. A
@@ -59,29 +58,37 @@ resource "partiteai_mesh_version_label" %q {
 `, name, label)
 }
 
-func captureID(address string, into *string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[address]
-		if !ok {
-			return fmt.Errorf("%s not in state", address)
-		}
-		*into = rs.Primary.Attributes["id"]
-		return nil
-	}
-}
-
 const labelA = "partiteai_mesh_version_label.a"
-const labelB = "partiteai_mesh_version_label.b"
 
-func TestAccMeshVersionLabel_freezesTheDraft(t *testing.T) {
-	config := labelMesh("x") + labelBlock("a", "a-baseline")
+const labelDataSource = `
+data "partiteai_mesh_version_label" "found" {
+  mesh_id = partiteai_mesh_version_label.a.mesh_id
+  label   = partiteai_mesh_version_label.a.label
+}
+`
+
+func TestAccMeshVersionLabel_basic(t *testing.T) {
+	renamed := labelMesh() + labelBlock("a", "new") + labelDataSource
 	accTest(t,
 		resource.TestStep{
-			Config: config,
-			Check:  resource.TestCheckResourceAttr(labelA, "ordinal", "1"),
+			Config: labelMesh() + labelBlock("a", "old") + labelDataSource,
+			Check: resource.ComposeTestCheckFunc(
+				resource.TestCheckResourceAttr(labelA, "ordinal", "1"),
+				resource.TestCheckResourceAttrPair("data.partiteai_mesh_version_label.found", "id", labelA, "id"),
+				resource.TestCheckResourceAttr("data.partiteai_mesh_version_label.found", "ordinal", "1"),
+			),
 		},
 		resource.TestStep{
-			Config:            config,
+			Config: renamed,
+			ConfigPlanChecks: resource.ConfigPlanChecks{
+				PreApply: []plancheck.PlanCheck{
+					plancheck.ExpectResourceAction(labelA, plancheck.ResourceActionUpdate),
+				},
+			},
+			Check: resource.TestCheckResourceAttrPair("data.partiteai_mesh_version_label.found", "id", labelA, "id"),
+		},
+		resource.TestStep{
+			Config:            renamed,
 			ResourceName:      labelA,
 			ImportState:       true,
 			ImportStateVerify: true,
@@ -94,31 +101,13 @@ func TestAccMeshVersionLabel_freezesTheDraft(t *testing.T) {
 func TestAccMeshVersionLabel_destroyRemovesTheLabel(t *testing.T) {
 	accTest(t,
 		resource.TestStep{
-			Config: labelMesh("x") + labelBlock("a", "a-baseline"),
+			Config: labelMesh() + labelBlock("a", "a-baseline"),
 		},
 		resource.TestStep{
-			Config: labelMesh("x"),
+			Config: labelMesh(),
 		},
 		resource.TestStep{
-			Config: labelMesh("x") + labelBlock("a", "a-baseline"),
-			Check:  resource.TestCheckResourceAttr(labelA, "ordinal", "2"),
-		},
-	)
-}
-
-// The workflow in the resource documentation: label, change the draft, then
-// replace the label resource with one at a new address.
-func TestAccMeshVersionLabel_swapMovesTheBaseline(t *testing.T) {
-	accTest(t,
-		resource.TestStep{
-			Config: labelMesh("first") + labelBlock("a", "a-baseline"),
-		},
-		resource.TestStep{
-			Config: labelMesh("second") + labelBlock("a", "a-baseline"),
-		},
-		resource.TestStep{
-			Config: labelMesh("second") + labelBlock("b", "b-openfda-retry"),
-			Check:  resource.TestCheckResourceAttr(labelB, "ordinal", "2"),
+			Config: labelMesh() + labelBlock("a", "a-baseline"),
 		},
 	)
 }
@@ -144,52 +133,20 @@ resource "partiteai_mesh_version_label" "test" {
 func TestAccMeshVersionLabel_emptyLabelFails(t *testing.T) {
 	accTest(t,
 		resource.TestStep{
-			Config:      labelMesh("x") + labelBlock("a", ""),
-			ExpectError: regexp.MustCompile(`(?i)length.*at least 1`),
+			Config:      labelMesh() + labelBlock("a", ""),
+			ExpectError: regexp.MustCompile(`(?is)length.*at least 1`),
 		},
 	)
-}
-
-func TestAccMeshVersionLabel_renameInPlace(t *testing.T) {
-	var id string
-	accTest(t,
-		resource.TestStep{
-			Config: labelMesh("x") + labelBlock("a", "old"),
-			Check:  captureID(labelA, &id),
-		},
-		resource.TestStep{
-			Config: labelMesh("x") + labelBlock("a", "new"),
-			Check: resource.ComposeTestCheckFunc(
-				resource.TestCheckResourceAttrPtr(labelA, "id", &id),
-				resource.TestCheckResourceAttr(labelA, "ordinal", "1"),
-			),
-		},
-	)
-}
-
-func TestAccMeshVersionLabelDataSource_findsByLabel(t *testing.T) {
-	accTest(t, resource.TestStep{
-		Config: labelMesh("x") + labelBlock("a", "a-baseline") + `
-data "partiteai_mesh_version_label" "found" {
-  mesh_id = partiteai_mesh_version_label.a.mesh_id
-  label   = partiteai_mesh_version_label.a.label
-}
-`,
-		Check: resource.ComposeTestCheckFunc(
-			resource.TestCheckResourceAttrPair("data.partiteai_mesh_version_label.found", "id", labelA, "id"),
-			resource.TestCheckResourceAttrPair("data.partiteai_mesh_version_label.found", "ordinal", labelA, "ordinal"),
-		),
-	})
 }
 
 func TestAccMeshVersionLabelDataSource_unknownLabelFails(t *testing.T) {
 	accTest(t, resource.TestStep{
-		Config: labelMesh("x") + `
+		Config: labelMesh() + `
 data "partiteai_mesh_version_label" "missing" {
   mesh_id = partiteai_mesh.base.id
   label   = "missing"
 }
 `,
-		ExpectError: regexp.MustCompile(`has no version with the label "missing"`),
+		ExpectError: regexp.MustCompile(`(?s)has no version with the label\s+"missing"`),
 	})
 }

@@ -2,11 +2,8 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -29,6 +26,10 @@ type RouteResource struct {
 	BaseResource
 }
 
+type RouteResourceModel struct {
+	RouteBaseModel
+}
+
 func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Splits the traffic of a mesh across its versions by weight.\n\n" +
@@ -40,7 +41,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			"id": commonSchemas.id,
 			"mesh_id": schema.StringAttribute{
 				Required:            true,
-				MarkdownDescription: "The ID of the mesh. A change replaces the route.",
+				MarkdownDescription: "The ID of the mesh. Changing it replaces the route.",
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"name": schema.StringAttribute{
@@ -54,7 +55,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			"segments": schema.SetNestedAttribute{
 				Required:            true,
 				MarkdownDescription: "The shares of the traffic. The weights must add up to 100.",
-				Validators:          []validator.Set{setvalidator.SizeAtLeast(1), routeWeightsAddUpTo100{}},
+				Validators:          []validator.Set{routeWeightsAddUpTo100{}},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"mesh_version_id": schema.StringAttribute{
@@ -74,7 +75,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 }
 
 func (r *RouteResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var data RouteModel
+	var data RouteResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -105,7 +106,7 @@ func (r *RouteResource) Create(ctx context.Context, req resource.CreateRequest, 
 }
 
 func (r *RouteResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var data RouteModel
+	var data RouteResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -128,7 +129,7 @@ func (r *RouteResource) Read(ctx context.Context, req resource.ReadRequest, resp
 }
 
 func (r *RouteResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var data RouteModel
+	var data RouteResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -158,7 +159,7 @@ func (r *RouteResource) Update(ctx context.Context, req resource.UpdateRequest, 
 }
 
 func (r *RouteResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var data RouteModel
+	var data RouteResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -172,41 +173,4 @@ func (r *RouteResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 	}
 
 	logResourceOperation(ctx, "deleted", "route", data.Id.ValueString())
-}
-
-func (r *RouteResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-}
-
-// routeWeightsAddUpTo100 skips the check while a weight is unknown.
-type routeWeightsAddUpTo100 struct{}
-
-func (v routeWeightsAddUpTo100) Description(ctx context.Context) string {
-	return "the segment weights add up to 100"
-}
-
-func (v routeWeightsAddUpTo100) MarkdownDescription(ctx context.Context) string {
-	return v.Description(ctx)
-}
-
-func (v routeWeightsAddUpTo100) ValidateSet(ctx context.Context, req validator.SetRequest, resp *validator.SetResponse) {
-	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
-		return
-	}
-	var segments []routeSegmentStruct
-	resp.Diagnostics.Append(req.ConfigValue.ElementsAs(ctx, &segments, false)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	var total int64
-	for _, s := range segments {
-		if s.Weight.IsUnknown() {
-			return
-		}
-		total += s.Weight.ValueInt64()
-	}
-	if total != 100 {
-		resp.Diagnostics.AddAttributeError(req.Path, "Route weights do not add up to 100",
-			fmt.Sprintf("The segment weights add up to %d. They must add up to 100.", total))
-	}
 }

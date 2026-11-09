@@ -23,5 +23,4 @@ Finds a mesh version by its mesh and its exact label.
 ### Read-Only
 
 - `id` (String) The ID of the mesh version.
-- `mesh_version_id` (String) The ID of the mesh version. This is the same value as `id`.
 - `ordinal` (Number) The ordinal of the mesh version.

@@ -2105,22 +2105,6 @@ type GetMemoryStoreResponse struct {
 // GetMemoryStore returns GetMemoryStoreResponse.MemoryStore, and is useful for accessing the field via an interface.
 func (v *GetMemoryStoreResponse) GetMemoryStore() *MemoryStoreDetails { return v.MemoryStore }
 
-// GetMeshDraftVersionMesh includes the requested fields of the GraphQL type Mesh.
-type GetMeshDraftVersionMesh struct {
-	DraftVersion MeshVersionDetails `json:"draftVersion"`
-}
-
-// GetDraftVersion returns GetMeshDraftVersionMesh.DraftVersion, and is useful for accessing the field via an interface.
-func (v *GetMeshDraftVersionMesh) GetDraftVersion() MeshVersionDetails { return v.DraftVersion }
-
-// GetMeshDraftVersionResponse is returned by GetMeshDraftVersion on success.
-type GetMeshDraftVersionResponse struct {
-	Mesh *GetMeshDraftVersionMesh `json:"mesh"`
-}
-
-// GetMesh returns GetMeshDraftVersionResponse.Mesh, and is useful for accessing the field via an interface.
-func (v *GetMeshDraftVersionResponse) GetMesh() *GetMeshDraftVersionMesh { return v.Mesh }
-
 // GetMeshInputsMesh includes the requested fields of the GraphQL type Mesh.
 type GetMeshInputsMesh struct {
 	DraftVersion GetMeshInputsMeshDraftVersionMeshVersion `json:"draftVersion"`
@@ -7656,14 +7640,6 @@ type __GetMemoryStoreInput struct {
 // GetId returns __GetMemoryStoreInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetMemoryStoreInput) GetId() string { return v.Id }
 
-// __GetMeshDraftVersionInput is used internally by genqlient
-type __GetMeshDraftVersionInput struct {
-	MeshId string `json:"meshId"`
-}
-
-// GetMeshId returns __GetMeshDraftVersionInput.MeshId, and is useful for accessing the field via an interface.
-func (v *__GetMeshDraftVersionInput) GetMeshId() string { return v.MeshId }
-
 // __GetMeshInput is used internally by genqlient
 type __GetMeshInput struct {
 	Id string `json:"id"`
@@ -11771,50 +11747,6 @@ func GetMesh(
 	}
 
 	data_ = &GetMeshResponse{}
-	resp_ := &graphql.Response{Data: data_}
-
-	err_ = client_.MakeRequest(
-		ctx_,
-		req_,
-		resp_,
-	)
-
-	return data_, err_
-}
-
-// The query executed by GetMeshDraftVersion.
-const GetMeshDraftVersion_Operation = `
-query GetMeshDraftVersion ($meshId: MeshID!) {
-	mesh(id: $meshId) {
-		draftVersion {
-			... MeshVersionDetails
-		}
-	}
-}
-fragment MeshVersionDetails on MeshVersion {
-	id
-	ordinal
-	label
-	mesh {
-		id
-	}
-}
-`
-
-func GetMeshDraftVersion(
-	ctx_ context.Context,
-	client_ graphql.Client,
-	meshId string,
-) (data_ *GetMeshDraftVersionResponse, err_ error) {
-	req_ := &graphql.Request{
-		OpName: "GetMeshDraftVersion",
-		Query:  GetMeshDraftVersion_Operation,
-		Variables: &__GetMeshDraftVersionInput{
-			MeshId: meshId,
-		},
-	}
-
-	data_ = &GetMeshDraftVersionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

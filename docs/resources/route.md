@@ -23,7 +23,7 @@ Splits the traffic of a mesh across its versions by weight.
 
 ### Required
 
-- `mesh_id` (String) The ID of the mesh. A change replaces the route.
+- `mesh_id` (String) The ID of the mesh. Changing it replaces the route.
 - `name` (String) The name of the route.
 - `segments` (Attributes Set) The shares of the traffic. The weights must add up to 100. (see [below for nested schema](#nestedatt--segments))
 

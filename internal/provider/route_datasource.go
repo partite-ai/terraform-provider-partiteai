@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -20,6 +19,10 @@ func NewRouteDataSource() datasource.DataSource {
 
 type RouteDataSource struct {
 	BaseDataSource
+}
+
+type RouteDataSourceModel struct {
+	RouteBaseModel
 }
 
 func (d *RouteDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
@@ -63,7 +66,7 @@ func (d *RouteDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 }
 
 func (d *RouteDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data RouteModel
+	var data RouteDataSourceModel
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -77,7 +80,7 @@ func (d *RouteDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 	if routeResp.Route == nil {
-		resp.Diagnostics.AddError("Route not found", fmt.Sprintf("No route has the ID %s.", data.Id.ValueString()))
+		resp.Diagnostics.AddError("Not found", "No route has ID "+data.Id.ValueString())
 		return
 	}
 

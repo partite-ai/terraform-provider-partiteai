@@ -2,14 +2,16 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	pgql "github.com/partite-ai/terraform-provider-partiteai/internal/graphql"
 )
 
-type RouteModel struct {
+type RouteBaseModel struct {
 	Id          types.String `tfsdk:"id"`
 	MeshId      types.String `tfsdk:"mesh_id"`
 	Name        types.String `tfsdk:"name"`
@@ -28,7 +30,7 @@ func (s *routeSegmentStruct) FromGQL(src pgql.RouteDetailsSegmentsRouteSegment) 
 	return nil
 }
 
-func (m *RouteModel) MapFromGraphQL(ctx context.Context, route pgql.RouteDetails) diag.Diagnostics {
+func (m *RouteBaseModel) MapFromGraphQL(ctx context.Context, route pgql.RouteDetails) diag.Diagnostics {
 	return setFields(
 		ctx,
 		&m.Id, route.Id,
@@ -39,7 +41,7 @@ func (m *RouteModel) MapFromGraphQL(ctx context.Context, route pgql.RouteDetails
 	)
 }
 
-func (m *RouteModel) segmentInputs(ctx context.Context) ([]pgql.NewRouteSegment, diag.Diagnostics) {
+func (m *RouteBaseModel) segmentInputs(ctx context.Context) ([]pgql.NewRouteSegment, diag.Diagnostics) {
 	var segments []routeSegmentStruct
 	diags := m.Segments.ElementsAs(ctx, &segments, false)
 	inputs := make([]pgql.NewRouteSegment, len(segments))
@@ -50,4 +52,40 @@ func (m *RouteModel) segmentInputs(ctx context.Context) ([]pgql.NewRouteSegment,
 		}
 	}
 	return inputs, diags
+}
+
+// routeWeightsAddUpTo100 finds at plan time the weights that the engine
+// refuses on apply. While a weight is unknown, it cannot check the sum.
+type routeWeightsAddUpTo100 struct{}
+
+var _ validator.Set = routeWeightsAddUpTo100{}
+
+func (routeWeightsAddUpTo100) Description(context.Context) string {
+	return "the segment weights add up to 100"
+}
+
+func (v routeWeightsAddUpTo100) MarkdownDescription(ctx context.Context) string {
+	return v.Description(ctx)
+}
+
+func (routeWeightsAddUpTo100) ValidateSet(ctx context.Context, req validator.SetRequest, resp *validator.SetResponse) {
+	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
+		return
+	}
+	var segments []routeSegmentStruct
+	resp.Diagnostics.Append(req.ConfigValue.ElementsAs(ctx, &segments, false)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	var total int64
+	for _, s := range segments {
+		if s.Weight.IsUnknown() {
+			return
+		}
+		total += s.Weight.ValueInt64()
+	}
+	if total != 100 {
+		resp.Diagnostics.AddAttributeError(req.Path, "Route weights do not add up to 100",
+			fmt.Sprintf("The segment weights add up to %d. They must add up to 100.", total))
+	}
 }

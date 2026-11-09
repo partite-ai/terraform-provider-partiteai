@@ -113,11 +113,7 @@ func runAcc(t *testing.T, backend meshtest.Backend, steps []resource.TestStep) {
 		if run[i].ImportState || run[i].ExpectError != nil {
 			continue
 		}
-		run[i].ConfigPlanChecks = resource.ConfigPlanChecks{
-			PostApplyPostRefresh: []plancheck.PlanCheck{
-				plancheck.ExpectEmptyPlan(),
-			},
-		}
+		run[i].ConfigPlanChecks.PostApplyPostRefresh = append(run[i].ConfigPlanChecks.PostApplyPostRefresh, plancheck.ExpectEmptyPlan())
 	}
 
 	resource.Test(t, resource.TestCase{
