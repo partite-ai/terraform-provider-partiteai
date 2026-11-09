@@ -77,7 +77,10 @@ func TestAccMeshInput_basic(t *testing.T) {
 // A link's source agent has to already be in the mesh, so the fixture reaches
 // the mesh through an input on the source agent first. meshLinkBase is
 // everything around the link, so a step can drop the link on its own.
-const meshLinkBase = meshInputConfig + `
+const meshLinkBase = meshInputConfig + meshLinkToAgent
+
+// meshLinkToAgent is the target agent of the link, as partiteai_agent.to.
+const meshLinkToAgent = `
 resource "partiteai_agent" "to" {
   name               = "link-to"
   model_complexity   = "LOW"
@@ -87,7 +90,13 @@ resource "partiteai_agent" "to" {
 `
 
 func meshLinkConfigWith(name, description string, transfersControl bool) string {
-	return meshLinkBase + fmt.Sprintf(`
+	return meshLinkBase + meshLinkBlock(name, description, transfersControl)
+}
+
+// meshLinkBlock is partiteai_mesh_link.test, from partiteai_agent.base to
+// partiteai_agent.to.
+func meshLinkBlock(name, description string, transfersControl bool) string {
+	return fmt.Sprintf(`
 resource "partiteai_mesh_link" "test" {
   # The source agent reaches the mesh through the input, on the way in and on
   # the way out. Terraform cannot infer that from the attributes alone.

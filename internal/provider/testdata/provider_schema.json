@@ -5029,6 +5029,75 @@
         "DeprecationMessage": ""
       }
     },
+    "partiteai_mesh_version_label": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the labeled mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "label",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The label of the mesh version. Changing it renames the version.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh. Changing it replaces the resource.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "ordinal",
+            "Type": "number",
+            "NestedType": null,
+            "Description": "The ordinal of the labeled mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Labels a mesh version. Creating the resource freezes the mesh's current draft under `label`, and the mesh gets a new draft with the same configuration. The resource then follows that version by its ID.\n\n* Changing `label` renames that version. It does not freeze a new version. To freeze a new version, add a resource at a new address.\n* To freeze the draft under a new label and remove the old label, replace the resource block with a block at a new address in one apply. The old version stays frozen.\n* Destroying the resource removes the label. The version stays frozen, with its conversations and evaluation runs. If you apply the same configuration again, the resource freezes the current draft. It does not label the old version again. To keep the label when you remove the resource, use a `removed` block that has `lifecycle { destroy = false }`.\n* Labeling must happen after the configuration that it freezes. Add `depends_on` for the mesh's `partiteai_mesh_input` and `partiteai_mesh_link` resources, and for anything else that changes the draft.\n* A frozen version keeps references to the agent versions it uses, so an agent cannot be deleted while a frozen version of its mesh exists. Add `depends_on` for the mesh's agents to the `partiteai_mesh` resource, so that a destroy deletes the mesh first.\n* If one apply adds two label resources for the same mesh, add `depends_on` from one to the other. Without it, Terraform can create both at the same time, and one of them can fail with a conflict. Both freeze the same configuration.\n* A webhook destination or a schedule that names a removed or renamed label fails on its next use.",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
     "partiteai_model_profile": {
       "Version": 0,
       "Block": {
@@ -6732,6 +6801,121 @@
         ],
         "BlockTypes": null,
         "Description": "A particle artifact (.particle tarball) uploaded to the Partite AI mesh.",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_route": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "description",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The description of the route.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "Resource identifier",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh. Changing it replaces the route.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The name of the route.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "segments",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "mesh_version_id",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The ID of the mesh version that gets this share of the traffic. If you leave it out, the share goes to the mesh's draft.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "weight",
+                  "Type": "number",
+                  "NestedType": null,
+                  "Description": "The share of the traffic, as a percentage.",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 3
+            },
+            "Description": "The shares of the traffic. The weights must add up to 100.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Splits the traffic of a mesh across its versions by weight.\n\n* A segment without `mesh_version_id` sends its share of the traffic to the mesh's current draft. When a label freezes the draft, the segment follows the new draft.\n* To send traffic to a frozen version, use the `id` of a `partiteai_mesh_version_label` resource.\n* The weights must add up to 100. A segment with a weight of 0 gets no traffic.\n* A route that a webhook destination or a schedule uses cannot be deleted.",
         "DescriptionKind": 1,
         "Deprecated": false,
         "DeprecationMessage": ""
@@ -17055,6 +17239,75 @@
         "DeprecationMessage": ""
       }
     },
+    "partiteai_mesh_version_label": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "label",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The label of the mesh version.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "ordinal",
+            "Type": "number",
+            "NestedType": null,
+            "Description": "The ordinal of the mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Finds a mesh version by its mesh and its exact label.",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
     "partiteai_model_profile": {
       "Version": 0,
       "Block": {
@@ -18716,6 +18969,121 @@
         ],
         "BlockTypes": null,
         "Description": "A particle artifact uploaded to the Partite AI mesh.",
+        "DescriptionKind": 1,
+        "Deprecated": false,
+        "DeprecationMessage": ""
+      }
+    },
+    "partiteai_route": {
+      "Version": 0,
+      "Block": {
+        "Version": 0,
+        "Attributes": [
+          {
+            "Name": "description",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The description of the route.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the route.",
+            "Required": true,
+            "Optional": false,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "name",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The name of the route.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "segments",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "mesh_version_id",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "The ID of the mesh version that gets this share of the traffic. If it is null, the share goes to the mesh's draft.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "weight",
+                  "Type": "number",
+                  "NestedType": null,
+                  "Description": "The share of the traffic, as a percentage.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 3
+            },
+            "Description": "The shares of the traffic.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          }
+        ],
+        "BlockTypes": null,
+        "Description": "Finds a route by its ID.",
         "DescriptionKind": 1,
         "Deprecated": false,
         "DeprecationMessage": ""

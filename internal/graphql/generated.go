@@ -1225,6 +1225,14 @@ type CreateModelSetResponse struct {
 // GetCreateModelSet returns CreateModelSetResponse.CreateModelSet, and is useful for accessing the field via an interface.
 func (v *CreateModelSetResponse) GetCreateModelSet() ModelSetDetails { return v.CreateModelSet }
 
+// CreateRouteResponse is returned by CreateRoute on success.
+type CreateRouteResponse struct {
+	CreateRoute RouteDetails `json:"createRoute"`
+}
+
+// GetCreateRoute returns CreateRouteResponse.CreateRoute, and is useful for accessing the field via an interface.
+func (v *CreateRouteResponse) GetCreateRoute() RouteDetails { return v.CreateRoute }
+
 // CreateRubricResponse is returned by CreateRubric on success.
 type CreateRubricResponse struct {
 	CreateRubric RubricDetails `json:"createRubric"`
@@ -1657,6 +1665,24 @@ type DeleteModelSetResponse struct {
 // GetDeleteModelSets returns DeleteModelSetResponse.DeleteModelSets, and is useful for accessing the field via an interface.
 func (v *DeleteModelSetResponse) GetDeleteModelSets() DeleteModelSetDeleteModelSetsDeleteResults {
 	return v.DeleteModelSets
+}
+
+// DeleteRouteDeleteRoutesDeleteResults includes the requested fields of the GraphQL type DeleteResults.
+type DeleteRouteDeleteRoutesDeleteResults struct {
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns DeleteRouteDeleteRoutesDeleteResults.Ids, and is useful for accessing the field via an interface.
+func (v *DeleteRouteDeleteRoutesDeleteResults) GetIds() []string { return v.Ids }
+
+// DeleteRouteResponse is returned by DeleteRoute on success.
+type DeleteRouteResponse struct {
+	DeleteRoutes DeleteRouteDeleteRoutesDeleteResults `json:"deleteRoutes"`
+}
+
+// GetDeleteRoutes returns DeleteRouteResponse.DeleteRoutes, and is useful for accessing the field via an interface.
+func (v *DeleteRouteResponse) GetDeleteRoutes() DeleteRouteDeleteRoutesDeleteResults {
+	return v.DeleteRoutes
 }
 
 // DeleteRubricDeleteRubricsDeleteResults includes the requested fields of the GraphQL type DeleteResults.
@@ -2139,6 +2165,31 @@ type GetMeshResponse struct {
 // GetMesh returns GetMeshResponse.Mesh, and is useful for accessing the field via an interface.
 func (v *GetMeshResponse) GetMesh() *MeshDetails { return v.Mesh }
 
+// GetMeshVersionByLabelMesh includes the requested fields of the GraphQL type Mesh.
+type GetMeshVersionByLabelMesh struct {
+	// The version of this mesh with exactly this label, or null if no version has it.
+	VersionByLabel *MeshVersionDetails `json:"versionByLabel"`
+}
+
+// GetVersionByLabel returns GetMeshVersionByLabelMesh.VersionByLabel, and is useful for accessing the field via an interface.
+func (v *GetMeshVersionByLabelMesh) GetVersionByLabel() *MeshVersionDetails { return v.VersionByLabel }
+
+// GetMeshVersionByLabelResponse is returned by GetMeshVersionByLabel on success.
+type GetMeshVersionByLabelResponse struct {
+	Mesh *GetMeshVersionByLabelMesh `json:"mesh"`
+}
+
+// GetMesh returns GetMeshVersionByLabelResponse.Mesh, and is useful for accessing the field via an interface.
+func (v *GetMeshVersionByLabelResponse) GetMesh() *GetMeshVersionByLabelMesh { return v.Mesh }
+
+// GetMeshVersionResponse is returned by GetMeshVersion on success.
+type GetMeshVersionResponse struct {
+	MeshVersion *MeshVersionDetails `json:"meshVersion"`
+}
+
+// GetMeshVersion returns GetMeshVersionResponse.MeshVersion, and is useful for accessing the field via an interface.
+func (v *GetMeshVersionResponse) GetMeshVersion() *MeshVersionDetails { return v.MeshVersion }
+
 // GetModelProfileByProviderAndNameResponse is returned by GetModelProfileByProviderAndName on success.
 type GetModelProfileByProviderAndNameResponse struct {
 	ModelProfileByProviderAndName ModelProfileDetails `json:"modelProfileByProviderAndName"`
@@ -2182,6 +2233,14 @@ type GetParticleArtifactResponse struct {
 func (v *GetParticleArtifactResponse) GetParticleArtifact() *ParticleArtifactDetails {
 	return v.ParticleArtifact
 }
+
+// GetRouteResponse is returned by GetRoute on success.
+type GetRouteResponse struct {
+	Route *RouteDetails `json:"route"`
+}
+
+// GetRoute returns GetRouteResponse.Route, and is useful for accessing the field via an interface.
+func (v *GetRouteResponse) GetRoute() *RouteDetails { return v.Route }
 
 // GetRubricResponse is returned by GetRubric on success.
 type GetRubricResponse struct {
@@ -2680,6 +2739,25 @@ const (
 var AllJudgeScope = []JudgeScope{
 	JudgeScopeRequest,
 	JudgeScopeHop,
+}
+
+// LabelMeshDraftResponse is returned by LabelMeshDraft on success.
+type LabelMeshDraftResponse struct {
+	// Labels the mesh's draft, which freezes it, and starts a new draft with the same configuration. Returns the frozen version. The draft is found and labeled in one transaction. If another operation replaces the draft at the same time, the mutation fails with a conflict.
+	LabelMeshDraft MeshVersionDetails `json:"labelMeshDraft"`
+}
+
+// GetLabelMeshDraft returns LabelMeshDraftResponse.LabelMeshDraft, and is useful for accessing the field via an interface.
+func (v *LabelMeshDraftResponse) GetLabelMeshDraft() MeshVersionDetails { return v.LabelMeshDraft }
+
+// LabelMeshVersionResponse is returned by LabelMeshVersion on success.
+type LabelMeshVersionResponse struct {
+	LabelMeshVersion MeshVersionDetails `json:"labelMeshVersion"`
+}
+
+// GetLabelMeshVersion returns LabelMeshVersionResponse.LabelMeshVersion, and is useful for accessing the field via an interface.
+func (v *LabelMeshVersionResponse) GetLabelMeshVersion() MeshVersionDetails {
+	return v.LabelMeshVersion
 }
 
 // LinkDetails includes the GraphQL fields of Link requested by the fragment LinkDetails.
@@ -4377,6 +4455,34 @@ type MeshDetailsMemoryStore struct {
 // GetId returns MeshDetailsMemoryStore.Id, and is useful for accessing the field via an interface.
 func (v *MeshDetailsMemoryStore) GetId() string { return v.Id }
 
+// MeshVersionDetails includes the GraphQL fields of MeshVersion requested by the fragment MeshVersionDetails.
+type MeshVersionDetails struct {
+	Id      string                 `json:"id"`
+	Ordinal int                    `json:"ordinal"`
+	Label   *string                `json:"label"`
+	Mesh    MeshVersionDetailsMesh `json:"mesh"`
+}
+
+// GetId returns MeshVersionDetails.Id, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetails) GetId() string { return v.Id }
+
+// GetOrdinal returns MeshVersionDetails.Ordinal, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetails) GetOrdinal() int { return v.Ordinal }
+
+// GetLabel returns MeshVersionDetails.Label, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetails) GetLabel() *string { return v.Label }
+
+// GetMesh returns MeshVersionDetails.Mesh, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetails) GetMesh() MeshVersionDetailsMesh { return v.Mesh }
+
+// MeshVersionDetailsMesh includes the requested fields of the GraphQL type Mesh.
+type MeshVersionDetailsMesh struct {
+	Id string `json:"id"`
+}
+
+// GetId returns MeshVersionDetailsMesh.Id, and is useful for accessing the field via an interface.
+func (v *MeshVersionDetailsMesh) GetId() string { return v.Id }
+
 type MetricCategory string
 
 const (
@@ -5322,6 +5428,14 @@ type ModifyModelSetResponse struct {
 // GetUpdateModelSet returns ModifyModelSetResponse.UpdateModelSet, and is useful for accessing the field via an interface.
 func (v *ModifyModelSetResponse) GetUpdateModelSet() ModelSetDetails { return v.UpdateModelSet }
 
+// ModifyRouteResponse is returned by ModifyRoute on success.
+type ModifyRouteResponse struct {
+	UpdateRoute RouteDetails `json:"updateRoute"`
+}
+
+// GetUpdateRoute returns ModifyRouteResponse.UpdateRoute, and is useful for accessing the field via an interface.
+func (v *ModifyRouteResponse) GetUpdateRoute() RouteDetails { return v.UpdateRoute }
+
 // ModifyRubricResponse is returned by ModifyRubric on success.
 type ModifyRubricResponse struct {
 	UpdateRubric RubricDetails `json:"updateRubric"`
@@ -5934,6 +6048,48 @@ type RevokeMcpConnectionTunnelKeyResponse struct {
 func (v *RevokeMcpConnectionTunnelKeyResponse) GetRevokeMcpConnectionTunnelKey() McpConnectionTunnelKeyDetails {
 	return v.RevokeMcpConnectionTunnelKey
 }
+
+// RouteDetails includes the GraphQL fields of Route requested by the fragment RouteDetails.
+type RouteDetails struct {
+	Id          string                             `json:"id"`
+	Name        string                             `json:"name"`
+	Description *string                            `json:"description"`
+	MeshID      string                             `json:"meshID"`
+	Segments    []RouteDetailsSegmentsRouteSegment `json:"segments"`
+}
+
+// GetId returns RouteDetails.Id, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetId() string { return v.Id }
+
+// GetName returns RouteDetails.Name, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetName() string { return v.Name }
+
+// GetDescription returns RouteDetails.Description, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetDescription() *string { return v.Description }
+
+// GetMeshID returns RouteDetails.MeshID, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetMeshID() string { return v.MeshID }
+
+// GetSegments returns RouteDetails.Segments, and is useful for accessing the field via an interface.
+func (v *RouteDetails) GetSegments() []RouteDetailsSegmentsRouteSegment { return v.Segments }
+
+// RouteDetailsSegmentsRouteSegment includes the requested fields of the GraphQL type RouteSegment.
+type RouteDetailsSegmentsRouteSegment struct {
+	// The version this share of the traffic goes to. Null means the draft.
+	MeshVersionID *string `json:"meshVersionID"`
+	// This segment's share of the traffic, as a percentage. A route's segments add up
+	// to 100.
+	//
+	// Zero is allowed and means the segment takes no traffic. That is how a version is
+	// kept in a route, named and ready, without being served.
+	Weight int `json:"weight"`
+}
+
+// GetMeshVersionID returns RouteDetailsSegmentsRouteSegment.MeshVersionID, and is useful for accessing the field via an interface.
+func (v *RouteDetailsSegmentsRouteSegment) GetMeshVersionID() *string { return v.MeshVersionID }
+
+// GetWeight returns RouteDetailsSegmentsRouteSegment.Weight, and is useful for accessing the field via an interface.
+func (v *RouteDetailsSegmentsRouteSegment) GetWeight() int { return v.Weight }
 
 // RubricDetails includes the GraphQL fields of Rubric requested by the fragment RubricDetails.
 type RubricDetails struct {
@@ -6697,6 +6853,17 @@ var AllToolFilterType = []ToolFilterType{
 	ToolFilterTypePattern,
 }
 
+// UnlabelMeshVersionResponse is returned by UnlabelMeshVersion on success.
+type UnlabelMeshVersionResponse struct {
+	// Removes the label of a mesh version. The version stays frozen. If the version has no label, it is returned unchanged.
+	UnlabelMeshVersion MeshVersionDetails `json:"unlabelMeshVersion"`
+}
+
+// GetUnlabelMeshVersion returns UnlabelMeshVersionResponse.UnlabelMeshVersion, and is useful for accessing the field via an interface.
+func (v *UnlabelMeshVersionResponse) GetUnlabelMeshVersion() MeshVersionDetails {
+	return v.UnlabelMeshVersion
+}
+
 type UpdateEvalMeshMonitor struct {
 	ModelSetID *string  `json:"modelSetID,omitempty"`
 	Enabled    *bool    `json:"enabled,omitempty"`
@@ -7057,6 +7224,14 @@ type __CreateModelSetInput struct {
 // GetInput returns __CreateModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateModelSetInput) GetInput() *NewModelSet { return v.Input }
 
+// __CreateRouteInput is used internally by genqlient
+type __CreateRouteInput struct {
+	Input *NewRoute `json:"input"`
+}
+
+// GetInput returns __CreateRouteInput.Input, and is useful for accessing the field via an interface.
+func (v *__CreateRouteInput) GetInput() *NewRoute { return v.Input }
+
 // __CreateRubricInput is used internally by genqlient
 type __CreateRubricInput struct {
 	Input NewRubric `json:"input"`
@@ -7260,6 +7435,14 @@ type __DeleteModelSetInput struct {
 
 // GetId returns __DeleteModelSetInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteModelSetInput) GetId() string { return v.Id }
+
+// __DeleteRouteInput is used internally by genqlient
+type __DeleteRouteInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __DeleteRouteInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteRouteInput) GetId() string { return v.Id }
 
 // __DeleteRubricInput is used internally by genqlient
 type __DeleteRubricInput struct {
@@ -7481,6 +7664,26 @@ type __GetMeshLinksInput struct {
 // GetMeshId returns __GetMeshLinksInput.MeshId, and is useful for accessing the field via an interface.
 func (v *__GetMeshLinksInput) GetMeshId() string { return v.MeshId }
 
+// __GetMeshVersionByLabelInput is used internally by genqlient
+type __GetMeshVersionByLabelInput struct {
+	MeshId string `json:"meshId"`
+	Label  string `json:"label"`
+}
+
+// GetMeshId returns __GetMeshVersionByLabelInput.MeshId, and is useful for accessing the field via an interface.
+func (v *__GetMeshVersionByLabelInput) GetMeshId() string { return v.MeshId }
+
+// GetLabel returns __GetMeshVersionByLabelInput.Label, and is useful for accessing the field via an interface.
+func (v *__GetMeshVersionByLabelInput) GetLabel() string { return v.Label }
+
+// __GetMeshVersionInput is used internally by genqlient
+type __GetMeshVersionInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetMeshVersionInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetMeshVersionInput) GetId() string { return v.Id }
+
 // __GetModelProfileByProviderAndNameInput is used internally by genqlient
 type __GetModelProfileByProviderAndNameInput struct {
 	ProviderId string `json:"providerId"`
@@ -7524,6 +7727,14 @@ type __GetParticleArtifactInput struct {
 
 // GetId returns __GetParticleArtifactInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetParticleArtifactInput) GetId() string { return v.Id }
+
+// __GetRouteInput is used internally by genqlient
+type __GetRouteInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __GetRouteInput.Id, and is useful for accessing the field via an interface.
+func (v *__GetRouteInput) GetId() string { return v.Id }
 
 // __GetRubricInput is used internally by genqlient
 type __GetRubricInput struct {
@@ -7572,6 +7783,30 @@ type __GetWorkspaceInput struct {
 
 // GetId returns __GetWorkspaceInput.Id, and is useful for accessing the field via an interface.
 func (v *__GetWorkspaceInput) GetId() string { return v.Id }
+
+// __LabelMeshDraftInput is used internally by genqlient
+type __LabelMeshDraftInput struct {
+	MeshId string `json:"meshId"`
+	Label  string `json:"label"`
+}
+
+// GetMeshId returns __LabelMeshDraftInput.MeshId, and is useful for accessing the field via an interface.
+func (v *__LabelMeshDraftInput) GetMeshId() string { return v.MeshId }
+
+// GetLabel returns __LabelMeshDraftInput.Label, and is useful for accessing the field via an interface.
+func (v *__LabelMeshDraftInput) GetLabel() string { return v.Label }
+
+// __LabelMeshVersionInput is used internally by genqlient
+type __LabelMeshVersionInput struct {
+	Id    string `json:"id"`
+	Label string `json:"label"`
+}
+
+// GetId returns __LabelMeshVersionInput.Id, and is useful for accessing the field via an interface.
+func (v *__LabelMeshVersionInput) GetId() string { return v.Id }
+
+// GetLabel returns __LabelMeshVersionInput.Label, and is useful for accessing the field via an interface.
+func (v *__LabelMeshVersionInput) GetLabel() string { return v.Label }
 
 // __ModifyAccessPointClientInput is used internally by genqlient
 type __ModifyAccessPointClientInput struct {
@@ -7825,6 +8060,18 @@ func (v *__ModifyModelSetInput) GetId() string { return v.Id }
 // GetInput returns __ModifyModelSetInput.Input, and is useful for accessing the field via an interface.
 func (v *__ModifyModelSetInput) GetInput() *UpdateModelSet { return v.Input }
 
+// __ModifyRouteInput is used internally by genqlient
+type __ModifyRouteInput struct {
+	Id    string       `json:"id"`
+	Input *UpdateRoute `json:"input"`
+}
+
+// GetId returns __ModifyRouteInput.Id, and is useful for accessing the field via an interface.
+func (v *__ModifyRouteInput) GetId() string { return v.Id }
+
+// GetInput returns __ModifyRouteInput.Input, and is useful for accessing the field via an interface.
+func (v *__ModifyRouteInput) GetInput() *UpdateRoute { return v.Input }
+
 // __ModifyRubricInput is used internally by genqlient
 type __ModifyRubricInput struct {
 	Id    string        `json:"id"`
@@ -7896,6 +8143,14 @@ func (v *__SearchJudgeMetricsInput) GetFirst() int { return v.First }
 
 // GetAfter returns __SearchJudgeMetricsInput.After, and is useful for accessing the field via an interface.
 func (v *__SearchJudgeMetricsInput) GetAfter() *string { return v.After }
+
+// __UnlabelMeshVersionInput is used internally by genqlient
+type __UnlabelMeshVersionInput struct {
+	Id string `json:"id"`
+}
+
+// GetId returns __UnlabelMeshVersionInput.Id, and is useful for accessing the field via an interface.
+func (v *__UnlabelMeshVersionInput) GetId() string { return v.Id }
 
 // The mutation executed by CreateAccessPoint.
 const CreateAccessPoint_Operation = `
@@ -9189,6 +9444,50 @@ func CreateModelSet(
 	return data_, err_
 }
 
+// The mutation executed by CreateRoute.
+const CreateRoute_Operation = `
+mutation CreateRoute ($input: NewRoute!) {
+	createRoute(input: $input) {
+		... RouteDetails
+	}
+}
+fragment RouteDetails on Route {
+	id
+	name
+	description
+	meshID
+	segments {
+		meshVersionID
+		weight
+	}
+}
+`
+
+func CreateRoute(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	input *NewRoute,
+) (data_ *CreateRouteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateRoute",
+		Query:  CreateRoute_Operation,
+		Variables: &__CreateRouteInput{
+			Input: input,
+		},
+	}
+
+	data_ = &CreateRouteResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by CreateRubric.
 const CreateRubric_Operation = `
 mutation CreateRubric ($input: NewRubric!) {
@@ -10093,6 +10392,40 @@ func DeleteModelSet(
 	}
 
 	data_ = &DeleteModelSetResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by DeleteRoute.
+const DeleteRoute_Operation = `
+mutation DeleteRoute ($id: RouteID!) {
+	deleteRoutes(routeIDs: [$id]) {
+		ids
+	}
+}
+`
+
+func DeleteRoute(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *DeleteRouteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "DeleteRoute",
+		Query:  DeleteRoute_Operation,
+		Variables: &__DeleteRouteInput{
+			Id: id,
+		},
+	}
+
+	data_ = &DeleteRouteResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -11542,6 +11875,94 @@ func GetMeshLinks(
 	return data_, err_
 }
 
+// The query executed by GetMeshVersion.
+const GetMeshVersion_Operation = `
+query GetMeshVersion ($id: MeshVersionID!) {
+	meshVersion(id: $id) {
+		... MeshVersionDetails
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func GetMeshVersion(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetMeshVersionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetMeshVersion",
+		Query:  GetMeshVersion_Operation,
+		Variables: &__GetMeshVersionInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetMeshVersionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetMeshVersionByLabel.
+const GetMeshVersionByLabel_Operation = `
+query GetMeshVersionByLabel ($meshId: MeshID!, $label: String!) {
+	mesh(id: $meshId) {
+		versionByLabel(label: $label) {
+			... MeshVersionDetails
+		}
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func GetMeshVersionByLabel(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	meshId string,
+	label string,
+) (data_ *GetMeshVersionByLabelResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetMeshVersionByLabel",
+		Query:  GetMeshVersionByLabel_Operation,
+		Variables: &__GetMeshVersionByLabelInput{
+			MeshId: meshId,
+			Label:  label,
+		},
+	}
+
+	data_ = &GetMeshVersionByLabelResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetModelProfile.
 const GetModelProfile_Operation = `
 query GetModelProfile ($id: ModelProfileID!) {
@@ -11872,6 +12293,50 @@ func GetParticleArtifact(
 	return data_, err_
 }
 
+// The query executed by GetRoute.
+const GetRoute_Operation = `
+query GetRoute ($id: RouteID!) {
+	route(id: $id) {
+		... RouteDetails
+	}
+}
+fragment RouteDetails on Route {
+	id
+	name
+	description
+	meshID
+	segments {
+		meshVersionID
+		weight
+	}
+}
+`
+
+func GetRoute(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *GetRouteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetRoute",
+		Query:  GetRoute_Operation,
+		Variables: &__GetRouteInput{
+			Id: id,
+		},
+	}
+
+	data_ = &GetRouteResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The query executed by GetRubric.
 const GetRubric_Operation = `
 query GetRubric ($id: RubricID!) {
@@ -12148,6 +12613,94 @@ func GetWorkspaceByName(
 	}
 
 	data_ = &GetWorkspaceByNameResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by LabelMeshDraft.
+const LabelMeshDraft_Operation = `
+mutation LabelMeshDraft ($meshId: MeshID!, $label: String!) {
+	labelMeshDraft(meshID: $meshId, label: $label) {
+		... MeshVersionDetails
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func LabelMeshDraft(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	meshId string,
+	label string,
+) (data_ *LabelMeshDraftResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "LabelMeshDraft",
+		Query:  LabelMeshDraft_Operation,
+		Variables: &__LabelMeshDraftInput{
+			MeshId: meshId,
+			Label:  label,
+		},
+	}
+
+	data_ = &LabelMeshDraftResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by LabelMeshVersion.
+const LabelMeshVersion_Operation = `
+mutation LabelMeshVersion ($id: MeshVersionID!, $label: String!) {
+	labelMeshVersion(meshVersionID: $id, label: $label) {
+		... MeshVersionDetails
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func LabelMeshVersion(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	label string,
+) (data_ *LabelMeshVersionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "LabelMeshVersion",
+		Query:  LabelMeshVersion_Operation,
+		Variables: &__LabelMeshVersionInput{
+			Id:    id,
+			Label: label,
+		},
+	}
+
+	data_ = &LabelMeshVersionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -13388,6 +13941,52 @@ func ModifyModelSet(
 	return data_, err_
 }
 
+// The mutation executed by ModifyRoute.
+const ModifyRoute_Operation = `
+mutation ModifyRoute ($id: RouteID!, $input: UpdateRoute!) {
+	updateRoute(routeID: $id, input: $input) {
+		... RouteDetails
+	}
+}
+fragment RouteDetails on Route {
+	id
+	name
+	description
+	meshID
+	segments {
+		meshVersionID
+		weight
+	}
+}
+`
+
+func ModifyRoute(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+	input *UpdateRoute,
+) (data_ *ModifyRouteResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "ModifyRoute",
+		Query:  ModifyRoute_Operation,
+		Variables: &__ModifyRouteInput{
+			Id:    id,
+			Input: input,
+		},
+	}
+
+	data_ = &ModifyRouteResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
 // The mutation executed by ModifyRubric.
 const ModifyRubric_Operation = `
 mutation ModifyRubric ($id: RubricID!, $input: UpdateRubric!) {
@@ -13706,6 +14305,48 @@ func SearchJudgeMetrics(
 	}
 
 	data_ = &SearchJudgeMetricsResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by UnlabelMeshVersion.
+const UnlabelMeshVersion_Operation = `
+mutation UnlabelMeshVersion ($id: MeshVersionID!) {
+	unlabelMeshVersion(meshVersionID: $id) {
+		... MeshVersionDetails
+	}
+}
+fragment MeshVersionDetails on MeshVersion {
+	id
+	ordinal
+	label
+	mesh {
+		id
+	}
+}
+`
+
+func UnlabelMeshVersion(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	id string,
+) (data_ *UnlabelMeshVersionResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "UnlabelMeshVersion",
+		Query:  UnlabelMeshVersion_Operation,
+		Variables: &__UnlabelMeshVersionInput{
+			Id: id,
+		},
+	}
+
+	data_ = &UnlabelMeshVersionResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

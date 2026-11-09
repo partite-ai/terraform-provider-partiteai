@@ -81,6 +81,8 @@ bindings:
     type: string
   SkillFileID:
     type: string
+  RouteID:
+    type: string
   SerializableType:
     type: "encoding/json.RawMessage"
   SerializableTMap:
@@ -163,3 +165,7 @@ bindings:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewAccessPointClient"
   UpdateAccessPointClient:
     type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateAccessPointClient"
+  NewRoute:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.NewRoute"
+  UpdateRoute:
+    type: "*github.com/partite-ai/terraform-provider-partiteai/internal/graphql.UpdateRoute"

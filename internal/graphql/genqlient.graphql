@@ -634,6 +634,54 @@ mutation DeleteInput($meshId: MeshID!, $name: String!) {
   }
 }
 
+# @genqlient(typename: "MeshVersionDetails")
+fragment MeshVersionDetails on MeshVersion {
+  id
+  ordinal
+  label
+  mesh {
+    id
+  }
+}
+
+query GetMeshVersion($id: MeshVersionID!) {
+  # @genqlient(flatten: true)
+  meshVersion(id: $id) {
+    ...MeshVersionDetails
+  }
+}
+
+query GetMeshVersionByLabel($meshId: MeshID!, $label: String!) {
+  mesh(id: $meshId) {
+    # @genqlient(flatten: true)
+    versionByLabel(label: $label) {
+      ...MeshVersionDetails
+    }
+  }
+}
+
+
+mutation LabelMeshVersion($id: MeshVersionID!, $label: String!) {
+  # @genqlient(flatten: true)
+  labelMeshVersion(meshVersionID: $id, label: $label) {
+    ...MeshVersionDetails
+  }
+}
+
+mutation LabelMeshDraft($meshId: MeshID!, $label: String!) {
+  # @genqlient(flatten: true)
+  labelMeshDraft(meshID: $meshId, label: $label) {
+    ...MeshVersionDetails
+  }
+}
+
+mutation UnlabelMeshVersion($id: MeshVersionID!) {
+  # @genqlient(flatten: true)
+  unlabelMeshVersion(meshVersionID: $id) {
+    ...MeshVersionDetails
+  }
+}
+
 query GetAgentIDForVersion($id: AgentVersionID!) {
   agentVersion(id: $id) {
     agent {
@@ -1561,6 +1609,45 @@ mutation CreateAccessPointClientSecret(
 
 mutation DeleteAccessPointClientSecret($id: AccessPointClientSecretID!) {
   deleteAccessPointClientSecrets(accessPointClientSecretIDs: [$id]) {
+    ids
+  }
+}
+
+# @genqlient(typename: "RouteDetails")
+fragment RouteDetails on Route {
+  id
+  name
+  description
+  meshID
+  segments {
+    meshVersionID
+    weight
+  }
+}
+
+query GetRoute($id: RouteID!) {
+  # @genqlient(flatten: true)
+  route(id: $id) {
+    ...RouteDetails
+  }
+}
+
+mutation CreateRoute($input: NewRoute!) {
+  # @genqlient(flatten: true)
+  createRoute(input: $input) {
+    ...RouteDetails
+  }
+}
+
+mutation ModifyRoute($id: RouteID!, $input: UpdateRoute!) {
+  # @genqlient(flatten: true)
+  updateRoute(routeID: $id, input: $input) {
+    ...RouteDetails
+  }
+}
+
+mutation DeleteRoute($id: RouteID!) {
+  deleteRoutes(routeIDs: [$id]) {
     ids
   }
 }
