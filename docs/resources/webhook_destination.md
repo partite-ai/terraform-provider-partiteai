@@ -24,6 +24,7 @@ Webhook Destination resource
 ### Optional
 
 - `description` (String) Resource description
+- `handler` (Attributes) Code that turns each request to the destination into the input's message, and can refuse the request. Without it, the request body is the message. (see [below for nested schema](#nestedatt--handler))
 - `mesh_version_label` (String) Optional mesh version label
 
 ### Read-Only
@@ -33,3 +34,22 @@ Webhook Destination resource
 - `id` (String) Resource identifier
 - `invoke_url` (String) Invoke URL for the webhook destination
 - `updated_at` (String) Timestamp when the resource was last updated
+
+<a id="nestedatt--handler"></a>
+### Nested Schema for `handler`
+
+Required:
+
+- `source_path` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Path to the handler's code: an ES module for `JAVASCRIPT`, or a wasm component for `WASM_COMPONENT`. It is not kept in state: `source_hash` tracks the file's content, so moving the file changes nothing.
+- `type` (String) `JAVASCRIPT` or `WASM_COMPONENT`.
+
+Optional:
+
+- `config` (Map of String) Settings the handler reads with `config.get`.
+- `secrets_version` (Number) The version of the handler's secrets. Increment it to send every value in `secrets_wo` again.
+- `secrets_wo` (Map of String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Values the handler reads with `secrets.get`, such as a signing key. Write-only: never stored in state. Adding or removing a name takes effect on the next apply. Terraform cannot see a value change, so increment `secrets_version` to send changed values.
+
+Read-Only:
+
+- `secret_names` (Set of String) The names of the secrets the server holds for the handler.
+- `source_hash` (String) SHA-256 hex digest of the code, as the server reports it. A file at `source_path` with other content is uploaded on the next apply.

@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"regexp"
 	"testing"
 
@@ -96,7 +95,7 @@ resource "partiteai_model_provider" "test" {
 // is a separate branch in the create and read mapping, and a mistake in any of
 // them shows up as a non-empty plan after apply.
 func TestAccModelProvider_variants(t *testing.T) {
-	config := fmt.Sprintf(`
+	config := `
 resource "partiteai_model_provider" "anthropic" {
   probe = false
   name = "acc-anthropic"
@@ -169,7 +168,7 @@ resource "partiteai_model_provider" "bedrock_static_keys" {
     }
   }
 }
-`, serviceAccountKey(t))
+`
 	accTest(t, resource.TestStep{
 		Config: config,
 		Check: resource.ComposeAggregateTestCheckFunc(

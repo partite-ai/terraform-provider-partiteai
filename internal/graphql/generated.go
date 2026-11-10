@@ -6900,15 +6900,16 @@ func (v *UpdateMcpConnection) GetHeaderCredentials() *McpConnectionHeaderCredent
 
 // WebhookDestinationDetails includes the GraphQL fields of WebhookDestination requested by the fragment WebhookDestinationDetails.
 type WebhookDestinationDetails struct {
-	Id               string                        `json:"id"`
-	Name             string                        `json:"name"`
-	Description      *string                       `json:"description"`
-	ExternalID       string                        `json:"externalID"`
-	Mesh             WebhookDestinationDetailsMesh `json:"mesh"`
-	MeshVersionLabel *string                       `json:"meshVersionLabel"`
-	InputName        string                        `json:"inputName"`
-	CreatedAt        string                        `json:"createdAt"`
-	UpdatedAt        string                        `json:"updatedAt"`
+	Id               string                                          `json:"id"`
+	Name             string                                          `json:"name"`
+	Description      *string                                         `json:"description"`
+	ExternalID       string                                          `json:"externalID"`
+	Mesh             WebhookDestinationDetailsMesh                   `json:"mesh"`
+	MeshVersionLabel *string                                         `json:"meshVersionLabel"`
+	InputName        string                                          `json:"inputName"`
+	Handler          *WebhookDestinationDetailsHandlerWebhookHandler `json:"handler"`
+	CreatedAt        string                                          `json:"createdAt"`
+	UpdatedAt        string                                          `json:"updatedAt"`
 }
 
 // GetId returns WebhookDestinationDetails.Id, and is useful for accessing the field via an interface.
@@ -6932,11 +6933,52 @@ func (v *WebhookDestinationDetails) GetMeshVersionLabel() *string { return v.Mes
 // GetInputName returns WebhookDestinationDetails.InputName, and is useful for accessing the field via an interface.
 func (v *WebhookDestinationDetails) GetInputName() string { return v.InputName }
 
+// GetHandler returns WebhookDestinationDetails.Handler, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetails) GetHandler() *WebhookDestinationDetailsHandlerWebhookHandler {
+	return v.Handler
+}
+
 // GetCreatedAt returns WebhookDestinationDetails.CreatedAt, and is useful for accessing the field via an interface.
 func (v *WebhookDestinationDetails) GetCreatedAt() string { return v.CreatedAt }
 
 // GetUpdatedAt returns WebhookDestinationDetails.UpdatedAt, and is useful for accessing the field via an interface.
 func (v *WebhookDestinationDetails) GetUpdatedAt() string { return v.UpdatedAt }
+
+// WebhookDestinationDetailsHandlerWebhookHandler includes the requested fields of the GraphQL type WebhookHandler.
+type WebhookDestinationDetailsHandlerWebhookHandler struct {
+	Type   WebhookHandlerType `json:"type"`
+	Config *json.RawMessage   `json:"config"`
+	// The names of the handler's secrets. Their values are never returned.
+	SecretNames []string                                           `json:"secretNames"`
+	Code        WebhookDestinationDetailsHandlerWebhookHandlerCode `json:"code"`
+}
+
+// GetType returns WebhookDestinationDetailsHandlerWebhookHandler.Type, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetailsHandlerWebhookHandler) GetType() WebhookHandlerType { return v.Type }
+
+// GetConfig returns WebhookDestinationDetailsHandlerWebhookHandler.Config, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetailsHandlerWebhookHandler) GetConfig() *json.RawMessage {
+	return v.Config
+}
+
+// GetSecretNames returns WebhookDestinationDetailsHandlerWebhookHandler.SecretNames, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetailsHandlerWebhookHandler) GetSecretNames() []string {
+	return v.SecretNames
+}
+
+// GetCode returns WebhookDestinationDetailsHandlerWebhookHandler.Code, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetailsHandlerWebhookHandler) GetCode() WebhookDestinationDetailsHandlerWebhookHandlerCode {
+	return v.Code
+}
+
+// WebhookDestinationDetailsHandlerWebhookHandlerCode includes the requested fields of the GraphQL type WebhookHandlerCode.
+type WebhookDestinationDetailsHandlerWebhookHandlerCode struct {
+	// The SHA-256 of the code, in hex.
+	Sha256 string `json:"sha256"`
+}
+
+// GetSha256 returns WebhookDestinationDetailsHandlerWebhookHandlerCode.Sha256, and is useful for accessing the field via an interface.
+func (v *WebhookDestinationDetailsHandlerWebhookHandlerCode) GetSha256() string { return v.Sha256 }
 
 // WebhookDestinationDetailsMesh includes the requested fields of the GraphQL type Mesh.
 type WebhookDestinationDetailsMesh struct {
@@ -6945,6 +6987,18 @@ type WebhookDestinationDetailsMesh struct {
 
 // GetId returns WebhookDestinationDetailsMesh.Id, and is useful for accessing the field via an interface.
 func (v *WebhookDestinationDetailsMesh) GetId() string { return v.Id }
+
+type WebhookHandlerType string
+
+const (
+	WebhookHandlerTypeJavascript    WebhookHandlerType = "JAVASCRIPT"
+	WebhookHandlerTypeWasmComponent WebhookHandlerType = "WASM_COMPONENT"
+)
+
+var AllWebhookHandlerType = []WebhookHandlerType{
+	WebhookHandlerTypeJavascript,
+	WebhookHandlerTypeWasmComponent,
+}
 
 // WorkspaceDetails includes the GraphQL fields of Workspace requested by the fragment WorkspaceDetails.
 type WorkspaceDetails struct {
@@ -9583,6 +9637,14 @@ fragment WebhookDestinationDetails on WebhookDestination {
 	}
 	meshVersionLabel
 	inputName
+	handler {
+		type
+		config
+		secretNames
+		code {
+			sha256
+		}
+	}
 	createdAt
 	updatedAt
 }
@@ -12474,6 +12536,14 @@ fragment WebhookDestinationDetails on WebhookDestination {
 	}
 	meshVersionLabel
 	inputName
+	handler {
+		type
+		config
+		secretNames
+		code {
+			sha256
+		}
+	}
 	createdAt
 	updatedAt
 }
@@ -14076,6 +14146,14 @@ fragment WebhookDestinationDetails on WebhookDestination {
 	}
 	meshVersionLabel
 	inputName
+	handler {
+		type
+		config
+		secretNames
+		code {
+			sha256
+		}
+	}
 	createdAt
 	updatedAt
 }

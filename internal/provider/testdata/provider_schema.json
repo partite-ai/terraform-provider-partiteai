@@ -7264,6 +7264,131 @@
             "DeprecationMessage": ""
           },
           {
+            "Name": "handler",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "config",
+                  "Type": [
+                    "map",
+                    "string"
+                  ],
+                  "NestedType": null,
+                  "Description": "Settings the handler reads with `config.get`.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "secret_names",
+                  "Type": [
+                    "set",
+                    "string"
+                  ],
+                  "NestedType": null,
+                  "Description": "The names of the secrets the server holds for the handler.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "secrets_version",
+                  "Type": "number",
+                  "NestedType": null,
+                  "Description": "The version of the handler's secrets. Increment it to send every value in `secrets_wo` again.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "secrets_wo",
+                  "Type": [
+                    "map",
+                    "string"
+                  ],
+                  "NestedType": null,
+                  "Description": "Values the handler reads with `secrets.get`, such as a signing key. Write-only: never stored in state. Adding or removing a name takes effect on the next apply. Terraform cannot see a value change, so increment `secrets_version` to send changed values.",
+                  "Required": false,
+                  "Optional": true,
+                  "Computed": false,
+                  "Sensitive": true,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": true,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "source_hash",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "SHA-256 hex digest of the code, as the server reports it. A file at `source_path` with other content is uploaded on the next apply.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "source_path",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "Path to the handler's code: an ES module for `JAVASCRIPT`, or a wasm component for `WASM_COMPONENT`. It is not kept in state: `source_hash` tracks the file's content, so moving the file changes nothing.",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": true,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "type",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "`JAVASCRIPT` or `WASM_COMPONENT`.",
+                  "Required": true,
+                  "Optional": false,
+                  "Computed": false,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 1
+            },
+            "Description": "Code that turns each request to the destination into the input's message, and can refuse the request. Without it, the request body is the message.",
+            "Required": false,
+            "Optional": true,
+            "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
             "Name": "id",
             "Type": "string",
             "NestedType": null,
@@ -19362,6 +19487,86 @@
             "Type": "string",
             "NestedType": null,
             "Description": "External ID for the webhook destination",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "handler",
+            "Type": null,
+            "NestedType": {
+              "Attributes": [
+                {
+                  "Name": "config",
+                  "Type": [
+                    "map",
+                    "string"
+                  ],
+                  "NestedType": null,
+                  "Description": "Settings the handler reads with `config.get`.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "secret_names",
+                  "Type": [
+                    "set",
+                    "string"
+                  ],
+                  "NestedType": null,
+                  "Description": "The names of the handler's secrets. Their values are never returned.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "source_hash",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "SHA-256 hex digest of the code.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                },
+                {
+                  "Name": "type",
+                  "Type": "string",
+                  "NestedType": null,
+                  "Description": "`JAVASCRIPT` or `WASM_COMPONENT`.",
+                  "Required": false,
+                  "Optional": false,
+                  "Computed": true,
+                  "Sensitive": false,
+                  "DescriptionKind": 1,
+                  "Deprecated": false,
+                  "WriteOnly": false,
+                  "DeprecationMessage": ""
+                }
+              ],
+              "Nesting": 1
+            },
+            "Description": "Code that turns each request to the destination into the input's message. Null when the request body is the message.",
             "Required": false,
             "Optional": false,
             "Computed": true,

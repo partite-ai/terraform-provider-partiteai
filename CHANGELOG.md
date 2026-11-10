@@ -159,6 +159,15 @@ FEATURES:
 * resource/partiteai_api_key: `token`, the `prt_ak_` token for the key. State
   from before this has it filled in from `kid` and `secret` on the next
   refresh.
+* resource/partiteai_webhook_destination: `handler`, the code that turns each
+  request into the input's message and can refuse it. It takes a `type`, the
+  code at `source_path`, a `config` map, and `secrets_wo`, a write-only map
+  the handler reads with `secrets.get`. A changed code file is uploaded on
+  the next apply, as is a secret name added or removed. To send changed
+  values, increment `secrets_version`. Needs a server that changes handler
+  secrets by name.
+* data-source/partiteai_webhook_destination: `handler`, with its `type`,
+  `source_hash`, `config` and `secret_names`.
 
 DEPRECATIONS:
 

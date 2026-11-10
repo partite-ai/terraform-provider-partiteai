@@ -27,6 +27,7 @@ type WebhookDestinationDataSource struct {
 // WebhookDestinationDataSourceModel extends the base model with data source-specific fields.
 type WebhookDestinationDataSourceModel struct {
 	WebhookDestinationBaseModel
+	Handler types.Object `tfsdk:"handler"`
 }
 
 func (d *WebhookDestinationDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
@@ -56,6 +57,30 @@ func (d *WebhookDestinationDataSource) Schema(ctx context.Context, req datasourc
 				Computed:            true,
 				MarkdownDescription: "URL to invoke the webhook destination",
 			},
+			"handler": schema.SingleNestedAttribute{
+				MarkdownDescription: "Code that turns each request to the destination into the input's message. Null when the request body is the message.",
+				Computed:            true,
+				Attributes: map[string]schema.Attribute{
+					"type": schema.StringAttribute{
+						MarkdownDescription: "`JAVASCRIPT` or `WASM_COMPONENT`.",
+						Computed:            true,
+					},
+					"source_hash": schema.StringAttribute{
+						MarkdownDescription: "SHA-256 hex digest of the code.",
+						Computed:            true,
+					},
+					"config": schema.MapAttribute{
+						MarkdownDescription: "Settings the handler reads with `config.get`.",
+						ElementType:         types.StringType,
+						Computed:            true,
+					},
+					"secret_names": schema.SetAttribute{
+						MarkdownDescription: "The names of the handler's secrets. Their values are never returned.",
+						ElementType:         types.StringType,
+						Computed:            true,
+					},
+				},
+			},
 			"created_at": commonDataSourceSchemas.createdAt,
 			"updated_at": commonDataSourceSchemas.updatedAt,
 		},
@@ -83,5 +108,21 @@ func (d *WebhookDestinationDataSource) Read(ctx context.Context, req datasource.
 		return
 	}
 	data.InvokeUrl = types.StringValue(d.baseURL.JoinPath("webhooks", data.ExternalId.ValueString()).String())
+
+	data.Handler = types.ObjectNull(webhookHandlerDataAttrTypes())
+	if server := webhookResp.WebhookDestination.Handler; server != nil {
+		config, diags := webhookHandlerConfig(ctx, server.Config, false)
+		resp.Diagnostics.Append(diags...)
+		names, diags := types.SetValueFrom(ctx, types.StringType, server.SecretNames)
+		resp.Diagnostics.Append(diags...)
+		handler, diags := types.ObjectValueFrom(ctx, webhookHandlerDataAttrTypes(), webhookHandlerDataModel{
+			Type:        types.StringValue(string(server.Type)),
+			SourceHash:  types.StringValue(server.Code.Sha256),
+			Config:      config,
+			SecretNames: names,
+		})
+		resp.Diagnostics.Append(diags...)
+		data.Handler = handler
+	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

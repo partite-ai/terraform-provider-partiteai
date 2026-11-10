@@ -695,6 +695,14 @@ fragment WebhookDestinationDetails on WebhookDestination {
   }
   meshVersionLabel
   inputName
+  handler {
+    type
+    config
+    secretNames
+    code {
+      sha256
+    }
+  }
   createdAt
   updatedAt
 }

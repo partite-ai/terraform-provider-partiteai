@@ -270,19 +270,40 @@ type NewInputResponse struct {
 }
 
 type NewWebhookDestination struct {
-	Name             string           `json:"name"`
-	Description      Optional[string] `json:"description,omitzero"`
-	MeshID           string           `json:"meshID"`
-	MeshVersionLabel Optional[string] `json:"meshVersionLabel,omitzero"`
-	InputName        string           `json:"inputName"`
+	Name             string                              `json:"name"`
+	Description      Optional[string]                    `json:"description,omitzero"`
+	MeshID           string                              `json:"meshID"`
+	MeshVersionLabel Optional[string]                    `json:"meshVersionLabel,omitzero"`
+	InputName        string                              `json:"inputName"`
+	Handler          Optional[WebhookHandlerCreateInput] `json:"handler,omitzero"`
 }
 
 type UpdateWebhookDestination struct {
-	Name             Optional[string] `json:"name,omitzero"`
-	Description      Optional[string] `json:"description,omitzero"`
-	MeshID           Optional[string] `json:"meshID,omitzero"`
-	MeshVersionLabel Optional[string] `json:"meshVersionLabel,omitzero"`
-	InputName        Optional[string] `json:"inputName,omitzero"`
+	Name             Optional[string]                    `json:"name,omitzero"`
+	Description      Optional[string]                    `json:"description,omitzero"`
+	MeshID           Optional[string]                    `json:"meshID,omitzero"`
+	MeshVersionLabel Optional[string]                    `json:"meshVersionLabel,omitzero"`
+	InputName        Optional[string]                    `json:"inputName,omitzero"`
+	Handler          Optional[WebhookHandlerUpdateInput] `json:"handler,omitzero"`
+}
+
+// WebhookHandlerCreateInput is a new handler. Its code is the file sent with
+// the request.
+type WebhookHandlerCreateInput struct {
+	Type    string                      `json:"type"`
+	Code    FileUpload                  `json:"code"`
+	Config  Optional[map[string]string] `json:"config,omitzero"`
+	Secrets Optional[map[string]string] `json:"secrets,omitzero"`
+}
+
+// WebhookHandlerUpdateInput changes a handler. Code is set when new code is
+// the file sent with the request. Secrets change by name: a value sets that
+// secret and nil deletes it.
+type WebhookHandlerUpdateInput struct {
+	Type    Optional[string]             `json:"type,omitzero"`
+	Code    *FileUpload                  `json:"code,omitempty"`
+	Config  Optional[map[string]string]  `json:"config,omitzero"`
+	Secrets Optional[map[string]*string] `json:"secrets,omitzero"`
 }
 
 type NewClientTaskDefinition struct {

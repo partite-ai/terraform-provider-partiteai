@@ -24,9 +24,20 @@ Webhook Destination data source
 - `created_at` (String) Timestamp when the resource was created
 - `description` (String) Resource description
 - `external_id` (String) External ID for the webhook destination
+- `handler` (Attributes) Code that turns each request to the destination into the input's message. Null when the request body is the message. (see [below for nested schema](#nestedatt--handler))
 - `input_name` (String) Name of the input to invoke
 - `invoke_url` (String) URL to invoke the webhook destination
 - `mesh_id` (String) ID of the mesh associated with this webhook destination
 - `mesh_version_label` (String) Optional mesh version label
 - `name` (String) Resource name
 - `updated_at` (String) Timestamp when the resource was last updated
+
+<a id="nestedatt--handler"></a>
+### Nested Schema for `handler`
+
+Read-Only:
+
+- `config` (Map of String) Settings the handler reads with `config.get`.
+- `secret_names` (Set of String) The names of the handler's secrets. Their values are never returned.
+- `source_hash` (String) SHA-256 hex digest of the code.
+- `type` (String) `JAVASCRIPT` or `WASM_COMPONENT`.
