@@ -55,6 +55,16 @@ BREAKING CHANGES:
   changes neither it nor the provider's other settings leaves the stored
   secret alone. This also makes the resource work against servers that no
   longer return provider secrets.
+* resource/partiteai_mesh_version_label: `id` is now `mesh_version_id`. The
+  resource does not create an object of its own. It labels a mesh version, and
+  the attribute holds the ID of that version. In route `segments`, change
+  `partiteai_mesh_version_label.<name>.id` to
+  `partiteai_mesh_version_label.<name>.mesh_version_id`. The state of a label
+  created with v1.0.19 has no `mesh_version_id`, so the next plan creates the
+  label again. To keep the label on its version, remove the resource from state
+  and import it by its mesh version ID.
+* data-source/partiteai_mesh_version_label: `id` is now `mesh_version_id`, for
+  the same reason.
 
 FEATURES:
 

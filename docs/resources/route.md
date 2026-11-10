@@ -4,7 +4,7 @@ page_title: "partiteai_route Resource - partiteai"
 subcategory: ""
 description: |-
   Splits the traffic of a mesh across its versions by weight.
-  A segment without mesh_version_id sends its share of the traffic to the mesh's current draft. When a label freezes the draft, the segment follows the new draft.To send traffic to a frozen version, use the id of a partiteai_mesh_version_label resource.The weights must add up to 100. A segment with a weight of 0 gets no traffic.A route that a webhook destination or a schedule uses cannot be deleted.
+  A segment without mesh_version_id sends its share of the traffic to the mesh's current draft. When a label freezes the draft, the segment follows the new draft.To send traffic to a frozen version, use the mesh_version_id of a partiteai_mesh_version_label resource.The weights must add up to 100. A segment with a weight of 0 gets no traffic.A route that a webhook destination or a schedule uses cannot be deleted.
 ---
 
 # partiteai_route (Resource)
@@ -12,7 +12,7 @@ description: |-
 Splits the traffic of a mesh across its versions by weight.
 
 * A segment without `mesh_version_id` sends its share of the traffic to the mesh's current draft. When a label freezes the draft, the segment follows the new draft.
-* To send traffic to a frozen version, use the `id` of a `partiteai_mesh_version_label` resource.
+* To send traffic to a frozen version, use the `mesh_version_id` of a `partiteai_mesh_version_label` resource.
 * The weights must add up to 100. A segment with a weight of 0 gets no traffic.
 * A route that a webhook destination or a schedule uses cannot be deleted.
 

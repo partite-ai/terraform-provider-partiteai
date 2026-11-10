@@ -31,5 +31,5 @@ Labels a mesh version. Creating the resource freezes the mesh's current draft un
 
 ### Read-Only
 
-- `id` (String) The ID of the labeled mesh version.
+- `mesh_version_id` (String) The ID of the labeled mesh version.
 - `ordinal` (Number) The ordinal of the labeled mesh version.

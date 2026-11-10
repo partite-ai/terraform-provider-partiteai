@@ -141,7 +141,12 @@ func TestIDIsComputed(t *testing.T) {
 
 	// mesh_input is addressed by mesh_id + name, not by an id of its own, and
 	// implements its own ImportState to match.
-	exempt := map[string]bool{"partiteai_mesh_input": true}
+	// mesh_version_label manages a column of a mesh version, not an object of
+	// its own, so it is addressed by mesh_version_id.
+	exempt := map[string]bool{
+		"partiteai_mesh_input":         true,
+		"partiteai_mesh_version_label": true,
+	}
 
 	for name, s := range providerSchema(t).ResourceSchemas {
 		if exempt[name] {

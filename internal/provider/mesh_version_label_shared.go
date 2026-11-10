@@ -10,16 +10,16 @@ import (
 )
 
 type MeshVersionLabelBaseModel struct {
-	Id      types.String `tfsdk:"id"`
-	MeshId  types.String `tfsdk:"mesh_id"`
-	Label   types.String `tfsdk:"label"`
-	Ordinal types.Int64  `tfsdk:"ordinal"`
+	MeshVersionId types.String `tfsdk:"mesh_version_id"`
+	MeshId        types.String `tfsdk:"mesh_id"`
+	Label         types.String `tfsdk:"label"`
+	Ordinal       types.Int64  `tfsdk:"ordinal"`
 }
 
 func (m *MeshVersionLabelBaseModel) MapFromGraphQL(ctx context.Context, v pgql.MeshVersionDetails) diag.Diagnostics {
 	return setFields(
 		ctx,
-		&m.Id, v.Id,
+		&m.MeshVersionId, v.Id,
 		&m.MeshId, v.Mesh.Id,
 		&m.Label, v.Label,
 		&m.Ordinal, v.Ordinal,

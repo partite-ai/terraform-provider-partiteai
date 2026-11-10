@@ -23,7 +23,7 @@ resource "partiteai_route" "prod" {
   mesh_id = partiteai_mesh.base.id
   name    = "prod"
   segments = [
-    { mesh_version_id = partiteai_mesh_version_label.a.id, weight = 70 },
+    { mesh_version_id = partiteai_mesh_version_label.a.mesh_version_id, weight = 70 },
     { weight = 30 },
   ]
 }
@@ -36,7 +36,7 @@ resource "partiteai_route" "prod" {
   name        = "prod"
   description = "Half and half."
   segments = [
-    { mesh_version_id = partiteai_mesh_version_label.a.id, weight = 50 },
+    { mesh_version_id = partiteai_mesh_version_label.a.mesh_version_id, weight = 50 },
     { weight = 50 },
   ]
 }
@@ -44,7 +44,7 @@ resource "partiteai_route" "prod" {
 			Check: resource.ComposeTestCheckFunc(
 				resource.TestCheckResourceAttrPair("data.partiteai_route.found", "mesh_id", routeProd, "mesh_id"),
 				resource.TestCheckResourceAttr("data.partiteai_route.found", "description", "Half and half."),
-				resource.TestCheckTypeSetElemAttrPair("data.partiteai_route.found", "segments.*.mesh_version_id", labelA, "id"),
+				resource.TestCheckTypeSetElemAttrPair("data.partiteai_route.found", "segments.*.mesh_version_id", labelA, "mesh_version_id"),
 			),
 		},
 		resource.TestStep{
