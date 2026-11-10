@@ -8,6 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/plancheck"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 // labelMesh is a mesh with one input.
@@ -74,7 +75,7 @@ func TestAccMeshVersionLabel_basic(t *testing.T) {
 			Config: labelMesh() + labelBlock("a", "old") + labelDataSource,
 			Check: resource.ComposeTestCheckFunc(
 				resource.TestCheckResourceAttr(labelA, "ordinal", "1"),
-				resource.TestCheckResourceAttrPair("data.partiteai_mesh_version_label.found", "id", labelA, "id"),
+				resource.TestCheckResourceAttrPair("data.partiteai_mesh_version_label.found", "mesh_version_id", labelA, "mesh_version_id"),
 				resource.TestCheckResourceAttr("data.partiteai_mesh_version_label.found", "ordinal", "1"),
 			),
 		},
@@ -85,13 +86,17 @@ func TestAccMeshVersionLabel_basic(t *testing.T) {
 					plancheck.ExpectResourceAction(labelA, plancheck.ResourceActionUpdate),
 				},
 			},
-			Check: resource.TestCheckResourceAttrPair("data.partiteai_mesh_version_label.found", "id", labelA, "id"),
+			Check: resource.TestCheckResourceAttrPair("data.partiteai_mesh_version_label.found", "mesh_version_id", labelA, "mesh_version_id"),
 		},
 		resource.TestStep{
 			Config:            renamed,
 			ResourceName:      labelA,
 			ImportState:       true,
 			ImportStateVerify: true,
+			ImportStateIdFunc: func(s *terraform.State) (string, error) {
+				return s.RootModule().Resources[labelA].Primary.Attributes["mesh_version_id"], nil
+			},
+			ImportStateVerifyIdentifierAttribute: "mesh_version_id",
 		},
 	)
 }

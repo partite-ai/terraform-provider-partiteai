@@ -34,7 +34,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Splits the traffic of a mesh across its versions by weight.\n\n" +
 			"* A segment without `mesh_version_id` sends its share of the traffic to the mesh's current draft. When a label freezes the draft, the segment follows the new draft.\n" +
-			"* To send traffic to a frozen version, use the `id` of a `partiteai_mesh_version_label` resource.\n" +
+			"* To send traffic to a frozen version, use the `mesh_version_id` of a `partiteai_mesh_version_label` resource.\n" +
 			"* The weights must add up to 100. A segment with a weight of 0 gets no traffic.\n" +
 			"* A route that a webhook destination or a schedule uses cannot be deleted.",
 		Attributes: map[string]schema.Attribute{

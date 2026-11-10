@@ -30,7 +30,7 @@ func (d *MeshVersionLabelDataSource) Schema(ctx context.Context, req datasource.
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Finds a mesh version by its mesh and its exact label.",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
+			"mesh_version_id": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "The ID of the mesh version.",
 			},

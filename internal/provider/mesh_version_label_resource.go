@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -42,7 +43,7 @@ func (r *MeshVersionLabelResource) Schema(ctx context.Context, req resource.Sche
 			"* If one apply adds two label resources for the same mesh, add `depends_on` from one to the other. Without it, Terraform can create both at the same time, and one of them can fail with a conflict. Both freeze the same configuration.\n" +
 			"* A webhook destination or a schedule that names a removed or renamed label fails on its next use.",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
+			"mesh_version_id": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "The ID of the labeled mesh version.",
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
@@ -82,7 +83,7 @@ func (r *MeshVersionLabelResource) Create(ctx context.Context, req resource.Crea
 	}
 
 	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, labelResp.LabelMeshDraft)...)
-	logResourceOperation(ctx, "created", "mesh_version_label", data.Id.ValueString())
+	logResourceOperation(ctx, "created", "mesh_version_label", data.MeshVersionId.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -93,11 +94,11 @@ func (r *MeshVersionLabelResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 
-	logResourceOperation(ctx, "reading", "mesh_version_label", data.Id.ValueString())
+	logResourceOperation(ctx, "reading", "mesh_version_label", data.MeshVersionId.ValueString())
 
-	versionResp, err := pgql.GetMeshVersion(ctx, r.GetClient(), data.Id.ValueString())
+	versionResp, err := pgql.GetMeshVersion(ctx, r.GetClient(), data.MeshVersionId.ValueString())
 	if err != nil {
-		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "mesh_version_label", data.Id.ValueString())
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "read", "mesh_version_label", data.MeshVersionId.ValueString())
 		return
 	}
 	if versionResp.MeshVersion == nil {
@@ -117,16 +118,16 @@ func (r *MeshVersionLabelResource) Update(ctx context.Context, req resource.Upda
 		return
 	}
 
-	logResourceOperation(ctx, "updating", "mesh_version_label", state.Id.ValueString())
+	logResourceOperation(ctx, "updating", "mesh_version_label", state.MeshVersionId.ValueString())
 
-	labelResp, err := pgql.LabelMeshVersion(ctx, r.GetClient(), state.Id.ValueString(), plan.Label.ValueString())
+	labelResp, err := pgql.LabelMeshVersion(ctx, r.GetClient(), state.MeshVersionId.ValueString(), plan.Label.ValueString())
 	if err != nil {
-		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "mesh_version_label", state.Id.ValueString())
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "mesh_version_label", state.MeshVersionId.ValueString())
 		return
 	}
 
 	resp.Diagnostics.Append(plan.MapFromGraphQL(ctx, labelResp.LabelMeshVersion)...)
-	logResourceOperation(ctx, "updated", "mesh_version_label", plan.Id.ValueString())
+	logResourceOperation(ctx, "updated", "mesh_version_label", plan.MeshVersionId.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
@@ -137,12 +138,16 @@ func (r *MeshVersionLabelResource) Delete(ctx context.Context, req resource.Dele
 		return
 	}
 
-	logResourceOperation(ctx, "deleting", "mesh_version_label", data.Id.ValueString())
+	logResourceOperation(ctx, "deleting", "mesh_version_label", data.MeshVersionId.ValueString())
 
-	if _, err := pgql.UnlabelMeshVersion(ctx, r.GetClient(), data.Id.ValueString()); err != nil {
-		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "mesh_version_label", data.Id.ValueString())
+	if _, err := pgql.UnlabelMeshVersion(ctx, r.GetClient(), data.MeshVersionId.ValueString()); err != nil {
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "delete", "mesh_version_label", data.MeshVersionId.ValueString())
 		return
 	}
 
-	logResourceOperation(ctx, "deleted", "mesh_version_label", data.Id.ValueString())
+	logResourceOperation(ctx, "deleted", "mesh_version_label", data.MeshVersionId.ValueString())
+}
+
+func (r *MeshVersionLabelResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("mesh_version_id"), req, resp)
 }

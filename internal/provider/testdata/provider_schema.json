@@ -5035,20 +5035,6 @@
         "Version": 0,
         "Attributes": [
           {
-            "Name": "id",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "The ID of the labeled mesh version.",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
             "Name": "label",
             "Type": "string",
             "NestedType": null,
@@ -5070,6 +5056,20 @@
             "Required": true,
             "Optional": false,
             "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_version_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the labeled mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
             "Sensitive": false,
             "DescriptionKind": 1,
             "Deprecated": false,
@@ -6915,7 +6915,7 @@
           }
         ],
         "BlockTypes": null,
-        "Description": "Splits the traffic of a mesh across its versions by weight.\n\n* A segment without `mesh_version_id` sends its share of the traffic to the mesh's current draft. When a label freezes the draft, the segment follows the new draft.\n* To send traffic to a frozen version, use the `id` of a `partiteai_mesh_version_label` resource.\n* The weights must add up to 100. A segment with a weight of 0 gets no traffic.\n* A route that a webhook destination or a schedule uses cannot be deleted.",
+        "Description": "Splits the traffic of a mesh across its versions by weight.\n\n* A segment without `mesh_version_id` sends its share of the traffic to the mesh's current draft. When a label freezes the draft, the segment follows the new draft.\n* To send traffic to a frozen version, use the `mesh_version_id` of a `partiteai_mesh_version_label` resource.\n* The weights must add up to 100. A segment with a weight of 0 gets no traffic.\n* A route that a webhook destination or a schedule uses cannot be deleted.",
         "DescriptionKind": 1,
         "Deprecated": false,
         "DeprecationMessage": ""
@@ -17245,20 +17245,6 @@
         "Version": 0,
         "Attributes": [
           {
-            "Name": "id",
-            "Type": "string",
-            "NestedType": null,
-            "Description": "The ID of the mesh version.",
-            "Required": false,
-            "Optional": false,
-            "Computed": true,
-            "Sensitive": false,
-            "DescriptionKind": 1,
-            "Deprecated": false,
-            "WriteOnly": false,
-            "DeprecationMessage": ""
-          },
-          {
             "Name": "label",
             "Type": "string",
             "NestedType": null,
@@ -17280,6 +17266,20 @@
             "Required": true,
             "Optional": false,
             "Computed": false,
+            "Sensitive": false,
+            "DescriptionKind": 1,
+            "Deprecated": false,
+            "WriteOnly": false,
+            "DeprecationMessage": ""
+          },
+          {
+            "Name": "mesh_version_id",
+            "Type": "string",
+            "NestedType": null,
+            "Description": "The ID of the mesh version.",
+            "Required": false,
+            "Optional": false,
+            "Computed": true,
             "Sensitive": false,
             "DescriptionKind": 1,
             "Deprecated": false,
