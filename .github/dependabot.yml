@@ -13,6 +13,10 @@ updates:
       "terraform-plugin":
         patterns:
           - "github.com/hashicorp/terraform-plugin-*"
+      # Group all AWS SDK dependencies together
+      "aws":
+        patterns:
+          - "github.com/aws/*"
   - package-ecosystem: "gomod"
     directory: "/tools"
     schedule:
