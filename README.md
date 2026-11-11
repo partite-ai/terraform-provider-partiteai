@@ -1,64 +1,65 @@
-# Terraform Provider Scaffolding (Terraform Plugin Framework)
+# Terraform Provider for Partite AI
 
-_This template repository is built on the [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework). The template repository built on the [Terraform Plugin SDK](https://github.com/hashicorp/terraform-plugin-sdk) can be found at [terraform-provider-scaffolding](https://github.com/hashicorp/terraform-provider-scaffolding). See [Which SDK Should I Use?](https://developer.hashicorp.com/terraform/plugin/framework-benefits) in the Terraform documentation for additional information._
+Manages Partite AI configuration with Terraform: meshes, agents, model
+providers and profiles, MCP connections, memory stores, particles, access
+points and the rest of what the GraphQL API configures. It works with a
+self-hosted mesh and with an enterprise deployment.
 
-This repository is a *template* for a [Terraform](https://www.terraform.io) provider. It is intended as a starting point for creating Terraform providers, containing:
-
-- A resource and a data source (`internal/provider/`),
-- Examples (`examples/`) and generated documentation (`docs/`),
-- Miscellaneous meta files.
-
-These files contain boilerplate code that you will need to edit to create your own Terraform provider. Tutorials for creating Terraform providers can be found on the [HashiCorp Developer](https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework) platform. _Terraform Plugin Framework specific guides are titled accordingly._
-
-Please see the [GitHub template repository documentation](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template) for how to create a new repository from this template on GitHub.
-
-Once you've written your provider, you'll want to [publish it on the Terraform Registry](https://developer.hashicorp.com/terraform/registry/providers/publishing) so that others can use it.
+Resource and data source docs are in [`docs/`](docs/).
 
 ## Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.23
+- [Go](https://golang.org/doc/install) >= 1.25, to build it
 
-## Building The Provider
+## Using the provider
 
-1. Clone the repository
-1. Enter the repository directory
-1. Build the provider using the Go `install` command:
+```terraform
+terraform {
+  required_providers {
+    partiteai = {
+      source = "partiteai/partiteai"
+    }
+  }
+}
+
+provider "partiteai" {
+  endpoint  = "https://api.partite.ai/graphql"
+  api_token = var.partite_api_token
+}
+```
+
+`endpoint` and `api_token` can also come from the `PARTITE_AI_ENDPOINT` and
+`PARTITE_AI_API_TOKEN` environment variables. Resources that exist only in an
+enterprise deployment, such as `partiteai_rubric`, are refused against a
+self-hosted mesh; see `enterprise` in [`docs/index.md`](docs/index.md).
+
+## Building
 
 ```shell
 go install
 ```
 
-## Adding Dependencies
+This puts the provider binary in `$GOPATH/bin`. `make` formats, lints, builds,
+installs and regenerates the docs.
 
-This provider uses [Go modules](https://github.com/golang/go/wiki/Modules).
-Please see the Go documentation for the most up to date information about using Go modules.
+## Docs
 
-To add a new dependency `github.com/author/dependency` to your Terraform provider:
-
-```shell
-go get github.com/author/dependency
-go mod tidy
-```
-
-Then commit the changes to `go.mod` and `go.sum`.
-
-## Using the provider
-
-Fill this in for each provider
-
-## Developing the Provider
-
-If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (see [Requirements](#requirements) above).
-
-To compile the provider, run `go install`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
-
-To generate or update documentation, run `make generate`.
-
-In order to run the full suite of Acceptance tests, run `make testacc`.
-
-*Note:* Acceptance tests create real resources, and often cost money to run.
+`docs/` is generated from the schema and `examples/`. After changing either,
+run:
 
 ```shell
-make testacc
+make generate
 ```
+
+## Testing
+
+```shell
+make testunit         # schema checks, no backend and no Terraform binary
+make test             # everything, against a local mesh
+make testenterprise   # the acceptance tests against mesh-enterprise
+make testall          # both backends
+```
+
+The acceptance tests start their backend themselves. See
+[TESTING.md](TESTING.md) for what each layer covers and what it needs.
