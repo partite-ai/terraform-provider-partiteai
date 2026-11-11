@@ -10,7 +10,7 @@ Resource and data source docs are in [`docs/`](docs/).
 ## Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.25, to build it
+- [Go](https://golang.org/doc/install) >= 1.27, to build it
 
 ## Using the provider
 
