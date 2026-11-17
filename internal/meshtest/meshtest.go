@@ -89,6 +89,7 @@ func Start(t *testing.T) *Server {
 		"MCP_QUEUE_DB_URL="+filepath.Join(dir, "mcpqueue.db"),
 		"MEMORY_DB_URL="+filepath.Join(dir, "memory.db"),
 		"FILESTORE_ROOT_DIR="+filepath.Join(dir, "files"),
+		"BLOB_DIR="+filepath.Join(dir, "assets"),
 		"PARTICLE_BLOB_CACHE_DIR="+filepath.Join(dir, "blobs"),
 	)
 

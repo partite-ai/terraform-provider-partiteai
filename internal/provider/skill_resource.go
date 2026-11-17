@@ -82,7 +82,7 @@ func (r *SkillResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	logResourceOperation(ctx, "creating", "skill", "")
 
-	files, diags := skillSourceFiles(ctx, data.Files)
+	files, diags := skillSourceFiles(ctx, r.GetClient(), data.Files)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -143,7 +143,7 @@ func (r *SkillResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		update.Name = pgql.Opt(planData.Name.ValueString())
 	}
 	if !planData.Files.Equal(stateData.Files) {
-		files, diags := skillSourceFiles(ctx, planData.Files)
+		files, diags := skillSourceFiles(ctx, r.GetClient(), planData.Files)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
 			return

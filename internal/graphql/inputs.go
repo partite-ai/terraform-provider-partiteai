@@ -287,23 +287,23 @@ type UpdateWebhookDestination struct {
 	Handler          Optional[WebhookHandlerUpdateInput] `json:"handler,omitzero"`
 }
 
-// WebhookHandlerCreateInput is a new handler. Its code is the file sent with
-// the request.
+// WebhookHandlerCreateInput is a new handler. CodeUpload is the id of an
+// upload holding its code.
 type WebhookHandlerCreateInput struct {
-	Type    string                      `json:"type"`
-	Code    FileUpload                  `json:"code"`
-	Config  Optional[map[string]string] `json:"config,omitzero"`
-	Secrets Optional[map[string]string] `json:"secrets,omitzero"`
+	Type       string                      `json:"type"`
+	CodeUpload string                      `json:"codeUpload"`
+	Config     Optional[map[string]string] `json:"config,omitzero"`
+	Secrets    Optional[map[string]string] `json:"secrets,omitzero"`
 }
 
-// WebhookHandlerUpdateInput changes a handler. Code is set when new code is
-// the file sent with the request. Secrets change by name: a value sets that
-// secret and nil deletes it.
+// WebhookHandlerUpdateInput changes a handler. CodeUpload is set to the id of
+// an upload holding new code. Secrets change by name: a value sets that secret
+// and nil deletes it.
 type WebhookHandlerUpdateInput struct {
-	Type    Optional[string]             `json:"type,omitzero"`
-	Code    *FileUpload                  `json:"code,omitempty"`
-	Config  Optional[map[string]string]  `json:"config,omitzero"`
-	Secrets Optional[map[string]*string] `json:"secrets,omitzero"`
+	Type       Optional[string]             `json:"type,omitzero"`
+	CodeUpload Optional[string]             `json:"codeUpload,omitzero"`
+	Config     Optional[map[string]string]  `json:"config,omitzero"`
+	Secrets    Optional[map[string]*string] `json:"secrets,omitzero"`
 }
 
 type NewClientTaskDefinition struct {
@@ -354,10 +354,11 @@ type SkillSource struct {
 	Files []SkillSourceFile `json:"files"`
 }
 
-// SkillSourceFile is one file of a skill folder, given as text.
+// SkillSourceFile is one file of a skill folder, given as the id of an upload
+// holding it.
 type SkillSourceFile struct {
-	Path string `json:"path"`
-	Text string `json:"text"`
+	Path          string `json:"path"`
+	ContentUpload string `json:"contentUpload"`
 }
 
 type NewParticleAgentAssociation struct {

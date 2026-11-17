@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"net/url"
 
 	"github.com/Khan/genqlient/graphql"
@@ -16,8 +15,6 @@ import (
 type BaseResource struct {
 	client     graphql.Client
 	baseURL    *url.URL
-	httpClient *http.Client
-	graphqlURL *url.URL
 	typeName   string
 	enterprise bool
 }
@@ -47,8 +44,6 @@ func (r *BaseResource) Configure(ctx context.Context, req resource.ConfigureRequ
 
 	r.client = providerData.client
 	r.baseURL = providerData.baseURL
-	r.httpClient = providerData.httpClient
-	r.graphqlURL = providerData.graphqlURL
 	r.enterprise = providerData.enterprise
 }
 
@@ -65,16 +60,6 @@ func (r *BaseResource) ImportState(ctx context.Context, req resource.ImportState
 // GetClient returns the configured GraphQL client.
 func (r *BaseResource) GetClient() graphql.Client {
 	return r.client
-}
-
-// GetHTTPClient returns the configured HTTP client (with the auth transport).
-func (r *BaseResource) GetHTTPClient() *http.Client {
-	return r.httpClient
-}
-
-// GetGraphQLURL returns the un-stripped GraphQL endpoint URL (used for multipart uploads).
-func (r *BaseResource) GetGraphQLURL() *url.URL {
-	return r.graphqlURL
 }
 
 // RequireEnterprise reports whether this resource may be used against the

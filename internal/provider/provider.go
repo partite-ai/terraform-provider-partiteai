@@ -239,14 +239,12 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 			)
 			return
 		}
-		graphqlURL := *baseURL
 		baseURL.Path = ""
 
 		data := &providerData{
 			client:     p.client,
 			baseURL:    baseURL,
 			httpClient: http.DefaultClient,
-			graphqlURL: &graphqlURL,
 			enterprise: enterprise,
 		}
 		resp.DataSourceData = data
@@ -262,15 +260,6 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 
 	client := graphql.NewClient(endpoint, httpClient)
 
-	graphqlURL, err := url.Parse(endpoint)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Invalid endpoint URL",
-			"The provider cannot create the Partite.ai API client because the endpoint URL is invalid: "+err.Error(),
-		)
-		return
-	}
-
 	baseURL, err := url.Parse(endpoint)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -285,7 +274,6 @@ func (p *PartiteAIProvider) Configure(ctx context.Context, req provider.Configur
 		client:     client,
 		baseURL:    baseURL,
 		httpClient: httpClient,
-		graphqlURL: graphqlURL,
 		enterprise: enterprise,
 	}
 	resp.DataSourceData = data
@@ -399,7 +387,6 @@ type providerData struct {
 	client     graphql.Client
 	baseURL    *url.URL
 	httpClient *http.Client
-	graphqlURL *url.URL
 	// enterprise gates the resources that only an enterprise deployment
 	// serves.
 	enterprise bool

@@ -6,8 +6,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -173,7 +173,8 @@ func (r *ParticleArtifactResource) Create(ctx context.Context, req resource.Crea
 	defer f.Close()
 
 	hasher := sha256.New()
-	if _, err := io.Copy(hasher, f); err != nil {
+	size, err := io.Copy(hasher, f)
+	if err != nil {
 		resp.Diagnostics.AddError("Cannot hash source_path", err.Error())
 		return
 	}
@@ -184,13 +185,18 @@ func (r *ParticleArtifactResource) Create(ctx context.Context, req resource.Crea
 		return
 	}
 
-	details, err := pgql.UploadParticleArtifact(ctx, r.GetHTTPClient(), r.GetGraphQLURL(), filepath.Base(srcPath), f)
+	upload, err := pgql.Upload(ctx, r.GetClient(), http.DefaultClient, f, size, &hashHex)
+	if err != nil {
+		handleAPIError(&resp.Diagnostics, err, "upload particle artifact")
+		return
+	}
+	uploadResp, err := pgql.UploadParticleArtifact(ctx, r.GetClient(), upload)
 	if err != nil {
 		handleAPIError(&resp.Diagnostics, err, "upload particle artifact")
 		return
 	}
 
-	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, details)...)
+	resp.Diagnostics.Append(data.MapFromGraphQL(ctx, uploadResp.UploadParticleArtifact)...)
 	if data.SourceHash.ValueString() != hashHex {
 		resp.Diagnostics.AddError("Upload changed the file",
 			fmt.Sprintf("The server's digest %s of the uploaded file is not the file's digest %s.", data.SourceHash.ValueString(), hashHex))

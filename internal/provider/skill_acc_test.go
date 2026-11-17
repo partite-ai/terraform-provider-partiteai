@@ -1,7 +1,9 @@
 package provider
 
 import (
+	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -152,6 +154,44 @@ resource "partiteai_agent" "poet" {
 }
 `,
 			ExpectError: regexp.MustCompile(`both declare the name`),
+		},
+	)
+}
+
+// A file too large for its content to be returned is read back from its
+// download URL, so it shows no drift and imports whole.
+func TestAccSkill_largeFile(t *testing.T) {
+	const largeConfig = `
+resource "partiteai_skill" "large" {
+  name = "acc-large"
+  files = {
+    "SKILL.md" = <<-EOT
+      ---
+      name: large
+      description: Has a large file.
+      ---
+
+      Read large.md.
+    EOT
+    "large.md" = format("%70000s", "end")
+  }
+}
+`
+	accTest(t,
+		resource.TestStep{
+			Config: largeConfig,
+			Check: resource.TestCheckResourceAttrWith("partiteai_skill.large", "files.large.md", func(v string) error {
+				if len(v) != 70000 || !strings.HasSuffix(v, "end") {
+					return fmt.Errorf("large.md is %d bytes, want 70000 ending in end", len(v))
+				}
+				return nil
+			}),
+		},
+		resource.TestStep{
+			Config:            largeConfig,
+			ResourceName:      "partiteai_skill.large",
+			ImportState:       true,
+			ImportStateVerify: true,
 		},
 	)
 }

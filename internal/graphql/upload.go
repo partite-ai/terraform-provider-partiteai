@@ -1,105 +1,58 @@
 package graphql
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"net/http"
-	"net/textproto"
-	"net/url"
+
+	"github.com/Khan/genqlient/graphql"
 )
 
-// FileUpload marks the variable a file in a multipart request fills in. It is
-// sent as null, as the GraphQL multipart request spec asks.
-type FileUpload struct{}
-
-func (FileUpload) MarshalJSON() ([]byte, error) {
-	return []byte("null"), nil
+// Upload sends size bytes of body to an upload made with createUpload, and
+// returns the upload's id, which a mutation takes in place of the content.
+// sha256, the content's digest in lowercase hex, is optional. The URL carries
+// its own authorization, so plain must send no credentials.
+func Upload(ctx context.Context, c graphql.Client, plain *http.Client, body io.Reader, size int64, sha256 *string) (string, error) {
+	resp, err := CreateUpload(ctx, c, int(size), sha256)
+	if err != nil {
+		return "", err
+	}
+	target := resp.CreateUpload
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, target.Url, body)
+	if err != nil {
+		return "", err
+	}
+	req.ContentLength = size
+	for _, h := range target.Headers {
+		req.Header.Add(h.Name, h.Value)
+	}
+	put, err := plain.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("upload: %w", err)
+	}
+	defer put.Body.Close()
+	if put.StatusCode/100 != 2 {
+		msg, _ := io.ReadAll(io.LimitReader(put.Body, 4<<10))
+		return "", fmt.Errorf("upload: HTTP %d: %s", put.StatusCode, msg)
+	}
+	return target.Id, nil
 }
 
-// postWithUpload sends a GraphQL operation as a graphql-multipart-request-spec
-// request. The file fills the variable at variablePath, such as
-// "variables.input.handler.code", and the response's data is decoded into out.
-// genqlient cannot send files, so operations that take one go through here.
-func postWithUpload(
-	ctx context.Context,
-	httpClient *http.Client,
-	graphqlURL *url.URL,
-	operation, operationName string,
-	variables any,
-	variablePath, filename string,
-	file io.Reader,
-	out any,
-) error {
-	var buf bytes.Buffer
-	mw := multipart.NewWriter(&buf)
-
-	opBytes, err := json.Marshal(map[string]any{
-		"query":         operation,
-		"operationName": operationName,
-		"variables":     variables,
-	})
+// Download reads the content at a download URL. The URL carries its own
+// authorization, so plain must send no credentials.
+func Download(ctx context.Context, plain *http.Client, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return fmt.Errorf("marshal operations: %w", err)
+		return nil, err
 	}
-	if err := mw.WriteField("operations", string(opBytes)); err != nil {
-		return fmt.Errorf("write operations field: %w", err)
-	}
-	mapBytes, err := json.Marshal(map[string][]string{"0": {variablePath}})
+	resp, err := plain.Do(req)
 	if err != nil {
-		return fmt.Errorf("marshal map: %w", err)
-	}
-	if err := mw.WriteField("map", string(mapBytes)); err != nil {
-		return fmt.Errorf("write map field: %w", err)
-	}
-
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="0"; filename=%q`, filename))
-	h.Set("Content-Type", "application/octet-stream")
-	filePart, err := mw.CreatePart(h)
-	if err != nil {
-		return fmt.Errorf("create file part: %w", err)
-	}
-	if _, err := io.Copy(filePart, file); err != nil {
-		return fmt.Errorf("copy file body: %w", err)
-	}
-	if err := mw.Close(); err != nil {
-		return fmt.Errorf("close multipart writer: %w", err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, graphqlURL.String(), &buf)
-	if err != nil {
-		return fmt.Errorf("build request: %w", err)
-	}
-	req.Header.Set("Content-Type", mw.FormDataContentType())
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("post: %w", err)
+		return nil, fmt.Errorf("download: %w", err)
 	}
 	defer resp.Body.Close()
-	respBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("read response: %w", err)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("download: HTTP %d", resp.StatusCode)
 	}
-	if resp.StatusCode/100 != 2 {
-		return fmt.Errorf("upload returned HTTP %d: %s", resp.StatusCode, string(respBytes))
-	}
-
-	parsed := struct {
-		Data   any `json:"data"`
-		Errors []struct {
-			Message string `json:"message"`
-		} `json:"errors"`
-	}{Data: out}
-	if err := json.Unmarshal(respBytes, &parsed); err != nil {
-		return fmt.Errorf("unmarshal response: %w (body: %s)", err, string(respBytes))
-	}
-	if len(parsed.Errors) > 0 {
-		return fmt.Errorf("graphql error: %s", parsed.Errors[0].Message)
-	}
-	return nil
+	return io.ReadAll(resp.Body)
 }

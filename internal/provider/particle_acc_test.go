@@ -8,8 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 )
 
-// The artifact resource uploads a bundle over multipart, which is the only
-// place the provider talks to the API outside of genqlient.
+// The artifact resource sends a bundle to an upload URL, outside the GraphQL
+// client.
 const particleArtifactHCL = `
 resource "partiteai_particle_artifact" "test" {
   source_path = "testdata/hello.particle"

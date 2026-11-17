@@ -3,8 +3,8 @@ package provider
 import (
 	"context"
 
+	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -249,15 +249,7 @@ func (r *WebhookDestinationResource) Create(ctx context.Context, req resource.Cr
 		return
 	}
 
-	var created *pgql.WebhookDestinationDetails
-	if handler == nil {
-		createResp, err := pgql.CreateWebhookDestination(ctx, r.GetClient(), &input)
-		if err != nil {
-			handleAPIError(&resp.Diagnostics, err, "create webhook destination")
-			return
-		}
-		created = &createResp.CreateWebhookDestination
-	} else {
+	if handler != nil {
 		writeOnly, diags := readWebhookHandlerWriteOnly(ctx, req.Config)
 		resp.Diagnostics.Append(diags...)
 		config, diags := webhookHandlerConfigMap(ctx, handler)
@@ -265,27 +257,24 @@ func (r *WebhookDestinationResource) Create(ctx context.Context, req resource.Cr
 		if resp.Diagnostics.HasError() {
 			return
 		}
-		handlerInput := pgql.WebhookHandlerCreateInput{Type: handler.Type.ValueString(), Config: pgql.Opt(config)}
+		upload, err := r.uploadHandlerCode(ctx, writeOnly.sourcePath)
+		if err != nil {
+			resp.Diagnostics.AddError("Cannot upload handler.source_path", err.Error())
+			return
+		}
+		handlerInput := pgql.WebhookHandlerCreateInput{Type: handler.Type.ValueString(), CodeUpload: upload, Config: pgql.Opt(config)}
 		if len(writeOnly.secrets) > 0 {
 			handlerInput.Secrets = pgql.Opt(writeOnly.secrets)
 		}
 		input.Handler = pgql.Opt(handlerInput)
-
-		code, err := os.Open(writeOnly.sourcePath)
-		if err != nil {
-			resp.Diagnostics.AddError("Cannot open handler.source_path", err.Error())
-			return
-		}
-		defer code.Close()
-		createResp, err := pgql.CreateWebhookDestinationWithCode(ctx, r.GetHTTPClient(), r.GetGraphQLURL(), &input, filepath.Base(writeOnly.sourcePath), code)
-		if err != nil {
-			handleAPIError(&resp.Diagnostics, err, "create webhook destination")
-			return
-		}
-		created = &createResp.CreateWebhookDestination
+	}
+	createResp, err := pgql.CreateWebhookDestination(ctx, r.GetClient(), &input)
+	if err != nil {
+		handleAPIError(&resp.Diagnostics, err, "create webhook destination")
+		return
 	}
 
-	resp.Diagnostics.Append(r.mapResponse(ctx, &data, created, handler)...)
+	resp.Diagnostics.Append(r.mapResponse(ctx, &data, &createResp.CreateWebhookDestination, handler)...)
 	data.InvokeUrl = types.StringValue(r.baseURL.JoinPath("webhooks", data.ExternalId.ValueString()).String())
 	logResourceOperation(ctx, "created", "webhook_destination", data.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -338,13 +327,11 @@ func (r *WebhookDestinationResource) Update(ctx context.Context, req resource.Up
 		return
 	}
 
-	upload := false
-	var writeOnly webhookHandlerWriteOnly
 	switch {
 	case planHandler == nil && stateHandler != nil:
 		input.Handler = pgql.Optional[pgql.WebhookHandlerUpdateInput]{Set: true, Nil: true}
 	case planHandler != nil:
-		writeOnly, diags = readWebhookHandlerWriteOnly(ctx, req.Config)
+		writeOnly, diags := readWebhookHandlerWriteOnly(ctx, req.Config)
 		resp.Diagnostics.Append(diags...)
 		config, diags := webhookHandlerConfigMap(ctx, planHandler)
 		resp.Diagnostics.Append(diags...)
@@ -354,11 +341,15 @@ func (r *WebhookDestinationResource) Update(ctx context.Context, req resource.Up
 		handlerInput := pgql.WebhookHandlerUpdateInput{Type: pgql.Opt(planHandler.Type.ValueString()), Config: pgql.Opt(config)}
 
 		// A new handler, or one whose code or type changed, is sent its code.
-		upload = stateHandler == nil ||
+		if stateHandler == nil ||
 			!planHandler.SourceHash.Equal(stateHandler.SourceHash) ||
-			!planHandler.Type.Equal(stateHandler.Type)
-		if upload {
-			handlerInput.Code = &pgql.FileUpload{}
+			!planHandler.Type.Equal(stateHandler.Type) {
+			upload, err := r.uploadHandlerCode(ctx, writeOnly.sourcePath)
+			if err != nil {
+				resp.Diagnostics.AddError("Cannot upload handler.source_path", err.Error())
+				return
+			}
+			handlerInput.CodeUpload = pgql.Opt(upload)
 		}
 
 		// Names the server holds that aren't configured are deleted, and new
@@ -376,33 +367,31 @@ func (r *WebhookDestinationResource) Update(ctx context.Context, req resource.Up
 		input.Handler = pgql.Opt(handlerInput)
 	}
 
-	var updated *pgql.WebhookDestinationDetails
-	if upload {
-		code, err := os.Open(writeOnly.sourcePath)
-		if err != nil {
-			resp.Diagnostics.AddError("Cannot open handler.source_path", err.Error())
-			return
-		}
-		defer code.Close()
-		updateResp, err := pgql.ModifyWebhookDestinationWithCode(ctx, r.GetHTTPClient(), r.GetGraphQLURL(), planData.Id.ValueString(), &input, filepath.Base(writeOnly.sourcePath), code)
-		if err != nil {
-			handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "webhook_destination", planData.Id.ValueString())
-			return
-		}
-		updated = &updateResp.UpdateWebhookDestination
-	} else {
-		updateResp, err := pgql.ModifyWebhookDestination(ctx, r.GetClient(), planData.Id.ValueString(), &input)
-		if err != nil {
-			handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "webhook_destination", planData.Id.ValueString())
-			return
-		}
-		updated = &updateResp.UpdateWebhookDestination
+	updateResp, err := pgql.ModifyWebhookDestination(ctx, r.GetClient(), planData.Id.ValueString(), &input)
+	if err != nil {
+		handleAPIErrorWithDetails(&resp.Diagnostics, err, "update", "webhook_destination", planData.Id.ValueString())
+		return
 	}
 
-	resp.Diagnostics.Append(r.mapResponse(ctx, &planData, updated, planHandler)...)
+	resp.Diagnostics.Append(r.mapResponse(ctx, &planData, &updateResp.UpdateWebhookDestination, planHandler)...)
 
 	logResourceOperation(ctx, "updated", "webhook_destination", planData.Id.ValueString())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
+}
+
+// uploadHandlerCode uploads the handler code in the file at path, and returns
+// the upload's id.
+func (r *WebhookDestinationResource) uploadHandlerCode(ctx context.Context, path string) (string, error) {
+	code, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer code.Close()
+	info, err := code.Stat()
+	if err != nil {
+		return "", err
+	}
+	return pgql.Upload(ctx, r.GetClient(), http.DefaultClient, code, info.Size(), nil)
 }
 
 func (r *WebhookDestinationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

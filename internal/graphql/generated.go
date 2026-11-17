@@ -1101,6 +1101,7 @@ func (v *CreateJudgeMetricResponse) GetCreateJudgeMetric() JudgeMetricDetails {
 
 // CreateLinkResponse is returned by CreateLink on success.
 type CreateLinkResponse struct {
+	// Adds a link to the mesh's draft. An input has to reach the agent it starts at.
 	AddMeshLink LinkDetails `json:"addMeshLink"`
 }
 
@@ -1252,6 +1253,61 @@ type CreateSkillResponse struct {
 
 // GetCreateSkill returns CreateSkillResponse.CreateSkill, and is useful for accessing the field via an interface.
 func (v *CreateSkillResponse) GetCreateSkill() SkillDetails { return v.CreateSkill }
+
+// CreateUploadCreateUploadContentUpload includes the requested fields of the GraphQL type ContentUpload.
+// The GraphQL type's documentation follows.
+//
+// Where to send the bytes of an upload. Once they are sent, the upload's id is
+// given in place of the bytes to the mutation that uses them, such as
+// uploadParticleArtifact. An upload no mutation uses is deleted after a day.
+type CreateUploadCreateUploadContentUpload struct {
+	// The upload's id, given to the mutation that uses it.
+	Id string `json:"id"`
+	// PUT exactly the size of bytes asked for here, with headers. The URL carries
+	// its own authorization, so anyone holding it can upload until it expires.
+	Url string `json:"url"`
+	// Headers the PUT must send, besides Content-Length.
+	Headers []CreateUploadCreateUploadContentUploadHeadersHTTPHeader `json:"headers"`
+}
+
+// GetId returns CreateUploadCreateUploadContentUpload.Id, and is useful for accessing the field via an interface.
+func (v *CreateUploadCreateUploadContentUpload) GetId() string { return v.Id }
+
+// GetUrl returns CreateUploadCreateUploadContentUpload.Url, and is useful for accessing the field via an interface.
+func (v *CreateUploadCreateUploadContentUpload) GetUrl() string { return v.Url }
+
+// GetHeaders returns CreateUploadCreateUploadContentUpload.Headers, and is useful for accessing the field via an interface.
+func (v *CreateUploadCreateUploadContentUpload) GetHeaders() []CreateUploadCreateUploadContentUploadHeadersHTTPHeader {
+	return v.Headers
+}
+
+// CreateUploadCreateUploadContentUploadHeadersHTTPHeader includes the requested fields of the GraphQL type HTTPHeader.
+type CreateUploadCreateUploadContentUploadHeadersHTTPHeader struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns CreateUploadCreateUploadContentUploadHeadersHTTPHeader.Name, and is useful for accessing the field via an interface.
+func (v *CreateUploadCreateUploadContentUploadHeadersHTTPHeader) GetName() string { return v.Name }
+
+// GetValue returns CreateUploadCreateUploadContentUploadHeadersHTTPHeader.Value, and is useful for accessing the field via an interface.
+func (v *CreateUploadCreateUploadContentUploadHeadersHTTPHeader) GetValue() string { return v.Value }
+
+// CreateUploadResponse is returned by CreateUpload on success.
+type CreateUploadResponse struct {
+	// Make an upload: a URL to send content to, and an id that a mutation such as
+	// uploadParticleArtifact takes in place of the content. size is the length
+	// of the content in bytes, at most 256 MiB; the mutation that takes the
+	// upload refuses content larger than it allows. sha256, its digest in
+	// lowercase hex, is optional; when given, content with another digest is
+	// refused.
+	CreateUpload CreateUploadCreateUploadContentUpload `json:"createUpload"`
+}
+
+// GetCreateUpload returns CreateUploadResponse.CreateUpload, and is useful for accessing the field via an interface.
+func (v *CreateUploadResponse) GetCreateUpload() CreateUploadCreateUploadContentUpload {
+	return v.CreateUpload
+}
 
 // CreateWebhookDestinationResponse is returned by CreateWebhookDestination on success.
 type CreateWebhookDestinationResponse struct {
@@ -1453,6 +1509,8 @@ func (v *DeleteInputRemoveMeshInputDeleteResult) GetId() string { return v.Id }
 
 // DeleteInputResponse is returned by DeleteInput on success.
 type DeleteInputResponse struct {
+	// Removes an input of the mesh's draft, and every link that no other input
+	// reaches any more.
 	RemoveMeshInput DeleteInputRemoveMeshInputDeleteResult `json:"removeMeshInput"`
 }
 
@@ -1510,6 +1568,8 @@ func (v *DeleteLinkRemoveMeshLinkByStableIDDeleteResult) GetId() string { return
 
 // DeleteLinkResponse is returned by DeleteLink on success.
 type DeleteLinkResponse struct {
+	// Removes a link of a mesh draft, and every link that no input reaches any
+	// more.
 	RemoveMeshLinkByStableID DeleteLinkRemoveMeshLinkByStableIDDeleteResult `json:"removeMeshLinkByStableID"`
 }
 
@@ -4353,9 +4413,9 @@ type MemoryTagSource string
 const (
 	// The value the configuration holds.
 	MemoryTagSourceFixed MemoryTagSource = "FIXED"
-	// The values the tags of the request hold under that key, which are
-	// alternatives. A request with no tag under that key produces nothing for this
-	// mapping.
+	// The values the tags of the request and of its conversation hold under that
+	// key, which are alternatives. A request whose tags and conversation's tags
+	// have nothing under that key produces nothing for this mapping.
 	MemoryTagSourceRequestTag MemoryTagSource = "REQUEST_TAG"
 )
 
@@ -5338,9 +5398,9 @@ type ModifyMemoryStoreResponse struct {
 	// embedding profile can be cleared in the same update that stops the scopes
 	// which needed it.
 	//
-	// The scopes the input removes go first, then the ones it changes, then the
-	// ones it writes, so one call can replace a scope that holds a tag key with
-	// another that holds the same key.
+	// The scopes the input removes are removed first, then the ones it changes
+	// are changed, then the ones it writes are written, so one call can replace a
+	// scope that holds a tag key with another that holds the same key.
 	UpdateMemoryStore MemoryStoreDetails `json:"updateMemoryStore"`
 }
 
@@ -5381,9 +5441,9 @@ type ModifyModelProviderResponse struct {
 	// provider and every profile commit together, so a change that needs both is
 	// one call.
 	//
-	// The profiles the input removes go first, then the ones it changes, then the
-	// ones it writes, so one call can replace a profile that holds a name with
-	// another that holds the same name.
+	// The profiles the input removes are removed first, then the ones it changes
+	// are changed, then the ones it writes are written, so one call can replace a
+	// profile that holds a name with another that holds the same name.
 	UpdateModelProvider ModelProviderDetails `json:"updateModelProvider"`
 }
 
@@ -6047,7 +6107,7 @@ func (v *RouteDetails) GetSegments() []RouteDetailsSegmentsRouteSegment { return
 
 // RouteDetailsSegmentsRouteSegment includes the requested fields of the GraphQL type RouteSegment.
 type RouteDetailsSegmentsRouteSegment struct {
-	// The version this share of the traffic goes to. Null means the draft.
+	// The version this share of the traffic is sent to. Null means the draft.
 	MeshVersionID *string `json:"meshVersionID"`
 	// This segment's share of the traffic, as a percentage. A route's segments add up
 	// to 100.
@@ -6758,15 +6818,23 @@ func (v *SkillDetails) GetUpdatedAt() string { return v.UpdatedAt }
 type SkillDetailsFilesSkillFile struct {
 	// The path of the file within the skill folder.
 	Path string `json:"path"`
-	// Read only when asked for, so listing files does not read their content.
-	Content string `json:"content"`
+	// The content, when it is 64 KiB or less; null for a larger file, which is read
+	// from downloadURL. Read only when asked for, so listing files does not read
+	// their content.
+	Content *string `json:"content"`
+	// A short-lived URL to GET the content from, when it is larger than 64 KiB.
+	// Null for a smaller file.
+	DownloadURL *string `json:"downloadURL"`
 }
 
 // GetPath returns SkillDetailsFilesSkillFile.Path, and is useful for accessing the field via an interface.
 func (v *SkillDetailsFilesSkillFile) GetPath() string { return v.Path }
 
 // GetContent returns SkillDetailsFilesSkillFile.Content, and is useful for accessing the field via an interface.
-func (v *SkillDetailsFilesSkillFile) GetContent() string { return v.Content }
+func (v *SkillDetailsFilesSkillFile) GetContent() *string { return v.Content }
+
+// GetDownloadURL returns SkillDetailsFilesSkillFile.DownloadURL, and is useful for accessing the field via an interface.
+func (v *SkillDetailsFilesSkillFile) GetDownloadURL() *string { return v.DownloadURL }
 
 // What a model returns of its thinking. Each provider accepts its own subset.
 type ThinkingDisplay string
@@ -6896,6 +6964,19 @@ func (v *UpdateMcpConnection) GetBasicCredentials() *McpConnectionBasicCredentia
 // GetHeaderCredentials returns UpdateMcpConnection.HeaderCredentials, and is useful for accessing the field via an interface.
 func (v *UpdateMcpConnection) GetHeaderCredentials() *McpConnectionHeaderCredentials {
 	return v.HeaderCredentials
+}
+
+// UploadParticleArtifactResponse is returned by UploadParticleArtifact on success.
+type UploadParticleArtifactResponse struct {
+	// Store a .particle tarball of at most 256 MiB, given as exactly one of bytes
+	// and upload, the id of an upload holding it. Returns the parsed artifact
+	// with manifest details. The artifact is not yet attached to any install.
+	UploadParticleArtifact ParticleArtifactDetails `json:"uploadParticleArtifact"`
+}
+
+// GetUploadParticleArtifact returns UploadParticleArtifactResponse.UploadParticleArtifact, and is useful for accessing the field via an interface.
+func (v *UploadParticleArtifactResponse) GetUploadParticleArtifact() ParticleArtifactDetails {
+	return v.UploadParticleArtifact
 }
 
 // WebhookDestinationDetails includes the GraphQL fields of WebhookDestination requested by the fragment WebhookDestinationDetails.
@@ -7273,6 +7354,18 @@ type __CreateSkillInput struct {
 
 // GetInput returns __CreateSkillInput.Input, and is useful for accessing the field via an interface.
 func (v *__CreateSkillInput) GetInput() *NewSkill { return v.Input }
+
+// __CreateUploadInput is used internally by genqlient
+type __CreateUploadInput struct {
+	Size   int     `json:"size"`
+	Sha256 *string `json:"sha256,omitempty"`
+}
+
+// GetSize returns __CreateUploadInput.Size, and is useful for accessing the field via an interface.
+func (v *__CreateUploadInput) GetSize() int { return v.Size }
+
+// GetSha256 returns __CreateUploadInput.Sha256, and is useful for accessing the field via an interface.
+func (v *__CreateUploadInput) GetSha256() *string { return v.Sha256 }
 
 // __CreateWebhookDestinationInput is used internally by genqlient
 type __CreateWebhookDestinationInput struct {
@@ -8177,6 +8270,14 @@ type __UnlabelMeshVersionInput struct {
 
 // GetId returns __UnlabelMeshVersionInput.Id, and is useful for accessing the field via an interface.
 func (v *__UnlabelMeshVersionInput) GetId() string { return v.Id }
+
+// __UploadParticleArtifactInput is used internally by genqlient
+type __UploadParticleArtifactInput struct {
+	Upload string `json:"upload"`
+}
+
+// GetUpload returns __UploadParticleArtifactInput.Upload, and is useful for accessing the field via an interface.
+func (v *__UploadParticleArtifactInput) GetUpload() string { return v.Upload }
 
 // The mutation executed by CreateAccessPoint.
 const CreateAccessPoint_Operation = `
@@ -9589,6 +9690,7 @@ fragment SkillDetails on Skill {
 	files {
 		path
 		content
+		downloadURL
 	}
 	createdAt
 	updatedAt
@@ -9609,6 +9711,47 @@ func CreateSkill(
 	}
 
 	data_ = &CreateSkillResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by CreateUpload.
+const CreateUpload_Operation = `
+mutation CreateUpload ($size: Int!, $sha256: String) {
+	createUpload(size: $size, sha256: $sha256) {
+		id
+		url
+		headers {
+			name
+			value
+		}
+	}
+}
+`
+
+func CreateUpload(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	size int,
+	sha256 *string,
+) (data_ *CreateUploadResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "CreateUpload",
+		Query:  CreateUpload_Operation,
+		Variables: &__CreateUploadInput{
+			Size:   size,
+			Sha256: sha256,
+		},
+	}
+
+	data_ = &CreateUploadResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -12441,6 +12584,7 @@ fragment SkillDetails on Skill {
 	files {
 		path
 		content
+		downloadURL
 	}
 	createdAt
 	updatedAt
@@ -12488,6 +12632,7 @@ fragment SkillDetails on Skill {
 	files {
 		path
 		content
+		downloadURL
 	}
 	createdAt
 	updatedAt
@@ -14096,6 +14241,7 @@ fragment SkillDetails on Skill {
 	files {
 		path
 		content
+		downloadURL
 	}
 	createdAt
 	updatedAt
@@ -14382,6 +14528,83 @@ func UnlabelMeshVersion(
 	}
 
 	data_ = &UnlabelMeshVersionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The mutation executed by UploadParticleArtifact.
+const UploadParticleArtifact_Operation = `
+mutation UploadParticleArtifact ($upload: ID!) {
+	uploadParticleArtifact(upload: $upload) {
+		... ParticleArtifactDetails
+	}
+}
+fragment ParticleArtifactDetails on ParticleArtifact {
+	id
+	name
+	version
+	sha256
+	description
+	capabilities {
+		http {
+			allowedHosts
+		}
+	}
+	credentials {
+		name
+		hosts
+		required
+		methods {
+			name
+			type
+			description
+			apiKeyLocation {
+				kind
+				name
+				scheme
+			}
+			oauth2 {
+				authorizationUrl
+				tokenUrl
+				deviceAuthUrl
+				scopes
+				flows
+			}
+			signingKey {
+				algorithm
+			}
+		}
+	}
+	tools {
+		name
+		description
+		inputSchema
+	}
+	createdAt
+}
+`
+
+func UploadParticleArtifact(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	upload string,
+) (data_ *UploadParticleArtifactResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "UploadParticleArtifact",
+		Query:  UploadParticleArtifact_Operation,
+		Variables: &__UploadParticleArtifactInput{
+			Upload: upload,
+		},
+	}
+
+	data_ = &UploadParticleArtifactResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

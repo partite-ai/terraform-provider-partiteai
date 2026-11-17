@@ -3,10 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"path"
 	"sort"
 	"strings"
 
+	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -28,7 +30,8 @@ type SkillBaseModel struct {
 	UpdatedAt    timetypes.RFC3339 `tfsdk:"updated_at"`
 }
 
-// MapFromGraphQL maps GraphQL response to the base model.
+// MapFromGraphQL maps GraphQL response to the base model. A file too large
+// for its content to be returned is read from its download URL.
 func (m *SkillBaseModel) MapFromGraphQL(ctx context.Context, s *pgql.SkillDetails) diag.Diagnostics {
 	var diags diag.Diagnostics
 
@@ -45,7 +48,20 @@ func (m *SkillBaseModel) MapFromGraphQL(ctx context.Context, s *pgql.SkillDetail
 
 	files := make(map[string]string, len(s.Files))
 	for _, f := range s.Files {
-		files[f.Path] = f.Content
+		switch {
+		case f.Content != nil:
+			files[f.Path] = *f.Content
+		case f.DownloadURL != nil:
+			content, err := pgql.Download(ctx, http.DefaultClient, *f.DownloadURL)
+			if err != nil {
+				diags.AddError("Cannot read skill file", fmt.Sprintf("%s: %s", f.Path, err))
+				return diags
+			}
+			files[f.Path] = string(content)
+		default:
+			diags.AddError("Cannot read skill file", fmt.Sprintf("the server returned no content for %s", f.Path))
+			return diags
+		}
 	}
 	filesValue, d := types.MapValueFrom(ctx, types.StringType, files)
 	diags.Append(d...)
@@ -54,9 +70,10 @@ func (m *SkillBaseModel) MapFromGraphQL(ctx context.Context, s *pgql.SkillDetail
 	return diags
 }
 
-// skillSourceFiles turns the files map of a configuration into the files of a
-// skill folder, in path order so a request is the same each time.
-func skillSourceFiles(ctx context.Context, files types.Map) ([]pgql.SkillSourceFile, diag.Diagnostics) {
+// skillSourceFiles uploads each file of the files map of a configuration, and
+// returns them as the files of a skill folder, in path order so a request is
+// the same each time.
+func skillSourceFiles(ctx context.Context, client graphql.Client, files types.Map) ([]pgql.SkillSourceFile, diag.Diagnostics) {
 	var byPath map[string]string
 	diags := files.ElementsAs(ctx, &byPath, false)
 	if diags.HasError() {
@@ -69,7 +86,13 @@ func skillSourceFiles(ctx context.Context, files types.Map) ([]pgql.SkillSourceF
 	sort.Strings(paths)
 	out := make([]pgql.SkillSourceFile, 0, len(paths))
 	for _, p := range paths {
-		out = append(out, pgql.SkillSourceFile{Path: p, Text: byPath[p]})
+		content := byPath[p]
+		upload, err := pgql.Upload(ctx, client, http.DefaultClient, strings.NewReader(content), int64(len(content)), nil)
+		if err != nil {
+			diags.AddError("Cannot upload skill file", fmt.Sprintf("%s: %s", p, err))
+			return nil, diags
+		}
+		out = append(out, pgql.SkillSourceFile{Path: p, ContentUpload: upload})
 	}
 	return out, diags
 }
