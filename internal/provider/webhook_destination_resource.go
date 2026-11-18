@@ -91,14 +91,13 @@ func webhookHandlerResourceSchema() schema.SingleNestedAttribute {
 		Optional: true,
 		Attributes: map[string]schema.Attribute{
 			"type": schema.StringAttribute{
-				MarkdownDescription: "`JAVASCRIPT` or `WASM_COMPONENT`.",
+				MarkdownDescription: "`JAVASCRIPT`, the only type.",
 				Required:            true,
-				Validators:          []validator.String{stringvalidator.OneOf("JAVASCRIPT", "WASM_COMPONENT")},
+				Validators:          []validator.String{stringvalidator.OneOf("JAVASCRIPT")},
 			},
 			"source_path": schema.StringAttribute{
-				MarkdownDescription: "Path to the handler's code: an ES module for `JAVASCRIPT`, or a wasm " +
-					"component for `WASM_COMPONENT`. It is not kept in state: `source_hash` tracks the file's " +
-					"content, so moving the file changes nothing.",
+				MarkdownDescription: "Path to the handler's code, an ES module. It is not kept in state: " +
+					"`source_hash` tracks the file's content, so moving the file changes nothing.",
 				Required:  true,
 				WriteOnly: true,
 			},

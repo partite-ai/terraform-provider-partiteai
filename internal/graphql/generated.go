@@ -7072,13 +7072,11 @@ func (v *WebhookDestinationDetailsMesh) GetId() string { return v.Id }
 type WebhookHandlerType string
 
 const (
-	WebhookHandlerTypeJavascript    WebhookHandlerType = "JAVASCRIPT"
-	WebhookHandlerTypeWasmComponent WebhookHandlerType = "WASM_COMPONENT"
+	WebhookHandlerTypeJavascript WebhookHandlerType = "JAVASCRIPT"
 )
 
 var AllWebhookHandlerType = []WebhookHandlerType{
 	WebhookHandlerTypeJavascript,
-	WebhookHandlerTypeWasmComponent,
 }
 
 // WorkspaceDetails includes the GraphQL fields of Workspace requested by the fragment WorkspaceDetails.

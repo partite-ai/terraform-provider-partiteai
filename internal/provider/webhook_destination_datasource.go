@@ -62,7 +62,7 @@ func (d *WebhookDestinationDataSource) Schema(ctx context.Context, req datasourc
 				Computed:            true,
 				Attributes: map[string]schema.Attribute{
 					"type": schema.StringAttribute{
-						MarkdownDescription: "`JAVASCRIPT` or `WASM_COMPONENT`.",
+						MarkdownDescription: "`JAVASCRIPT`, the only type.",
 						Computed:            true,
 					},
 					"source_hash": schema.StringAttribute{

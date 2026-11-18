@@ -40,8 +40,8 @@ Webhook Destination resource
 
 Required:
 
-- `source_path` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Path to the handler's code: an ES module for `JAVASCRIPT`, or a wasm component for `WASM_COMPONENT`. It is not kept in state: `source_hash` tracks the file's content, so moving the file changes nothing.
-- `type` (String) `JAVASCRIPT` or `WASM_COMPONENT`.
+- `source_path` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Path to the handler's code, an ES module. It is not kept in state: `source_hash` tracks the file's content, so moving the file changes nothing.
+- `type` (String) `JAVASCRIPT`, the only type.
 
 Optional:
 

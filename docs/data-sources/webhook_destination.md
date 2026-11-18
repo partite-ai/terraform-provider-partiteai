@@ -40,4 +40,4 @@ Read-Only:
 - `config` (Map of String) Settings the handler reads with `config.get`.
 - `secret_names` (Set of String) The names of the handler's secrets. Their values are never returned.
 - `source_hash` (String) SHA-256 hex digest of the code.
-- `type` (String) `JAVASCRIPT` or `WASM_COMPONENT`.
+- `type` (String) `JAVASCRIPT`, the only type.
