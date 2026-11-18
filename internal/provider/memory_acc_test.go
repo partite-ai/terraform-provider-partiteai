@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -128,6 +129,28 @@ resource "partiteai_memory_interaction_profile" "test" {
   ]
 }
 `
+
+func TestAccMemoryStore_intervalUnderAMinuteIsRefused(t *testing.T) {
+	accTest(t, resource.TestStep{
+		Config: embeddingProfileHCL + `
+resource "partiteai_memory_store" "test" {
+  name                     = "acc-memory-store"
+  embedding_profile_id     = partiteai_embedding_profile.test.id
+  extract_interval_seconds = 59
+}
+`,
+		ExpectError: regexp.MustCompile(`(?s)extract_interval_seconds.*at least 60`),
+	}, resource.TestStep{
+		Config: embeddingProfileHCL + `
+resource "partiteai_memory_store" "test" {
+  name                         = "acc-memory-store"
+  embedding_profile_id         = partiteai_embedding_profile.test.id
+  consolidate_interval_seconds = 59
+}
+`,
+		ExpectError: regexp.MustCompile(`(?s)consolidate_interval_seconds.*at least 60`),
+	})
+}
 
 func TestAccMemoryInteractionProfile_basic(t *testing.T) {
 	accTest(t,

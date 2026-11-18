@@ -21,10 +21,10 @@ A memory store: what a mesh remembers, and the scopes that divide it.
 
 ### Optional
 
-- `consolidate_interval_seconds` (Number) How often the facts of this store are queued into consolidation passes
+- `consolidate_interval_seconds` (Number) How often the facts of this store are queued into consolidation passes, at least 60 seconds
 - `description` (String) Resource description
 - `embedding_profile_id` (String) ID of the embedding profile this store writes its vectors with. A store without one is not embedded, and a recall over it searches words only. A store with any scope that extracts or consolidates needs one.
-- `extract_interval_seconds` (Number) How often the turns of this store are planned into extraction work
+- `extract_interval_seconds` (Number) How often the turns of this store are planned into extraction work, at least 60 seconds
 - `index_conversation_messages` (Boolean) Index and embed those turns as well as keeping them, so a recall can find one by its words or its meaning
 - `ingest_conversations` (Boolean) Write the turns of a conversation into this store as they are said
 - `scopes` (Attributes List) The scopes of this store. A scope decides which documents are read and what tag the records it produces carry. (see [below for nested schema](#nestedatt--scopes))

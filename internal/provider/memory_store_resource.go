@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -63,16 +64,18 @@ func (r *MemoryStoreResource) Schema(ctx context.Context, req resource.SchemaReq
 				Optional:            true,
 			},
 			"extract_interval_seconds": schema.Int64Attribute{
-				MarkdownDescription: "How often the turns of this store are planned into extraction work",
+				MarkdownDescription: "How often the turns of this store are planned into extraction work, at least 60 seconds",
 				Optional:            true,
 				Computed:            true,
 				Default:             int64default.StaticInt64(300),
+				Validators:          []validator.Int64{int64validator.AtLeast(60)},
 			},
 			"consolidate_interval_seconds": schema.Int64Attribute{
-				MarkdownDescription: "How often the facts of this store are queued into consolidation passes",
+				MarkdownDescription: "How often the facts of this store are queued into consolidation passes, at least 60 seconds",
 				Optional:            true,
 				Computed:            true,
 				Default:             int64default.StaticInt64(28800),
+				Validators:          []validator.Int64{int64validator.AtLeast(60)},
 			},
 			"scopes": schema.ListNestedAttribute{
 				MarkdownDescription: "The scopes of this store. A scope decides which documents are read and what tag the records it produces carry.",
